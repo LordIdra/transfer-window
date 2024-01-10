@@ -1,0 +1,3 @@
+pub const GRAVITATIONAL_CONSTANT: f64 = 6.674e-11;
+pub const BURN_TIME_STEP: f64 = 0.1;
+pub const BURN_ACCELERATION_MAGNITUDE: f64 = 10.0;

@@ -1,0 +1,22 @@
+[package]
+name = "transfer-window"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nalgebra-glm = "0.18.0"
+
+[profile.dev]
+opt-level=1
+debug=2
+incremental=true
+
+[profile.bench]
+opt-level=3
+debug=2
+incremental=true
+
+[profile.release]
+opt-level=3
+debug=0
+incremental=true
