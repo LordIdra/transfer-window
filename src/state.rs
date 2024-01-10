@@ -1,4 +1,4 @@
-use std::collections::{HashSet, hash_set::Intersection};
+use std::collections::HashSet;
 
 use crate::{storage::{entity_allocator::{EntityAllocator, Entity}, component_storage::ComponentStorage, entity_builder::EntityBuilder}, components::{name_component::NameComponent, ComponentType}};
 
