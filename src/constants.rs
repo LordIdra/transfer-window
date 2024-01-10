@@ -1,3 +1,4 @@
 pub const GRAVITATIONAL_CONSTANT: f64 = 6.674e-11;
+pub const MAX_KEPLER_SOLVER_RECURSIONS: usize = 5;
 pub const BURN_TIME_STEP: f64 = 0.1;
 pub const BURN_ACCELERATION_MAGNITUDE: f64 = 10.0;

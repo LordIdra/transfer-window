@@ -83,7 +83,6 @@ mod test {
         let expected_time = duration;
         let expected_position = vec2(0.5 * constant_acceleration.magnitude() * duration.powi(2), 0.0);
         let expected_velocity = vec2(constant_acceleration.magnitude() * duration, 0.0);
-        println!("{} {}", expected_position, tester.get_position());
         assert!((tester.get_time() - expected_time).abs() < 1.0e-1);
         assert!((tester.get_position() - expected_position).magnitude() < 2.0);
         assert!((tester.get_velocity() - expected_velocity).magnitude() < 1.0e-2);

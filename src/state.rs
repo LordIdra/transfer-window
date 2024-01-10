@@ -1,10 +1,11 @@
 use std::collections::HashSet;
 
-use crate::{storage::{entity_allocator::{EntityAllocator, Entity}, component_storage::ComponentStorage, entity_builder::EntityBuilder}, components::{name_component::NameComponent, ComponentType}};
+use crate::{storage::{entity_allocator::{EntityAllocator, Entity}, component_storage::ComponentStorage, entity_builder::EntityBuilder}, components::{name_component::NameComponent, ComponentType, physics_component::PhysicsComponent}};
 
 pub struct State {
     entity_allocator: EntityAllocator,
     name_components: ComponentStorage<NameComponent>,
+    physics_components: ComponentStorage<PhysicsComponent>,
 }
 
 impl State {
@@ -12,6 +13,7 @@ impl State {
         Self {
             entity_allocator: EntityAllocator::new(),
             name_components: ComponentStorage::new(),
+            physics_components: ComponentStorage::new(),
         }
     }
 
@@ -20,6 +22,7 @@ impl State {
         while let Some(component_type) = component_types.pop() {
             let other_entities = match component_type {
                 ComponentType::NameComponent => self.name_components.get_entities(),
+                ComponentType::TrajectoryComponent => self.physics_components.get_entities(),
             };
             entities.retain(|entity| other_entities.contains(entity));
         }
@@ -29,9 +32,11 @@ impl State {
     pub fn allocate(&mut self, entity_builder: EntityBuilder) -> Entity {
         let EntityBuilder {
             name_component,
+            physics_component,
         } = entity_builder;
         let entity = self.entity_allocator.allocate();
         self.name_components.set(entity, name_component);
+        self.physics_components.set(entity, physics_component);
         entity
     }
 
@@ -47,6 +52,14 @@ impl State {
     pub fn get_name_component(&self, entity: Entity) -> &NameComponent {
         self.name_components.get(entity)
     }
+
+    pub fn get_physics_component_mut(&mut self, entity: Entity) -> &mut PhysicsComponent {
+        self.physics_components.get_mut(entity)
+    }
+
+    pub fn get_physics_component(&self, entity: Entity) -> &PhysicsComponent {
+        self.physics_components.get(entity)
+    }
 }
 
 #[cfg(test)]
@@ -58,7 +71,7 @@ mod test {
     use super::State;
 
     #[test]
-    fn test() {
+    fn test_components() {
         let mut state = State::new();
         let builder1 = EntityBuilder::new().with_name_component(NameComponent::new("oh no".to_string()));
         let builder2 = EntityBuilder::new();
