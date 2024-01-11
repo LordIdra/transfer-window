@@ -1,39 +1,24 @@
-use nalgebra_glm::DVec2;
-
 use self::segment::Segment;
 
 #[cfg(test)]
 mod brute_force_tester;
-mod burn;
-mod orbit;
-mod segment;
+pub mod burn;
+pub mod orbit;
+pub mod segment;
 
-pub struct Trajectory {
+/// Must have MassComponent, cannot have StationaryComponent
+pub struct TrajectoryComponent {
     current_index: usize,
     segments: Vec<Option<Segment>>
 }
 
-impl Trajectory {
+impl TrajectoryComponent {
     pub fn new() -> Self {
         Self { current_index: 0, segments: vec![] }
     }
+}
 
-    pub fn get_current_position(&self) -> DVec2 {
-        self.get_current_segment().get_current_position()
-    }
-
-    pub fn get_current_velocity(&self) -> DVec2 {
-        self.get_current_segment().get_current_velocity()
-    }
-
-    pub fn get_position_at_time(&self) -> DVec2 {
-        self.get_current_segment().get_current_position()
-    }
-
-    pub fn get_velocity_at_time(&self) -> DVec2 {
-        self.get_current_segment().get_current_velocity()
-    }
-
+impl TrajectoryComponent {
     pub fn get_segment_at_time(&self, time: f64) -> &Segment {
         for segment in &self.segments {
             if let Some(segment) = segment {
@@ -50,7 +35,23 @@ impl Trajectory {
             .get(self.current_index as usize)
             .expect("Current segment does not exist")
             .as_ref()
-            .unwrap() // current index should never be None
+            .unwrap() // current segment value should never be None
+    }
+
+    pub fn get_end_segment(&self) -> &Segment {
+        self.segments
+            .last()
+            .expect("End segment does not exist")
+            .as_ref()
+            .unwrap() // end segment value should never be None
+    }
+
+    pub fn get_end_segment_mut(&mut self) -> &mut Segment {
+        self.segments
+            .last_mut()
+            .expect("End segment does not exist")
+            .as_mut()
+            .unwrap() // end segment value should never be None
     }
 
     fn get_current_segment_mut(&mut self) -> &mut Segment {
@@ -58,7 +59,7 @@ impl Trajectory {
             .get_mut(self.current_index as usize)
             .expect("Current segment does not exist")
             .as_mut()
-            .unwrap() // current index should never be None
+            .unwrap() // current segment value should never be None
     }
 
     pub fn add_segment(&mut self, segment: Segment) {
@@ -78,14 +79,14 @@ impl Trajectory {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::storage::entity_allocator::Entity;
+    use crate::{storage::entity_allocator::Entity, components::trajectory_component::TrajectoryComponent};
 
-    use super::{Trajectory, segment::Segment, orbit::Orbit};
+    use super::{segment::Segment, orbit::Orbit};
 
 
     #[test]
     pub fn test() {
-        let mut trajectory = Trajectory::new();
+        let mut trajectory = TrajectoryComponent::new();
 
         let orbit_1 = {
             let parent = Entity::mock();

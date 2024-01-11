@@ -1,0 +1,38 @@
+{
+    "entities": {
+        "sun": {
+            "mass": 2948434,
+            "position": [0, 0]
+        },
+        "earth": {
+            "parent": "sun",
+            "mass": 2948,
+            "position": [0, 3898],
+            "velocity": [99, 0]
+        },
+        "moon": {
+            "parent": "earth",
+            "mass": 248,
+            "position": [0, 34],
+            "velocity": [4, 0]
+        }
+    },
+
+    "spacecraft": {
+        "parent": "earth",
+        "mass": 3,
+        "position": [0, 5],
+        "velocity": [8, 0]
+    },
+
+    "expected": [
+        {
+            "time": 89498,
+            "new_parent": "moon"
+        },
+        {
+            "time": 93838,
+            "new_parent": "earth"
+        }
+    ]
+}

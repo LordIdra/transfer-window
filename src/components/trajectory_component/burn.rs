@@ -126,7 +126,7 @@ impl Burn {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::physics_component::trajectory::{brute_force_tester::BruteForceTester, burn::Burn}, storage::entity_allocator::Entity, constants::{BURN_ACCELERATION_MAGNITUDE, BURN_TIME_STEP}};
+    use crate::{components::trajectory_component::{brute_force_tester::BruteForceTester, burn::Burn}, storage::entity_allocator::Entity, constants::{BURN_ACCELERATION_MAGNITUDE, BURN_TIME_STEP}};
 
     #[test]
     pub fn test() {
