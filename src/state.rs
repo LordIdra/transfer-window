@@ -110,6 +110,7 @@ impl State {
     pub fn get_trajectory_component(&self, entity: Entity) -> &TrajectoryComponent {
         self.trajectory_components.get(entity)
     }
+    
 }
 
 #[cfg(test)]

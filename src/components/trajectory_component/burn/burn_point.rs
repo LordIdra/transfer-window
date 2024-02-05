@@ -2,7 +2,7 @@ use nalgebra_glm::DVec2;
 
 use crate::constants::GRAVITATIONAL_CONSTANT;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct BurnPoint {
     parent_mass: f64,
     time: f64,

@@ -6,6 +6,7 @@ use self::burn_point::BurnPoint;
 
 mod burn_point;
 
+#[derive(Debug)]
 pub struct Burn {
     entity: Entity,
     parent: Entity,

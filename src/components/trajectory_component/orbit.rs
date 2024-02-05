@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::DVec2;
 
-use crate::storage::entity_allocator::Entity;
+use crate::{storage::entity_allocator::Entity, util::normalize_angle};
 
 use self::{orbit_point::OrbitPoint, orbit_direction::OrbitDirection, conic::{Conic, new_conic}, conic_type::ConicType};
 
@@ -12,6 +12,7 @@ mod orbit_direction;
 mod orbit_point;
 mod scary_math;
 
+#[derive(Debug)]
 pub struct Orbit {
     parent: Entity,
     conic: Box<dyn Conic>,
@@ -47,27 +48,18 @@ impl Orbit {
             return 2.0 * PI;
         }
 
-        let mut adjusted_end_theta = self.end_point.get_theta() % (2.0 * PI);
-        if adjusted_end_theta < 0.0 {
-            adjusted_end_theta += 2.0 * PI;
-        }
-        let mut adjusted_current_theta = self.current_point.get_theta() % (2.0 * PI);
-        if adjusted_current_theta < 0.0 {
-            adjusted_current_theta += 2.0 * PI;
-        }
-
-        let mut remaining_angle = adjusted_end_theta - adjusted_current_theta;
-        if let OrbitDirection::Clockwise = self.conic.get_direction() {
-            if remaining_angle > 0.0 {
-                remaining_angle -= 2.0 * PI
+        let mut end_theta = normalize_angle(self.end_point.get_theta());
+        let current_theta = normalize_angle(self.current_point.get_theta());
+        if let OrbitDirection::AntiClockwise = self.conic.get_direction() {
+            if end_theta < current_theta {
+                end_theta += 2.0 * PI;
             }
-            remaining_angle
         } else {
-            if remaining_angle < 0.0 {
-                remaining_angle += 2.0 * PI
+            if end_theta > current_theta {
+                end_theta -= 2.0 * PI;
             }
-            remaining_angle
         }
+        end_theta - current_theta
     }
 
     pub fn get_remaining_orbits(&self) -> i32 {

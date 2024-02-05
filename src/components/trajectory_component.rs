@@ -7,9 +7,10 @@ pub mod orbit;
 pub mod segment;
 
 /// Must have MassComponent, cannot have StationaryComponent
+#[derive(Debug)]
 pub struct TrajectoryComponent {
     current_index: usize,
-    segments: Vec<Option<Segment>>
+    segments: Vec<Option<Segment>>,
 }
 
 impl TrajectoryComponent {

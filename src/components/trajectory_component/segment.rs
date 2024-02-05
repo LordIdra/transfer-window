@@ -4,6 +4,7 @@ use crate::storage::entity_allocator::Entity;
 
 use super::{burn::Burn, orbit::Orbit};
 
+#[derive(Debug)]
 pub enum Segment {
     Orbit(Orbit),
     Burn(Burn),
