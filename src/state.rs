@@ -34,9 +34,9 @@ impl State {
         }
     }
 
-    pub fn get_entities(&self, mut component_types: Vec<ComponentType>) -> HashSet<Entity> {
+    pub fn get_entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
         let mut entities = self.entity_allocator.get_entities().clone();
-        while let Some(component_type) = component_types.pop() {
+        while let Some(component_type) = with_component_types.pop() {
             let other_entities = match component_type {
                 ComponentType::MassComponent => self.mass_components.get_entities(),
                 ComponentType::NameComponent => self.name_components.get_entities(),

@@ -1,18 +1,46 @@
-use std::{collections::HashMap, fs};
+use std::{collections::{HashMap, VecDeque}, fs};
 
 use nalgebra_glm::vec2;
 use serde::Deserialize;
 
 use crate::{components::{mass_component::MassComponent, name_component::NameComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, state::State, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
 
+use super::util::EncounterType;
+
 #[derive(Deserialize)]
-struct MetaData {
+struct CaseMetaData {
     end_time: f64,
     time_step: f64,
 }
 
-#[derive(Deserialize)]
-struct ObjectData {
+#[derive(Debug, Deserialize)]
+pub struct CaseEncounter {
+    encounter_type: EncounterType,
+    object: String,
+    new_parent: String,
+    time: f64,
+}
+
+impl CaseEncounter {
+    pub fn get_type(&self) -> EncounterType {
+        self.encounter_type.clone()
+    }
+
+    pub fn get_object(&self) -> String {
+        self.object.clone()
+    }
+
+    pub fn get_new_parent(&self) -> String {
+        self.new_parent.clone()
+    }
+
+    pub fn get_time(&self) -> f64 {
+        self.time
+    }
+}
+
+#[derive(Clone, Deserialize)]
+struct CaseObjectData {
     orbitable: bool,
     mass: f64,
     position: [f64; 2],
@@ -20,74 +48,76 @@ struct ObjectData {
     parent_name: Option<String>,
 }
 
-#[derive(Deserialize)]
-enum EncounterType {
-    Entrance,
-    Exit,
-}
-
-#[derive(Deserialize)]
-struct Encounter {
-    encounter_type: EncounterType,
-    object: String,
-    new_parent: String,
-    time: f64,
-}
-
 struct Case {
-    metadata: MetaData,
-    object_data: Vec<ObjectData>,
-    encounters: Vec<Encounter>,
+    metadata: CaseMetaData,
+    object_data: Vec<CaseObjectData>,
+    encounters: Vec<CaseEncounter>,
 }
 
-fn load_case_metadata(name: &String) -> MetaData {
-    let file = fs::read_to_string("cases/".to_string() + name.as_str() + "/metadata.json")
+fn load_case_metadata(name: &str) -> CaseMetaData {
+    let file = fs::read_to_string("resources/prediction-test-cases/".to_string() + name + "/metadata.json")
         .expect(format!("Failed to load metadata {}", name).as_str());
     serde_json::from_str(file.as_str())
         .expect(format!("Failed to deserialize metadata {}", name).as_str())
 }
 
-fn load_case_object_data(name: &String, metadata: &MetaData) -> HashMap<String, ObjectData> {
-    let file = fs::read_to_string("cases/".to_string() + name.as_str() + "/objects.json")
+fn load_case_object_data(name: &str) -> HashMap<String, CaseObjectData> {
+    let file = fs::read_to_string("resources/prediction-test-cases/".to_string() + name + "/objects.json")
         .expect(format!("Failed to load objects {}", name).as_str());
     serde_json::from_str(file.as_str())
         .expect(format!("Failed to deserialize objects {}", name).as_str())
 }
 
-fn load_case_encounters(name: &String) -> Vec<Encounter> {
-    let file = fs::read_to_string("cases/".to_string() + name.as_str() + "/encounters.json")
+fn load_case_encounters(name: &str) -> VecDeque<CaseEncounter> {
+    let file = fs::read_to_string("resources/prediction-test-cases/".to_string() + name + "/encounters.json")
     .expect(format!("Failed to load encounters {}", name).as_str());
     serde_json::from_str(file.as_str())
         .expect(format!("Failed to deserialize objects {}", name).as_str())
 }
 
-fn load_case(name: &String) -> (State, Vec<Encounter>, f64) {
+pub fn load_case(name: &str) -> (State, VecDeque<CaseEncounter>, Entity, f64, f64) {
     let metadata = load_case_metadata(name);
-    let object_data = load_case_object_data(name, &metadata);
+    let mut object_data = load_case_object_data(name);
     let encounters = load_case_encounters(name);
 
     let mut state = State::mock();
-    let changed = true;
     let mut object_entities: HashMap<String, Entity> = HashMap::new();
-    while changed {
-        for (name, data) in &object_data {
+    let orbitable_entity = None;
+    while !object_data.is_empty() {
+        for (name, data) in object_data.clone() {
             let mut entity_builder = EntityBuilder::new()
                 .with_name_component(NameComponent::new(name.clone()))
                 .with_mass_component(MassComponent::new(data.mass));
+
             if data.velocity.is_none() && data.parent_name.is_none() {
-                entity_builder = entity_builder.with_stationary_component(StationaryComponent::new(vec2(data.position[0], data.position[1])));
-                object_entities.insert(name.clone(), state.allocate(entity_builder));
+                let position = vec2(data.position[0], data.position[1]);
+                entity_builder = entity_builder.with_stationary_component(StationaryComponent::new(position));
+
             } else if data.velocity.is_some() && data.parent_name.is_some() {
-                if object_entities.get(data.parent_name.unwrap()) {
-                    let trajectory_component = TrajectoryComponent::new();
-                    trajectory_component.add_segment(Segment::Orbit(Orbit::new(parent, parent_mass, position, velocity, time)))
-                    entity_builder = entity_builder.with_trajectory_component();
+                if let Some(parent) = object_entities.get(data.parent_name.as_ref().unwrap()) {
+                    let parent_mass = state.get_mass_component(*parent).get_mass();
+                    let position = vec2(data.position[0], data.position[1]);
+                    let velocity = vec2(data.velocity.unwrap()[0], data.velocity.unwrap()[1]);
+                    let mut trajectory_component = TrajectoryComponent::new();
+                    trajectory_component.add_segment(Segment::Orbit(Orbit::new(*parent, parent_mass, position, velocity, 0.0)));
+                    entity_builder = entity_builder.with_trajectory_component(trajectory_component);
                 }
+
             } else {
                 panic!("Object {} has only one of velocity and parent_name, ", name);
             }
+
+            let entity = state.allocate(entity_builder);
+            if data.orbitable {
+                match orbitable_entity {
+                    Some(_) => todo!(),
+                    None => todo!(),
+                }
+            }
+            object_entities.insert(name.clone(), entity);
+            object_data.remove(&name);
         }
     }
 
-    (state, metadata.end_time)
+    (state, encounters, metadata.end_time, metadata.time_step)
 }
