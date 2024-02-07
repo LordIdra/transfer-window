@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use crate::{storage::{entity_allocator::{EntityAllocator, Entity}, component_storage::ComponentStorage, entity_builder::EntityBuilder}, components::{name_component::NameComponent, ComponentType, mass_component::MassComponent, orbitable_component::OrbitableComponent, trajectory_component::TrajectoryComponent, stationary_component::StationaryComponent}};
 
+#[derive(Debug)]
 pub struct State {
     entity_allocator: EntityAllocator,
     mass_components: ComponentStorage<MassComponent>,

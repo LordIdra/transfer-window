@@ -1,6 +1,7 @@
 use nalgebra_glm::DVec2;
 
 /// Must have MassComponent and cannot have TrajectoryComponent
+#[derive(Debug)]
 pub struct StationaryComponent {
     position: DVec2,
 }

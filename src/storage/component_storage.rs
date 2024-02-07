@@ -2,11 +2,13 @@ use std::collections::HashSet;
 
 use super::entity_allocator::Entity;
 
+#[derive(Debug)]
 struct StorageEntry<T> {
     value: T,
     generation: usize,
 }
 
+#[derive(Debug)]
 pub struct ComponentStorage<T> {
     entities: HashSet<Entity>,
     entries: Vec<Option<StorageEntry<T>>>,

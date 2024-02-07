@@ -3,7 +3,7 @@ use std::{collections::{HashMap, VecDeque}, fs};
 use nalgebra_glm::vec2;
 use serde::Deserialize;
 
-use crate::{components::{mass_component::MassComponent, name_component::NameComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, state::State, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
+use crate::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, state::State, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
 
 use super::util::EncounterType;
 
@@ -82,7 +82,7 @@ pub fn load_case(name: &str) -> (State, VecDeque<CaseEncounter>, Entity, f64, f6
 
     let mut state = State::mock();
     let mut object_entities: HashMap<String, Entity> = HashMap::new();
-    let orbitable_entity = None;
+    let mut non_orbitable_entity = None;
     while !object_data.is_empty() {
         for (name, data) in object_data.clone() {
             let mut entity_builder = EntityBuilder::new()
@@ -101,23 +101,31 @@ pub fn load_case(name: &str) -> (State, VecDeque<CaseEncounter>, Entity, f64, f6
                     let mut trajectory_component = TrajectoryComponent::new();
                     trajectory_component.add_segment(Segment::Orbit(Orbit::new(*parent, parent_mass, position, velocity, 0.0)));
                     entity_builder = entity_builder.with_trajectory_component(trajectory_component);
+                } else {
+                    continue; // the object's parent is not added yet
                 }
 
             } else {
                 panic!("Object {} has only one of velocity and parent_name, ", name);
             }
 
-            let entity = state.allocate(entity_builder);
             if data.orbitable {
-                match orbitable_entity {
-                    Some(_) => todo!(),
-                    None => todo!(),
+                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new());
+            }
+
+            let entity = state.allocate(entity_builder);
+            if !data.orbitable {
+                match non_orbitable_entity {
+                    Some(_) => panic!("Found multiple non-orbitable entities"),
+                    None => non_orbitable_entity = Some(entity),
                 }
             }
+
             object_entities.insert(name.clone(), entity);
             object_data.remove(&name);
         }
     }
+    let non_orbitable_entity = non_orbitable_entity.expect("Case does not contain a non-orbitable entity");
 
-    (state, encounters, metadata.end_time, metadata.time_step)
+    (state, encounters, non_orbitable_entity, metadata.end_time, metadata.time_step)
 }

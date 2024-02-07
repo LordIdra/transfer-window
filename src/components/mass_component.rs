@@ -1,4 +1,5 @@
 /// Must have either StationaryComponent or TrajectoryComponent
+#[derive(Debug)]
 pub struct MassComponent {
     mass: f64,
 }

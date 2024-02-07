@@ -4,7 +4,7 @@ use nalgebra_glm::DVec2;
 
 use crate::{storage::entity_allocator::Entity, util::normalize_angle};
 
-use self::{orbit_point::OrbitPoint, orbit_direction::OrbitDirection, conic::{Conic, new_conic}, conic_type::ConicType};
+use self::{conic::{new_conic, Conic}, conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::sphere_of_influence};
 
 mod conic_type;
 mod conic;
@@ -16,18 +16,20 @@ mod scary_math;
 pub struct Orbit {
     parent: Entity,
     conic: Box<dyn Conic>,
+    sphere_of_influence: f64,
     start_point: OrbitPoint,
     end_point: OrbitPoint,
     current_point: OrbitPoint,
 }
 
 impl Orbit {
-    pub fn new(parent: Entity, parent_mass: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
+    pub fn new(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
         let conic = new_conic(parent_mass, position, velocity);
+        let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
         let start_point = OrbitPoint::new(&*conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, conic, start_point, end_point, current_point }
+        Self { parent, conic, sphere_of_influence, start_point, end_point, current_point }
     }
 
     pub fn get_start_point(&self) -> &OrbitPoint {
@@ -143,6 +145,10 @@ impl Orbit {
         self.conic.get_velocity(self.get_position_from_theta(theta), theta)
     }
 
+    pub fn get_sphere_of_influence(&self) -> f64 {
+        self.sphere_of_influence
+    }
+
     pub fn end_at(&mut self, time: f64) {
         let theta = self.get_theta_from_time(time);
         let position = self.conic.get_position(theta);
@@ -171,12 +177,13 @@ mod test {
     #[test]
     fn test_get_remaining_angle_1() {
         let parent = Entity::mock();
+        let mass = 100.0;
         let parent_mass = 1.989e30;
         let position = vec2(147.095e9, 0.0);
         let velocity = vec2(0.0, 30.29e3);
         let start_time = 0.0;
         let end_time = 20.0 * 24.0 * 60.0 * 60.0;
-        let mut orbit = Orbit::new(parent, parent_mass, position, velocity, start_time);
+        let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
         orbit.end_at(end_time);
         let expected_angle = orbit.get_theta_from_time(end_time);
         assert!((orbit.get_remaining_angle() - expected_angle).abs() < 1.0e-1);
@@ -185,12 +192,13 @@ mod test {
     #[test]
     fn test_get_remaining_angle_2() {
         let parent = Entity::mock();
+        let mass = 100.0;
         let parent_mass = 1.989e30;
         let position = vec2(147.095e9, 0.0);
         let velocity = vec2(0.0, 30.29e3);
         let start_time = 0.0;
         let end_time = 283.0 * 24.0 * 60.0 * 60.0;
-        let mut orbit = Orbit::new(parent, parent_mass, position, velocity, start_time);
+        let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
         orbit.end_at(end_time);
         let expected_angle = orbit.get_theta_from_time(end_time);
         assert!((orbit.get_remaining_angle() - expected_angle).abs() < 1.0e-1);
@@ -199,12 +207,13 @@ mod test {
     #[test]
     fn test_get_remaining_angle_3() {
         let parent = Entity::mock();
+        let mass = 100.0;
         let parent_mass = 1.989e30;
         let position = vec2(147.095e9, 0.0);
         let velocity = vec2(0.0, 30.29e3);
         let start_time = 0.0;
         let end_time = 420.0 * 24.0 * 60.0 * 60.0;
-        let mut orbit = Orbit::new(parent, parent_mass, position, velocity, start_time);
+        let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
         orbit.end_at(end_time);
         let expected_angle = 2.0 * PI;
         assert!((orbit.get_remaining_angle() - expected_angle).abs() < 1.0e-1);

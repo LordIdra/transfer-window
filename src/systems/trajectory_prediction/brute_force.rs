@@ -149,26 +149,28 @@ mod test {
             .with_trajectory_component(moon_trajectory));
 
         let mut start_time = 0.0;
-        while let Some(encounter) = incremental_find_next_encounter(&mut state, start_time, 13.997 * 24.0 * 60.0 * 60.0, 60.0) {
+        let end_time = 13.997 * 24.0 * 60.0 * 60.0;
+        while let Some(encounter) = incremental_find_next_encounter(&mut state, start_time, end_time, 60.0) {
             start_time = encounter.get_time();
             apply_encounter(&mut state, encounter);
         }
 
-        let moon_position = state.get_trajectory_component(moon).get_end_segment().as_orbit().get_end_point().get_position();
-        let moon_velocity = state.get_trajectory_component(moon).get_end_segment().as_orbit().get_end_point().get_velocity();
-        assert!((moon_position.magnitude() - 4.156e8).abs() < 1.0e5);
-        assert!((moon_velocity.magnitude() - 946.0).abs() < 1.0);
+        let end_point = state.get_trajectory_component(moon).get_end_segment().as_orbit().get_end_point();
+        assert!((end_point.get_position().magnitude() - 4.156e8).abs() < 1.0e5);
+        assert!((end_point.get_velocity().magnitude() - 946.0).abs() < 1.0);
+        assert!((end_point.get_time() - end_time).abs() < 61.0);
 
         let mut start_time = 0.0;
-        while let Some(encounter) = incremental_find_next_encounter(&mut state, start_time, 365.169 * 24.0 * 60.0 * 60.0, 60.0) {
+        let end_time = 365.169 * 24.0 * 60.0 * 60.0;
+        while let Some(encounter) = incremental_find_next_encounter(&mut state, start_time, end_time, 60.0) {
             start_time = encounter.get_time();
             apply_encounter(&mut state, encounter);
         }
 
-        let earth_position = state.get_trajectory_component(earth).get_end_segment().as_orbit().get_end_point().get_position();
-        let earth_velocity = state.get_trajectory_component(earth).get_end_segment().as_orbit().get_end_point().get_velocity();
-        assert!((earth_position.magnitude() - 147.095e9).abs() < 1.0e5);
-        assert!((earth_velocity.magnitude() - 30.29e3).abs() < 1.0);
+        let end_point = state.get_trajectory_component(earth).get_end_segment().as_orbit().get_end_point();
+        assert!((end_point.get_position().magnitude() - 147.095e9).abs() < 1.0e5);
+        assert!((end_point.get_velocity().magnitude() - 30.29e3).abs() < 1.0);
+        assert!((end_point.get_time() - end_time).abs() < 61.0);
     }
 
     #[test]
@@ -208,10 +210,10 @@ mod test {
             apply_encounter(&mut state, encounter);
         }
 
-        let moon_position = state.get_trajectory_component(moon).get_end_segment().as_orbit().get_end_point().get_position();
-        let moon_velocity = state.get_trajectory_component(moon).get_end_segment().as_orbit().get_end_point().get_velocity();
-        assert!((moon_position.magnitude() - 4.156e8).abs() < 1.0e5);
-        assert!((moon_velocity.magnitude() - 946.0).abs() < 1.0);
+        let end_point = state.get_trajectory_component(moon).get_end_segment().as_orbit().get_end_point();
+        assert!((end_point.get_position().magnitude() - 4.156e8).abs() < 1.0e5);
+        assert!((end_point.get_velocity().magnitude() - 946.0).abs() < 1.0);
+        assert!((end_point.get_time() - end_time).abs() < 61.0);
     }
 
     // TODO - document the fuck out of this, it's kinda confusing
@@ -221,12 +223,14 @@ mod test {
 
         let mut start_time = 0.0;
         while let Some(encounter) = incremental_find_next_encounter(&mut state, start_time, end_time, time_step) {
+            println!("1 {:?}", encounter);
             start_time = encounter.get_time();
             apply_encounter(&mut state, encounter);
         }
 
         let mut start_time = 0.0;
         while let Some(encounter) = oneshot_find_next_encounter(&mut state, non_orbitable_entity, start_time, end_time, time_step) {
+            println!("2 {:?}", encounter);
             if !compare_encounters(&state, &encounter, encounters.front().expect("Found unexpected encounter")) {
                 panic!("Encounters not equal: {:?} {:?}", encounter, encounters.front())
             }
@@ -234,8 +238,11 @@ mod test {
             start_time = encounter.get_time();
             apply_encounter(&mut state, encounter);
         }
+        println!("{:#?}", state);
         if !encounters.is_empty() {
             panic!("Missed encounters: {:?}", encounters);
         }
     }
 }
+
+// find, tar, gzip, nohup, paralle, basename, gnuplot

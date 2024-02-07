@@ -3,7 +3,7 @@ use std::f64::consts::PI;
 use nalgebra_glm::{DVec2, vec2};
 use rand::Rng;
 
-use crate::constants::MAX_KEPLER_SOLVER_RECURSIONS;
+use crate::constants::{GRAVITATIONAL_CONSTANT, MAX_KEPLER_SOLVER_RECURSIONS};
 
 // https://phys.libretexts.org/Bookshelves/Astronomy__Cosmology/Celestial_Mechanics_(Tatum)/09%3A_The_Two_Body_Problem_in_Two_Dimensions/9.08%3A_Orbital_Elements_and_Velocity_Vector#mjx-eqn-9.5.31
 // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/elliptical-orbits.html
@@ -92,6 +92,11 @@ pub fn solve_kepler_equation_hyperbola(eccentricity: f64, mean_anomaly: f64, sta
         attempts += 1;
     }
     eccentric_anomaly
+}
+
+pub fn sphere_of_influence(mass: f64, parent_mass: f64, position: DVec2, velocity: DVec2) -> f64 {
+    let semi_major_axis = semi_major_axis(position, velocity, GRAVITATIONAL_CONSTANT * parent_mass);
+    semi_major_axis * (mass / parent_mass).powf(2.0 / 5.0)
 }
 
 #[cfg(test)]

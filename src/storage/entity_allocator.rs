@@ -21,11 +21,13 @@ impl Entity {
     }
 }
 
+#[derive(Debug)]
 struct AllocatorEntry {
     is_allocated: bool,
     generation: usize,
 }
 
+#[derive(Debug)]
 pub struct EntityAllocator {
     entities: HashSet<Entity>,
     entries: Vec<AllocatorEntry>,
