@@ -70,6 +70,8 @@ fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis:
 // Then check if the in order case contains the minimum
 // If so, that's our solution. If not, the other case is the solution
 fn make_range_containing(theta_1: f64, theta_2: f64, containing: f64) -> (f64, f64) {
+    let theta_1 = normalize_angle(theta_1);
+    let theta_2 = normalize_angle(theta_2);
     let in_order = (f64::min(theta_1, theta_2), f64::max(theta_1, theta_2));
     let out_of_order = (in_order.1, in_order.0);
     if containing > in_order.0 && containing < in_order.1 {
@@ -79,20 +81,36 @@ fn make_range_containing(theta_1: f64, theta_2: f64, containing: f64) -> (f64, f
     }
 }
 
-// Returns the distance between two angles
-// More complicated than it sounds because the difference between eg 0.1 and 5.9 is about 0.483 (NOT 5.8)
-fn angular_distance(theta_1: f64, theta_2: f64) -> f64 {
-    let theta_1 = normalize_angle(theta_1);
-    let theta_2 = normalize_angle(theta_2);
-    let (min, max) = (f64::min(theta_1, theta_2), f64::max(theta_1, theta_2));
-    f64::min((min - max).abs(), (min + 2.0*PI - max).abs())
+// Returns the (smallest) distance from the first angle to the second, ie wrapping round if necessary
+fn angular_distance(from: f64, to: f64) -> f64 {
+    let from = normalize_angle(from);
+    let to = normalize_angle(to);
+    if from < to {
+        to - from
+    } else {
+        to + 2.0*PI - from
+    }
 }
 
-fn find_smallest_window_containing(theta_containing: f64, thetas: Vec<f64>) {
-
+fn find_smallest_window_containing(containing: f64, thetas: &Vec<f64>) -> (f64, f64) {
+    let mut min_distance = f64::MAX;
+    let mut smallest_window = None;
+    for theta_1 in thetas {
+        for theta_2 in thetas {
+            if theta_1 == theta_2 {
+                continue;
+            }
+            let (min, max) = make_range_containing(*theta_1, *theta_2, containing);
+            if angular_distance(min, max) < min_distance {
+                smallest_window = Some((min, max));
+                min_distance = angular_distance(min, max);
+            }
+        }
+    }
+    smallest_window.unwrap()
 }
 
-fn find_intersections(f: &impl Fn(f64) -> f64, soi: f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
+fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
     let theta_1 = normalize_angle(newton_raphson(&f, bisection(&f, min_theta, max_theta)).expect("Newton-Raphson failed to converge"));
     // the other angle is in the 'opposite' range
     // we can find this by subtracting 2pi from the highest theta
@@ -120,13 +138,14 @@ pub fn find_encounter_bounds(orbit_a: &Orbit, orbit_b: &Orbit) -> EncounterBound
     } else if min.is_sign_negative() && min.abs() > soi {
         let f_inner = |theta: f64| sdf(theta) - soi;
         let f_outer = |theta: f64| sdf(theta) + soi;
-        let inner_intersections = find_intersections(&f_inner, soi, min_theta, max_theta);
-        let outer_intersections = find_intersections(&f_outer, soi, min_theta, max_theta);
-        let inersections = find_intersections(&sdf, soi, min_theta, max_theta);
-        EncounterBounds::Two()
+        let inner_intersections = find_intersections(&f_inner, min_theta, max_theta);
+        let outer_intersections = find_intersections(&f_outer, min_theta, max_theta);
+        let zero_intersections = find_intersections(&sdf, min_theta, max_theta);
+        let all_intersections = vec![inner_intersections.0, inner_intersections.1, outer_intersections.0, outer_intersections.1];
+        EncounterBounds::Two(find_smallest_window_containing(zero_intersections.0, &all_intersections), find_smallest_window_containing(zero_intersections.1, &all_intersections))
     } else {
         let f = |theta: f64| sdf(theta) - soi;
-        let intersections = find_intersections(&f, soi, min_theta, max_theta);
+        let intersections = find_intersections(&f, min_theta, max_theta);
         let window = make_range_containing(intersections.0, intersections.1, min_theta);
         EncounterBounds::One(window)
     }
@@ -134,18 +153,23 @@ pub fn find_encounter_bounds(orbit_a: &Orbit, orbit_b: &Orbit) -> EncounterBound
 
 #[cfg(test)]
 mod test {
-    use crate::systems::trajectory_prediction::fast_solver::bounding::make_range_containing;
+    use std::f64::consts::PI;
+
+    use crate::systems::trajectory_prediction::fast_solver::bounding::{find_smallest_window_containing, make_range_containing};
 
     #[test]
     fn test_make_range_containing() {
         assert!(make_range_containing(0.0, 3.0, 2.0) == (0.0, 3.0));
         assert!(make_range_containing(0.0, 3.0, 5.0) == (3.0, 0.0));
-        assert!(make_range_containing(-2.0, 2.0, 0.1) == (-2.0, 2.0));
-        assert!(make_range_containing(-2.0, 2.0, 2.8) == (2.0, -2.0));
+        assert!(make_range_containing(-2.0, 2.0, 0.1) == (-2.0 + 2.0*PI, 2.0));
+        assert!(make_range_containing(-2.0, 2.0, 2.8) == (2.0, -2.0 + 2.0*PI));
     }
 
     #[test]
     fn test_find_smallest_window_containing() {
-
+        dbg!(find_smallest_window_containing(0.0, &vec![0.1, 4.0, 3.2, -0.5, -0.25]));
+        assert!(find_smallest_window_containing(0.0, &vec![0.1, 4.0, 3.2, -0.5, -0.25]) == (-0.25 + 2.0*PI, 0.1));
+        assert!(find_smallest_window_containing(3.9, &vec![0.1, 4.0, 3.2, -0.5, -0.25]) == (3.2, 4.0));
+        assert!(find_smallest_window_containing(-0.3, &vec![0.1, 4.0, 3.2, -0.5, -0.25]) == (-0.5 + 2.0*PI, -0.25 + 2.0*PI));
     }
 }
