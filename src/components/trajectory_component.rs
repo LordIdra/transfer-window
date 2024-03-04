@@ -91,12 +91,13 @@ mod test {
 
         let orbit_1 = {
             let parent = Entity::mock();
+            let mass = 100.0;
             let parent_mass = 5.9722e24;
             let position = vec2(2.0e6, 0.0);
             let velocity = vec2(0.0, 1.0e5);
             let start_time = 0.0;
             let end_time = 100.0;
-            let mut orbit = Orbit::new(parent, parent_mass, position, velocity, start_time);
+            let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
             orbit.end_at(end_time);
             orbit
         };
@@ -104,12 +105,13 @@ mod test {
         let orbit_2 = {
             // Exact same start point but opposite velocity, so same end velocity/position magnitude
             let parent = Entity::mock();
+            let mass = 100.0;
             let parent_mass = 5.9722e24;
             let position = vec2(2.0e6, 0.0);
             let velocity = vec2(0.0, -1.0e5); 
             let start_time = 100.0;
             let end_time = 200.0;
-            let mut orbit = Orbit::new(parent, parent_mass, position, velocity, start_time);
+            let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
             orbit.end_at(end_time);
             orbit
         };

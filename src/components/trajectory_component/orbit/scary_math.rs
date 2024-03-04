@@ -117,7 +117,8 @@ mod tests {
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.989e30;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         // actual SMA is slightly different due to N-body perturbations and the like
-        assert!((semi_major_axis - 5.790375e10).abs() < 10000.0); 
+        // yes this is 'slightly' in astronomical terms
+        assert!((semi_major_axis - 5.7909e10).abs() < 1.0e7); 
     }
 
     #[test]

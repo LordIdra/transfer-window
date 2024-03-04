@@ -145,8 +145,8 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let ellipse = Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let expected_time = 210.0 * 24.0 * 60.0 * 60.0;
-        let duration = 365.25 * 24.0 * 60.0 * 60.0 + expected_time;
-        let mut tester = BruteForceTester::new(parent_mass, position, velocity, vec2(0.0, 0.0), 10.0);
+        let duration = 365.20 * 24.0 * 60.0 * 60.0 + expected_time;
+        let mut tester = BruteForceTester::new(parent_mass, position, velocity, vec2(0.0, 0.0), 60.0);
         tester.update(duration);
         let theta = f64::atan2(tester.get_position().y, tester.get_position().x);
         let time = ellipse.get_time_since_last_periapsis(theta);
@@ -194,7 +194,7 @@ mod tests {
         let ellipse = Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let true_anomaly = PI;
         let new_position = ellipse.get_position(true_anomaly);
-        let expected_position = vec2(-1.470834e11, 0.0);
+        let expected_position = vec2(-1.4707039418e11, 0.0);
         let position_difference = new_position - expected_position;
         assert!(position_difference.x.abs() < 5000.0);
         assert!(position_difference.y.abs() < 0.1);

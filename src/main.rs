@@ -4,6 +4,7 @@ use state::State;
 
 mod components;
 mod constants;
+mod debug;
 mod state;
 mod storage;
 mod systems;

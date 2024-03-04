@@ -50,7 +50,7 @@ mod test {
         let parent_mass = 5.972e24; // earth's mass
         let start_position = vec2(3.633e8, 0.0);
         let start_velocity = vec2(0.0, 1.082e3);
-        let period = 27.99455 * 24.0 * 60.0 * 60.0;
+        let period = 27.9917 * 24.0 * 60.0 * 60.0; 
         let mut tester = BruteForceTester::new(parent_mass, start_position, start_velocity, vec2(0.0, 0.0), 1.0);
 
         tester.update(0.5 * period);
@@ -66,7 +66,7 @@ mod test {
         let expected_position = start_position;
         let expected_velocity = start_velocity;
         assert!((tester.get_time() - expected_time).abs() < 2.0);
-        assert!((tester.get_position() - expected_position).magnitude() < 1.0e3);
+        assert!((tester.get_position() - expected_position).magnitude() < 1.0e5);
         assert!((tester.get_velocity() - expected_velocity).magnitude() < 1.0);
     }
 

@@ -5,7 +5,7 @@ use serde::Deserialize;
 
 use crate::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, state::State, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
 
-use super::util::EncounterType;
+use super::util::{Encounter, EncounterType};
 
 #[derive(Deserialize)]
 struct CaseMetaData {
@@ -36,6 +36,16 @@ impl CaseEncounter {
 
     pub fn get_time(&self) -> f64 {
         self.time
+    }
+
+    pub fn compare(&self, state: &State, encounter: &Encounter) -> bool {
+        let object_name = state.get_name_component(encounter.get_object()).get_name();
+        let new_parent_name = state.get_name_component(encounter.get_new_parent()).get_name();
+        let difference = (encounter.get_time() - self.get_time()).abs() / encounter.get_time();
+        encounter.get_type() == self.get_type()
+            && object_name == self.get_object()
+            && new_parent_name == self.get_new_parent()
+            && difference < 0.005
     }
 }
 
@@ -99,7 +109,7 @@ pub fn load_case(name: &str) -> (State, VecDeque<CaseEncounter>, Entity, f64, f6
                     let position = vec2(data.position[0], data.position[1]);
                     let velocity = vec2(data.velocity.unwrap()[0], data.velocity.unwrap()[1]);
                     let mut trajectory_component = TrajectoryComponent::new();
-                    trajectory_component.add_segment(Segment::Orbit(Orbit::new(*parent, parent_mass, position, velocity, 0.0)));
+                    trajectory_component.add_segment(Segment::Orbit(Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0)));
                     entity_builder = entity_builder.with_trajectory_component(trajectory_component);
                 } else {
                     continue; // the object's parent is not added yet

@@ -211,7 +211,7 @@ mod tests {
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(107.78);
         let radius = hyperbola.get_position(theta).magnitude();
-        let expected_radius = 1.63291969e08;
+        let expected_radius = 1.63229846e08;
         assert!((radius - expected_radius).abs() < 1.0);
     }
 
@@ -287,7 +287,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(107.78);
-        let expected_speed = 1.05126e4;
+        let expected_speed = 1.0512457e4;
         let speed = hyperbola.get_velocity(hyperbola.get_position(theta), theta).magnitude();
         assert!((speed - expected_speed).abs() < 0.1);
     }

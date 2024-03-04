@@ -15,7 +15,6 @@ mod test {
 
     #[test]
     fn test_normalize_angle() {
-        println!("{}", normalize_angle(2.01 * PI));
         assert!((normalize_angle(2.01 * PI) - 0.01 * PI).abs() < 1.0e-5);
         assert!((normalize_angle(3.789 * PI) - 1.789 * PI).abs() < 1.0e-5);
         assert!((normalize_angle(-1.345 * PI) - 0.655 * PI).abs() < 1.0e-5);

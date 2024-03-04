@@ -40,18 +40,20 @@ impl Encounter {
 
 fn do_exit(state: &mut State, entity: Entity, new_parent: Entity, time: f64) {
     let old_parent = state.get_trajectory_component(entity).get_end_segment().get_parent();
+    let mass = state.get_mass_component(entity).get_mass();
     let new_parent_mass = state.get_mass_component(new_parent).get_mass();
     let position = state.get_trajectory_component(entity).get_end_segment().get_end_position() + state.get_trajectory_component(old_parent).get_end_segment().get_end_position();
     let velocity = state.get_trajectory_component(entity).get_end_segment().get_end_velocity() + state.get_trajectory_component(old_parent).get_end_segment().get_end_velocity();
-    let segment = Segment::Orbit(Orbit::new(new_parent, new_parent_mass, position, velocity, time));
+    let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
     state.get_trajectory_component_mut(entity).add_segment(segment);
 }
 
 fn do_entrance(state: &mut State, entity: Entity, new_parent: Entity, time: f64) {
     let new_parent_mass = state.get_mass_component(new_parent).get_mass();
+    let mass = state.get_mass_component(entity).get_mass();
     let position = state.get_trajectory_component(entity).get_end_segment().get_end_position() - state.get_trajectory_component(new_parent).get_end_segment().get_end_position();
     let velocity = state.get_trajectory_component(entity).get_end_segment().get_end_velocity() - state.get_trajectory_component(new_parent).get_end_segment().get_end_velocity();
-    let segment = Segment::Orbit(Orbit::new(new_parent, new_parent_mass, position, velocity, time));
+    let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
     state.get_trajectory_component_mut(entity).add_segment(segment);
 }
 
