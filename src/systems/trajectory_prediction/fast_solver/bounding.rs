@@ -79,6 +79,19 @@ fn make_range_containing(theta_1: f64, theta_2: f64, containing: f64) -> (f64, f
     }
 }
 
+// Returns the distance between two angles
+// More complicated than it sounds because the difference between eg 0.1 and 5.9 is about 0.483 (NOT 5.8)
+fn angular_distance(theta_1: f64, theta_2: f64) -> f64 {
+    let theta_1 = normalize_angle(theta_1);
+    let theta_2 = normalize_angle(theta_2);
+    let (min, max) = (f64::min(theta_1, theta_2), f64::max(theta_1, theta_2));
+    f64::min((min - max).abs(), (min + 2.0*PI - max).abs())
+}
+
+fn find_smallest_window_containing(theta_containing: f64, thetas: Vec<f64>) {
+
+}
+
 fn find_intersections(f: &impl Fn(f64) -> f64, soi: f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
     let theta_1 = normalize_angle(newton_raphson(&f, bisection(&f, min_theta, max_theta)).expect("Newton-Raphson failed to converge"));
     // the other angle is in the 'opposite' range
@@ -89,7 +102,7 @@ fn find_intersections(f: &impl Fn(f64) -> f64, soi: f64, min_theta: f64, max_the
         (min_theta, max_theta - 2.0 * PI)
     };
     let theta_2 = normalize_angle(newton_raphson(&f, bisection(&f, new_min_theta, new_max_theta)).expect("Newton-Raphson failed to converge"));
-    
+    (theta_1, theta_2)
 }
 
 // Object A: The object which will have encounters
@@ -107,7 +120,10 @@ pub fn find_encounter_bounds(orbit_a: &Orbit, orbit_b: &Orbit) -> EncounterBound
     } else if min.is_sign_negative() && min.abs() > soi {
         let f_inner = |theta: f64| sdf(theta) - soi;
         let f_outer = |theta: f64| sdf(theta) + soi;
-        EncounterBounds::Two(find_intersections(&f_inner, soi, min_theta, max_theta), find_intersections(&f_outer, soi, min_theta, max_theta))
+        let inner_intersections = find_intersections(&f_inner, soi, min_theta, max_theta);
+        let outer_intersections = find_intersections(&f_outer, soi, min_theta, max_theta);
+        let inersections = find_intersections(&sdf, soi, min_theta, max_theta);
+        EncounterBounds::Two()
     } else {
         let f = |theta: f64| sdf(theta) - soi;
         let intersections = find_intersections(&f, soi, min_theta, max_theta);
@@ -126,5 +142,10 @@ mod test {
         assert!(make_range_containing(0.0, 3.0, 5.0) == (3.0, 0.0));
         assert!(make_range_containing(-2.0, 2.0, 0.1) == (-2.0, 2.0));
         assert!(make_range_containing(-2.0, 2.0, 2.8) == (2.0, -2.0));
+    }
+
+    #[test]
+    fn test_find_smallest_window_containing() {
+
     }
 }
