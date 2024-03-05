@@ -68,7 +68,19 @@ impl<'a> TimeWindow<'a> {
     }
 }
 
-fn get_initial_bounds(state: &State, entity: Entity, start_time: f64) -> (Vec<Entity>, Vec<TimeWindow>) {
+struct Unbounded<'a> {
+    orbit: &'a Orbit,
+    other_orbit: &'a Orbit,
+    other_entity: Entity,
+}
+
+impl<'a> Unbounded<'a> {
+    pub fn new(orbit: &'a Orbit, other_orbit: &'a Orbit, other_entity: Entity) -> Self {
+        Self { orbit, other_orbit, other_entity }
+    }
+}
+
+fn get_initial_bounds(state: &State, entity: Entity, start_time: f64) -> (Vec<Unbounded>, Vec<TimeWindow>) {
     let orbit = state.get_trajectory_component(entity).get_end_segment().as_orbit();
     let can_enter = &state.get_entities(vec![ComponentType::TrajectoryComponent]);
     let parallel_entities = get_parallel_entities(state, can_enter, entity);
@@ -79,7 +91,7 @@ fn get_initial_bounds(state: &State, entity: Entity, start_time: f64) -> (Vec<En
         let bounds = find_encounter_bounds(orbit, other_orbit);
         match bounds {
             EncounterBoundType::NoEncounters => (),
-            EncounterBoundType::NoBounds => unbounded.push(other_entity),
+            EncounterBoundType::NoBounds => unbounded.push(Unbounded::new(orbit, other_orbit, other_entity)),
             EncounterBoundType::One(angle_window) => {
                 let time_window = angle_window_to_time_window(&orbit, angle_window);
                 //TODO the unwrap will cause the program to crash encountering hyperbolic case
@@ -104,11 +116,17 @@ fn get_initial_bounds(state: &State, entity: Entity, start_time: f64) -> (Vec<En
 }
 
 
-pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_time: f64) -> () {
+pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     let (unbounded, mut time_bounds) = get_initial_bounds(state, entity, start_time);
 
     if time_bounds.is_empty() {
-        // brute force
+        let soonest_encounter = None;
+        for unbounded in unbounded {
+            if let Some(encounter)time) = solve_for_encounter(unbounded.orbit, unbounded.other_orbit, start_time, end_time) {
+                (if)
+                soonest_encounter = Some(Encounter::new(EncounterType::Entrance, entity, unbounded.other_entity, time));
+            }
+        }
     }
 
     let mut start_time = time_bounds.first().unwrap().get_soonest_time();
