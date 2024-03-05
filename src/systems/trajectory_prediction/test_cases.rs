@@ -39,7 +39,7 @@ impl CaseEncounter {
     }
 
     pub fn compare(&self, state: &State, encounter: &Encounter) -> bool {
-        let object_name = state.get_name_component(encounter.get_object()).get_name();
+        let object_name = state.get_name_component(encounter.get_entity()).get_name();
         let new_parent_name = state.get_name_component(encounter.get_new_parent()).get_name();
         let difference = (encounter.get_time() - self.get_time()).abs() / encounter.get_time();
         encounter.get_type() == self.get_type()

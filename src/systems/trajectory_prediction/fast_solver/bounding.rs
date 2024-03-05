@@ -7,7 +7,7 @@ use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_
 // The contained slices are windows in terms of theta of where an encounter could happen
 // They are ordered, ie (0.5, 2.4) means an encounter could happen between 0.5 and 2.4, not the other way round
 #[derive(Debug)]
-pub enum EncounterBounds {
+pub enum EncounterBoundType {
     NoEncounters, // no encounters at all can ever happen
     NoBounds, // encounters can happen at any time, there's no way to bound them
     One((f64, f64)),
@@ -95,6 +95,7 @@ fn angular_distance(from: f64, to: f64) -> f64 {
 }
 
 fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
+    println!("{} {}", min_theta, max_theta);
     let theta_1 = normalize_angle(newton_raphson(&f, bisection(&f, min_theta, max_theta)).expect("Newton-Raphson failed to converge"));
     // the other angle is in the 'opposite' range
     // we can find this by subtracting 2pi from the highest theta
@@ -107,27 +108,37 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
     (theta_1, theta_2)
 }
 
-// Object A: The object which will have encounters
-// Object B: The object that object A will encounter
-pub fn find_encounter_bounds(orbit_a: &Orbit, orbit_b: &Orbit) -> EncounterBounds {
-    // we start at the angle of apoapsis (rather than periapsis) because this is where the distance is most sensitive to the angle
-    // so the starting angle there is actually more likely to be closer to the real solution
-    let argument_of_apoapsis = orbit_a.get_argument_of_periapsis() + PI;
-    let sdf = make_sdf(orbit_a, orbit_b);
-    let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis);
-    let (min, max) = (sdf(min_theta), sdf(max_theta));
-    let soi = orbit_b.get_sphere_of_influence();
+// Bounds returned by this function assume the orbit is clockwise
+fn get_bound(sdf: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64, min: f64, max: f64, soi: f64) -> EncounterBoundType {
     if min.abs() < soi && max.abs() < soi {
-        EncounterBounds::NoBounds // TODO document this
-    } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() > soi) || (max.is_sign_negative() && min.is_sign_negative() && min.abs() > soi) {
-        EncounterBounds::NoEncounters
-    } else if min.is_sign_negative() && min.abs() > soi {
+        // No bounds
+        EncounterBoundType::NoBounds
+
+    } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() > soi) || (max.is_sign_negative() && min.is_sign_negative() && max.abs() > soi) {
+        // No encounters possible
+        EncounterBoundType::NoEncounters
+
+    } else if min.is_sign_negative() && max.is_sign_positive() && min.abs() < soi {
+        // One encounter on the outside
+        let f = |theta: f64| sdf(theta) - soi;
+        let intersections = find_intersections(&f, min_theta, max_theta);
+        let window = make_range_containing(intersections.0, intersections.1, min_theta);
+        EncounterBoundType::One(window)
+
+    } else if min.is_sign_negative() && max.is_sign_positive() && max.abs() < soi {
+        // One encounter on the inside
+        let f = |theta: f64| sdf(theta) + soi;
+        let intersections = find_intersections(&f, min_theta, max_theta);
+        let window = make_range_containing(intersections.0, intersections.1, min_theta);
+        EncounterBoundType::One(window)
+
+    } else {
+        // Two windows for encounters
         let f_inner = |theta: f64| sdf(theta) - soi;
         let f_outer = |theta: f64| sdf(theta) + soi;
-        let f_derivative = |theta: f64| (sdf(theta) - sdf(theta + 0.00001)) / 0.00001;
         let inner_intersections = find_intersections(&f_inner, min_theta, max_theta);
         let outer_intersections = find_intersections(&f_outer, min_theta, max_theta);
-        let zero_intersections = find_intersections(&f_derivative, min_theta, max_theta);
+        let zero_intersections = find_intersections(&sdf, min_theta, max_theta);
 
         // We have 4 points, and know where the orbits intersect
         // Now we need to create two windows that cover exactly one intersection
@@ -137,7 +148,7 @@ pub fn find_encounter_bounds(orbit_a: &Orbit, orbit_b: &Orbit) -> EncounterBound
         let mut min_distance = f64::MAX;
         for i in 0..possible_tos.len() {
             let window = make_range_containing(from, possible_tos[i], zero_intersections.0);
-            let distance = angular_distance(from, possible_tos[i]);
+            let distance = angular_distance(window.0, window.1);
             if distance < min_distance {
                 min_distance = distance;
                 to_index = i
@@ -147,13 +158,22 @@ pub fn find_encounter_bounds(orbit_a: &Orbit, orbit_b: &Orbit) -> EncounterBound
         let window_1 = make_range_containing(from, to, zero_intersections.0);
         let window_2 = make_range_containing(possible_tos[0], possible_tos[1], zero_intersections.1);
 
-        EncounterBounds::Two(window_1, window_2)
-    } else {
-        let f = |theta: f64| sdf(theta) - soi;
-        let intersections = find_intersections(&f, min_theta, max_theta);
-        let window = make_range_containing(intersections.0, intersections.1, min_theta);
-        EncounterBounds::One(window)
+        EncounterBoundType::Two(window_1, window_2)
+
     }
+}
+
+// Object A: The object which will have encounters
+// Object B: The object that object A will encounter
+pub fn find_encounter_bounds(orbit_a: &Orbit, orbit_b: &Orbit) -> EncounterBoundType {
+    // we start at the angle of apoapsis (rather than periapsis) because this is where the distance is most sensitive to the angle
+    // so the starting angle there is actually more likely to be closer to the real solution
+    let argument_of_apoapsis = orbit_a.get_argument_of_periapsis() + PI;
+    let sdf = make_sdf(orbit_a, orbit_b);
+    let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis);
+    let (min, max) = (sdf(min_theta), sdf(max_theta));
+    let soi = orbit_b.get_sphere_of_influence();
+    get_bound(&sdf, min_theta, max_theta, min, max, soi)
 }
 
 #[cfg(test)]

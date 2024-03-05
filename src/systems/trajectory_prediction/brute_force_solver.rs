@@ -10,24 +10,9 @@ use std::collections::HashSet;
 
 use crate::{components::ComponentType, state::State, storage::entity_allocator::Entity};
 
-use super::util::{Encounter, EncounterType};
+use super::util::{get_parallel_entities, Encounter, EncounterType};
 
-fn get_parallel_entities(state: &State, can_enter: &HashSet<Entity>, entity: Entity, parent: Entity) -> Vec<Entity> {
-    let mut parallel_entities = vec![];
-    for other_entity in can_enter {
-        if entity == *other_entity {
-            continue;
-        }
-        let other_end_segment = state.get_trajectory_component(*other_entity).get_end_segment();
-        if parent != other_end_segment.get_parent() {
-            continue;
-        }
-        parallel_entities.push(*other_entity);
-    }
-    parallel_entities
-}
-
- fn exit_check(state: &State, can_exit: &HashSet<Entity>, entity: Entity) -> Option<Entity> {
+fn exit_check(state: &State, can_exit: &HashSet<Entity>, entity: Entity) -> Option<Entity> {
     let trajectory_component = state.get_trajectory_component(entity);
     let end_segment = trajectory_component.get_end_segment();
     let position = end_segment.get_end_position();
@@ -45,7 +30,7 @@ fn get_parallel_entities(state: &State, can_enter: &HashSet<Entity>, entity: Ent
 fn entrance_check(state: &State, can_enter: &HashSet<Entity>, entity: Entity) -> Option<Entity> {
     let end_segment = state.get_trajectory_component(entity).get_end_segment();
     let position = end_segment.get_end_position();
-    let parallel_entities = get_parallel_entities(state, can_enter, entity, end_segment.get_parent());
+    let parallel_entities = get_parallel_entities(state, can_enter, entity);
     for other_entity in parallel_entities {
         let trajectory_component = state.get_trajectory_component(other_entity);
         let end_segment = trajectory_component.get_end_segment();

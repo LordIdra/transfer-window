@@ -104,6 +104,13 @@ impl Orbit {
         self.conic.get_period()
     }
 
+    pub fn is_clockwise(&self) -> bool {
+        match self.get_direction() {
+            OrbitDirection::Clockwise => true,
+            OrbitDirection::AntiClockwise => false,
+        }
+    }
+
     pub fn is_finished(&self) -> bool {
         self.current_point.is_after(&self.end_point)
     }

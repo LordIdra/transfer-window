@@ -1,67 +1,160 @@
-// ALRIGHT, HERE'S THE PLAN FOR ELLIPSE-ELLIPSE
-// 1) Choose enttity and other_entity where we are finding encounters of entity with other_entity
-// 2) Calculate SOI of other_entity
-// 2) Construct a signed distance function (SDF) in terms of theta where the SDF goes negative when entity is further out than other_entity
-// Note that the SDF is not the actual minimum distance between the objects
-// Rather, it's just a similar (but much easier to evaluate) function that has roots in the same position and one minimum and one maximum
-// 3) Find the minimum and maximum of the SDF
-// 4) Construct a new function (F) representing the minimum distance between the two ellipses at a given theta for entity's ellipse
-// Note that this function will need to be solved numerically using newton-raphson
-// Also note this function is unsigned
-// When we say min F, this is not actually the minimum of F, this is the value of F when SDF is a minimum
-// 5) Start at theta = minimum SDF and use newton-raphson to find the minimum of F
-// 6) Do the same for maximum of F
-// 7) If min SDF > 0 and min F > SOI, it is impossible for an encounter to happen; return no encounters
-// 8) If min SDF < 0 and min F > SOI, there are 2 possible encounters during one period; go to TWO ENCOUNTERS
-// 9) Otherwise, there is 1 possible encounter; go to ONE ENCOUNTER
+use std::cmp::Ordering;
 
-// ONE ENCOUNTER
-// 1) Construct a function G = F - SOI
-// We now want to solve for G = 0  and know there will be exactly 2 solutions
-// We also know that at G = 0, G is at a minimum, therefore dG/dtheta = 0
-// We also know that the solutions lie on either side of min F and max F (these are the two maximums of G)
-// 2) Use binary search to find estimates to the solutions of dG/dtheta = 0 in the intervals min G to max G and max G to min G
-// 3) Use newton-raphson to refine the estimates
-// 4) Construct a range from one solution to the other that includings min G
-// This range is the range of thetas in which an encounter is possible
-// 5) Return SOLVE WINDOW with the range
+use crate::{components::{trajectory_component::orbit::Orbit, ComponentType}, constants::PREDICTION_TIME_STEP, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::util::get_parallel_entities};
 
-// TWO ENCOUNTERS
-// 1) Construct a function G = F - SOI
-// We now want to solve for G = 0  and know there will be exactly 4 solutions
-// We also know that at G = 0, G is at a minimum, therefore dG/dtheta = 0
-// 2) Solve for F = 0
-// We know F = 0 is at a minimum, so just solve for dF/dtheta = 0 using binary search + newton refinement
-// 3) Order min F, max F, and the two solutions to F = 0
-// 4) Pair each solution in the order they appear to create 4 pairs (last will need to be paired with first)
-// We know that each quadrant contains exactly one solution to G = 0
-// 5) Solve for G = 0 in each quadrant by solving dG/dtheta = 0 with binary search and newton refinement
-// 6) Pair the solutions up into 2 pairs so that each pair contains one of the two solutions to F = 0
-// Do this by ordering the solutions, then pairing the first two and last two. Do the same but pair the first and last and middle two
-// Then check which set of pairs contains both solutions to F = 0
-// Angles might be difficult to deal with here
-// We now have two ranges of thetas where an encounter is possible
-// Return the lowest of SOLVE WINDOW with first range and SOLVE WINDOW with second range
+use self::bounding::{find_encounter_bounds, EncounterBoundType};
 
-// test cases to add:
-// moon orbiting very close to earth with various eccentricities of spacecraft
-// Encounters with two moons
+use super::util::{Encounter, EncounterType};
 
 mod bounding;
+
+fn angle_window_to_time_window(orbit: &Orbit, window: (f64, f64)) -> (f64, f64) {
+    (orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.0), orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.1))
+}
+
+fn solve_for_encounter(orbit: &Orbit, other_orbit: &Orbit, start_time: f64, end_time: f64) -> Option<f64> {
+    let soi = other_orbit.get_sphere_of_influence();
+    let f = |time: f64| {
+        let position = orbit.get_theta_from_time(time);
+        let other_position = other_orbit.get_theta_from_time(time);
+        (position - other_position).abs() - soi
+    };
+    let mut time = start_time;
+    let mut previous_distance = f64::MAX;
+    while time < end_time {
+        let distance = f(time);
+        if distance.is_sign_negative() && previous_distance.is_sign_positive() {
+            return Some(time);
+        }
+        previous_distance = distance;
+        time += PREDICTION_TIME_STEP;
+    }
+    None
+}
+
+#[derive(Debug)]
+struct TimeWindow<'a> {
+    orbit: &'a Orbit,
+    other_orbit: &'a Orbit,
+    other_entity: Entity,
+    window: (f64, f64),
+}
+
+impl<'a> TimeWindow<'a> {
+    pub fn new(orbit: &'a Orbit, other_orbit: &'a Orbit, other_entity: Entity, window: (f64, f64)) -> Self {
+        Self { orbit, other_orbit, other_entity, window }
+    }
+
+    fn get_soonest_time(&self) -> f64 {
+        f64::min(self.window.0, self.window.1)
+    }
+
+    fn get_latest_time(&self) -> f64 {
+        f64::max(self.window.0, self.window.1)
+    }
+
+    fn increment_by_period(&mut self) {
+        self.window.0 += self.orbit.get_period().unwrap();
+        self.window.1 += self.orbit.get_period().unwrap();
+    }
+
+    // Order by the soonest time we'll have to think about an encounter
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self.get_soonest_time() < other.get_soonest_time() {
+            Some(Ordering::Less)
+        } else {
+            Some(Ordering::Greater)
+        }
+    }
+}
+
+fn get_initial_bounds(state: &State, entity: Entity, start_time: f64) -> (Vec<Entity>, Vec<TimeWindow>) {
+    let orbit = state.get_trajectory_component(entity).get_end_segment().as_orbit();
+    let can_enter = &state.get_entities(vec![ComponentType::TrajectoryComponent]);
+    let parallel_entities = get_parallel_entities(state, can_enter, entity);
+    let mut unbounded = vec![];
+    let mut time_bounds = vec![];
+    for other_entity in parallel_entities {
+        let other_orbit = state.get_trajectory_component(other_entity).get_segment_at_time(start_time).as_orbit();
+        let bounds = find_encounter_bounds(orbit, other_orbit);
+        match bounds {
+            EncounterBoundType::NoEncounters => (),
+            EncounterBoundType::NoBounds => unbounded.push(other_entity),
+            EncounterBoundType::One(angle_window) => {
+                let time_window = angle_window_to_time_window(&orbit, angle_window);
+                //TODO the unwrap will cause the program to crash encountering hyperbolic case
+                time_bounds.push(TimeWindow::new(orbit, other_orbit, other_entity, time_window))
+            }
+            EncounterBoundType::Two(angle_window_1, angle_window_2) => {
+                let time_window_1 = angle_window_to_time_window(&orbit, angle_window_1);
+                let time_window_2 = angle_window_to_time_window(&orbit, angle_window_2);
+                //TODO the unwrap will cause the program to crash encountering hyperbolic case
+                time_bounds.push(TimeWindow::new(orbit, other_orbit, other_entity, time_window_1));
+                time_bounds.push(TimeWindow::new(orbit, other_orbit, other_entity, time_window_2));
+            }
+        }
+    }
+    for bound in &mut time_bounds {
+        while bound.get_soonest_time() < start_time && bound.get_latest_time() < start_time {
+            bound.increment_by_period()
+        }
+    }
+    time_bounds.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
+    (unbounded, time_bounds)
+}
+
+
+pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_time: f64) -> () {
+    let (unbounded, mut time_bounds) = get_initial_bounds(state, entity, start_time);
+
+    if time_bounds.is_empty() {
+        // brute force
+    }
+
+    let mut start_time = time_bounds.first().unwrap().get_soonest_time();
+    let mut end_time = end_time;
+    let mut soonest_encounter: Option<Encounter> = None;
+
+    loop {
+        if start_time > end_time {
+            break;
+        }
+
+        let first = time_bounds.first().unwrap();
+        let new_start_time = first.get_soonest_time();
+        
+        // Check if window contains encounters
+        if let Some(encounter_time) = solve_for_encounter(first.orbit, first.other_orbit, first.get_soonest_time(), f64::min(first.get_latest_time(), end_time)) {
+
+            // If so update soonest encounter + end time if new encounter occurs sooner
+            let should_update = if let Some(soonest_encounter) = &mut soonest_encounter {
+                encounter_time < soonest_encounter.get_time()
+            } else {
+                true
+            };
+            if should_update {
+                soonest_encounter = Some(Encounter::new(EncounterType::Entrance, entity, first.other_entity, encounter_time));
+                end_time = encounter_time;
+            }
+        }
+        
+        // Solve for any unbounded encounters from the old start time to the new start time
+        // Brute force
+
+        time_bounds.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
+    };
+}
 
 #[cfg(test)]
 mod test {
     use crate::{debug::get_entity_by_name, systems::trajectory_prediction::test_cases::load_case};
 
-    use super::bounding::find_encounter_bounds;
+    use super::find_next_encounter;
 
     #[test]
     fn temp() {
-        let (mut state, mut encounters, _, end_time, time_step) = load_case("insanity-3");
-        let moon = get_entity_by_name(&state, "moon");
+        let (mut state, mut encounters, _, end_time, time_step) = load_case("two-moons-varied-encounters");
         let spacecraft = get_entity_by_name(&state, "spacecraft");
-        let moon_orbit = state.get_trajectory_component(moon).get_current_segment().as_orbit();
-        let spacecraft_orbit = state.get_trajectory_component(spacecraft).get_current_segment().as_orbit();
-        println!("{:?}", find_encounter_bounds(spacecraft_orbit, moon_orbit));
+        find_next_encounter(&state, spacecraft, 0.0, 1.0e10)
     }
 }

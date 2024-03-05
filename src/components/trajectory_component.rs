@@ -23,7 +23,7 @@ impl TrajectoryComponent {
     pub fn get_segment_at_time(&self, time: f64) -> &Segment {
         for segment in &self.segments {
             if let Some(segment) = segment {
-                if segment.get_start_time() < time && segment.get_end_time() > time {
+                if segment.get_start_time() <= time && segment.get_end_time() >= time {
                     return segment
                 }
             }

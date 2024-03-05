@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use serde::Deserialize;
 
 use crate::{components::trajectory_component::{orbit::Orbit, segment::Segment}, state::State, storage::entity_allocator::Entity};
@@ -11,22 +13,22 @@ pub enum EncounterType {
 #[derive(Debug)]
 pub struct Encounter {
     encounter_type: EncounterType,
-    object: Entity,
+    entity: Entity,
     new_parent: Entity,
     time: f64,
 }
 
 impl Encounter {
-    pub fn new(encounter_type: EncounterType, object: Entity, new_parent: Entity, time: f64) -> Self {
-        Self { encounter_type, object, new_parent, time }
+    pub fn new(encounter_type: EncounterType, entity: Entity, new_parent: Entity, time: f64) -> Self {
+        Self { encounter_type, entity, new_parent, time }
     }
 
     pub fn get_type(&self) -> EncounterType {
         self.encounter_type.clone()
     }
 
-    pub fn get_object(&self) -> Entity {
-        self.object
+    pub fn get_entity(&self) -> Entity {
+        self.entity
     }
 
     pub fn get_new_parent(&self) -> Entity {
@@ -61,7 +63,25 @@ fn do_entrance(state: &mut State, entity: Entity, new_parent: Entity, time: f64)
 /// As well as leading to cleaner overall design
 pub fn apply_encounter(state: &mut State, encounter: Encounter) {
     match encounter.encounter_type {
-        EncounterType::Entrance => do_entrance(state, encounter.object, encounter.new_parent, encounter.time),
-        EncounterType::Exit => do_exit(state, encounter.object, encounter.new_parent, encounter.time),
+        EncounterType::Entrance => do_entrance(state, encounter.entity, encounter.new_parent, encounter.time),
+        EncounterType::Exit => do_exit(state, encounter.entity, encounter.new_parent, encounter.time),
     }
+}
+
+pub fn get_parallel_entities(state: &State, can_enter: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
+    let end_segment = state.get_trajectory_component(entity).get_end_segment();
+    let time = end_segment.get_end_time();
+    let parent = end_segment.get_parent();
+    let mut parallel_entities = vec![];
+    for other_entity in can_enter {
+        if entity == *other_entity {
+            continue;
+        }
+        let other_end_segment = state.get_trajectory_component(*other_entity).get_segment_at_time(time);
+        if parent != other_end_segment.get_parent() {
+            continue;
+        }
+        parallel_entities.push(*other_entity);
+    }
+    parallel_entities
 }
