@@ -8,7 +8,8 @@ use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_
 // They are ordered, ie (0.5, 2.4) means an encounter could happen between 0.5 and 2.4, not the other way round
 #[derive(Debug)]
 pub enum EncounterBounds {
-    None,
+    NoEncounters, // no encounters at all can ever happen
+    NoBounds, // encounters can happen at any time, there's no way to bound them
     One((f64, f64)),
     Two((f64, f64), (f64, f64)),
 }
@@ -116,8 +117,10 @@ pub fn find_encounter_bounds(orbit_a: &Orbit, orbit_b: &Orbit) -> EncounterBound
     let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis);
     let (min, max) = (sdf(min_theta), sdf(max_theta));
     let soi = orbit_b.get_sphere_of_influence();
-    if min.is_sign_positive() && min > soi {
-        EncounterBounds::None
+    if min.abs() < soi && max.abs() < soi {
+        EncounterBounds::NoBounds // TODO document this
+    } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() > soi) || (max.is_sign_negative() && min.is_sign_negative() && min.abs() > soi) {
+        EncounterBounds::NoEncounters
     } else if min.is_sign_negative() && min.abs() > soi {
         let f_inner = |theta: f64| sdf(theta) - soi;
         let f_outer = |theta: f64| sdf(theta) + soi;
