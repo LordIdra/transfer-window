@@ -28,7 +28,7 @@ fn make_closest_point_on_orbit_function(orbit: &Orbit) -> impl Fn(DVec2) -> DVec
     move |point: DVec2| {
         let distance_function = |theta: f64| (orbit.get_position_from_theta(theta) - point).magnitude();
         let starting_theta = f64::atan2(point.y, point.x);
-        let mut theta = newton_raphson_to_find_stationary_point(&distance_function, starting_theta)
+        let mut theta = newton_raphson_to_find_stationary_point(&distance_function, starting_theta, 1.0e-6)
             .expect("Newton-Raphson failed to converge to stationary point when finding encounter bound");
         // weird bug occurred here where sometimes the distance function would be less slightly after if the value of theta was too low
         // this is why we add slightly more to theta and check both before and after
@@ -54,7 +54,7 @@ fn make_sdf<'a>(orbit_a: &'a Orbit, orbit_b: &'a Orbit) -> impl Fn(f64) -> f64 +
 }
 
 fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> (f64, f64) {
-    let theta_1 = newton_raphson_to_find_stationary_point(&sdf, argument_of_apoapsis)
+    let theta_1 = newton_raphson_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-6)
         .expect("Newton-Raphson failed to converge to stationary point when finding encounter bound");
     let theta_2 = find_other_stationary_point(theta_1, &sdf);
     let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
@@ -95,8 +95,7 @@ fn angular_distance(from: f64, to: f64) -> f64 {
 }
 
 fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
-    println!("{} {}", min_theta, max_theta);
-    let theta_1 = normalize_angle(newton_raphson(&f, bisection(&f, min_theta, max_theta)).expect("Newton-Raphson failed to converge"));
+    let theta_1 = normalize_angle(newton_raphson(&f, bisection(&f, min_theta, max_theta), 1.0e-6).expect("Newton-Raphson failed to converge"));
     // the other angle is in the 'opposite' range
     // we can find this by subtracting 2pi from the highest theta
     let (new_min_theta, new_max_theta) = if min_theta > max_theta {
@@ -104,7 +103,7 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
     } else {
         (min_theta, max_theta - 2.0 * PI)
     };
-    let theta_2 = normalize_angle(newton_raphson(&f, bisection(&f, new_min_theta, new_max_theta)).expect("Newton-Raphson failed to converge"));
+    let theta_2 = normalize_angle(newton_raphson(&f, bisection(&f, new_min_theta, new_max_theta), 1.0e-6).expect("Newton-Raphson failed to converge"));
     (theta_1, theta_2)
 }
 

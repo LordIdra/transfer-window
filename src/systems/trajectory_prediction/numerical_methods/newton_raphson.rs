@@ -1,4 +1,4 @@
-use crate::constants::{NEWTON_SOLVER_DERIVATIVE_DELTA, NEWTON_SOLVER_MAX_DELTA, NEWTON_SOLVER_MAX_ITERATIONS, NEWTON_SOLVER_MIN_VALUE};
+use crate::constants::{NEWTON_SOLVER_DERIVATIVE_DELTA, NEWTON_SOLVER_MAX_ITERATIONS, NEWTON_SOLVER_MIN_VALUE};
 
 /// Returns (first derivative, second derivative)
 fn differentiate(f: &impl Fn(f64) -> f64, x: f64) -> (f64, f64) {
@@ -13,7 +13,7 @@ fn differentiate(f: &impl Fn(f64) -> f64, x: f64) -> (f64, f64) {
     (f_prime, f_prime_prime)
 }
 
-pub fn newton_raphson_to_find_stationary_point(function: &impl Fn(f64) -> f64, starting_x: f64) -> Option<f64> {
+pub fn newton_raphson_to_find_stationary_point(function: &impl Fn(f64) -> f64, starting_x: f64, max_delta: f64) -> Option<f64> {
     let mut x = starting_x;
     let mut i = 0;
     while i < NEWTON_SOLVER_MAX_ITERATIONS {
@@ -22,7 +22,7 @@ pub fn newton_raphson_to_find_stationary_point(function: &impl Fn(f64) -> f64, s
         }
         let (first, second) = differentiate(function, x);
         let delta = -first/second;
-        if delta.abs() < NEWTON_SOLVER_MAX_DELTA {
+        if delta.abs() < max_delta {
             return Some(x);
         }
         x += delta;
@@ -31,7 +31,7 @@ pub fn newton_raphson_to_find_stationary_point(function: &impl Fn(f64) -> f64, s
     return None;
 }
 
-pub fn newton_raphson(function: &impl Fn(f64) -> f64, starting_x: f64) -> Option<f64> {
+pub fn newton_raphson(function: &impl Fn(f64) -> f64, starting_x: f64, max_delta: f64) -> Option<f64> {
     let mut x = starting_x;
     let mut i = 0;
     while i < NEWTON_SOLVER_MAX_ITERATIONS {
@@ -42,7 +42,7 @@ pub fn newton_raphson(function: &impl Fn(f64) -> f64, starting_x: f64) -> Option
         let f_2 = function(x + NEWTON_SOLVER_DERIVATIVE_DELTA);
         let derivative = (f_2 - f_1) / NEWTON_SOLVER_DERIVATIVE_DELTA;
         let delta = -f_1 / derivative;
-        if delta.abs() < NEWTON_SOLVER_MAX_DELTA {
+        if delta.abs() < max_delta {
             return Some(x);
         }
         x += delta;
@@ -59,13 +59,13 @@ mod test {
     fn test_newton_raphson() {
         let function = |x: f64| x.powi(2) - 4.0;
         let starting_x = 4.0;
-        assert!((newton_raphson(&function, starting_x).unwrap() - 2.0).abs() < 1.0e-3);
+        assert!((newton_raphson(&function, starting_x, 1.0e-6).unwrap() - 2.0).abs() < 1.0e-3);
     }
 
     #[test]
     fn test_newton_raphson_to_find_stationary_point() {
         let function = |x: f64| x.powi(2) - 4.0*x - 10.0;
         let starting_x = -1.74;
-        assert!((newton_raphson_to_find_stationary_point(&function, starting_x).unwrap() - 2.0).abs() < 1.0e-3);
+        assert!((newton_raphson_to_find_stationary_point(&function, starting_x, 1.0e-6).unwrap() - 2.0).abs() < 1.0e-3);
     }
 }

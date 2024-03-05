@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::{components::{trajectory_component::orbit::Orbit, ComponentType}, constants::PREDICTION_TIME_STEP, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::util::get_parallel_entities};
+use crate::{components::{trajectory_component::orbit::Orbit, ComponentType}, constants::PREDICTION_TIME_STEP, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::{numerical_methods::bisection::bisection, util::get_parallel_entities}};
 
 use self::bounding::{find_encounter_bounds, EncounterBoundType};
 
@@ -13,18 +13,18 @@ fn angle_window_to_time_window(orbit: &Orbit, window: (f64, f64)) -> (f64, f64) 
 }
 
 fn solve_for_encounter(orbit: &Orbit, other_orbit: &Orbit, start_time: f64, end_time: f64) -> Option<f64> {
-    let soi = other_orbit.get_sphere_of_influence();
     let f = |time: f64| {
-        let position = orbit.get_theta_from_time(time);
-        let other_position = other_orbit.get_theta_from_time(time);
-        (position - other_position).abs() - soi
+        let position = orbit.get_position_from_theta(orbit.get_theta_from_time(time));
+        let other_position = other_orbit.get_position_from_theta(other_orbit.get_theta_from_time(time));
+        (position - other_position).magnitude()
     };
+    let soi = other_orbit.get_sphere_of_influence();
     let mut time = start_time;
     let mut previous_distance = f64::MAX;
     while time < end_time {
-        let distance = f(time);
+        let distance = f(time) - soi;
         if distance.is_sign_negative() && previous_distance.is_sign_positive() {
-            return Some(time);
+            return Some(bisection(&f, time - PREDICTION_TIME_STEP, time));
         }
         previous_distance = distance;
         time += PREDICTION_TIME_STEP;
@@ -115,52 +115,59 @@ fn get_initial_bounds(state: &State, entity: Entity, start_time: f64) -> (Vec<Un
     (unbounded, time_bounds)
 }
 
+fn should_update(soonest_encounter: &Option<Encounter>, encounter_time: f64) -> bool {
+    if let Some(soonest_encounter) = soonest_encounter {
+        encounter_time < soonest_encounter.get_time()
+    } else {
+        true
+    }
+}
+
+fn update_soonest_encounter(soonest_encounter: &mut Option<Encounter>, orbit: &Orbit, other_orbit: &Orbit, entity: Entity, other_entity: Entity, start_time: f64, end_time: &mut f64) {
+    if let Some(encounter_time) = solve_for_encounter(orbit, other_orbit, start_time, *end_time) {
+        if encounter_time > 0.0 && should_update(&soonest_encounter, encounter_time) {
+            *soonest_encounter = Some(Encounter::new(EncounterType::Entrance, entity, other_entity, encounter_time));
+            *end_time = encounter_time;
+        }
+    }
+}
 
 pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     let (unbounded, mut time_bounds) = get_initial_bounds(state, entity, start_time);
+    let mut start_time = if let Some(first) = time_bounds.first() {
+        first.get_soonest_time()
+    } else {
+        start_time
+    };
+    let mut end_time = end_time;
 
     if time_bounds.is_empty() {
-        let soonest_encounter = None;
+        let mut soonest_encounter: Option<Encounter> = None;
         for unbounded in unbounded {
-            if let Some(encounter)time) = solve_for_encounter(unbounded.orbit, unbounded.other_orbit, start_time, end_time) {
-                (if)
-                soonest_encounter = Some(Encounter::new(EncounterType::Entrance, entity, unbounded.other_entity, time));
-            }
+            update_soonest_encounter(&mut soonest_encounter, unbounded.orbit, unbounded.other_orbit, entity, unbounded.other_entity, start_time, &mut end_time);
         }
+        return soonest_encounter
     }
 
-    let mut start_time = time_bounds.first().unwrap().get_soonest_time();
-    let mut end_time = end_time;
     let mut soonest_encounter: Option<Encounter> = None;
-
     loop {
         if start_time > end_time {
             break;
         }
 
-        let first = time_bounds.first().unwrap();
+        let first = time_bounds.first_mut().unwrap();
         let new_start_time = first.get_soonest_time();
-        
-        // Check if window contains encounters
-        if let Some(encounter_time) = solve_for_encounter(first.orbit, first.other_orbit, first.get_soonest_time(), f64::min(first.get_latest_time(), end_time)) {
-
-            // If so update soonest encounter + end time if new encounter occurs sooner
-            let should_update = if let Some(soonest_encounter) = &mut soonest_encounter {
-                encounter_time < soonest_encounter.get_time()
-            } else {
-                true
-            };
-            if should_update {
-                soonest_encounter = Some(Encounter::new(EncounterType::Entrance, entity, first.other_entity, encounter_time));
-                end_time = encounter_time;
-            }
+        update_soonest_encounter(&mut soonest_encounter, first.orbit, first.other_orbit, entity, first.other_entity, start_time, &mut end_time);
+        first.increment_by_period();
+        for unbounded in &unbounded {
+            update_soonest_encounter(&mut soonest_encounter, unbounded.orbit, unbounded.other_orbit, entity, unbounded.other_entity, start_time, &mut end_time);
         }
         
-        // Solve for any unbounded encounters from the old start time to the new start time
-        // Brute force
-
+        start_time = new_start_time;
         time_bounds.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
     };
+
+    return soonest_encounter;
 }
 
 #[cfg(test)]
@@ -171,8 +178,8 @@ mod test {
 
     #[test]
     fn temp() {
-        let (mut state, mut encounters, _, end_time, time_step) = load_case("two-moons-varied-encounters");
+        let (mut state, mut encounters, _, end_time, time_step) = load_case("encounter-with-earth-and-moon");
         let spacecraft = get_entity_by_name(&state, "spacecraft");
-        find_next_encounter(&state, spacecraft, 0.0, 1.0e10)
+        println!("{:?}", find_next_encounter(&state, spacecraft, 0.0, 1.0e10));
     }
 }
