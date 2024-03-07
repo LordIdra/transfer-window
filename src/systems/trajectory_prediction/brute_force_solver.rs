@@ -237,5 +237,3 @@ mod test {
         run_case("two-moons-varied-encounters");
     }
 }
-
-// find, tar, gzip, nohup, paralle, basename, gnuplot
