@@ -40,9 +40,9 @@ fn find_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Op
 /// Solves for when an entity will leave its parent
 /// If the given entity is not on a hyperbolic trajectory, returns none when a call to solve is made
 pub fn solve_for_exit(state: &State, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
-    let orbit = state.get_trajectory_component(entity).get_segment_at_time(start_time).as_orbit();
+    let orbit = state.get_trajectory_component(entity).get_end_segment().as_orbit(); 
     if orbit.get_semi_major_axis().is_sign_positive() {
-        // Orbit is an ellipse so parent cannot be exited
+        // TODO Orbit is an ellipse
         return None;
     }
     let Some(parent_trajectory_component) = state.try_get_trajectory_component(orbit.get_parent()) else {

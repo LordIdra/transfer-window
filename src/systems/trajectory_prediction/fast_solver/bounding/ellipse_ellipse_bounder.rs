@@ -43,17 +43,8 @@ impl<'a> BounderData<'a> {
         vec![]
     }
 
-    fn one_bound_outside(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+    fn one_bound(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
         let f = |theta: f64| (sdf)(theta) - self.soi;
-        let intersections = find_intersections(&f, self.min_theta, self.max_theta);
-        let angle_bound = make_range_containing(intersections.0, intersections.1, self.min_theta);
-        let bound = angle_window_to_time_window(&self.orbit, angle_bound);
-        let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound);
-        vec![window]
-    }
-
-    fn one_bound_inside(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
-        let f = |theta: f64| (sdf)(theta) + self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
         let angle_bound = make_range_containing(intersections.0, intersections.1, self.min_theta);
         let bound = angle_window_to_time_window(&self.orbit, angle_bound);
@@ -114,14 +105,17 @@ pub fn get_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity
         end_time
     };
 
+    println!("{:.e} {:.e} {:.e}", min, max, soi);
+
     if min.abs() < soi && max.abs() < soi {
         data.no_bounds()
     } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() > soi) || (max.is_sign_negative() && min.is_sign_negative() && max.abs() > soi) {
         data.no_encounters()
-    } else if min.is_sign_negative() && max.is_sign_positive() && min.abs() < soi {
-        data.one_bound_outside(sdf)
-    } else if min.is_sign_negative() && max.is_sign_positive() && max.abs() < soi {
-        data.one_bound_inside(sdf)
+    } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() < soi) 
+           || (max.is_sign_positive() && min.is_sign_negative() && min.abs() < soi) 
+           || (max.is_sign_positive() && min.is_sign_negative() && max.abs() < soi)
+           || (max.is_sign_negative() && min.is_sign_negative() && max.abs() < soi) { 
+        data.one_bound(sdf)
     } else {
         data.two_bounds(sdf)
     }

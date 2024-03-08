@@ -68,9 +68,9 @@ pub fn apply_encounter(state: &mut State, encounter: Encounter) {
     }
 }
 
-/// Returns all entities with the same parent from can_enter
+/// Returns all entities with the same FINAL parent from can_enter
 /// It's expected that candidates only contains entities with a trajectory component
-pub fn get_siblings(state: &State, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
+pub fn get_final_siblings(state: &State, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
     let end_segment = state.get_trajectory_component(entity).get_end_segment();
     let time = end_segment.get_end_time();
     let parent = end_segment.get_parent();

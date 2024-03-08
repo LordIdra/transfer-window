@@ -1,4 +1,4 @@
-use crate::{components::ComponentType, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::util::{get_siblings, Encounter, EncounterType}};
+use crate::{components::ComponentType, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::util::{get_final_siblings, Encounter, EncounterType}};
 
 use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
 
@@ -28,7 +28,7 @@ mod exit_solver;
 /// - If an encounter is found, set the new end time to the time of the encounter and continue running the algorithm
 pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     let can_enter = &state.get_entities(vec![ComponentType::TrajectoryComponent, ComponentType::OrbitableComponent]);
-    let siblings = get_siblings(state, can_enter, entity);
+    let siblings = get_final_siblings(state, can_enter, entity);
     let mut windows = vec![];
     for window in get_initial_windows(state, entity, siblings, start_time, end_time) {
         windows.append(&mut window.split());
@@ -52,7 +52,7 @@ pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_t
         let from = f64::max(window.get_soonest_time(), start_time);
         let to = f64::min(window.get_latest_time(), end_time);
         if let Some(encounter_time) = solve_for_entrance(window.get_orbit(), window.get_other_orbit(), from, to) {
-            if encounter_time > start_time { // prevents objects falling back into their SOI instantly after an exit
+            if encounter_time > start_time {
                 soonest_encounter = Some(Encounter::new(EncounterType::Entrance, entity, window.get_other_entity(), encounter_time));
                 end_time = encounter_time;
             }

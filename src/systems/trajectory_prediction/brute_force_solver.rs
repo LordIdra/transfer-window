@@ -10,7 +10,7 @@ use std::collections::HashSet;
 
 use crate::{components::ComponentType, state::State, storage::entity_allocator::Entity};
 
-use super::util::{get_siblings, Encounter, EncounterType};
+use super::util::{get_final_siblings, Encounter, EncounterType};
 
 fn exit_check(state: &State, can_exit: &HashSet<Entity>, entity: Entity) -> Option<Entity> {
     let trajectory_component = state.get_trajectory_component(entity);
@@ -30,7 +30,7 @@ fn exit_check(state: &State, can_exit: &HashSet<Entity>, entity: Entity) -> Opti
 fn entrance_check(state: &State, can_enter: &HashSet<Entity>, entity: Entity) -> Option<Entity> {
     let end_segment = state.get_trajectory_component(entity).get_end_segment();
     let position = end_segment.get_end_position();
-    let siblings = get_siblings(state, can_enter, entity);
+    let siblings = get_final_siblings(state, can_enter, entity);
     for sibling in siblings {
         let trajectory_component = state.get_trajectory_component(sibling);
         let end_segment = trajectory_component.get_end_segment();
