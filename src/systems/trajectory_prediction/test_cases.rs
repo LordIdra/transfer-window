@@ -44,7 +44,7 @@ impl CaseEncounter {
         let difference = (encounter.get_time() - self.get_time()).abs() / encounter.get_time();
         encounter.get_type() == self.get_type()
             && object_name == self.get_object()
-            && new_parent_name == self.get_new_parent()
+            && new_parent_name == self.get_new_parent() 
             && difference < 0.005
     }
 }

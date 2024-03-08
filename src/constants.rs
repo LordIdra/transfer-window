@@ -8,3 +8,4 @@ pub const NEWTON_SOLVER_DERIVATIVE_DELTA: f64 = 1.0e-2;
 pub const NEWTON_SOLVER_MAX_ITERATIONS: usize = 200;
 pub const NEWTON_SOLVER_MIN_VALUE: f64 = -1.0e6;
 pub const BISECTION_ITERATIONS: usize = 12;
+pub const SOLVER_WINDOW_MAX_SECONDS: f64 = 60.0 * 60.0 * 6.0;

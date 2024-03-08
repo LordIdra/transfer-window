@@ -52,28 +52,36 @@ impl<T> ComponentStorage<T> {
     }
 
     pub fn get_mut(&mut self, entity: Entity) -> &mut T {
+        self.try_get_mut(entity).expect("Attempted to get nonexistant component")
+    }
+
+    pub fn get(&self, entity: Entity) -> &T {
+        self.try_get(entity).expect("Attempted to get nonexistant component")
+    }
+
+    pub fn try_get_mut(&mut self, entity: Entity) -> Option<&mut T> {
         let entry = self.entries
             .get_mut(entity.get_index())
             .expect("Entity index out of range")
             .as_mut();
         if let Some(entry) = entry {
             if entry.generation == entity.get_generation() {
-                return &mut entry.value;
+                return Some(&mut entry.value);
             }
         }
-        panic!("Attempted to get nonexistant component");
+        None
     }
 
-    pub fn get(&self, entity: Entity) -> &T {
+    pub fn try_get(&self, entity: Entity) -> Option<&T> {
         let entry = self.entries
             .get(entity.get_index())
             .expect("Entity index out of range");
         if let Some(entry) = entry {
             if entry.generation == entity.get_generation() {
-                return &entry.value;
+                return Some(&entry.value);
             }
         }
-        panic!("Attempted to get nonexistant component");
+        None
     }
 
     pub fn get_entities(&self) -> &HashSet<Entity> {

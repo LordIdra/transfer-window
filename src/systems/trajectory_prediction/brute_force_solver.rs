@@ -10,7 +10,7 @@ use std::collections::HashSet;
 
 use crate::{components::ComponentType, state::State, storage::entity_allocator::Entity};
 
-use super::util::{get_parallel_entities, Encounter, EncounterType};
+use super::util::{get_siblings, Encounter, EncounterType};
 
 fn exit_check(state: &State, can_exit: &HashSet<Entity>, entity: Entity) -> Option<Entity> {
     let trajectory_component = state.get_trajectory_component(entity);
@@ -30,15 +30,15 @@ fn exit_check(state: &State, can_exit: &HashSet<Entity>, entity: Entity) -> Opti
 fn entrance_check(state: &State, can_enter: &HashSet<Entity>, entity: Entity) -> Option<Entity> {
     let end_segment = state.get_trajectory_component(entity).get_end_segment();
     let position = end_segment.get_end_position();
-    let parallel_entities = get_parallel_entities(state, can_enter, entity);
-    for other_entity in parallel_entities {
-        let trajectory_component = state.get_trajectory_component(other_entity);
+    let siblings = get_siblings(state, can_enter, entity);
+    for sibling in siblings {
+        let trajectory_component = state.get_trajectory_component(sibling);
         let end_segment = trajectory_component.get_end_segment();
         let sphere_of_influence = end_segment.as_orbit().get_sphere_of_influence();
         let other_position = end_segment.get_end_position();
         let distance = (position - other_position).magnitude();
         if distance < sphere_of_influence {
-            return Some(other_entity);
+            return Some(sibling);
         }
     }
     None
@@ -188,6 +188,11 @@ mod test {
     }
 
     #[test]
+    fn test_case_ellipse_encounter_with_escaping_moon() {
+        run_case("ellipse-encounter-with-escaping-moon");
+    }
+
+    #[test]
     fn test_case_encounter_with_earth() {
         run_case("encounter-with-earth");
     }
@@ -200,6 +205,11 @@ mod test {
     #[test]
     fn test_case_escape_from_earth() {
         run_case("escape-from-earth");
+    }
+
+    #[test]
+    fn test_case_hyperbola_encounter_with_escaping_moon() {
+        run_case("hyperbola-encounter-with-escaping-moon");
     }
 
     #[test]

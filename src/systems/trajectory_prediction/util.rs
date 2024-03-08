@@ -68,12 +68,14 @@ pub fn apply_encounter(state: &mut State, encounter: Encounter) {
     }
 }
 
-pub fn get_parallel_entities(state: &State, can_enter: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
+/// Returns all entities with the same parent from can_enter
+/// It's expected that candidates only contains entities with a trajectory component
+pub fn get_siblings(state: &State, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
     let end_segment = state.get_trajectory_component(entity).get_end_segment();
     let time = end_segment.get_end_time();
     let parent = end_segment.get_parent();
-    let mut parallel_entities = vec![];
-    for other_entity in can_enter {
+    let mut siblings = vec![];
+    for other_entity in candidates {
         if entity == *other_entity {
             continue;
         }
@@ -81,7 +83,7 @@ pub fn get_parallel_entities(state: &State, can_enter: &HashSet<Entity>, entity:
         if parent != other_end_segment.get_parent() {
             continue;
         }
-        parallel_entities.push(*other_entity);
+        siblings.push(*other_entity);
     }
-    parallel_entities
+    siblings
 }
