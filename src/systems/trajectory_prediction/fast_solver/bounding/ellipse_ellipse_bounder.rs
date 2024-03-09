@@ -5,7 +5,11 @@ use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allo
 use super::{sdf::{find_min_max_signed_distance, make_sdf}, window::Window};
 
 fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
-    let theta_1 = normalize_angle(newton_raphson(&f, bisection(&f, min_theta, max_theta), 1.0e-6).expect("Newton-Raphson failed to converge"));
+    println!("a {} {}", f(min_theta), f(max_theta));
+    let dbgg = bisection(&f, min_theta, max_theta, 24);
+    println!("d {} {}", f(min_theta), f(max_theta));
+    println!("e {} {} {}", f(dbgg - 0.01), f(dbgg), f(dbgg + 0.01));
+    let theta_1 = normalize_angle(newton_raphson(&f, bisection(&f, min_theta, max_theta, 24), 1.0e-4).expect("Newton-Raphson failed to converge"));
     // the other angle is in the 'opposite' range
     // we can find this by subtracting 2pi from the highest theta
     let (new_min_theta, new_max_theta) = if min_theta > max_theta {
@@ -13,7 +17,9 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
     } else {
         (min_theta, max_theta - 2.0 * PI)
     };
-    let theta_2 = normalize_angle(newton_raphson(&f, bisection(&f, new_min_theta, new_max_theta), 1.0e-6).expect("Newton-Raphson failed to converge"));
+    let theta_2 = bisection(&f, new_min_theta, new_max_theta, 12);
+    let theta_2 = newton_raphson(&f, theta_2, 1.0e-6).expect("Newton-Raphson failed to converge");
+    let theta_2 = normalize_angle(theta_2);
     (theta_1, theta_2)
 }
 
@@ -43,8 +49,19 @@ impl<'a> BounderData<'a> {
         vec![]
     }
 
-    fn one_bound(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+    fn one_bound_inner(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+        // Bound start/end points are on the INSIDE
         let f = |theta: f64| (sdf)(theta) - self.soi;
+        let intersections = find_intersections(&f, self.min_theta, self.max_theta);
+        let angle_bound = make_range_containing(intersections.0, intersections.1, self.min_theta);
+        let bound = angle_window_to_time_window(&self.orbit, angle_bound);
+        let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound);
+        vec![window]
+    }
+
+    fn one_bound_outer(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+        // Bound start/end points are on the OUTSIDE
+        let f = |theta: f64| (sdf)(theta) + self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
         let angle_bound = make_range_containing(intersections.0, intersections.1, self.min_theta);
         let bound = angle_window_to_time_window(&self.orbit, angle_bound);
@@ -109,13 +126,15 @@ pub fn get_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity
 
     if min.abs() < soi && max.abs() < soi {
         data.no_bounds()
-    } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() > soi) || (max.is_sign_negative() && min.is_sign_negative() && max.abs() > soi) {
+    } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() > soi) 
+           || (max.is_sign_negative() && min.is_sign_negative() && max.abs() > soi) {
         data.no_encounters()
-    } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() < soi) 
-           || (max.is_sign_positive() && min.is_sign_negative() && min.abs() < soi) 
-           || (max.is_sign_positive() && min.is_sign_negative() && max.abs() < soi)
-           || (max.is_sign_negative() && min.is_sign_negative() && max.abs() < soi) { 
-        data.one_bound(sdf)
+    } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() < soi)
+           || (max.is_sign_positive() && min.is_sign_negative() && min.abs() < soi) {
+        data.one_bound_inner(sdf)
+    } else if (max.is_sign_positive() && min.is_sign_negative() && max.abs() < soi)
+           || (max.is_sign_negative() && min.is_sign_negative() && max.abs() < soi) {
+        data.one_bound_outer(sdf)
     } else {
         data.two_bounds(sdf)
     }

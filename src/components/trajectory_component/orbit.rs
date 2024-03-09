@@ -111,6 +111,10 @@ impl Orbit {
         }
     }
 
+    pub fn is_ellipse(&self) -> bool {
+        self.get_period().is_some()
+    }
+
     pub fn is_finished(&self) -> bool {
         self.current_point.is_after(&self.end_point)
     }

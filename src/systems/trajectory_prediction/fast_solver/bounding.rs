@@ -1,6 +1,6 @@
 use crate::{state::State, storage::entity_allocator::Entity};
 
-use self::window::Window;
+use self::{ellipse_ellipse_bounder::get_bound, window::Window};
 
 mod ellipse_ellipse_bounder;
 mod sdf;
@@ -14,9 +14,15 @@ pub fn get_initial_windows(state: &State, entity: Entity, siblings: Vec<Entity>,
 
     for sibling in siblings {
         let other_orbit = state.get_trajectory_component(sibling).get_segment_at_time(start_time).as_orbit();
-        // TODO this assumes it's ellipse-ellipse
-        if orbit.is_ellipse() // TODO add this and change the sma shit
-        windows.append(&mut get_bound(orbit, other_orbit, sibling, start_time, end_time));
+        if orbit.is_ellipse() && other_orbit.is_ellipse() { // TODO add this and change the sma shit
+            windows.append(&mut get_bound(orbit, other_orbit, sibling, start_time, end_time));
+        } else if !orbit.is_ellipse() {
+            //TODO
+        } else if !other_orbit.is_ellipse() {
+            //TODO
+        } else {
+            //TODO
+        }
     }
 
     for window in &mut windows {

@@ -38,6 +38,11 @@ impl Encounter {
     pub fn get_time(&self) -> f64 {
         self.time
     }
+
+    #[cfg(test)]
+    pub fn set_time(&mut self, time: f64) {
+        self.time = time;
+    }
 }
 
 fn do_exit(state: &mut State, entity: Entity, new_parent: Entity, time: f64) {

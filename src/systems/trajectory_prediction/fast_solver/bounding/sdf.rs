@@ -10,7 +10,7 @@ fn find_other_stationary_point(known_stationary_point_theta: f64, distance_funct
     let min = known_stationary_point_theta + 0.001;
     let max = known_stationary_point_theta - 0.001 + 2.0*PI;
     let derivative = move |theta: f64| (distance_function(theta + 0.00001) - distance_function(theta)) / 0.00001;
-    bisection(&derivative, min, max)
+    bisection(&derivative, min, max, 12)
 }
 
 // Returns a function that will return the closest point on the given orbit from an arbitrary point
