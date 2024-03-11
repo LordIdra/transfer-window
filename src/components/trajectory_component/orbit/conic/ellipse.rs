@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::components::trajectory_component::orbit::{orbit_direction::OrbitDirection, scary_math::{period, argument_of_periapsis, specific_angular_momentum, solve_kepler_equation_ellipse}, orbit_point::OrbitPoint, conic_type::ConicType};
+use crate::{components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, period, solve_kepler_equation_ellipse, specific_angular_momentum}}, util::normalize_angle};
 
 use super::Conic;
 
@@ -46,15 +46,17 @@ impl Conic for Ellipse {
     }
     /// Always returns a positive time
     fn get_time_since_last_periapsis(&self, theta: f64) -> f64 {
-        let true_anomaly = theta - self.argument_of_periapsis;
+        let mut true_anomaly = theta - self.argument_of_periapsis;
+        // Solve an edge case where if true_anomaly is very close to 0 or pi, it will spit out inaccurate results due to the tan
+        if true_anomaly.abs() < 1.0e-6 || (true_anomaly.abs() - PI).abs() < 1.0e-4 {
+            true_anomaly += 1.0e-4
+        }
         let eccentric_anomaly = 2.0 * f64::atan(f64::sqrt((1.0 - self.eccentricity) / (1.0 + self.eccentricity)) * f64::tan(true_anomaly / 2.0));
         let mut mean_anomaly = eccentric_anomaly - self.eccentricity * f64::sin(eccentric_anomaly);
         if let OrbitDirection::Clockwise = self.direction {
             mean_anomaly = -mean_anomaly;
         }
-        if mean_anomaly.is_sign_negative() {
-            mean_anomaly += 2.0 * PI;
-        }
+        mean_anomaly = normalize_angle(mean_anomaly);
         mean_anomaly * self.period / (2.0 * PI)
     }
 
@@ -115,7 +117,7 @@ impl Conic for Ellipse {
 
 #[cfg(test)]
 mod tests {
-    use crate::{constants::GRAVITATIONAL_CONSTANT, components::trajectory_component::{orbit::scary_math::{semi_major_axis, eccentricity}, brute_force_tester::BruteForceTester}};
+    use crate::{components::trajectory_component::{brute_force_tester::BruteForceTester, orbit::{conic::new_conic, scary_math::{eccentricity, semi_major_axis}}}, constants::GRAVITATIONAL_CONSTANT};
 
     use super::*;
     
@@ -151,6 +153,19 @@ mod tests {
         let theta = f64::atan2(tester.get_position().y, tester.get_position().x);
         let time = ellipse.get_time_since_last_periapsis(theta);
         assert!((expected_time - time).abs() < 1.0e4);
+    }
+
+    #[test]
+    fn test_get_time_since_last_periapsis_3() {
+        let position = vec2(8.0e6,  0.0);
+        let velocity = vec2(0.0, 0.11e4);
+        let parent_mass = 7.348e22;
+        let conic = new_conic(parent_mass, position, velocity);
+        assert!(conic.get_semi_major_axis().is_sign_positive());
+        let theta = 2.0;
+        let time = conic.get_time_since_last_periapsis(theta);
+        let new_theta = conic.get_theta_from_time_since_periapsis(time);
+        assert!((new_theta - theta).abs() < 1.0e-4);
     }
 
     #[test]

@@ -12,8 +12,7 @@ fn solve_ellipse_ellipse(orbit: &Orbit, sibling_orbit: &Orbit, start_time: f64, 
     while time < end_time {
         let distance = f(time);
         if distance.is_sign_negative() && previous_distance.is_sign_positive() {
-            println!("bisecting entrance {} to {}", time - PREDICTION_TIME_STEP, time);
-            return Some(bisection(&f, time - PREDICTION_TIME_STEP, time, 12));
+            return Some(bisection(&f, time - PREDICTION_TIME_STEP, time, 24));
         }
         previous_distance = distance;
         time += PREDICTION_TIME_STEP;

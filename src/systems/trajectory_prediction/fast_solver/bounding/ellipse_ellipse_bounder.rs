@@ -1,15 +1,11 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, mem::swap};
 
-use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::{fast_solver::bounding::util::{angular_distance, make_range_containing}, numerical_methods::{bisection::bisection, newton_raphson::newton_raphson}}, util::normalize_angle};
+use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::{fast_solver::bounding::util::{angular_distance, make_range_containing}, numerical_methods::bisection::bisection}, util::normalize_angle};
 
 use super::{sdf::{find_min_max_signed_distance, make_sdf}, window::Window};
 
 fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
-    println!("a {} {}", f(min_theta), f(max_theta));
-    let dbgg = bisection(&f, min_theta, max_theta, 24);
-    println!("d {} {}", f(min_theta), f(max_theta));
-    println!("e {} {} {}", f(dbgg - 0.01), f(dbgg), f(dbgg + 0.01));
-    let theta_1 = normalize_angle(newton_raphson(&f, bisection(&f, min_theta, max_theta, 24), 1.0e-4).expect("Newton-Raphson failed to converge"));
+    let theta_1 = normalize_angle(bisection(&f, min_theta, max_theta, 24));
     // the other angle is in the 'opposite' range
     // we can find this by subtracting 2pi from the highest theta
     let (new_min_theta, new_max_theta) = if min_theta > max_theta {
@@ -17,14 +13,22 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
     } else {
         (min_theta, max_theta - 2.0 * PI)
     };
-    let theta_2 = bisection(&f, new_min_theta, new_max_theta, 12);
-    let theta_2 = newton_raphson(&f, theta_2, 1.0e-6).expect("Newton-Raphson failed to converge");
+    let theta_2 = bisection(&f, new_min_theta, new_max_theta, 24);
     let theta_2 = normalize_angle(theta_2);
     (theta_1, theta_2)
 }
 
-fn angle_window_to_time_window(orbit: &Orbit, window: (f64, f64)) -> (f64, f64) {
-    (orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.0), orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.1))
+fn angle_window_to_time_window(orbit: &Orbit, mut window: (f64, f64)) -> (f64, f64) {
+    if orbit.is_clockwise() {
+        swap(&mut window.0, &mut window.1);
+    }
+    let mut window = (
+        orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.0), 
+        orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.1));
+    if window.1 < window.0 {
+        window.1 += orbit.get_period().unwrap()
+    }
+    window
 }
 
 struct BounderData<'a> {
@@ -63,7 +67,7 @@ impl<'a> BounderData<'a> {
         // Bound start/end points are on the OUTSIDE
         let f = |theta: f64| (sdf)(theta) + self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
-        let angle_bound = make_range_containing(intersections.0, intersections.1, self.min_theta);
+        let angle_bound = make_range_containing(intersections.0, intersections.1, self.max_theta);
         let bound = angle_window_to_time_window(&self.orbit, angle_bound);
         let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound);
         vec![window]
@@ -121,8 +125,6 @@ pub fn get_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity
         start_time,
         end_time
     };
-
-    println!("{:.e} {:.e} {:.e}", min, max, soi);
 
     if min.abs() < soi && max.abs() < soi {
         data.no_bounds()

@@ -1,4 +1,6 @@
-use crate::{components::ComponentType, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::util::{get_final_siblings, Encounter, EncounterType}};
+use std::collections::HashSet;
+
+use crate::{components::ComponentType, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
 
 use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
 
@@ -6,6 +8,26 @@ use super::bounding::get_initial_windows;
 
 mod entrance_solver;
 mod exit_solver;
+
+/// Returns all entities with the same FINAL parent from can_enter
+/// It's expected that candidates only contains entities with a trajectory component
+pub fn get_final_siblings(state: &State, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
+    let end_segment = state.get_trajectory_component(entity).get_end_segment();
+    let time = end_segment.get_end_time();
+    let parent = end_segment.get_parent();
+    let mut siblings = vec![];
+    for other_entity in candidates {
+        if entity == *other_entity {
+            continue;
+        }
+        let other_end_segment = state.get_trajectory_component(*other_entity).get_segment_at_time(time);
+        if parent != other_end_segment.get_parent() {
+            continue;
+        }
+        siblings.push(*other_entity);
+    }
+    siblings
+}
 
 /// Solves for the next encounter of a single entity by combining the entrance and exit solvers
 /// Problem:
@@ -29,11 +51,7 @@ mod exit_solver;
 pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     let can_enter = &state.get_entities(vec![ComponentType::TrajectoryComponent, ComponentType::OrbitableComponent]);
     let siblings = get_final_siblings(state, can_enter, entity);
-    let mut windows = vec![];
-    for window in get_initial_windows(state, entity, siblings, start_time, end_time) {
-        windows.append(&mut window.split());
-    }
-
+    let mut windows = get_initial_windows(state, entity, siblings, start_time, end_time);
     let mut soonest_encounter = solve_for_exit(state, entity, start_time, end_time);
     let mut end_time = match &soonest_encounter {
         Some(encounter) => encounter.get_time(),

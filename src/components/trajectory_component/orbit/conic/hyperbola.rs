@@ -41,7 +41,11 @@ impl Conic for Hyperbola {
 
     /// Time can be negative if we have not reached the periapsis at the given theta
     fn get_time_since_last_periapsis(&self, theta: f64) -> f64 {
-        let true_anomaly = theta - self.argument_of_periapsis;
+        let mut true_anomaly = theta - self.argument_of_periapsis;
+        // Solve an edge case where if true_anomaly is very close to 0 or pi, it will spit out inaccurate results due to the tan
+        if true_anomaly.abs() < 1.0e-6 || (true_anomaly.abs() - PI).abs() < 1.0e-4 {
+            true_anomaly += 1.0e-4
+        }
         let eccentric_anomaly = 2.0 * f64::atanh(f64::sqrt((self.eccentricity - 1.0) / (self.eccentricity + 1.0)) * f64::tan(true_anomaly / 2.0));
         let mean_anomaly = self.eccentricity * f64::sinh(eccentric_anomaly) - eccentric_anomaly;
         let x = self.specific_angular_momentum.powi(3) / self.standard_gravitational_parameter.powi(2);

@@ -47,7 +47,6 @@ impl<'a> Window<'a> {
         Self::new(self.orbit, self.other_orbit, self.other_entity, self.periodic, bound)
     }
 
-    // Order by the latest time we'll have to think about an encounter
     pub fn cmp(&self, other: &Self) -> Ordering {
         if self.get_soonest_time() > other.get_soonest_time() {
             Ordering::Less

@@ -124,6 +124,7 @@ mod test {
 
         let end_position_1 = trajectory.get_segment_at_time(43.64).get_end_position();
         let end_position_2 = trajectory.get_segment_at_time(172.01).get_end_position();
+        println!("{:?} {:?}", end_position_1, end_position_2); //TODO wtf happened here?
         assert!((end_position_1.magnitude() - end_position_2.magnitude()) < 1.0e-3);
 
         for _ in 0..200 {

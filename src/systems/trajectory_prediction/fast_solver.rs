@@ -1,9 +1,41 @@
+use crate::{components::trajectory_component::{orbit::Orbit, segment::Segment}, state::State, storage::entity_allocator::Entity};
+
+use super::encounter::{Encounter, EncounterType};
+
 mod bounding;
 mod entity_solver;
 
+fn do_exit(state: &mut State, entity: Entity, new_parent: Entity, time: f64) {
+    let old_parent = state.get_trajectory_component(entity).get_end_segment().get_parent();
+    let mass = state.get_mass_component(entity).get_mass();
+    let new_parent_mass = state.get_mass_component(new_parent).get_mass();
+    let position = state.get_trajectory_component(entity).get_end_segment().get_end_position() + state.get_trajectory_component(old_parent).get_end_segment().get_end_position();
+    let velocity = state.get_trajectory_component(entity).get_end_segment().get_end_velocity() + state.get_trajectory_component(old_parent).get_end_segment().get_end_velocity();
+    let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
+    state.get_trajectory_component_mut(entity).add_segment(segment);
+}
+
+fn do_entrance(state: &mut State, entity: Entity, new_parent: Entity, time: f64) {
+    let new_parent_mass = state.get_mass_component(new_parent).get_mass();
+    let mass = state.get_mass_component(entity).get_mass();
+    let position = state.get_trajectory_component(entity).get_end_segment().get_end_position() - state.get_trajectory_component(new_parent).get_end_segment().get_end_position();
+    let velocity = state.get_trajectory_component(entity).get_end_segment().get_end_velocity() - state.get_trajectory_component(new_parent).get_end_segment().get_end_velocity();
+    let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
+    state.get_trajectory_component_mut(entity).add_segment(segment);
+}
+
+/// This detachment of encounter solving and application allows the solver to be much more easily tested
+/// As well as leading to cleaner overall design
+pub fn apply_encounter(state: &mut State, encounter: Encounter) {
+    match encounter.get_type() {
+        EncounterType::Entrance => do_entrance(state, encounter.get_entity(), encounter.get_new_parent(), encounter.get_time()),
+        EncounterType::Exit => do_exit(state, encounter.get_entity(), encounter.get_new_parent(), encounter.get_time()),
+    }
+}
+
 #[cfg(test)]
 mod test {
-    use crate::{components::ComponentType, systems::trajectory_prediction::{fast_solver::entity_solver::find_next_encounter, test_cases::load_case, util::{apply_encounter, Encounter}}};
+    use crate::{components::ComponentType, systems::trajectory_prediction::{fast_solver::{apply_encounter, entity_solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
 
     fn run_case(name: &str) {
         let (mut state, mut encounters, _, end_time, _) = load_case(name);
@@ -40,8 +72,7 @@ mod test {
             }
 
             // We unfortunately have to use the case encounter's time, not the calculated time
-            // Small errors in the cases can cause the simulations to massively diverge in more complex tests
-            //TODO stop doing this if we can get more accurate cases
+            // Small errors in the cases or differences in implementations can cause the simulations to massively diverge in more complex tests
             let case_encounter = encounters.pop_front().unwrap();
             encounter.set_time(case_encounter.get_time());
 
@@ -65,7 +96,7 @@ mod test {
 
     #[test]
     fn test_case_ellipse_encounter_with_escaping_moon() {
-        run_case("ellipse-encounter-with-escaping-moon");
+        run_case("ellipse-encounter-with-escaping-moon"); //TODO fix this case after improving kepler equations solvers...
     }
 
     #[test]
@@ -84,6 +115,16 @@ mod test {
     }
 
     #[test]
+    fn test_case_escape_from_moon_1() {
+        run_case("escape-from-moon-1");
+    }
+
+    #[test]
+    fn test_case_escape_from_moon_2() {
+        run_case("escape-from-moon-2");
+    }
+
+    #[test]
     fn test_case_hyperbola_encounter_with_escaping_moon() {
         run_case("hyperbola-encounter-with-escaping-moon");
     }
@@ -99,11 +140,6 @@ mod test {
     }
 
     #[test]
-    fn test_case_insanity_3() {
-        run_case("insanity-3");
-    }
-
-    #[test]
     fn test_case_many_moon_encounters() {
         run_case("many-moon-encounters");
     }
@@ -114,12 +150,27 @@ mod test {
     }
 
     #[test]
+    fn test_case_moons_yeet_each_other() {
+        run_case("moons-yeet-each-other");
+    }
+
+    #[test]
     fn test_case_no_encounters() {
         run_case("no-encounters");
     }
 
     #[test]
-    fn test_case_two_moons_varied_encounter() {
-        run_case("two-moons-varied-encounters");
+    fn test_case_parallel_with_moon() {
+        run_case("parallel-with-moon");
+    }
+
+    #[test]
+    fn test_case_two_moons_varied_encounter_1() {
+        run_case("two-moons-varied-encounters-1");
+    }
+
+    #[test]
+    fn test_case_two_moons_varied_encounter_2() {
+        run_case("two-moons-varied-encounters-2");
     }
 }

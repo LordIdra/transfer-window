@@ -1,9 +1,8 @@
-mod brute_force_solver;
 mod fast_solver;
 mod numerical_methods;
 #[cfg(test)]
 mod test_cases;
-mod util;
+mod encounter;
 
 
 // TODO - move these comments

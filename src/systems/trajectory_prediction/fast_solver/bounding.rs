@@ -12,19 +12,24 @@ pub fn get_initial_windows(state: &State, entity: Entity, siblings: Vec<Entity>,
     let orbit = state.get_trajectory_component(entity).get_end_segment().as_orbit();
     let mut windows = vec![];
 
-    for sibling in siblings {
-        let other_orbit = state.get_trajectory_component(sibling).get_segment_at_time(start_time).as_orbit();
-        if orbit.is_ellipse() && other_orbit.is_ellipse() { // TODO add this and change the sma shit
-            windows.append(&mut get_bound(orbit, other_orbit, sibling, start_time, end_time));
+    for sibling in &siblings {
+        let sibling_orbit = state.get_trajectory_component(*sibling).get_segment_at_time(start_time).as_orbit();
+        if orbit.is_ellipse() && sibling_orbit.is_ellipse() {
+            for window in get_bound(orbit, sibling_orbit, *sibling, start_time, end_time) {
+                windows.append(&mut window.split());
+            }
+
         } else if !orbit.is_ellipse() {
             //TODO
-        } else if !other_orbit.is_ellipse() {
+        } else if !sibling_orbit.is_ellipse() {
             //TODO
         } else {
             //TODO
         }
     }
 
+    // Increment each window until it doesn't occur in its entirety before the start time
+    // Then make sure the start and end times of the window are clamped to the global start/end times
     for window in &mut windows {
         if window.is_periodic() {
             while window.get_soonest_time() < start_time && window.get_latest_time() < start_time {
@@ -37,8 +42,6 @@ pub fn get_initial_windows(state: &State, entity: Entity, siblings: Vec<Entity>,
     windows.retain(|window| {
         window.is_periodic() || !window.is_periodic() && window.get_latest_time() > start_time && window.get_soonest_time() < end_time
     });
-
-    windows.sort_unstable_by(|a, b| a.cmp(b));
 
     windows
 }

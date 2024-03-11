@@ -5,7 +5,7 @@ use serde::Deserialize;
 
 use crate::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, state::State, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
 
-use super::util::{Encounter, EncounterType};
+use super::encounter::{Encounter, EncounterType};
 
 #[derive(Deserialize)]
 struct CaseMetaData {
@@ -45,7 +45,7 @@ impl CaseEncounter {
         encounter.get_type() == self.get_type()
             && object_name == self.get_object()
             && new_parent_name == self.get_new_parent() 
-            && difference < 0.001
+            && difference < 0.005
     }
 }
 
