@@ -12,13 +12,16 @@ use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_
 fn find_other_stationary_point(known_stationary_point_theta: f64, distance_function: impl Fn(f64) -> f64) -> f64 {
     let min = known_stationary_point_theta + 0.001;
     let max = known_stationary_point_theta - 0.001 + 2.0*PI;
-    let derivative = move |theta: f64| (distance_function(theta + 0.00001) - distance_function(theta)) / 0.00001;
-    bisection(&derivative, min, max, 1.0e-6, 64)
+    let derivative = |theta: f64| (distance_function(theta + 0.00001) - distance_function(theta)) / 0.00001;
+    let starting_estimate = bisection(&derivative, min, max, 1.0e-2, 64);
+    laguerre_to_find_stationary_point(&distance_function, starting_estimate, 1.0e-6, 16)
 }
 
 // Returns a function that will return the closest point on the given orbit from an arbitrary point
 fn make_closest_point_on_orbit_function(orbit: &Orbit) -> impl Fn(DVec2) -> DVec2 + '_ {
     move |point: DVec2| {
+        #[cfg(feature = "profiling")]
+        let _span = span!("Closest point on orbit");
         let distance_function = |theta: f64| (orbit.get_position_from_theta(theta) - point).magnitude();
         let starting_theta = f64::atan2(point.y, point.x);
         let mut theta = laguerre_to_find_stationary_point(&distance_function, starting_theta + 0.1, 1.0e-6, 256);
@@ -37,6 +40,8 @@ fn make_closest_point_on_orbit_function(orbit: &Orbit) -> impl Fn(DVec2) -> DVec
 pub fn make_sdf<'a>(orbit_a: &'a Orbit, orbit_b: &'a Orbit) -> impl Fn(f64) -> f64 + 'a  {
     let closest_point_function = make_closest_point_on_orbit_function(orbit_b);
     move |theta: f64| -> f64 {
+        #[cfg(feature = "profiling")]
+        let _span = span!("SDF");
         let point = orbit_a.get_position_from_theta(theta);
         let other_point = closest_point_function(point);
         let magnitude = (point - other_point).magnitude();
