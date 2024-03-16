@@ -1,11 +1,14 @@
 use std::{f64::consts::PI, mem::swap};
 
+#[cfg(feature = "profiling")]
+use tracy_client::span;
+
 use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::{fast_solver::bounding::util::{angular_distance, make_range_containing}, numerical_methods::bisection::bisection}, util::normalize_angle};
 
 use super::{sdf::{find_min_max_signed_distance, make_sdf}, window::Window};
 
 fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
-    let theta_1 = normalize_angle(bisection(&f, min_theta, max_theta, 24));
+    let theta_1 = normalize_angle(bisection(&f, min_theta, max_theta, 1.0e-6, 64));
     // the other angle is in the 'opposite' range
     // we can find this by subtracting 2pi from the highest theta
     let (new_min_theta, new_max_theta) = if min_theta > max_theta {
@@ -13,7 +16,7 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
     } else {
         (min_theta, max_theta - 2.0 * PI)
     };
-    let theta_2 = bisection(&f, new_min_theta, new_max_theta, 24);
+    let theta_2 = bisection(&f, new_min_theta, new_max_theta, 1.0e-6, 64);
     let theta_2 = normalize_angle(theta_2);
     (theta_1, theta_2)
 }
@@ -44,16 +47,22 @@ struct BounderData<'a> {
 
 impl<'a> BounderData<'a> {
     fn no_bounds(self) -> Vec<Window<'a>> {
+        #[cfg(feature = "profiling")]
+        let _span = span!("No bounds");
         let bound = (self.start_time, self.end_time);
         let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, false, bound);
         vec![window]
     }
 
     fn no_encounters(self) -> Vec<Window<'a>> {
+        #[cfg(feature = "profiling")]
+        let _span = span!("No encounters");
         vec![]
     }
 
     fn one_bound_inner(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+        #[cfg(feature = "profiling")]
+        let _span = span!("One bound inner");
         // Bound start/end points are on the INSIDE
         let f = |theta: f64| (sdf)(theta) - self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
@@ -64,6 +73,8 @@ impl<'a> BounderData<'a> {
     }
 
     fn one_bound_outer(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+        #[cfg(feature = "profiling")]
+        let _span = span!("One bound outer");
         // Bound start/end points are on the OUTSIDE
         let f = |theta: f64| (sdf)(theta) + self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
@@ -74,6 +85,8 @@ impl<'a> BounderData<'a> {
     }
 
     fn two_bounds(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+        #[cfg(feature = "profiling")]
+        let _span = span!("Two bounds");
         let f_inner = |theta: f64| (sdf)(theta) - self.soi;
         let f_outer = |theta: f64| (sdf)(theta) + self.soi;
         let inner_intersections = find_intersections(&f_inner, self.min_theta, self.max_theta);
@@ -110,6 +123,8 @@ impl<'a> BounderData<'a> {
 
 // Bounds returned by this function assume the orbit is clockwise
 pub fn get_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64, end_time: f64) -> Vec<Window<'a>> {
+    #[cfg(feature = "profiling")]
+    let _span = span!("Ellipse-ellipse bounding");
     let argument_of_apoapsis = orbit.get_argument_of_periapsis() + PI;
     let sdf = make_sdf(orbit, sibling_orbit);
     let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis);

@@ -2,7 +2,10 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::DVec2;
 
-use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_prediction::numerical_methods::{bisection::bisection, newton_raphson::newton_raphson_to_find_stationary_point}, util::normalize_angle};
+#[cfg(feature = "profiling")]
+use tracy_client::span;
+
+use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_prediction::numerical_methods::{bisection::bisection, laguerre::laguerre_to_find_stationary_point}, util::normalize_angle};
 
 // Assuming we've already found a stationary point on a periodic function with 1 minimum and 1 maximum,
 // we can find the other using bisection by just about excluding the known stationary point
@@ -10,7 +13,7 @@ fn find_other_stationary_point(known_stationary_point_theta: f64, distance_funct
     let min = known_stationary_point_theta + 0.001;
     let max = known_stationary_point_theta - 0.001 + 2.0*PI;
     let derivative = move |theta: f64| (distance_function(theta + 0.00001) - distance_function(theta)) / 0.00001;
-    bisection(&derivative, min, max, 12)
+    bisection(&derivative, min, max, 1.0e-6, 64)
 }
 
 // Returns a function that will return the closest point on the given orbit from an arbitrary point
@@ -18,8 +21,7 @@ fn make_closest_point_on_orbit_function(orbit: &Orbit) -> impl Fn(DVec2) -> DVec
     move |point: DVec2| {
         let distance_function = |theta: f64| (orbit.get_position_from_theta(theta) - point).magnitude();
         let starting_theta = f64::atan2(point.y, point.x);
-        let mut theta = newton_raphson_to_find_stationary_point(&distance_function, starting_theta, 1.0e-6)
-            .expect("Newton-Raphson failed to converge to stationary point when finding encounter bound");
+        let mut theta = laguerre_to_find_stationary_point(&distance_function, starting_theta + 0.1, 1.0e-6, 256);
         // weird bug occurred here where sometimes the distance function would be less slightly after if the value of theta was too low
         // this is why we add slightly more to theta and check both before and after
         if distance_function(theta + 0.001) < distance_function(theta) && distance_function(theta - 0.001) < distance_function(theta) {
@@ -44,8 +46,9 @@ pub fn make_sdf<'a>(orbit_a: &'a Orbit, orbit_b: &'a Orbit) -> impl Fn(f64) -> f
 }
 
 pub fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> (f64, f64) {
-    let theta_1 = newton_raphson_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-6)
-        .expect("Newton-Raphson failed to converge to stationary point when finding encounter bound");
+    #[cfg(feature = "profiling")]
+    let _span = span!("Min max signed distance");
+    let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-6, 256);
     let theta_2 = find_other_stationary_point(theta_1, &sdf);
     let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
     if sdf(theta_1) < sdf(theta_2) { 

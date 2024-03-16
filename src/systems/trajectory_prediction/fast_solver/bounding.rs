@@ -1,3 +1,6 @@
+#[cfg(feature = "profiling")]
+use tracy_client::span;
+
 use crate::{state::State, storage::entity_allocator::Entity};
 
 use self::{ellipse_ellipse_bounder::get_bound, window::Window};
@@ -9,6 +12,8 @@ mod window;
 
 /// Finds bounds for all siblings of an entity
 pub fn get_initial_windows(state: &State, entity: Entity, siblings: Vec<Entity>, start_time: f64, end_time: f64) -> Vec<Window> {
+    #[cfg(feature = "profiling")]
+    let _span = span!("Get initial windows");
     let orbit = state.get_trajectory_component(entity).get_end_segment().as_orbit();
     let mut windows = vec![];
 

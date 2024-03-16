@@ -1,5 +1,8 @@
 use std::f64::consts::PI;
 
+#[cfg(feature = "profiling")]
+use tracy_client::span;
+
 use crate::{components::trajectory_component::orbit::Orbit, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::{numerical_methods::bisection::bisection, encounter::{Encounter, EncounterType}}};
 
 fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Option<f64> {
@@ -18,7 +21,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if from < to {
             from += 2.0 * PI;
         }
-        bisection(&sdf, from, to, 24)
+        bisection(&sdf, from, to, 1.0e-3, 64)
     } else {
         // Check from apoapsis to periapsis (anticlockwise)
         let mut from = apoapsis;
@@ -26,7 +29,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if from < to {
             from += 2.0 * PI;
         }
-        bisection(&sdf, from, to, 24)
+        bisection(&sdf, from, to, 1.0e-3, 64)
     };
 
     let mut time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
@@ -68,7 +71,7 @@ fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if new_f.is_sign_negative() && previous_f.is_sign_positive() {
             let min = time - (time_step / 2.0);
             let max = time;
-            let encounter_time = bisection(&f, min, max, 32);
+            let encounter_time = bisection(&f, min, max, 1.0e-3, 32);
             if encounter_time > end_time {
                 return None;
             }
@@ -82,6 +85,8 @@ fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 /// Solves for when an entity will leave its parent
 /// If the given entity is not on a hyperbolic trajectory, returns none when a call to solve is made
 pub fn solve_for_exit(state: &State, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
+    #[cfg(feature = "profiling")]
+    let _span = span!("Solve for exit");
     let orbit = state.get_trajectory_component(entity).get_end_segment().as_orbit(); 
     let Some(parent_trajectory_component) = state.try_get_trajectory_component(orbit.get_parent()) else {
         // Parent cannot be exited as it is a root entity

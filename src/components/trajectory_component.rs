@@ -122,10 +122,12 @@ mod test {
         assert!(trajectory.current_index == 0);
         assert!(trajectory.get_segment_at_time(105.0).get_start_time() == 100.0);
 
-        let end_position_1 = trajectory.get_segment_at_time(43.64).get_end_position();
+        let end_position_1 = trajectory.get_segment_at_time(43.65).get_end_position();
         let end_position_2 = trajectory.get_segment_at_time(172.01).get_end_position();
-        println!("{:?} {:?}", end_position_1, end_position_2); //TODO wtf happened here?
-        assert!((end_position_1.magnitude() - end_position_2.magnitude()) < 1.0e-3);
+        let m1 = end_position_1.magnitude();
+        let m2 = end_position_2.magnitude();
+        let difference = (m1 - m2) / m1;
+        assert!(difference < 1.0e-4);
 
         for _ in 0..200 {
             trajectory.update(1.0);

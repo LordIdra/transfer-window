@@ -1,5 +1,8 @@
 use std::collections::HashSet;
 
+#[cfg(feature = "profiling")]
+use tracy_client::span;
+
 use crate::{components::ComponentType, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
 
 use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
@@ -49,6 +52,8 @@ pub fn get_final_siblings(state: &State, candidates: &HashSet<Entity>, entity: E
 /// - Keep going until either an encounter is found or the vec of windows is empty
 /// - If an encounter is found, set the new end time to the time of the encounter and continue running the algorithm
 pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
+    #[cfg(feature = "profiling")]
+    let _span = span!("Find next encounter");
     let can_enter = &state.get_entities(vec![ComponentType::TrajectoryComponent, ComponentType::OrbitableComponent]);
     let siblings = get_final_siblings(state, can_enter, entity);
     let mut windows = get_initial_windows(state, entity, siblings, start_time, end_time);
@@ -58,6 +63,8 @@ pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_t
         None => end_time,
     };
 
+    #[cfg(feature = "profiling")]
+    let _span = span!("Brute forcing windows");
     loop {
         windows.retain(|window| window.get_soonest_time() < end_time);
         windows.sort_by(|a, b| a.cmp(b));

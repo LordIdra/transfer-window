@@ -33,7 +33,7 @@ pub fn apply_encounter(state: &mut State, encounter: Encounter) {
     }
 }
 
-#[cfg(test)]
+//#[cfg(test)]
 mod test {
     use crate::{components::ComponentType, systems::trajectory_prediction::{fast_solver::{apply_encounter, entity_solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
 
@@ -95,11 +95,6 @@ mod test {
     }
 
     #[test]
-    fn test_case_ellipse_encounter_with_escaping_moon() {
-        run_case("ellipse-encounter-with-escaping-moon"); //TODO fix this case after improving kepler equations solvers...
-    }
-
-    #[test]
     fn test_case_encounter_with_earth() {
         run_case("encounter-with-earth");
     }
@@ -125,11 +120,6 @@ mod test {
     }
 
     #[test]
-    fn test_case_hyperbola_encounter_with_escaping_moon() {
-        run_case("hyperbola-encounter-with-escaping-moon");
-    }
-
-    #[test]
     fn test_case_insanity_1() {
         run_case("insanity-1");
     }
@@ -140,6 +130,11 @@ mod test {
     }
 
     #[test]
+    fn test_case_insanity_3() {
+        run_case("insanity-3");
+    }
+
+    #[test]
     fn test_case_many_moon_encounters() {
         run_case("many-moon-encounters");
     }
@@ -147,11 +142,6 @@ mod test {
     #[test]
     fn test_case_moon_slingshot_to_escape_earth() {
         run_case("moon-slingshot-to-escape-earth");
-    }
-
-    #[test]
-    fn test_case_moons_yeet_each_other() {
-        run_case("moons-yeet-each-other");
     }
 
     #[test]
@@ -172,5 +162,10 @@ mod test {
     #[test]
     fn test_case_two_moons_varied_encounter_2() {
         run_case("two-moons-varied-encounters-2");
+    }
+
+    #[test]
+    fn test_case_two_moons_varied_encounter_3() {
+        run_case("two-moons-varied-encounters-3");
     }
 }

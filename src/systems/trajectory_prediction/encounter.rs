@@ -37,7 +37,7 @@ impl Encounter {
         self.time
     }
 
-    #[cfg(test)]
+    //#[cfg(test)]
     pub fn set_time(&mut self, time: f64) {
         self.time = time;
     }

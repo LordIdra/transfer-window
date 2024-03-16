@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use state::State;
-
 mod components;
 mod constants;
 mod debug;
@@ -11,5 +9,5 @@ mod systems;
 mod util;
 
 fn main() {
-    State::new();
+    
 }
