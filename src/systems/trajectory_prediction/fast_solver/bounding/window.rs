@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::{components::trajectory_component::orbit::Orbit, constants::SOLVER_WINDOW_MAX_SECONDS, storage::entity_allocator::Entity};
+use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity};
 
 /// A one-time window where the bounds can be checked once then discarded
 #[derive(Debug)]
@@ -53,17 +53,5 @@ impl<'a> Window<'a> {
         } else {
             Ordering::Greater
         }
-    }
-
-    pub fn split(self) -> Vec<Window<'a>> {
-        let mut windows = Vec::new();
-        let mut from = self.get_soonest_time();
-        let mut to = f64::min(self.get_latest_time(), from + SOLVER_WINDOW_MAX_SECONDS);
-        while from != to {
-            windows.push(Window::new(self.orbit, self.other_orbit, self.other_entity, self.periodic, (from, to)));
-            from = to;
-            to = f64::min(self.get_latest_time(), from + SOLVER_WINDOW_MAX_SECONDS);
-        }
-        return windows;
     }
 }

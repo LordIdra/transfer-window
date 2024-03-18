@@ -1,7 +1,12 @@
+#[cfg(feature = "profiling")]
+use tracy_client::span;
+
 const DERIVATIVE_DELTA: f64 = 1.0e-4;
 
 /// Returns (value, first derivative)
 pub fn differentiate_1(f: &impl Fn(f64) -> f64, x: f64) -> (f64, f64) {
+    #[cfg(feature = "profiling")]
+    let _span = span!("Differentiate 1");
     let f_1 = f(x - DERIVATIVE_DELTA);
     let f_2 = f(x);
 
@@ -10,6 +15,8 @@ pub fn differentiate_1(f: &impl Fn(f64) -> f64, x: f64) -> (f64, f64) {
 
 /// Returns (value, first derivative, second derivative)
 pub fn differentiate_2(f: &impl Fn(f64) -> f64, x: f64) -> (f64, f64, f64) {
+    #[cfg(feature = "profiling")]
+    let _span = span!("Differentiate 2");
     let f_1 = f(x - DERIVATIVE_DELTA);
     let f_2 = f(x);
     let f_3 = f(x + DERIVATIVE_DELTA);
@@ -25,6 +32,8 @@ pub fn differentiate_2(f: &impl Fn(f64) -> f64, x: f64) -> (f64, f64, f64) {
 
 /// Returns (value, first derivative, second derivative, third derivative)
 pub fn differentiate_3(f: &impl Fn(f64) -> f64, x: f64) -> (f64, f64, f64, f64) {
+    #[cfg(feature = "profiling")]
+    let _span = span!("Differentiate 3");
     let f_1 = f(x - DERIVATIVE_DELTA);
     let f_2 = f(x);
     let f_3 = f(x + DERIVATIVE_DELTA);

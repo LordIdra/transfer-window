@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, kepler_hyperbola::HyperbolaSolver, specific_angular_momentum}};
+use crate::components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, kepler_hyperbola::HyperbolaSolver, specific_angular_momentum}};
 
 use super::Conic;
 
@@ -13,6 +13,8 @@ pub struct Hyperbola {
     eccentricity: f64,
     direction: OrbitDirection,
     argument_of_periapsis: f64,
+    min_asymptote_theta: f64,
+    max_asymptote_theta: f64,
     specific_angular_momentum: f64,
     solver: HyperbolaSolver,
 }
@@ -20,9 +22,10 @@ pub struct Hyperbola {
 impl Hyperbola {
     pub(in super) fn new(position: DVec2, velocity: DVec2, standard_gravitational_parameter: f64, semi_major_axis: f64, eccentricity: f64, direction: OrbitDirection) -> Self {
         let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
+        let (min_asymptote_theta, max_asymptote_theta) = asymptote_theta(eccentricity, argument_of_periapsis);
         let specific_angular_momentum = specific_angular_momentum(position, velocity);
         let solver = HyperbolaSolver::new(eccentricity);
-        Hyperbola { standard_gravitational_parameter, semi_major_axis, eccentricity, argument_of_periapsis, direction, specific_angular_momentum, solver }
+        Hyperbola { standard_gravitational_parameter, semi_major_axis, eccentricity, argument_of_periapsis, min_asymptote_theta, max_asymptote_theta, direction, specific_angular_momentum, solver }
     }
 }
 
@@ -94,6 +97,14 @@ impl Conic for Hyperbola {
 
     fn get_argument_of_periapsis(&self) -> f64 {
         self.argument_of_periapsis
+    }
+
+    fn get_min_asymptote_theta(&self) -> Option<f64> {
+        Some(self.min_asymptote_theta)
+    }
+
+    fn get_max_asymptote_theta(&self) -> Option<f64> {
+        Some(self.max_asymptote_theta)
     }
 
     fn get_eccentricity(&self) -> f64 {

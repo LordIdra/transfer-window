@@ -43,6 +43,11 @@ pub fn sphere_of_influence(mass: f64, parent_mass: f64, position: DVec2, velocit
     semi_major_axis * (mass / parent_mass).powf(2.0 / 5.0)
 }
 
+pub fn asymptote_theta(eccentricity: f64, argument_of_periapsis: f64) -> (f64, f64) {
+    let true_anomaly_of_asymptote = f64::acos(-1.0 / eccentricity);
+    (argument_of_periapsis - true_anomaly_of_asymptote, argument_of_periapsis + true_anomaly_of_asymptote)
+}
+
 #[cfg(test)]
 mod tests {
     use std::f64::consts::PI;

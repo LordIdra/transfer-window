@@ -33,9 +33,26 @@ pub fn apply_encounter(state: &mut State, encounter: Encounter) {
     }
 }
 
-//#[cfg(test)]
+#[cfg(test)]
 mod test {
     use crate::{components::ComponentType, systems::trajectory_prediction::{fast_solver::{apply_encounter, entity_solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
+
+    // pub fn run_cases() {
+    //     run_case("collision-with-moon");
+    //     run_case("encounter-with-earth");
+    //     run_case("escape-from-earth");
+    //     run_case("escape-from-moon-1");
+    //     run_case("escape-from-moon-2");
+    //     run_case("insanity-1");
+    //     run_case("insanity-2");
+    //     run_case("insanity-3");
+    //     run_case("many-moon-encounters");
+    //     run_case("moon-slingshot-to-escape-earth");
+    //     run_case("no-encounters");
+    //     run_case("parallel-with-moon");
+    //     run_case("two-moons-varied-encounters-1");
+    //     run_case("two-moons-varied-encounters-3");
+    // }
 
     fn run_case(name: &str) {
         let (mut state, mut encounters, _, end_time, _) = load_case(name);
@@ -90,7 +107,7 @@ mod test {
     }
 
     #[test]
-    fn test_case_collision_with_moon() {
+    pub fn test_case_collision_with_moon() {
         run_case("collision-with-moon");
     }
 
@@ -117,6 +134,31 @@ mod test {
     #[test]
     fn test_case_escape_from_moon_2() {
         run_case("escape-from-moon-2");
+    }
+
+    #[test]
+    fn test_case_hyperbolic_moon_encounter_1() {
+        run_case("hyperbolic-moon-encounter-1");
+    }
+
+    #[test]
+    fn test_case_hyperbolic_moon_encounter_2() {
+        run_case("hyperbolic-moon-encounter-2");
+    }
+
+    #[test]
+    fn test_case_hyperbolic_moon_encounter_3() {
+        run_case("hyperbolic-moon-encounter-3");
+    }
+
+    #[test]
+    fn test_case_hyperbolic_moon_encounter_4() {
+        run_case("hyperbolic-moon-encounter-4");
+    }
+
+    #[test]
+    fn test_case_hyperbolic_moon_encounter_5() {
+        run_case("hyperbolic-moon-encounter-5");
     }
 
     #[test]

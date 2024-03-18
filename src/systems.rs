@@ -1,1 +1,1 @@
-mod trajectory_prediction;
+pub mod trajectory_prediction;

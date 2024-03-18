@@ -3,7 +3,7 @@ use std::f64::consts::PI;
 #[cfg(feature = "profiling")]
 use tracy_client::span;
 
-use crate::{components::trajectory_component::orbit::Orbit, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::{numerical_methods::bisection::bisection, encounter::{Encounter, EncounterType}}};
+use crate::{components::trajectory_component::orbit::Orbit, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::{encounter::{Encounter, EncounterType}, numerical_methods::itp::itp}};
 
 fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Option<f64> {
     // SDF negative outside of SOI
@@ -21,7 +21,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if from < to {
             from += 2.0 * PI;
         }
-        bisection(&sdf, from, to, 1.0e-3, 64)
+        itp(&sdf, to, from)
     } else {
         // Check from apoapsis to periapsis (anticlockwise)
         let mut from = apoapsis;
@@ -29,7 +29,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if from < to {
             from += 2.0 * PI;
         }
-        bisection(&sdf, from, to, 1.0e-3, 64)
+        itp(&sdf, from, to)
     };
 
     let mut time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
@@ -48,7 +48,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 /// - Step time by 1
 /// - Calculate position
 /// - Check if object has escaped soi; if so:
-///   - Use bisection between time and (time - time_step) to find exact time of exit and return
+///   - Use bisection/ITP between time and (time - time_step) to find exact time of exit and return
 ///   - Check encounter is before end_time
 /// - Double the time step
 /// - Repeat until t > end_time
@@ -71,7 +71,7 @@ fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if new_f.is_sign_negative() && previous_f.is_sign_positive() {
             let min = time - (time_step / 2.0);
             let max = time;
-            let encounter_time = bisection(&f, min, max, 1.0e-3, 32);
+            let encounter_time = itp(&f, max, min);
             if encounter_time > end_time {
                 return None;
             }

@@ -96,6 +96,14 @@ impl Orbit {
         self.conic.get_argument_of_periapsis()
     }
 
+    pub fn get_min_asymptote_theta(&self) -> Option<f64> {
+        self.conic.get_min_asymptote_theta()
+    }
+
+    pub fn get_max_asymptote_theta(&self) -> Option<f64> {
+        self.conic.get_max_asymptote_theta()
+    }
+
     pub fn get_direction(&self) -> OrbitDirection {
         self.conic.get_direction()
     }

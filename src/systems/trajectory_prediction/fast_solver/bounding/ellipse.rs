@@ -1,14 +1,14 @@
-use std::{f64::consts::PI, mem::swap};
+use std::f64::consts::PI;
 
 #[cfg(feature = "profiling")]
 use tracy_client::span;
 
-use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::{fast_solver::bounding::util::{angular_distance, make_range_containing}, numerical_methods::bisection::bisection}, util::normalize_angle};
+use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::{fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point}}, util::normalize_angle};
 
-use super::{sdf::{find_min_max_signed_distance, make_sdf}, window::Window};
+use super::{sdf::make_sdf, util::find_other_stationary_point, window::Window};
 
 fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
-    let theta_1 = normalize_angle(bisection(&f, min_theta, max_theta, 1.0e-6, 64));
+    let theta_1 = itp(&f, min_theta, max_theta);
     // the other angle is in the 'opposite' range
     // we can find this by subtracting 2pi from the highest theta
     let (new_min_theta, new_max_theta) = if min_theta > max_theta {
@@ -16,22 +16,22 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
     } else {
         (min_theta, max_theta - 2.0 * PI)
     };
-    let theta_2 = bisection(&f, new_min_theta, new_max_theta, 1.0e-6, 64);
+    let theta_2 = itp(&f, new_min_theta, new_max_theta);
     let theta_2 = normalize_angle(theta_2);
     (theta_1, theta_2)
 }
 
-fn angle_window_to_time_window(orbit: &Orbit, mut window: (f64, f64)) -> (f64, f64) {
-    if orbit.is_clockwise() {
-        swap(&mut window.0, &mut window.1);
+fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> (f64, f64) {
+    #[cfg(feature = "profiling")]
+    let _span = span!("Min max signed distance");
+    let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-6, 256);
+    let theta_2 = find_other_stationary_point(&sdf, theta_1);
+    let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
+    if sdf(theta_1) < sdf(theta_2) { 
+        (theta_1, theta_2)
+    } else { 
+        (theta_2, theta_1)
     }
-    let mut window = (
-        orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.0), 
-        orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.1));
-    if window.1 < window.0 {
-        window.1 += orbit.get_period().unwrap()
-    }
-    window
 }
 
 struct BounderData<'a> {
@@ -89,9 +89,13 @@ impl<'a> BounderData<'a> {
         let _span = span!("Two bounds");
         let f_inner = |theta: f64| (sdf)(theta) - self.soi;
         let f_outer = |theta: f64| (sdf)(theta) + self.soi;
+        #[cfg(feature = "profiling")]
+        let _span1 = span!("Finding intersections");
         let inner_intersections = find_intersections(&f_inner, self.min_theta, self.max_theta);
         let outer_intersections = find_intersections(&f_outer, self.min_theta, self.max_theta);
         let zero_intersections = find_intersections(&sdf, self.min_theta, self.max_theta);
+        #[cfg(feature = "profiling")]
+        drop(_span1);
 
         // We have 4 points, and know where the orbits intersect
         // Now we need to create two windows that cover exactly one intersection
@@ -121,10 +125,9 @@ impl<'a> BounderData<'a> {
     }
 }
 
-// Bounds returned by this function assume the orbit is clockwise
-pub fn get_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64, end_time: f64) -> Vec<Window<'a>> {
+pub fn get_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64, end_time: f64) -> Vec<Window<'a>> {
     #[cfg(feature = "profiling")]
-    let _span = span!("Ellipse-ellipse bounding");
+    let _span = span!("Ellipse bounding");
     let argument_of_apoapsis = orbit.get_argument_of_periapsis() + PI;
     let sdf = make_sdf(orbit, sibling_orbit);
     let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis);

@@ -3,9 +3,10 @@ use tracy_client::span;
 
 use crate::{state::State, storage::entity_allocator::Entity};
 
-use self::{ellipse_ellipse_bounder::get_bound, window::Window};
+use self::{ellipse::get_ellipse_bound, hyperbola::get_hyperbola_bound, window::Window};
 
-mod ellipse_ellipse_bounder;
+mod ellipse;
+mod hyperbola;
 mod sdf;
 mod util;
 mod window;
@@ -19,17 +20,17 @@ pub fn get_initial_windows(state: &State, entity: Entity, siblings: Vec<Entity>,
 
     for sibling in &siblings {
         let sibling_orbit = state.get_trajectory_component(*sibling).get_segment_at_time(start_time).as_orbit();
-        if orbit.is_ellipse() && sibling_orbit.is_ellipse() {
-            for window in get_bound(orbit, sibling_orbit, *sibling, start_time, end_time) {
-                windows.append(&mut window.split());
+        if !sibling_orbit.is_ellipse() {
+            panic!("Orbitable is on hyperbolic trajectory")
+        }
+        if orbit.is_ellipse() {
+            for window in get_ellipse_bound(orbit, sibling_orbit, *sibling, start_time, end_time) {
+                windows.push(window);
             }
-
-        } else if !orbit.is_ellipse() {
-            //TODO
-        } else if !sibling_orbit.is_ellipse() {
-            //TODO
         } else {
-            //TODO
+            for window in get_hyperbola_bound(orbit, sibling_orbit, *sibling, start_time, end_time) {
+                windows.push(window);
+            }
         }
     }
 

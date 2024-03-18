@@ -5,7 +5,7 @@ use tracy_client::span;
 
 use crate::{components::ComponentType, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
 
-use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
+use self::{entrance_solver::solve_for_entrance_efficient, exit_solver::solve_for_exit};
 
 use super::bounding::get_initial_windows;
 
@@ -64,7 +64,7 @@ pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_t
     };
 
     #[cfg(feature = "profiling")]
-    let _span = span!("Brute forcing windows");
+    let _span = span!("Solving windows");
     loop {
         windows.retain(|window| window.get_soonest_time() < end_time);
         windows.sort_by(|a, b| a.cmp(b));
@@ -76,7 +76,7 @@ pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_t
         let window = windows.pop().unwrap();
         let from = f64::max(window.get_soonest_time(), start_time);
         let to = f64::min(window.get_latest_time(), end_time);
-        if let Some(encounter_time) = solve_for_entrance(window.get_orbit(), window.get_other_orbit(), from, to) {
+        if let Some(encounter_time) = solve_for_entrance_efficient(window.get_orbit(), window.get_other_orbit(), from, to) {
             // Add a minimum time as another encounter could be calculated as being eg 0.01 seconds later
             // if eg an entity exits an SOI and then an 'entrance' is calculated to be very shortly after
             if encounter_time > start_time + MIN_TIME_BEFORE_ENCOUNTER {

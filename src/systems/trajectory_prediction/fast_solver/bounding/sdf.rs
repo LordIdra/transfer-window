@@ -1,42 +1,72 @@
-use std::f64::consts::PI;
-
-use nalgebra_glm::DVec2;
+use nalgebra_glm::{vec2, DMat2, DVec2};
 
 #[cfg(feature = "profiling")]
 use tracy_client::span;
 
-use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_prediction::numerical_methods::{bisection::bisection, laguerre::laguerre_to_find_stationary_point}, util::normalize_angle};
+use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_prediction::numerical_methods::laguerre::laguerre_to_find_stationary_point, util::normalize_angle};
 
-// Assuming we've already found a stationary point on a periodic function with 1 minimum and 1 maximum,
-// we can find the other using bisection by just about excluding the known stationary point
-fn find_other_stationary_point(known_stationary_point_theta: f64, distance_function: impl Fn(f64) -> f64) -> f64 {
-    let min = known_stationary_point_theta + 0.001;
-    let max = known_stationary_point_theta - 0.001 + 2.0*PI;
-    let derivative = |theta: f64| (distance_function(theta + 0.00001) - distance_function(theta)) / 0.00001;
-    let starting_estimate = bisection(&derivative, min, max, 1.0e-2, 64);
-    laguerre_to_find_stationary_point(&distance_function, starting_estimate, 1.0e-6, 16)
+use super::util::find_other_stationary_point;
+
+/// https://stackoverflow.com/a/46007540
+/// https://blog.chatfield.io/simple-method-for-distance-to-ellipse/
+/// This is a GENIUS very efficient and accurate solution
+fn solve_for_closest_point_on_ellipse(a: f64, b: f64, p: DVec2) -> DVec2 {
+    // let px = f64::abs(p[0]);
+    // let py = f64::abs(p[1]);
+    let px = p.x;
+    let py = p.y;
+
+    let mut tx = 0.707;
+    let mut ty = 0.707;
+
+    for _ in 0..2 {
+        let x = a*tx;
+        let y = b*ty;
+
+        let ex = (a.powi(2) - b.powi(2)) * tx.powi(3) / a;
+        let ey = (b.powi(2) - a.powi(2)) * ty.powi(3) / b;
+
+        let qx = px - ex;
+        let qy = py - ey;
+        let q = f64::sqrt(qx.powi(2) + qy.powi(2));
+
+        let rx = x - ex;
+        let ry = y - ey;
+        let r = f64::sqrt(rx.powi(2) + ry.powi(2));
+
+        tx = (qx * r / q + ex) / a;
+        ty = (qy * r / q + ey) / b;
+
+        let t = f64::sqrt(ty.powi(2) + tx.powi(2));
+
+        tx /= t;
+        ty /= t;
+    }
+
+    vec2(a*tx, b*ty)
 }
+
 
 // Returns a function that will return the closest point on the given orbit from an arbitrary point
 fn make_closest_point_on_orbit_function(orbit: &Orbit) -> impl Fn(DVec2) -> DVec2 + '_ {
-    move |point: DVec2| {
-        #[cfg(feature = "profiling")]
-        let _span = span!("Closest point on orbit");
-        let distance_function = |theta: f64| (orbit.get_position_from_theta(theta) - point).magnitude();
-        let starting_theta = f64::atan2(point.y, point.x);
-        let mut theta = laguerre_to_find_stationary_point(&distance_function, starting_theta + 0.1, 1.0e-6, 256);
-        // weird bug occurred here where sometimes the distance function would be less slightly after if the value of theta was too low
-        // this is why we add slightly more to theta and check both before and after
-        if distance_function(theta + 0.001) < distance_function(theta) && distance_function(theta - 0.001) < distance_function(theta) {
-            // we found a maximum, but want a minimum
-            theta = find_other_stationary_point(theta, distance_function);
-        }
-        orbit.get_position_from_theta(theta)
+    let a = orbit.get_semi_major_axis();
+    let b = orbit.get_semi_minor_axis();
+    let aop = orbit.get_argument_of_periapsis();
+    let periapsis_position = orbit.get_position_from_theta(aop);
+    let periapsis_to_center_vector = -orbit.get_semi_major_axis() * vec2(f64::cos(aop), f64::sin(aop));
+    let center = periapsis_position + periapsis_to_center_vector;
+    let rotate_aop = DMat2::new(aop.cos(), -aop.sin(), aop.sin(), aop.cos());
+    let rotate_negative_aop = DMat2::new(aop.cos(), aop.sin(), -aop.sin(), aop.cos());
 
+    move |point: DVec2| {
+        let point = rotate_negative_aop * (point - center);
+        let point = solve_for_closest_point_on_ellipse(a, b, point);
+        rotate_aop * point + center
     }
 }
 
 // Returns a function that acts as a signed distance function in terms of an angle on orbit A
+// Negative when orbit_a is OUTSIDE orbit_b
 pub fn make_sdf<'a>(orbit_a: &'a Orbit, orbit_b: &'a Orbit) -> impl Fn(f64) -> f64 + 'a  {
     let closest_point_function = make_closest_point_on_orbit_function(orbit_b);
     move |theta: f64| -> f64 {
@@ -50,11 +80,12 @@ pub fn make_sdf<'a>(orbit_a: &'a Orbit, orbit_b: &'a Orbit) -> impl Fn(f64) -> f
     }
 }
 
-pub fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> (f64, f64) {
+// Assumes the SDF has ONLY a min distance (ie: hyperbola)
+pub fn find_min(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> (f64, f64) {
     #[cfg(feature = "profiling")]
     let _span = span!("Min max signed distance");
     let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-6, 256);
-    let theta_2 = find_other_stationary_point(theta_1, &sdf);
+    let theta_2 = find_other_stationary_point(&sdf, theta_1);
     let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
     if sdf(theta_1) < sdf(theta_2) { 
         (theta_1, theta_2)
@@ -62,3 +93,4 @@ pub fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoap
         (theta_2, theta_1)
     }
 }
+

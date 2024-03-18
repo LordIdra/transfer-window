@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-
 mod components;
 mod constants;
 mod debug;
@@ -9,5 +8,5 @@ mod systems;
 mod util;
 
 fn main() {
-    
+
 }

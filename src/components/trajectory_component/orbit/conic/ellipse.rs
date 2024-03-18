@@ -104,6 +104,14 @@ impl Conic for Ellipse {
         self.argument_of_periapsis
     }
 
+    fn get_min_asymptote_theta(&self) -> Option<f64> {
+        None
+    }
+
+    fn get_max_asymptote_theta(&self) -> Option<f64> {
+        None
+    }
+
     fn get_eccentricity(&self) -> f64 {
         self.eccentricity
     }
