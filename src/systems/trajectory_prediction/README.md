@@ -1,1 +1,0 @@
-See https://lordidra.github.io/patched-conics.html for documentation on how the fast solver work

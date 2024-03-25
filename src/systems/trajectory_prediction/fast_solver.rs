@@ -3,7 +3,7 @@ use crate::{components::trajectory_component::{orbit::Orbit, segment::Segment}, 
 use super::encounter::{Encounter, EncounterType};
 
 mod bounding;
-mod entity_solver;
+mod solver;
 
 fn do_exit(state: &mut State, entity: Entity, new_parent: Entity, time: f64) {
     let old_parent = state.get_trajectory_component(entity).get_end_segment().get_parent();
@@ -33,16 +33,22 @@ pub fn apply_encounter(state: &mut State, encounter: Encounter) {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use crate::{components::ComponentType, systems::trajectory_prediction::{fast_solver::{apply_encounter, entity_solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
+// #[cfg(test)]
+pub mod test {
+    use crate::{components::ComponentType, systems::trajectory_prediction::{fast_solver::{apply_encounter, solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
 
     // pub fn run_cases() {
     //     run_case("collision-with-moon");
     //     run_case("encounter-with-earth");
+    //     run_case("encounter-with-earth-and-moon");
     //     run_case("escape-from-earth");
     //     run_case("escape-from-moon-1");
     //     run_case("escape-from-moon-2");
+    //     run_case("hyperbolic-moon-encounter-1");
+    //     run_case("hyperbolic-moon-encounter-2");
+    //     run_case("hyperbolic-moon-encounter-3");
+    //     run_case("hyperbolic-moon-encounter-4");
+    //     run_case("hyperbolic-moon-encounter-5");
     //     run_case("insanity-1");
     //     run_case("insanity-2");
     //     run_case("insanity-3");
@@ -51,6 +57,7 @@ mod test {
     //     run_case("no-encounters");
     //     run_case("parallel-with-moon");
     //     run_case("two-moons-varied-encounters-1");
+    //     run_case("two-moons-varied-encounters-2");
     //     run_case("two-moons-varied-encounters-3");
     // }
 
@@ -79,8 +86,6 @@ mod test {
             
             let mut encounter = soonest_encounter.unwrap();
             
-            println!("{:?}", encounter);
-
             let Some(next_encounter) = encounters.front() else {
                 panic!("Found unexpected encounter: {:#?}", encounter);
             };

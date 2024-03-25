@@ -5,7 +5,7 @@ use tracy_client::span;
 
 use crate::{components::ComponentType, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
 
-use self::{entrance_solver::solve_for_entrance_efficient, exit_solver::solve_for_exit};
+use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
 
 use super::bounding::get_initial_windows;
 
@@ -33,30 +33,20 @@ pub fn get_final_siblings(state: &State, candidates: &HashSet<Entity>, entity: E
 }
 
 /// Solves for the next encounter of a single entity by combining the entrance and exit solvers
-/// Problem:
-/// - We have a bunch of windows between various times
-/// - We need to find the soonest encounter
-/// - We need to do it as quickly as possible
-/// - We can assume the chance of an encounter occuring at any point in aany window is constant
-/// - We might have a window or multiple that span the entire duration of start time to end time so just doing the earliest window isn't an option
-/// - Caching is a thing so swapping between windows *may or may not* be expensive
-/// - We have to choose the window to evaluate with the highest chance per unit time of giving us the soonest encounter
-/// So this is basically a scheduling problem
-/// Solution
-/// - Define a maximum time for each window
-/// - Iterate through each window on initialisation
-///   - If the window is above maximum time, split it up at max time
-/// - Now iterate windows, pick the soonest one, and evaluate for encounter
-/// - Make sure that when evaluating a window, the window's end time does not exceed the global end time, and same for start times
-/// - Once an encounter is evaluated, if it is periodic and the new window's soonest time exceeds end time, yeet the new window
-/// - Keep going until either an encounter is found or the vec of windows is empty
-/// - If an encounter is found, set the new end time to the time of the encounter and continue running the algorithm
+// - We create an ordered list of all the windows
+// - We continually evaluate the soonest window for encounters
+// - Once a window is evaluated, if it is periodic it will be incremented by a period, otherwise removed
+// - If an encounter is found, bring the end time forward to the time of the encounter (so we don't continue to uselessly compute encounters after the soonest known encounter)
 pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     #[cfg(feature = "profiling")]
     let _span = span!("Find next encounter");
+
+    // Find entrance windows
     let can_enter = &state.get_entities(vec![ComponentType::TrajectoryComponent, ComponentType::OrbitableComponent]);
     let siblings = get_final_siblings(state, can_enter, entity);
     let mut windows = get_initial_windows(state, entity, siblings, start_time, end_time);
+
+    // If an exit encounter is found, set that as the soonest known encounter
     let mut soonest_encounter = solve_for_exit(state, entity, start_time, end_time);
     let mut end_time = match &soonest_encounter {
         Some(encounter) => encounter.get_time(),
@@ -65,6 +55,9 @@ pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_t
 
     #[cfg(feature = "profiling")]
     let _span = span!("Solving windows");
+    // Evaluate entrance windows from soonest to latest until an encounter is found or no windows remain
+    // Once an encounter is found, we'll have to evaluate all the remaining windows that are not entirely after the time of the discovered encounter
+    // Because an encounter with another object could possibly happen sooner than the encounter we just found
     loop {
         windows.retain(|window| window.get_soonest_time() < end_time);
         windows.sort_by(|a, b| a.cmp(b));
@@ -73,10 +66,11 @@ pub fn find_next_encounter(state: &State, entity: Entity, start_time: f64, end_t
             break;
         }
 
+        // Popped window has the soonest start time
         let window = windows.pop().unwrap();
         let from = f64::max(window.get_soonest_time(), start_time);
         let to = f64::min(window.get_latest_time(), end_time);
-        if let Some(encounter_time) = solve_for_entrance_efficient(window.get_orbit(), window.get_other_orbit(), from, to) {
+        if let Some(encounter_time) = solve_for_entrance(window.get_orbit(), window.get_other_orbit(), from, to) {
             // Add a minimum time as another encounter could be calculated as being eg 0.01 seconds later
             // if eg an entity exits an SOI and then an 'entrance' is calculated to be very shortly after
             if encounter_time > start_time + MIN_TIME_BEFORE_ENCOUNTER {

@@ -75,7 +75,7 @@ pub fn make_sdf<'a>(orbit_a: &'a Orbit, orbit_b: &'a Orbit) -> impl Fn(f64) -> f
         let point = orbit_a.get_position_from_theta(theta);
         let other_point = closest_point_function(point);
         let magnitude = (point - other_point).magnitude();
-        let sign = (other_point.magnitude() - point.magnitude()).signum();
+        let sign = (other_point.magnitude_squared() - point.magnitude_squared()).signum();
         sign * magnitude
     }
 }

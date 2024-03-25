@@ -46,12 +46,25 @@ struct BounderData<'a> {
 }
 
 impl<'a> BounderData<'a> {
+    fn make_segmented_window(&self, periodic: bool, from: f64, to: f64, segments: usize) -> Vec<Window<'a>> {
+        let mut windows = vec![];
+        for i in 0..segments {
+            let start = from + (i as f64 / segments as f64) * (to - from);
+            let end = from + ((i + 1) as f64 / segments as f64) * (to - from);
+            let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, periodic, (start, end));
+            windows.push(window);
+        }
+        windows
+    }
+
     fn no_bounds(self) -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
         let _span = span!("No bounds");
-        let bound = (self.start_time, self.end_time);
-        let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, false, bound);
-        vec![window]
+        // Well, this is awkward, the orbit is ALWAYS within the sibling's SOI
+        // We split the orbit up into many segments
+        // It's incredibly unlikely that a segment will contain multiple minimums, 
+        // and all we need is a segment that contains 0-1 minimums for the solver
+        self.make_segmented_window(true, self.start_time, self.start_time + self.orbit.get_period().unwrap(), 16)
     }
 
     fn no_encounters(self) -> Vec<Window<'a>> {
@@ -68,8 +81,10 @@ impl<'a> BounderData<'a> {
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
         let angle_bound = make_range_containing(intersections.0, intersections.1, self.min_theta);
         let bound = angle_window_to_time_window(&self.orbit, angle_bound);
-        let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound);
-        vec![window]
+        // The reason we segment here is that our solver relies on the assumption that if there is a minimum,
+        // the derivative with respect to time is positive at the start and negative at the end
+        // There are some cases where this is not true, but splitting the window up into a few segments helps keep this assumption
+        self.make_segmented_window(true, bound.0, bound.1, 4)
     }
 
     fn one_bound_outer(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
@@ -80,8 +95,10 @@ impl<'a> BounderData<'a> {
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
         let angle_bound = make_range_containing(intersections.0, intersections.1, self.max_theta);
         let bound = angle_window_to_time_window(&self.orbit, angle_bound);
-        let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound);
-        vec![window]
+        // The reason we segment here is that our solver relies on the assumption that if there is a minimum,
+        // the derivative with respect to time is positive at the start and negative at the end
+        // There are some cases where this is not true, but splitting the window up into a few segments helps keep this assumption
+        self.make_segmented_window(true, bound.0, bound.1, 4)
     }
 
     fn two_bounds(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
@@ -121,7 +138,7 @@ impl<'a> BounderData<'a> {
         let window_1 = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound_1);
         let window_2 = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound_2);
 
-        vec![window_1, window_2]
+        vec![window_1, window_2] 
     }
 }
 

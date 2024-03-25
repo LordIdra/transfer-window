@@ -5,12 +5,21 @@ use tracy_client::span;
 
 use crate::{components::trajectory_component::orbit::Orbit, constants::MIN_TIME_BEFORE_ENCOUNTER, state::State, storage::entity_allocator::Entity, systems::trajectory_prediction::{encounter::{Encounter, EncounterType}, numerical_methods::itp::itp}};
 
+/// - Create an SDF in terms of theta that's negative outside of the SOI
+/// - Solve for the apoapsis (where the SDF will be minimum)
+/// - If the SDF at the apoapsis is positive, object will never leave parent SOI
+/// - Otherwise, use the ITP solver to find the angle where SDF = 0 (ie, the object leaves the SOI)
+/// - The 'side' of the orbit which we use as our bound depends on the orbit direction
+/// - Convert the angle to a time, and make sure the time is later than the start time
+/// - Finally, check that the time is not after end time - if it is, no encounter is possible
 fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Option<f64> {
     // SDF negative outside of SOI
     let sdf = |theta: f64| soi - orbit.get_position_from_theta(theta).magnitude(); 
     let periapsis = orbit.get_argument_of_periapsis();
     let apoapsis = periapsis + PI;
+
     if sdf(apoapsis).is_sign_positive() {
+        // Object will never leave the SOI
         return None;
     }
     
@@ -22,6 +31,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
             from += 2.0 * PI;
         }
         itp(&sdf, to, from)
+
     } else {
         // Check from apoapsis to periapsis (anticlockwise)
         let mut from = apoapsis;
@@ -43,12 +53,11 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
     Some(time)
 }
 
-/// Strategy: 
 /// - Start at time = start_time
 /// - Step time by 1
 /// - Calculate position
 /// - Check if object has escaped soi; if so:
-///   - Use bisection/ITP between time and (time - time_step) to find exact time of exit and return
+///   - Use ITP between time and (time - time_step) to find exact time of exit and return
 ///   - Check encounter is before end_time
 /// - Double the time step
 /// - Repeat until t > end_time
@@ -107,6 +116,7 @@ pub fn solve_for_exit(state: &State, entity: Entity, start_time: f64, end_time: 
     if encounter_time < start_time + MIN_TIME_BEFORE_ENCOUNTER {
         // Another encounter could be calculated as being eg 0.01 seconds later
         // if eg an entity exits an SOI and then an 'entrance' is calculated to be very shortly after
+        // So we add MIN_TIME_BEFORE_ENCOUNTER
         return None;
     }
 
