@@ -1,4 +1,5 @@
 # Current tasks
+- [1| ] MVC split
 - [1| ] Rendering backend
 - [1| ] Display current time
 - [1| ] Display time speed
