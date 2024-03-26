@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::model::components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, kepler_hyperbola::HyperbolaSolver, specific_angular_momentum}};
+use crate::components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, kepler_hyperbola::HyperbolaSolver, specific_angular_momentum}};
 
 use super::Conic;
 
@@ -124,7 +124,7 @@ impl Conic for Hyperbola {
 mod tests {
     use std::f64::consts::PI;
 
-    use crate::model::components::trajectory_component::orbit::scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT};
+    use crate::components::trajectory_component::orbit::scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT};
 
     use super::*;
 

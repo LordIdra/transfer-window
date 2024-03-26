@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::DVec2;
 
-use crate::{model::storage::entity_allocator::Entity, util::normalize_angle};
+use crate::{storage::entity_allocator::Entity, util::normalize_angle};
 
 use self::{conic::{new_conic, Conic}, conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::sphere_of_influence};
 
@@ -189,7 +189,7 @@ mod test {
 
     use nalgebra_glm::vec2;
 
-    use crate::model::storage::entity_allocator::Entity;
+    use crate::storage::entity_allocator::Entity;
 
     use super::Orbit;
 

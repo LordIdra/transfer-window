@@ -7,6 +7,7 @@ mod components;
 mod debug;
 mod storage;
 mod systems;
+mod util;
 
 #[derive(Debug)]
 pub struct Model {
@@ -163,7 +164,7 @@ impl Model {
 mod test {
     use std::collections::HashSet;
 
-    use crate::model::{components::{name_component::NameComponent, ComponentType}, storage::entity_builder::EntityBuilder};
+    use crate::{components::{name_component::NameComponent, ComponentType}, storage::entity_builder::EntityBuilder};
 
     use super::Model;
 

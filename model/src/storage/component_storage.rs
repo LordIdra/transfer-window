@@ -93,7 +93,7 @@ impl<T> ComponentStorage<T> {
 mod test {
     use std::collections::HashSet;
 
-    use crate::model::storage::entity_allocator::EntityAllocator;
+    use crate::storage::entity_allocator::EntityAllocator;
 
     use super::ComponentStorage;
 

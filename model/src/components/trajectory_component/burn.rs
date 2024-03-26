@@ -1,6 +1,6 @@
 use nalgebra_glm::{DVec2, vec2};
 
-use crate::model::storage::entity_allocator::Entity;
+use crate::storage::entity_allocator::Entity;
 
 use self::burn_point::BurnPoint;
 
@@ -130,7 +130,7 @@ impl Burn {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::model::{components::trajectory_component::{brute_force_tester::BruteForceTester, burn::{Burn, BURN_ACCELERATION_MAGNITUDE, BURN_TIME_STEP}}, storage::entity_allocator::Entity};
+    use crate::{components::trajectory_component::{brute_force_tester::BruteForceTester, burn::{Burn, BURN_ACCELERATION_MAGNITUDE, BURN_TIME_STEP}}, storage::entity_allocator::Entity};
 
     #[test]
     pub fn test() {

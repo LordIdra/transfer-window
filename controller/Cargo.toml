@@ -1,0 +1,12 @@
+[package]
+name = "transfer-window-controller"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+transfer-window-model = { path = "../model" }
+transfer-window-view = { path = "../view" }
+
+[dependencies.eframe]
+version = "0.26.2"
+features = ["glow"]

@@ -1,6 +1,6 @@
 use nalgebra_glm::DVec2;
 
-use crate::model::components::trajectory_component::orbit::scary_math::GRAVITATIONAL_CONSTANT;
+use crate::components::trajectory_component::orbit::scary_math::GRAVITATIONAL_CONSTANT;
 
 #[derive(Debug, Clone)]
 pub struct BurnPoint {

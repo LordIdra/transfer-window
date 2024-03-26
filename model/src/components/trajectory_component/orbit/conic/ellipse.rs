@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{model::components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, kepler_ellipse::EllipseSolver, period, specific_angular_momentum}}, util::normalize_angle};
+use crate::{components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, kepler_ellipse::EllipseSolver, period, specific_angular_momentum}}, util::normalize_angle};
 
 use super::Conic;
 
@@ -127,7 +127,7 @@ impl Conic for Ellipse {
 
 #[cfg(test)]
 mod tests {
-    use crate::model::components::trajectory_component::{brute_force_tester::BruteForceTester, orbit::{conic::new_conic, scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT}}};
+    use crate::components::trajectory_component::{brute_force_tester::BruteForceTester, orbit::{conic::new_conic, scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT}}};
 
     use super::*;
     

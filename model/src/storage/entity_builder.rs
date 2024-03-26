@@ -1,4 +1,4 @@
-use crate::model::components::{name_component::NameComponent, mass_component::MassComponent, orbitable_component::OrbitableComponent, trajectory_component::TrajectoryComponent, stationary_component::StationaryComponent};
+use crate::components::{name_component::NameComponent, mass_component::MassComponent, orbitable_component::OrbitableComponent, trajectory_component::TrajectoryComponent, stationary_component::StationaryComponent};
 
 pub struct EntityBuilder {
     pub mass_component: Option<MassComponent>,

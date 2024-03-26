@@ -76,7 +76,7 @@ impl EntityAllocator {
 
 #[cfg(test)]
 mod test {
-    use crate::model::storage::entity_allocator::EntityAllocator;
+    use crate::storage::entity_allocator::EntityAllocator;
 
 
     #[test]

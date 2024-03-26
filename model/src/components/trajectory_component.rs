@@ -80,7 +80,7 @@ impl TrajectoryComponent {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{model::storage::entity_allocator::Entity, model::components::trajectory_component::TrajectoryComponent};
+    use crate::{storage::entity_allocator::Entity, components::trajectory_component::TrajectoryComponent};
 
     use super::{segment::Segment, orbit::Orbit};
 

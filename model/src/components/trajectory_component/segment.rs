@@ -1,6 +1,6 @@
 use nalgebra_glm::DVec2;
 
-use crate::model::storage::entity_allocator::Entity;
+use crate::storage::entity_allocator::Entity;
 
 use super::{burn::Burn, orbit::Orbit};
 
