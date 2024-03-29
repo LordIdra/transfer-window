@@ -1,9 +1,9 @@
 use std::f64::consts::PI;
 
 /// Normalizes between 0 and 2pi
-/// https://stackoverflow.com/questions/31210357/is-there-a-modulus-not-remainder-function-operation
+/// <https://stackoverflow.com/questions/31210357/is-there-a-modulus-not-remainder-function-operation>
 pub fn normalize_angle(mut theta: f64) -> f64 {
-    theta = theta % (2.0 * PI);
+    theta %= 2.0 * PI;
     (theta + 2.0 * PI) % (2.0 * PI)
 }
 

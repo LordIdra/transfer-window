@@ -1,13 +1,14 @@
 use std::collections::HashSet;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Entity {
     index: usize,
     generation: usize,
 }
 
 impl Entity {
-    #[cfg(test)]
     pub fn mock() -> Self {
         Self { index: 0, generation: 0 }
     }
@@ -21,13 +22,13 @@ impl Entity {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct AllocatorEntry {
     is_allocated: bool,
     generation: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EntityAllocator {
     entities: HashSet<Entity>,
     entries: Vec<AllocatorEntry>,
@@ -35,15 +36,8 @@ pub struct EntityAllocator {
 }
 
 impl EntityAllocator {
-    pub fn new() -> Self {
-        Self { entities: HashSet::new(), entries: vec![], free: vec![] }
-    }
-
     pub fn allocate(&mut self) -> Entity {
         if let Some(index) = self.free.pop() {
-            if self.entries[index].is_allocated {
-                panic!("Attempt to allocate to an index that was already allocated");
-            }
             self.entries[index].is_allocated = true;
             let generation = self.entries[index].generation;
             let entity = Entity { index, generation };
@@ -59,10 +53,10 @@ impl EntityAllocator {
         entity
     }
 
+    /// # Panics
+    /// Panics if the entity is not allocated
     pub fn deallocate(&mut self, entity: Entity) {
-        if !self.entries[entity.index].is_allocated {
-            panic!("Attempt to deallocate an entity that was already deallocated");
-        }
+        assert!(self.entries[entity.index].is_allocated, "Attempt to deallocate an entity that was already deallocated");
         self.entries[entity.index].is_allocated = false;
         self.entries[entity.index].generation += 1;
         self.entities.remove(&entity);
@@ -81,7 +75,7 @@ mod test {
 
     #[test]
     fn test() {
-        let mut allocator = EntityAllocator::new();
+        let mut allocator = EntityAllocator::default();
         let e1 = allocator.allocate();
         assert!(e1.index == 0 && e1.generation == 0);
         let e2 = allocator.allocate();

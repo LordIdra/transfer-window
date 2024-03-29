@@ -1,3 +1,5 @@
+use log::error;
+
 use crate::components::ComponentType;
 
 use super::{storage::entity_allocator::Entity, Model};
@@ -9,5 +11,6 @@ pub fn get_entity_by_name(model: &Model, name: &str) -> Entity {
             return entity;
         }
     }
-    panic!("No entity '{}' found", name);
+    error!("No entity '{}' found", name);
+    Entity::mock()
 }

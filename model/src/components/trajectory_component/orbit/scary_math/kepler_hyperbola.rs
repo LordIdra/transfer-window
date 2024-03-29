@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
 
 const CUBIC_DELTA_THRESHOLD: f64 = 1.0e-6;
 
@@ -33,7 +34,7 @@ lazy_static! {
         7.0 / 4.0,
         6.0 / 4.0,
         5.0 / 4.0,
-        4.0 / 4.0,
+        1.0,
         3.0 / 4.0,
         2.0 / 4.0,
         1.0 / 4.0,
@@ -85,7 +86,7 @@ fn solve_cubic(coefficients: [f64; 4], mh: f64, ec: f64) -> f64 {
 /// If our mean anomaly is larger than this, we substitute into a gigantic expression
 /// I don't really know how it works but it's VERY accurate for E > 5
 /// For mean anomalies smaller than our threshold, we use a Pade approximation to
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct HyperbolaSolver {
     eccentricity: f64,
     pade_mean_anomaly_thresholds: [f64; 15],

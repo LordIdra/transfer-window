@@ -1,27 +1,33 @@
 use std::collections::HashSet;
 
+use log::error;
+use serde::{Deserialize, Serialize};
+
 use super::entity_allocator::Entity;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct StorageEntry<T> {
     value: T,
     generation: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ComponentStorage<T> {
     entities: HashSet<Entity>,
     entries: Vec<Option<StorageEntry<T>>>,
 }
 
-impl<T> ComponentStorage<T> {
-    pub fn new() -> Self {
+impl<T> Default for ComponentStorage<T> {
+    fn default() -> Self {
         Self { 
             entities: HashSet::new(),
             entries: vec![] 
         }
     }
+}
 
+impl<T> ComponentStorage<T> {
+    #[allow(clippy::missing_panics_doc)]
     pub fn set(&mut self, entity: Entity, value: Option<T>) {
         if value.is_some() {
             self.entities.insert(entity);
@@ -34,16 +40,20 @@ impl<T> ComponentStorage<T> {
         } else if entity.get_index() == self.entries.len() {
             self.entries.push(entry);
         } else {
-            panic!("Allocator and storages have desynced somewhere...")
+            // This should never happen
+            error!("Detected allocator and storage desync");
+            panic!("Error recoverable, but exiting anyway before something bad happens")
         }
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn remove_if_exists(&mut self, entity: Entity) {
         let entry = self.entries.get_mut(entity.get_index());
         if let Some(entry) = entry {
             if let Some(entry) = entry {
                 if entry.generation != entity.get_generation() {
-                    panic!("Attempt to remove a component with an entity that has a different generation")
+                    error!("Attempt to remove a component with an entity that has a different generation");
+                    panic!("Error recoverable, but exiting anyway before something bad happens")
                 }
                 self.entities.remove(&entity);
             }
@@ -51,19 +61,28 @@ impl<T> ComponentStorage<T> {
         }
     }
 
+    /// # Panics
+    /// Panics if the entity does not have an associated component
     pub fn get_mut(&mut self, entity: Entity) -> &mut T {
-        self.try_get_mut(entity).expect("Attempted to get nonexistant component")
+        if let Some(t) = self.try_get_mut(entity) {
+            return t;
+        }
+        error!("Attempted to get nonexistant component");
+        panic!("Unrecoverable error");
     }
 
+    /// # Panics
+    /// Panics if the entity does not have an associated component
     pub fn get(&self, entity: Entity) -> &T {
-        self.try_get(entity).expect("Attempted to get nonexistant component")
+        if let Some(t) = self.try_get(entity) {
+            return t;
+        }
+        error!("Attempted to get nonexistant component");
+        panic!("Unrecoverable error");
     }
 
     pub fn try_get_mut(&mut self, entity: Entity) -> Option<&mut T> {
-        let entry = self.entries
-            .get_mut(entity.get_index())
-            .expect("Entity index out of range")
-            .as_mut();
+        let entry = self.entries[entity.get_index()].as_mut();
         if let Some(entry) = entry {
             if entry.generation == entity.get_generation() {
                 return Some(&mut entry.value);
@@ -73,9 +92,7 @@ impl<T> ComponentStorage<T> {
     }
 
     pub fn try_get(&self, entity: Entity) -> Option<&T> {
-        let entry = self.entries
-            .get(entity.get_index())
-            .expect("Entity index out of range");
+        let entry = &self.entries[entity.get_index()];
         if let Some(entry) = entry {
             if entry.generation == entity.get_generation() {
                 return Some(&entry.value);
@@ -98,9 +115,10 @@ mod test {
     use super::ComponentStorage;
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn test() {
-        let mut allocator = EntityAllocator::new();
-        let mut storage: ComponentStorage<f64> = ComponentStorage::new();
+        let mut allocator = EntityAllocator::default();
+        let mut storage: ComponentStorage<f64> = ComponentStorage::default();
         let e1 = allocator.allocate();
         let e2 = allocator.allocate();
         storage.set(e1, Some(1.0));
@@ -115,8 +133,8 @@ mod test {
     #[test]
     #[should_panic]
     fn test_deallocate() {
-        let mut allocator = EntityAllocator::new();
-        let mut storage: ComponentStorage<f64> = ComponentStorage::new();
+        let mut allocator = EntityAllocator::default();
+        let mut storage: ComponentStorage<f64> = ComponentStorage::default();
         let e1 = allocator.allocate();
         let e2 = allocator.allocate();
         storage.set(e1, Some(1.0));
@@ -128,8 +146,8 @@ mod test {
     #[test]
     fn test_double_deallocate() {
         // De-allocating an entity that was is not allocated should not cause any issues
-        let mut allocator = EntityAllocator::new();
-        let mut storage: ComponentStorage<f64> = ComponentStorage::new();
+        let mut allocator = EntityAllocator::default();
+        let mut storage: ComponentStorage<f64> = ComponentStorage::default();
         let e1 = allocator.allocate();
         storage.remove_if_exists(e1);
         storage.remove_if_exists(e1);
@@ -138,8 +156,8 @@ mod test {
     #[test]
     fn test_entities() {
         // De-allocating an entity that was is not allocated should not cause any issues
-        let mut allocator = EntityAllocator::new();
-        let mut storage: ComponentStorage<f64> = ComponentStorage::new();
+        let mut allocator = EntityAllocator::default();
+        let mut storage: ComponentStorage<f64> = ComponentStorage::default();
         let e1 = allocator.allocate();
         let e2 = allocator.allocate();
         let e3 = allocator.allocate();

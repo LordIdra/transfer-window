@@ -1,4 +1,4 @@
-use crate::{components::trajectory_component::{orbit::Orbit, segment::Segment}, model::Model, storage::entity_allocator::Entity};
+use crate::{components::trajectory_component::{orbit::Orbit, segment::Segment}, Model, storage::entity_allocator::Entity};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -26,7 +26,7 @@ fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64)
 
 /// This detachment of encounter solving and application allows the solver to be much more easily tested
 /// As well as leading to cleaner overall design
-pub fn apply_encounter(model: &mut Model, encounter: Encounter) {
+pub fn apply_encounter(model: &mut Model, encounter: &Encounter) {
     match encounter.get_type() {
         EncounterType::Entrance => do_entrance(model, encounter.get_entity(), encounter.get_new_parent(), encounter.get_time()),
         EncounterType::Exit => do_exit(model, encounter.get_entity(), encounter.get_new_parent(), encounter.get_time()),
@@ -63,11 +63,9 @@ mod test {
             let mut encounter = soonest_encounter.unwrap();
             
             let Some(next_encounter) = encounters.front() else {
-                panic!("Found unexpected encounter: {:#?}", encounter);
+                panic!("Found unexpected encounter: {encounter:#?}");
             };
-            if !next_encounter.compare(&model, &encounter) {
-                panic!("Encounters not equal: {:#?} {:#?}", encounter, encounters.front())
-            }
+            assert!(next_encounter.compare(&model, &encounter), "Encounters not equal: {:#?} {:#?}", encounter, encounters.front());
 
             // We unfortunately have to use the case encounter's time, not the calculated time
             // Small errors in the cases or differences in implementations can cause the simulations to massively diverge in more complex tests
@@ -79,12 +77,10 @@ mod test {
             }
 
             start_time = encounter.get_time();
-            apply_encounter(&mut model, encounter);
+            apply_encounter(&mut model, &encounter);
         }
 
-        if !encounters.is_empty() {
-            panic!("Missed encounters: {:#?}", encounters);
-        }
+        assert!(encounters.is_empty(), "Missed encounters: {encounters:#?}");
     }
 
     #[test]

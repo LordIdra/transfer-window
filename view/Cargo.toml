@@ -4,8 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+log = "0.4.21"
+env_logger = "0.11.3"
+nalgebra-glm = "0.18.0"
 transfer-window-model = { path = "../model" }
+eframe = { version = "0.23", features = ["glow"] }
+image = { version = "0.25", features = ["jpeg", "png"] }
 
-[dependencies.eframe]
-version = "0.26.2"
-features = ["glow"]
+[lints]
+workspace = true

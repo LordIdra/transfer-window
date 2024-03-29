@@ -1,12 +1,11 @@
 use std::f64::consts::PI;
 
 use nalgebra_glm::{vec2, DVec2};
+use serde::{Deserialize, Serialize};
 
-use crate::components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, kepler_hyperbola::HyperbolaSolver, specific_angular_momentum}};
+use crate::components::trajectory_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, kepler_hyperbola::HyperbolaSolver, specific_angular_momentum}};
 
-use super::Conic;
-
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Hyperbola {
     standard_gravitational_parameter: f64,
     semi_major_axis: f64,
@@ -25,12 +24,12 @@ impl Hyperbola {
         let (min_asymptote_theta, max_asymptote_theta) = asymptote_theta(eccentricity, argument_of_periapsis);
         let specific_angular_momentum = specific_angular_momentum(position, velocity);
         let solver = HyperbolaSolver::new(eccentricity);
-        Hyperbola { standard_gravitational_parameter, semi_major_axis, eccentricity, argument_of_periapsis, min_asymptote_theta, max_asymptote_theta, direction, specific_angular_momentum, solver }
+        Hyperbola { standard_gravitational_parameter, semi_major_axis, eccentricity, direction, argument_of_periapsis, min_asymptote_theta, max_asymptote_theta, specific_angular_momentum, solver }
     }
 }
 
-impl Conic for Hyperbola {
-    fn get_theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
+impl Hyperbola {
+    pub fn get_theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
         let x = self.standard_gravitational_parameter.powi(2) / self.specific_angular_momentum.powi(3);
         let mean_anomaly = x * time_since_periapsis * (self.eccentricity.powi(2) - 1.0).powf(3.0 / 2.0);
         let eccentric_anomaly = self.solver.solve(mean_anomaly);
@@ -45,11 +44,11 @@ impl Conic for Hyperbola {
     }
 
     /// Time can be negative if we have not reached the periapsis at the given theta
-    fn get_time_since_last_periapsis(&self, theta: f64) -> f64 {
+    pub fn get_time_since_last_periapsis(&self, theta: f64) -> f64 {
         let mut true_anomaly = theta - self.argument_of_periapsis;
         // Solve an edge case where if true_anomaly is very close to 0 or pi, it will spit out inaccurate results due to the tan
         if true_anomaly.abs() < 1.0e-6 || (true_anomaly.abs() - PI).abs() < 1.0e-4 {
-            true_anomaly += 1.0e-4
+            true_anomaly += 1.0e-4;
         }
         let eccentric_anomaly = 2.0 * f64::atanh(f64::sqrt((self.eccentricity - 1.0) / (self.eccentricity + 1.0)) * f64::tan(true_anomaly / 2.0));
         let mean_anomaly = self.eccentricity * f64::sinh(eccentric_anomaly) - eccentric_anomaly;
@@ -57,13 +56,13 @@ impl Conic for Hyperbola {
         mean_anomaly * x / (self.eccentricity.powi(2) - 1.0).powf(3.0 / 2.0)
     }
 
-    fn get_position(&self, theta: f64) -> DVec2 {
+    pub fn get_position(&self, theta: f64) -> DVec2 {
         let true_anomaly = theta - self.argument_of_periapsis;
         let radius = (self.semi_major_axis * (1.0 - self.eccentricity.powi(2))) / (1.0 + self.eccentricity * true_anomaly.cos());
         vec2(radius * theta.cos(), radius * theta.sin())
     }
     
-    fn get_velocity(&self, position: DVec2, theta: f64) -> DVec2 {
+    pub fn get_velocity(&self, position: DVec2, theta: f64) -> DVec2 {
         let true_anomaly = theta - self.argument_of_periapsis;
         let radius = position.magnitude();
         let radius_derivative_with_respect_to_true_anomaly = self.semi_major_axis * self.eccentricity * (1.0 - self.eccentricity.powi(2)) * true_anomaly.sin()
@@ -75,47 +74,35 @@ impl Conic for Hyperbola {
         position_derivative_with_respect_to_true_anomaly * angular_speed
     }
 
-    fn get_type(&self) -> ConicType {
-        ConicType::Hyperbola
-    }
-
-    fn get_direction(&self) -> OrbitDirection {
+    pub fn get_direction(&self) -> OrbitDirection {
         self.direction
     }
 
-    fn get_period(&self) -> Option<f64> {
-        None
-    }
-
-    fn get_semi_major_axis(&self) -> f64 {
+    pub fn get_semi_major_axis(&self) -> f64 {
         self.semi_major_axis
     }
 
-    fn get_semi_minor_axis(&self) -> f64 {
+    pub fn get_semi_minor_axis(&self) -> f64 {
         self.semi_major_axis * f64::sqrt(self.eccentricity.powi(2) - 1.0)
     }
 
-    fn get_argument_of_periapsis(&self) -> f64 {
+    pub fn get_argument_of_periapsis(&self) -> f64 {
         self.argument_of_periapsis
     }
 
-    fn get_min_asymptote_theta(&self) -> Option<f64> {
-        Some(self.min_asymptote_theta)
+    pub fn get_min_asymptote_theta(&self) -> f64 {
+        self.min_asymptote_theta
     }
 
-    fn get_max_asymptote_theta(&self) -> Option<f64> {
-        Some(self.max_asymptote_theta)
+    pub fn get_max_asymptote_theta(&self) -> f64 {
+        self.max_asymptote_theta
     }
 
-    fn get_eccentricity(&self) -> f64 {
+    pub fn get_eccentricity(&self) -> f64 {
         self.eccentricity
     }
 
-    fn get_orbits(&self, _: f64) -> i32 {
-        0
-    }
-
-    fn is_time_between_points(&self, start: &OrbitPoint, end: &OrbitPoint, time: f64) -> bool {
+    pub fn is_time_between_points(start: &OrbitPoint, end: &OrbitPoint, time: f64) -> bool {
         time > start.get_time() && time < end.get_time()
     }
 }
@@ -130,7 +117,7 @@ mod tests {
 
     #[test]
     fn test_time_from_true_anomaly_1() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -140,12 +127,12 @@ mod tests {
         let theta = f64::to_radians(100.0);
         let time = hyperbola.get_time_since_last_periapsis(theta);
         let expected_time = 1.15 * 60.0 * 60.0;
-        assert!((time - expected_time).abs() < 3.0)
+        assert!((time - expected_time).abs() < 3.0);
     }
 
     #[test]
     fn test_time_from_true_anomaly_2() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -155,12 +142,12 @@ mod tests {
         let theta = f64::to_radians(-100.0);
         let time = hyperbola.get_time_since_last_periapsis(theta);
         let expected_time = -1.15 * 60.0 * 60.0;
-        assert!((time - expected_time).abs() < 3.0)
+        assert!((time - expected_time).abs() < 3.0);
     }
 
     #[test]
     fn test_theta_from_time_since_periapsis_1() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -169,12 +156,12 @@ mod tests {
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let expected_theta = 0.0;
         let theta = hyperbola.get_theta_from_time_since_periapsis(0.0);
-        assert!((theta - expected_theta).abs() < 0.01)
+        assert!((theta - expected_theta).abs() < 0.01);
     }
 
     #[test]
     fn test_theta_from_time_since_periapsis_2() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -189,7 +176,7 @@ mod tests {
 
     #[test]
     fn test_theta_from_time_since_periapsis_3() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -204,8 +191,8 @@ mod tests {
 
     #[test]
     fn test_theta_from_time_since_periapsis_4() {
-        let position = vec2(-33839778.563934326, -31862122.134700775);
-        let velocity = vec2(1187.3296202582328, 268.8766709200928);
+        let position = vec2(-33_839_778.563_934_326, -31_862_122.134_700_775);
+        let velocity = vec2(1_187.329_620_258_232_8, 268.876_670_920_092_8);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 7.346e22;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
@@ -219,7 +206,7 @@ mod tests {
 
     #[test]
     fn test_radius_from_true_anomaly() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -228,13 +215,13 @@ mod tests {
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(107.78);
         let radius = hyperbola.get_position(theta).magnitude();
-        let expected_radius = 1.63229846e08;
+        let expected_radius = 1.632_298_46e08;
         assert!((radius - expected_radius).abs() < 1.0);
     }
 
     #[test]
     fn test_position_from_true_anomaly_1() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -249,7 +236,7 @@ mod tests {
 
     #[test]
     fn test_position_from_true_anomaly_2() {
-        let position = vec2(6678100.0 * f64::cos(PI / 4.0), 6678100.0 * f64::sin(PI / 4.0));
+        let position = vec2(6_678_100.0 * f64::cos(PI / 4.0), 6_678_100.0 * f64::sin(PI / 4.0));
         let velocity = vec2(-15000.0 * f64::cos(PI / 4.0), 15000.0 * f64::sin(PI / 4.0));
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -264,9 +251,9 @@ mod tests {
 
     #[test]
     fn test_position_from_true_anomaly_3() {
-        let position = vec2(-22992216.820260637, -41211039.67710246);
-        let velocity = vec2(281.5681303192537, -961.5890730599444);
-        let standard_gravitational_parameter = 4902720400000.0;
+        let position = vec2(-22_992_216.820_260_637, -41_211_039.677_102_46);
+        let velocity = vec2(281.568_130_319_253_7, -961.589_073_059_944_4);
+        let standard_gravitational_parameter = 4_902_720_400_000.0;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);
@@ -280,7 +267,7 @@ mod tests {
 
     #[test]
     fn test_velocity_from_true_anomaly_1() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -296,7 +283,7 @@ mod tests {
 
     #[test]
     fn test_velocity_from_true_anomaly_2() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -304,14 +291,14 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(107.78);
-        let expected_speed = 1.0512457e4;
+        let expected_speed = 1.051_245_7e4;
         let speed = hyperbola.get_velocity(hyperbola.get_position(theta), theta).magnitude();
         assert!((speed - expected_speed).abs() < 0.1);
     }
 
     #[test]
     fn test_velocity_from_true_anomaly_3() {
-        let position = vec2(0.0, 6678100.0);
+        let position = vec2(0.0, 6_678_100.0);
         let velocity = vec2(-15000.0, 0.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -326,7 +313,7 @@ mod tests {
 
     #[test]
     fn test_velocity_from_true_anomaly_4() {
-        let position = vec2(6678100.0 * f64::cos(PI / 4.0), 6678100.0 * f64::sin(PI / 4.0));
+        let position = vec2(6_678_100.0 * f64::cos(PI / 4.0), 6_678_100.0 * f64::sin(PI / 4.0));
         let velocity = vec2(-20000.0 * f64::cos(PI / 4.0), 20000.0 * f64::sin(PI / 4.0));
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -343,9 +330,9 @@ mod tests {
 
     #[test]
     fn test_velocity_from_true_anomaly_5() {
-        let position = vec2(-22992216.820260637, -4211039.67710246);
-        let velocity = vec2(1201.8989386523506, 73.28331093245788);
-        let standard_gravitational_parameter = 4902720400000.0;
+        let position = vec2(-22_992_216.820_260_637, -4_211_039.677_102_46);
+        let velocity = vec2(1_201.898_938_652_350_6, 73.283_310_932_457_88);
+        let standard_gravitational_parameter = 4_902_720_400_000.0;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);

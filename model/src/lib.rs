@@ -1,15 +1,19 @@
 use std::collections::HashSet;
 
+use nalgebra_glm::DVec2;
+use serde::{Deserialize, Serialize};
+use systems::time::{self, TimeStep};
+
 use self::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
 
-mod components;
+pub mod components;
 mod debug;
-mod storage;
+pub mod storage;
 mod systems;
 mod util;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Model {
     entity_allocator: EntityAllocator,
     mass_components: ComponentStorage<MassComponent>,
@@ -17,29 +21,79 @@ pub struct Model {
     orbitable_components: ComponentStorage<OrbitableComponent>,
     stationary_components: ComponentStorage<StationaryComponent>,
     trajectory_components: ComponentStorage<TrajectoryComponent>,
+    time: f64,
+    time_step: TimeStep,
+}
+
+impl Default for Model {
+    fn default() -> Self {
+        Self {
+            entity_allocator: EntityAllocator::default(),
+            mass_components: ComponentStorage::default(),
+            name_components: ComponentStorage::default(),
+            orbitable_components: ComponentStorage::default(),
+            trajectory_components: ComponentStorage::default(),
+            stationary_components: ComponentStorage::default(),
+            time: 0.0,
+            time_step: TimeStep::Level{ level: 1, paused: false } ,
+        }
+    }
 }
 
 impl Model {
-    pub fn new() -> Self {
-        Self {
-            entity_allocator: EntityAllocator::new(),
-            mass_components: ComponentStorage::new(),
-            name_components: ComponentStorage::new(),
-            orbitable_components: ComponentStorage::new(),
-            trajectory_components: ComponentStorage::new(),
-            stationary_components: ComponentStorage::new(),
+
+    /// # Errors
+    /// Forwards serde deserialization error if deserialization fails
+    pub fn deserialize(serialized: &str) -> Result<Self, String> {
+        match serde_json::from_str(serialized) {
+            Ok(model) => Ok(model),
+            Err(error) => Err(error.to_string()),
         }
     }
 
-    pub fn mock() -> Self {
-        Self {
-            entity_allocator: EntityAllocator::new(),
-            name_components: ComponentStorage::new(),
-            mass_components: ComponentStorage::new(),
-            orbitable_components: ComponentStorage::new(),
-            trajectory_components: ComponentStorage::new(),
-            stationary_components: ComponentStorage::new(),
+    /// # Errors
+    /// Forwards serde serialization error if serialization fails
+    pub fn serialize(&self) -> Result<String, String> {
+        match serde_json::to_string(self) {
+            Ok(serialized) => Ok(serialized),
+            Err(error) => Err(error.to_string()),
         }
+    }
+
+    pub fn update(&mut self, dt: f64) {
+        time::update(self, dt);
+    }
+
+    pub fn toggle_paused(&mut self) {
+        self.time_step.toggle_paused();
+    }
+
+    pub fn get_time_step(&self) -> &TimeStep {
+        &self.time_step
+    }
+
+    pub fn get_time(&self) -> f64 {
+        self.time
+    }
+
+    pub fn increase_time_step_level(&mut self) {
+        self.time_step.increase_level();
+    }
+
+    pub fn decrease_time_step_level(&mut self) {
+        self.time_step.decrease_level();
+    }
+
+    pub fn get_position(&self, entity: Entity) -> Option<DVec2> {
+        if let Some(stationary_component) = self.try_get_stationary_component(entity) {
+            return Some(stationary_component.get_position())
+        }
+
+        if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
+            return Some(trajectory_component.get_current_segment().get_current_position())
+        }
+
+        None
     }
 
     pub fn get_entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
@@ -170,9 +224,9 @@ mod test {
 
     #[test]
     fn test_components() {
-        let mut model = Model::new();
-        let builder1 = EntityBuilder::new().with_name_component(NameComponent::new("oh no".to_string()));
-        let builder2 = EntityBuilder::new();
+        let mut model = Model::default();
+        let builder1 = EntityBuilder::default().with_name_component(NameComponent::new("oh no".to_string()));
+        let builder2 = EntityBuilder::default();
         let e1 = model.allocate(builder1);
         let e2 = model.allocate(builder2);
 

@@ -3,7 +3,7 @@ use std::f64::consts::PI;
 #[cfg(feature = "profiling")]
 use tracy_client::span;
 
-use crate::{components::trajectory_component::orbit::Orbit, model::Model, storage::entity_allocator::Entity, systems::trajectory_prediction::{encounter::{Encounter, EncounterType}, numerical_methods::itp::itp}};
+use crate::{components::trajectory_component::orbit::Orbit, Model, storage::entity_allocator::Entity, systems::trajectory_prediction::{encounter::{Encounter, EncounterType}, numerical_methods::itp::itp}};
 
 use super::MIN_TIME_BEFORE_ENCOUNTER;
 
@@ -46,7 +46,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 
     let mut time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
     while time < start_time {
-        time += orbit.get_period().unwrap()
+        time += orbit.get_period().unwrap();
     }
     if time > end_time {
         return None;
@@ -55,14 +55,14 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
     Some(time)
 }
 
-/// - Start at time = start_time
+/// - Start at time = `start_time`
 /// - Step time by 1
 /// - Calculate position
 /// - Check if object has escaped soi; if so:
-///   - Use ITP between time and (time - time_step) to find exact time of exit and return
-///   - Check encounter is before end_time
-/// - Double the time step
-/// - Repeat until t > end_time
+///   - Use ITP between time and (time - `time_step`) to find exact time of exit and return
+///   - Check encounter is before `end_time`
+/// - Double the `time_step`
+/// - Repeat until t > `end_time`
 fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Option<f64> {
     let f = |time: f64| {
         let theta = orbit.get_theta_from_time(time);
@@ -109,11 +109,7 @@ pub fn solve_for_exit(model: &Model, entity: Entity, start_time: f64, end_time: 
         find_elliptical_exit_time(orbit, parent_orbit.get_sphere_of_influence(), start_time, end_time)
     } else {
         find_hyperbolic_exit_time(orbit, parent_orbit.get_sphere_of_influence(), start_time, end_time)
-    };
-
-    let Some(encounter_time) = encounter_time else {
-        return None;
-    };
+    }?;
     
     if encounter_time < start_time + MIN_TIME_BEFORE_ENCOUNTER {
         // Another encounter could be calculated as being eg 0.01 seconds later

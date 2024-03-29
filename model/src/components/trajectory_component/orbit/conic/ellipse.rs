@@ -1,12 +1,11 @@
 use std::f64::consts::PI;
 
 use nalgebra_glm::{vec2, DVec2};
+use serde::{Deserialize, Serialize};
 
-use crate::{components::trajectory_component::orbit::{conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, kepler_ellipse::EllipseSolver, period, specific_angular_momentum}}, util::normalize_angle};
+use crate::{components::trajectory_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, kepler_ellipse::EllipseSolver, period, specific_angular_momentum}}, util::normalize_angle};
 
-use super::Conic;
-
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Ellipse {
     semi_major_axis: f64,
     eccentricity: f64,
@@ -23,12 +22,12 @@ impl Ellipse {
         let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
         let specific_angular_momentum = specific_angular_momentum(position, velocity);
         let solver = EllipseSolver::new(eccentricity);
-        Ellipse { semi_major_axis, eccentricity, period, argument_of_periapsis, direction, specific_angular_momentum, solver }
+        Ellipse { semi_major_axis, eccentricity, direction, period, argument_of_periapsis, specific_angular_momentum, solver }
     }
 }
 
-impl Conic for Ellipse {
-    fn get_theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
+impl Ellipse {
+    pub fn get_theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
         let time_since_periapsis = time_since_periapsis % self.period;
         let mean_anomaly = 2.0 * PI * time_since_periapsis / self.period;
         let eccentric_anomaly = self.solver.solve(mean_anomaly);
@@ -47,11 +46,11 @@ impl Conic for Ellipse {
         }
     }
     /// Always returns a positive time
-    fn get_time_since_last_periapsis(&self, theta: f64) -> f64 {
+    pub fn get_time_since_last_periapsis(&self, theta: f64) -> f64 {
         let mut true_anomaly = theta - self.argument_of_periapsis;
         // Solve an edge case where if true_anomaly is very close to 0 or pi, it will spit out inaccurate results due to the tan
         if true_anomaly.abs() < 1.0e-6 || (true_anomaly.abs() - PI).abs() < 1.0e-4 {
-            true_anomaly += 1.0e-4
+            true_anomaly += 1.0e-4;
         }
         let eccentric_anomaly = 2.0 * f64::atan(f64::sqrt((1.0 - self.eccentricity) / (1.0 + self.eccentricity)) * f64::tan(true_anomaly / 2.0));
         let mut mean_anomaly = eccentric_anomaly - self.eccentricity * f64::sin(eccentric_anomaly);
@@ -62,13 +61,13 @@ impl Conic for Ellipse {
         mean_anomaly * self.period / (2.0 * PI)
     }
 
-    fn get_position(&self, theta: f64) -> DVec2 {
+    pub fn get_position(&self, theta: f64) -> DVec2 {
         let true_anomaly = theta - self.argument_of_periapsis;
         let radius = (self.semi_major_axis * (1.0 - self.eccentricity.powi(2))) / (1.0 + self.eccentricity * true_anomaly.cos());
         vec2(radius * theta.cos(), radius * theta.sin())
     }
     
-    fn get_velocity(&self, position: DVec2, theta: f64) -> DVec2 {
+    pub fn get_velocity(&self, position: DVec2, theta: f64) -> DVec2 {
         let true_anomaly = theta - self.argument_of_periapsis;
         let radius = position.magnitude();
         let radius_derivative_with_respect_to_theta = self.semi_major_axis * self.eccentricity * (1.0 - self.eccentricity.powi(2)) * true_anomaly.sin()
@@ -79,61 +78,49 @@ impl Conic for Ellipse {
         let angular_speed = self.specific_angular_momentum / radius.powi(2);
         position_derivative_with_respect_to_theta * angular_speed
     }
-
-    fn get_type(&self) -> ConicType {
-        ConicType::Ellipse
-    }
-
-    fn get_direction(&self) -> OrbitDirection {
+    
+    pub fn get_direction(&self) -> OrbitDirection {
         self.direction
     }
 
-    fn get_period(&self) -> Option<f64> {
-        Some(self.period)
+    pub fn get_period(&self) -> f64 {
+        self.period
     }
 
-    fn get_semi_major_axis(&self) -> f64 {
+    pub fn get_semi_major_axis(&self) -> f64 {
         self.semi_major_axis
     }
 
-    fn get_semi_minor_axis(&self) -> f64 {
+    pub fn get_semi_minor_axis(&self) -> f64 {
         self.semi_major_axis * f64::sqrt(1.0 - self.eccentricity.powi(2))
     }
 
-    fn get_argument_of_periapsis(&self) -> f64 {
+    pub fn get_argument_of_periapsis(&self) -> f64 {
         self.argument_of_periapsis
     }
 
-    fn get_min_asymptote_theta(&self) -> Option<f64> {
-        None
-    }
-
-    fn get_max_asymptote_theta(&self) -> Option<f64> {
-        None
-    }
-
-    fn get_eccentricity(&self) -> f64 {
+    pub fn get_eccentricity(&self) -> f64 {
         self.eccentricity
     }
 
-    fn get_orbits(&self, time: f64) -> i32 {
+    pub fn get_orbits(&self, time: f64) -> i32 {
         (time / self.period) as i32
     }
 
-    fn is_time_between_points(&self, start: &OrbitPoint, end: &OrbitPoint, time: f64) -> bool {
+    pub fn is_time_between_points(start: &OrbitPoint, end: &OrbitPoint, time: f64) -> bool {
         time > start.get_time() && time < end.get_time()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::components::trajectory_component::{brute_force_tester::BruteForceTester, orbit::{conic::new_conic, scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT}}};
+    use crate::components::trajectory_component::{brute_force_tester::BruteForceTester, orbit::{conic::Conic, scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT}}};
 
     use super::*;
     
     #[test]
     fn test_get_time_since_last_periapsis_1() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
         let semi_major_axis = 1.53000e7;
@@ -153,7 +140,7 @@ mod tests {
         let parent_mass = 1.989e30;
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * parent_mass;
         let semi_major_axis = 149.598e9;
-        let eccentricity = 0.01671022;
+        let eccentricity = 0.016_710_22;
         let direction = OrbitDirection::new(position, velocity);
         let ellipse = Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let expected_time = 210.0 * 24.0 * 60.0 * 60.0;
@@ -170,7 +157,7 @@ mod tests {
         let position = vec2(8.0e6,  0.0);
         let velocity = vec2(0.0, 0.11e4);
         let parent_mass = 7.348e22;
-        let conic = new_conic(parent_mass, position, velocity);
+        let conic = Conic::new(parent_mass, position, velocity);
         assert!(conic.get_semi_major_axis().is_sign_positive());
         let theta = 2.0;
         let time = conic.get_time_since_last_periapsis(theta);
@@ -180,7 +167,7 @@ mod tests {
 
     #[test]
     fn test_get_theta_from_time_since_periapsis_1() {
-        let position = vec2(6678100.0,  0.0);
+        let position = vec2(6_678_100.0,  0.0);
         let velocity = vec2(0.0, 15000.0);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
         let semi_major_axis = 1.53000e7;
@@ -195,8 +182,8 @@ mod tests {
 
     #[test]
     fn test_get_theta_from_time_since_periapsis_2() {
-        let position = vec2(-83760632.16012573, -305649596.3836937);
-        let velocity = vec2(-929.2507297680404, 1168.0344669650149);
+        let position = vec2(-83_760_632.160_125_73, -305_649_596.383_693_7);
+        let velocity = vec2(-929.250_729_768_040_4, 1_168.034_466_965_014_9);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
@@ -212,14 +199,14 @@ mod tests {
     fn test_get_position_1() {
         let position = vec2(1.52100e11,  0.0);
         let velocity = vec2(0.0, 2.929e4);
-        let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.988500e30;
+        let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.988_500e30;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);
         let ellipse = Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let true_anomaly = PI;
         let new_position = ellipse.get_position(true_anomaly);
-        let expected_position = vec2(-1.4707039418e11, 0.0);
+        let expected_position = vec2(-1.470_703_941_8e11, 0.0);
         let position_difference = new_position - expected_position;
         assert!(position_difference.x.abs() < 5000.0);
         assert!(position_difference.y.abs() < 0.1);
@@ -227,14 +214,14 @@ mod tests {
 
     #[test]
     fn test_get_position_2() {
-        let position = vec2(321699434.0757532, 238177462.81333557);
-        let velocity = vec2(-448.8853759438255, 386.13875843572083);
+        let position = vec2(321_699_434.075_753_2, 238_177_462.813_335_57);
+        let velocity = vec2(-448.885_375_943_825_5, 386.138_758_435_720_83);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);
         let ellipse = Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
-        let theta = 0.6373110791759163;
+        let theta = 0.637_311_079_175_916_3;
         let new_position = ellipse.get_position(theta);
         let position_difference = new_position - position;
         assert!(position_difference.x.abs() < 0.01);
@@ -245,7 +232,7 @@ mod tests {
     fn test_get_velocity_1() {
         let position = vec2(1.52100e11,  0.0);
         let velocity = vec2(0.0, 2.929e4);
-        let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.988500e30;
+        let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.988_500e30;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);
@@ -261,8 +248,8 @@ mod tests {
 
     #[test]
     fn test_get_velocity_2() {
-        let position = vec2(234851481.38196197, 174455271.78610012);
-        let velocity = vec2(-250.6798696407834, 817.5591126812552);
+        let position = vec2(234_851_481.381_961_97, 174_455_271.786_100_12);
+        let velocity = vec2(-250.679_869_640_783_4, 817.559_112_681_255_2);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);

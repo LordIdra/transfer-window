@@ -20,9 +20,7 @@ pub fn halley(function: &impl Fn(f64) -> f64, starting_x: f64, max_delta: f64, m
         if delta.abs() < max_delta {
             break;
         }
-        if i > max_iterations {
-            panic!("Halley solver exceeded max iterations");
-        }
+        assert!(i < max_iterations, "Halley solver exceeded max iterations");
 
     }
     x
@@ -43,9 +41,7 @@ pub fn halley_to_find_stationary_point(function: &impl Fn(f64) -> f64, starting_
         if delta.abs() < max_delta {
             break;
         }
-        if i > max_iterations {
-            panic!("Halley solver exceeded max iterations");
-        }
+        assert!(i < max_iterations, "Halley solver exceeded max iterations");
     }
     x
 }

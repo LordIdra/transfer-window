@@ -1,5 +1,7 @@
-/// Must have either StationaryComponent or TrajectoryComponent
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+
+/// Must have either `StationaryComponent` or `TrajectoryComponent`
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MassComponent {
     mass: f64,
 }

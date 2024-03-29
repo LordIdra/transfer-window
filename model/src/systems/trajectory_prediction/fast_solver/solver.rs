@@ -3,7 +3,7 @@ use std::collections::HashSet;
 #[cfg(feature = "profiling")]
 use tracy_client::span;
 
-use crate::{components::ComponentType, model::Model, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
+use crate::{components::ComponentType, Model, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
 
 use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
 
@@ -14,7 +14,7 @@ mod exit_solver;
 
 pub const MIN_TIME_BEFORE_ENCOUNTER: f64 = 1.0;
 
-/// Returns all entities with the same FINAL parent from can_enter
+/// Returns all entities with the same FINAL parent from `can_enter`
 /// It's expected that candidates only contains entities with a trajectory component
 pub fn get_final_siblings(model: &Model, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
     let end_segment = model.get_trajectory_component(entity).get_end_segment();
@@ -62,6 +62,7 @@ pub fn find_next_encounter(model: &Model, entity: Entity, start_time: f64, end_t
     // Because an encounter with another object could possibly happen sooner than the encounter we just found
     loop {
         windows.retain(|window| window.get_soonest_time() < end_time);
+        #[allow(clippy::redundant_closure_for_method_calls)] // We would have to make Window public to fix this
         windows.sort_by(|a, b| a.cmp(b));
 
         if windows.is_empty() {
@@ -82,7 +83,7 @@ pub fn find_next_encounter(model: &Model, entity: Entity, start_time: f64, end_t
         }
 
         if window.is_periodic() {
-            windows.push(window.next())
+            windows.push(window.next());
         }
     }
 

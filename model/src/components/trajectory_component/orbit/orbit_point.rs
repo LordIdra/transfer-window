@@ -1,8 +1,9 @@
 use nalgebra_glm::DVec2;
+use serde::{Deserialize, Serialize};
 
 use super::conic::Conic;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OrbitPoint {
     theta: f64,
     time: f64,
@@ -12,14 +13,14 @@ pub struct OrbitPoint {
 }
 
 impl OrbitPoint {
-    pub fn new(conic: &dyn Conic, position: DVec2, time: f64) -> Self {
+    pub fn new(conic: &Conic, position: DVec2, time: f64) -> Self {
         let theta = f64::atan2(position.y, position.x);
         let time_since_periapsis = conic.get_time_since_last_periapsis(theta);
         let velocity = conic.get_velocity(position, theta);
         Self { theta, time, time_since_periapsis, position, velocity }
     }
 
-    pub fn next(&self, conic: &dyn Conic, delta_time: f64) -> Self {
+    pub fn next(&self, conic: &Conic, delta_time: f64) -> Self {
         let time = self.time + delta_time;
         let mut time_since_periapsis = self.time_since_periapsis + delta_time;
         if let Some(period) = conic.get_period() {

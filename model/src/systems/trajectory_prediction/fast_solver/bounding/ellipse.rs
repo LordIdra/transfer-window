@@ -25,7 +25,7 @@ fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis:
     #[cfg(feature = "profiling")]
     let _span = span!("Min max signed distance");
     let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-6, 256);
-    let theta_2 = find_other_stationary_point(&sdf, theta_1);
+    let theta_2 = find_other_stationary_point(sdf, theta_1);
     let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
     if sdf(theta_1) < sdf(theta_2) { 
         (theta_1, theta_2)
@@ -42,7 +42,6 @@ struct BounderData<'a> {
     max_theta: f64, 
     soi: f64,
     start_time: f64,
-    end_time: f64
 }
 
 impl<'a> BounderData<'a> {
@@ -67,7 +66,7 @@ impl<'a> BounderData<'a> {
         self.make_segmented_window(true, self.start_time, self.start_time + self.orbit.get_period().unwrap(), 16)
     }
 
-    fn no_encounters(self) -> Vec<Window<'a>> {
+    fn no_encounters() -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
         let _span = span!("No encounters");
         vec![]
@@ -80,7 +79,7 @@ impl<'a> BounderData<'a> {
         let f = |theta: f64| (sdf)(theta) - self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
         let angle_bound = make_range_containing(intersections.0, intersections.1, self.min_theta);
-        let bound = angle_window_to_time_window(&self.orbit, angle_bound);
+        let bound = angle_window_to_time_window(self.orbit, angle_bound);
         // The reason we segment here is that our solver relies on the assumption that if there is a minimum,
         // the derivative with respect to time is positive at the start and negative at the end
         // There are some cases where this is not true, but splitting the window up into a few segments helps keep this assumption
@@ -94,7 +93,7 @@ impl<'a> BounderData<'a> {
         let f = |theta: f64| (sdf)(theta) + self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
         let angle_bound = make_range_containing(intersections.0, intersections.1, self.max_theta);
-        let bound = angle_window_to_time_window(&self.orbit, angle_bound);
+        let bound = angle_window_to_time_window(self.orbit, angle_bound);
         // The reason we segment here is that our solver relies on the assumption that if there is a minimum,
         // the derivative with respect to time is positive at the start and negative at the end
         // There are some cases where this is not true, but splitting the window up into a few segments helps keep this assumption
@@ -120,20 +119,20 @@ impl<'a> BounderData<'a> {
         let mut possible_tos = vec![inner_intersections.1, outer_intersections.0, outer_intersections.1];
         let mut to_index = 0;
         let mut min_distance = f64::MAX;
-        for i in 0..possible_tos.len() {
-            let window = make_range_containing(from, possible_tos[i], zero_intersections.0);
+        for (i, possible_to) in possible_tos.iter().enumerate() {
+            let window = make_range_containing(from, *possible_to, zero_intersections.0);
             let distance = angular_distance(window.0, window.1);
             if distance < min_distance {
                 min_distance = distance;
-                to_index = i
+                to_index = i;
             }
         }
         let to = possible_tos.remove(to_index);
         let angle_bound_1 = make_range_containing(from, to, zero_intersections.0);
         let angle_bound_2 = make_range_containing(possible_tos[0], possible_tos[1], zero_intersections.1);
 
-        let bound_1 = angle_window_to_time_window(&self.orbit, angle_bound_1);
-        let bound_2 = angle_window_to_time_window(&self.orbit, angle_bound_2);
+        let bound_1 = angle_window_to_time_window(self.orbit, angle_bound_1);
+        let bound_2 = angle_window_to_time_window(self.orbit, angle_bound_2);
 
         let window_1 = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound_1);
         let window_2 = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound_2);
@@ -142,7 +141,7 @@ impl<'a> BounderData<'a> {
     }
 }
 
-pub fn get_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64, end_time: f64) -> Vec<Window<'a>> {
+pub fn get_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64) -> Vec<Window<'a>> {
     #[cfg(feature = "profiling")]
     let _span = span!("Ellipse bounding");
     let argument_of_apoapsis = orbit.get_argument_of_periapsis() + PI;
@@ -158,14 +157,13 @@ pub fn get_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling
         max_theta,
         soi,
         start_time,
-        end_time
     };
 
     if min.abs() < soi && max.abs() < soi {
         data.no_bounds()
     } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() > soi) 
            || (max.is_sign_negative() && min.is_sign_negative() && max.abs() > soi) {
-        data.no_encounters()
+        BounderData::no_encounters()
     } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() < soi)
            || (max.is_sign_positive() && min.is_sign_negative() && min.abs() < soi) {
         data.one_bound_inner(sdf)

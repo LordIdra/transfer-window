@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use self::segment::Segment;
 
 #[cfg(test)]
@@ -6,39 +8,41 @@ pub mod burn;
 pub mod orbit;
 pub mod segment;
 
-/// Must have MassComponent, cannot have StationaryComponent
-#[derive(Debug)]
+/// Must have `MassComponent`, cannot have `StationaryComponent`
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TrajectoryComponent {
     current_index: usize,
     segments: Vec<Option<Segment>>,
 }
 
 impl TrajectoryComponent {
-    pub fn new() -> Self {
-        Self { current_index: 0, segments: vec![] }
+    pub fn get_segments(&self) -> &Vec<Option<Segment>> {
+        &self.segments
     }
-}
 
-impl TrajectoryComponent {
+    /// # Panics
+    /// Panics if the trajectory has no segment at the given time
     pub fn get_segment_at_time(&self, time: f64) -> &Segment {
-        for segment in &self.segments {
-            if let Some(segment) = segment {
-                if segment.get_start_time() <= time && segment.get_end_time() >= time {
-                    return segment
-                }
+        for segment in self.segments.iter().flatten() {
+            if segment.get_start_time() <= time && segment.get_end_time() >= time {
+                return segment
             }
         }
         panic!("No segment exists at the given time")
     }
 
+    /// # Panics
+    /// Panics if the trajectory has no current segment
     pub fn get_current_segment(&self) -> &Segment {
         self.segments
-            .get(self.current_index as usize)
+            .get(self.current_index)
             .expect("Current segment does not exist")
             .as_ref()
             .unwrap() // current segment value should never be None
     }
 
+    /// # Panics
+    /// Panics if the trajectory has no end segment
     pub fn get_end_segment(&self) -> &Segment {
         self.segments
             .last()
@@ -47,6 +51,8 @@ impl TrajectoryComponent {
             .unwrap() // end segment value should never be None
     }
 
+    /// # Panics
+    /// Panics if the trajectory has no start segment
     pub fn get_end_segment_mut(&mut self) -> &mut Segment {
         self.segments
             .last_mut()
@@ -57,7 +63,7 @@ impl TrajectoryComponent {
 
     fn get_current_segment_mut(&mut self) -> &mut Segment {
         self.segments
-            .get_mut(self.current_index as usize)
+            .get_mut(self.current_index)
             .expect("Current segment does not exist")
             .as_mut()
             .unwrap() // current segment value should never be None
@@ -86,8 +92,9 @@ mod test {
 
 
     #[test]
+    #[allow(clippy::float_cmp)]
     pub fn test() {
-        let mut trajectory = TrajectoryComponent::new();
+        let mut trajectory = TrajectoryComponent::default();
 
         let orbit_1 = {
             let parent = Entity::mock();

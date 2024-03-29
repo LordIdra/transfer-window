@@ -23,12 +23,10 @@ struct BounderData<'a> {
     min_asymptote_theta: f64,
     max_asymptote_theta: f64,
     soi: f64,
-    start_time: f64,
-    end_time: f64
 }
 
 impl<'a> BounderData<'a> {
-    fn no_encounters(self) -> Vec<Window<'a>> {
+    fn no_encounters() -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
         let _span = span!("No encounters");
         vec![]
@@ -41,7 +39,7 @@ impl<'a> BounderData<'a> {
         let theta_1 = itp(&f, self.min_asymptote_theta, self.max_theta);
         let theta_2 = itp(&f, self.max_asymptote_theta, self.max_theta);
         let angle_bound = make_range_containing(theta_1, theta_2, self.max_theta);
-        let bound = angle_window_to_time_window(&self.orbit, angle_bound);
+        let bound = angle_window_to_time_window(self.orbit, angle_bound);
         let window = Window::new(self.orbit, self.sibling_orbit, self.sibling, false, bound);
         vec![window]
     }
@@ -63,8 +61,8 @@ impl<'a> BounderData<'a> {
         let angle_bound_1 = make_range_containing(theta_1_inner, theta_1_outer, theta_1);
         let angle_bound_2 = make_range_containing(theta_2_inner, theta_2_outer, theta_2);
 
-        let bound_1 = angle_window_to_time_window(&self.orbit, angle_bound_1);
-        let bound_2 = angle_window_to_time_window(&self.orbit, angle_bound_2);
+        let bound_1 = angle_window_to_time_window(self.orbit, angle_bound_1);
+        let bound_2 = angle_window_to_time_window(self.orbit, angle_bound_2);
 
         let window_1 = Window::new(self.orbit, self.sibling_orbit, self.sibling, false, bound_1);
         let window_2 = Window::new(self.orbit, self.sibling_orbit, self.sibling, false, bound_2);
@@ -73,7 +71,7 @@ impl<'a> BounderData<'a> {
     }
 }
 
-pub fn get_hyperbola_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64, end_time: f64) -> Vec<Window<'a>> {
+pub fn get_hyperbola_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity) -> Vec<Window<'a>> {
     let sdf = make_sdf(orbit, sibling_orbit);
     let soi = sibling_orbit.get_sphere_of_influence();
     let min_asymptote_theta = orbit.get_min_asymptote_theta().unwrap() + 0.001;
@@ -88,12 +86,10 @@ pub fn get_hyperbola_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibli
         min_asymptote_theta,
         max_asymptote_theta,
         soi,
-        start_time,
-        end_time
     };
 
     if max.is_sign_negative() && max.abs() > soi {
-        data.no_encounters()
+        BounderData::no_encounters()
     } else if max.is_sign_positive() && max.abs() > soi {
         data.two_bounds(sdf)
     } else {

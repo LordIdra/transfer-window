@@ -1,21 +1,21 @@
 use std::f64::consts::PI;
 
 use nalgebra_glm::DVec2;
+use serde::{Deserialize, Serialize};
 
 use crate::{storage::entity_allocator::Entity, util::normalize_angle};
 
-use self::{conic::{new_conic, Conic}, conic_type::ConicType, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::sphere_of_influence};
+use self::{conic::{Conic, ConicType}, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::sphere_of_influence};
 
-mod conic_type;
 mod conic;
 mod orbit_direction;
-mod orbit_point;
+pub mod orbit_point;
 pub mod scary_math;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Orbit {
     parent: Entity,
-    conic: Box<dyn Conic>,
+    conic: Conic,
     sphere_of_influence: f64,
     start_point: OrbitPoint,
     end_point: OrbitPoint,
@@ -24,9 +24,9 @@ pub struct Orbit {
 
 impl Orbit {
     pub fn new(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
-        let conic = new_conic(parent_mass, position, velocity);
+        let conic = Conic::new(parent_mass, position, velocity);
         let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
-        let start_point = OrbitPoint::new(&*conic, position, time);
+        let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
         Self { parent, conic, sphere_of_influence, start_point, end_point, current_point }
@@ -56,10 +56,8 @@ impl Orbit {
             if end_theta < current_theta {
                 end_theta += 2.0 * PI;
             }
-        } else {
-            if end_theta > current_theta {
-                end_theta -= 2.0 * PI;
-            }
+        } else if end_theta > current_theta {
+            end_theta -= 2.0 * PI;
         }
         end_theta - current_theta
     }
@@ -128,7 +126,7 @@ impl Orbit {
     }
 
     pub fn is_time_within_orbit(&self, time: f64) -> bool {
-        self.conic.is_time_between_points(&self.current_point, &self.end_point, time)
+        time > self.start_point.get_time() && time < self.end_point.get_time()
     }
 
     pub fn get_overshot_time(&self, time: f64) -> f64 {
@@ -171,7 +169,7 @@ impl Orbit {
     pub fn end_at(&mut self, time: f64) {
         let theta = self.get_theta_from_time(time);
         let position = self.conic.get_position(theta);
-        self.end_point = OrbitPoint::new(&*self.conic, position, time);
+        self.end_point = OrbitPoint::new(&self.conic, position, time);
     }
 
     pub fn reset(&mut self) {
@@ -179,7 +177,7 @@ impl Orbit {
     }
 
     pub fn update(&mut self, delta_time: f64) {
-        self.current_point = self.current_point.next(&*self.conic, delta_time);
+        self.current_point = self.current_point.next(&self.conic, delta_time);
     }
 }
 

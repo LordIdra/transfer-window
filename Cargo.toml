@@ -9,7 +9,7 @@ members = [
 [profile.dev]
 opt-level=0
 debug=2
-incremental=false
+incremental=true
 
 [profile.profiling]
 inherits = "dev"
@@ -21,3 +21,22 @@ incremental=true
 opt-level=3
 debug=0
 incremental=true
+
+[workspace.lints.clippy]
+# Setting priority = -1 lets us override
+# See https://rust.code-maven.com/simple-case-of-pedantic-lints
+pedantic = { priority = -1, level = "warn" }
+cast_possible_wrap = "allow"
+cast_lossless = "allow"
+cast_sign_loss = "allow"
+cast_precision_loss = "allow"
+cast_possible_truncation = "allow"
+manual_string_new = "allow"
+struct_field_names = "allow"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+return_self_not_must_use = "allow"
+large_enum_variant = "allow"
+should_panic_without_expect = "allow"
+many_single_char_names = "allow"
+similar_names = "allow"

@@ -1,8 +1,9 @@
 use nalgebra_glm::DVec2;
+use serde::{Deserialize, Serialize};
 
 use crate::components::trajectory_component::orbit::scary_math::GRAVITATIONAL_CONSTANT;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct BurnPoint {
     parent_mass: f64,
     time: f64,

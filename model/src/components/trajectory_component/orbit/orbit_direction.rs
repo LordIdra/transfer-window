@@ -1,8 +1,9 @@
 use nalgebra_glm::DVec2;
+use serde::{Deserialize, Serialize};
 
 use super::scary_math::transverse_velocity;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub enum OrbitDirection {
     AntiClockwise,
     Clockwise,

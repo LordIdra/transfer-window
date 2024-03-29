@@ -1,15 +1,16 @@
 use nalgebra_glm::{DVec2, vec2};
+use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
 use self::burn_point::BurnPoint;
 
-mod burn_point;
+pub mod burn_point;
 
 pub const BURN_TIME_STEP: f64 = 0.1;
 pub const BURN_ACCELERATION_MAGNITUDE: f64 = 10.0;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Burn {
     entity: Entity,
     parent: Entity,
@@ -20,6 +21,7 @@ pub struct Burn {
 }
 
 impl Burn {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(entity: Entity, parent: Entity, parent_mass: f64, tangent: DVec2, delta_v: DVec2, start_time: f64, start_position: DVec2, start_velocity: DVec2) -> Self {
         let start_point = BurnPoint::new(parent_mass, start_time, start_position, start_velocity);
         let mut burn = Self { 
@@ -30,10 +32,11 @@ impl Burn {
             current_point: start_point.clone(),
             points: vec![],
         };
-        burn.recompute_burn_points(start_point);
+        burn.recompute_burn_points(&start_point);
         burn
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn get_start_point(&self) -> &BurnPoint {
         self.points.first().unwrap()
     }
@@ -42,6 +45,7 @@ impl Burn {
         &self.current_point
     }
     
+    #[allow(clippy::missing_panics_doc)]
     pub fn get_end_point(&self) -> &BurnPoint {
         self.points.last().unwrap()
     }
@@ -76,16 +80,16 @@ impl Burn {
             let delta_time = time_after_start % BURN_TIME_STEP;
             closest_previous_point.next(delta_time, self.get_absolute_acceleration())
         } else {
-            self.points.last().unwrap().clone()
+            self.get_end_point().clone()
         }
     }
 
     pub fn is_finished(&self) -> bool {
-        self.current_point.get_time() > self.points.last().unwrap().get_time()
+        self.current_point.get_time() > self.get_end_point().get_time()
     }
 
     pub fn get_overshot_time(&self, time: f64) -> f64 {
-        time - self.points.last().unwrap().get_time()
+        time - self.get_end_point().get_time()
     }
 
     fn get_absolute_delta_v(&self) -> DVec2 {
@@ -101,10 +105,10 @@ impl Burn {
     pub fn adjust(&mut self, adjustment: DVec2) {
         self.delta_v += adjustment;
         let start_point = self.get_start_point().clone();
-        self.recompute_burn_points(start_point);
+        self.recompute_burn_points(&start_point);
     }
 
-    fn recompute_burn_points(&mut self, start_point: BurnPoint) {
+    fn recompute_burn_points(&mut self, start_point: &BurnPoint) {
         let mut points = vec![start_point.clone()];
         // We don't use a while loop because we need to compute at least 1 point (otherwise the duration of the burn is 0 which may break stuff)
         loop {
@@ -118,7 +122,7 @@ impl Burn {
     }
 
     pub fn reset(&mut self) {
-        self.current_point = self.points.first().unwrap().clone();
+        self.current_point = self.get_start_point().clone();
     }
 
     pub fn update(&mut self, delta_time: f64) {

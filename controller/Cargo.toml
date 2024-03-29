@@ -6,7 +6,13 @@ edition = "2021"
 [dependencies]
 transfer-window-model = { path = "../model" }
 transfer-window-view = { path = "../view" }
+nalgebra-glm = "0.18.0"
+log = "0.4.21"
+env_logger = "0.11.3"
 
 [dependencies.eframe]
-version = "0.26.2"
+version = "0.23"
 features = ["glow"]
+
+[lints]
+workspace = true

@@ -3,12 +3,10 @@ use nalgebra_glm::{vec2, DMat2, DVec2};
 #[cfg(feature = "profiling")]
 use tracy_client::span;
 
-use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_prediction::numerical_methods::laguerre::laguerre_to_find_stationary_point, util::normalize_angle};
+use crate::components::trajectory_component::orbit::Orbit;
 
-use super::util::find_other_stationary_point;
-
-/// https://stackoverflow.com/a/46007540
-/// https://blog.chatfield.io/simple-method-for-distance-to-ellipse/
+/// <https://stackoverflow.com/a/46007540>
+/// <https://blog.chatfield.io/simple-method-for-distance-to-ellipse/>
 /// This is a GENIUS very efficient and accurate solution
 fn solve_for_closest_point_on_ellipse(a: f64, b: f64, p: DVec2) -> DVec2 {
     // let px = f64::abs(p[0]);
@@ -79,18 +77,3 @@ pub fn make_sdf<'a>(orbit_a: &'a Orbit, orbit_b: &'a Orbit) -> impl Fn(f64) -> f
         sign * magnitude
     }
 }
-
-// Assumes the SDF has ONLY a min distance (ie: hyperbola)
-pub fn find_min(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> (f64, f64) {
-    #[cfg(feature = "profiling")]
-    let _span = span!("Min max signed distance");
-    let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-6, 256);
-    let theta_2 = find_other_stationary_point(&sdf, theta_1);
-    let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
-    if sdf(theta_1) < sdf(theta_2) { 
-        (theta_1, theta_2)
-    } else { 
-        (theta_2, theta_1)
-    }
-}
-

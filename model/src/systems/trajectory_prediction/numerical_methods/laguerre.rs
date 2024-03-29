@@ -13,9 +13,6 @@ fn delta(f: f64, f_prime: f64, f_prime_prime: f64) -> f64 {
     let h = g.powi(2) - f_prime_prime / f;
     let c = (n - 1.0) * (n * h - g.powi(2));
     let b = c.abs().sqrt() * g.signum();
-    if (-n / (g + b)).is_nan() {
-        panic!("{} {} {}", f, f_prime, f_prime_prime);
-    }
     -n / (g + b)
 }
 
@@ -32,9 +29,7 @@ pub fn laguerre(function: &impl Fn(f64) -> f64, starting_x: f64, max_delta: f64,
         if delta.abs() < max_delta {
             break;
         }
-        if i > max_iterations {
-            panic!("Laguerre solver exceeded max iterations");
-        }
+        assert!(i < max_iterations, "Laguerre solver exceeded max iterations");
     }
     x
 }
@@ -52,9 +47,7 @@ pub fn laguerre_to_find_stationary_point(function: &impl Fn(f64) -> f64, startin
         if delta.abs() < max_delta {
             break;
         }
-        if i > max_iterations {
-            panic!("Laguerre solver exceeded max iterations");
-        }
+        assert!(i < max_iterations, "Laguerre solver exceeded max iterations");
     }
     x
 }

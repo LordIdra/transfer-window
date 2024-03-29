@@ -1,18 +1,25 @@
 # Current tasks
-- [1| ] MVC split
-- [1| ] Rendering backend
-- [1| ] Display current time
-- [1| ] Display time speed
-- [1| ] Primitive planet rendering as sphere
+- [1|x] MVC split
+- [1|x] Rendering backend
+- [1|x] Primitive planet rendering as sphere
+- [1|x] Refocus selected object
+- [1|x] Drag to move focus
+- [1|x] Load/save games
+- [1|x] Display current time
+- [1|x] Speed up / slow down time
+- [1|x] Build default model
+- [1|x] Render icons (different types for different objects)
+- [1| ] Click icon to focus object
+- [1| ] Overlapping icons render with a priority system
+- [1| ] Update orbit state
 - [1| ] Intelligent conic rendering
-- [1| ] Refocus selected object
-- [1| ] Drag to move focus
-- [1| ] Load/save games
-- [1| ] Create new celestial objects
-- [1| ] Edit celestial objects
 - [1| ] Select a point on orbit
 - [1| ] Warp to point on orbit
 - [1| ] View N orbits into future on the selected orbit
+
+- [1| ] Display warp speed
+- [1| ] Games have names
+- [1| ] Choose game to load
 
 # Burns
 - [1| ] Can create burn
@@ -25,9 +32,7 @@
 - [1| ] Warp to burn button
 
 # Underlay
-- [1| ] Click icon to focus object
-- [1| ] Different types of objects have different icons
-- [1| ] Overlapping icons render with a priority system
+
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
 - [1| ] Show closest encounter for target and selected

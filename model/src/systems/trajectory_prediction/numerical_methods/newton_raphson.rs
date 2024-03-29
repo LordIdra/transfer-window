@@ -18,9 +18,7 @@ pub fn newton_raphson(function: &impl Fn(f64) -> f64, starting_x: f64, max_delta
         if delta.abs() < max_delta {
             break;
         }
-        if i > max_iterations {
-            panic!("Newton-Raphson solver exceeded max iterations");
-        }
+        assert!(i < max_iterations, "Newton-Raphson solver exceeded max iterations");
 
     }
     x
@@ -41,9 +39,7 @@ pub fn newton_raphson_to_find_stationary_point(function: &impl Fn(f64) -> f64, s
         if delta.abs() < max_delta {
             break;
         }
-        if i > max_iterations {
-            panic!("Newton-Raphson solver exceeded max iterations");
-        }
+        assert!(i < max_iterations, "Newton-Raphson solver exceeded max iterations");
     }
     x
 }

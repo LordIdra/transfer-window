@@ -1,10 +1,11 @@
 use nalgebra_glm::DVec2;
+use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
 use super::{burn::Burn, orbit::Orbit};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Segment {
     Orbit(Orbit),
     Burn(Burn),
@@ -81,6 +82,8 @@ impl Segment {
         }
     }
 
+    /// # Panics
+    /// Panics if the segment is not an orbit
     pub fn as_orbit(&self) -> &Orbit {
         match self {
             Segment::Burn(_) => panic!("Attempted to get non-orbit segment as orbit"),
@@ -88,6 +91,8 @@ impl Segment {
         }
     }
 
+    /// # Panics
+    /// Panics if the segment is not a burn
     pub fn as_orbit_mut(&mut self) -> &mut Orbit {
         match self {
             Segment::Burn(_) => panic!("Attempted to get non-orbit segment as orbit"),

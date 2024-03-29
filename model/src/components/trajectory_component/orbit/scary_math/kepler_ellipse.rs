@@ -1,5 +1,7 @@
 use std::f64::consts::PI;
 
+use serde::{Deserialize, Serialize};
+
 const DELTA_THRESHOLD: f64 = 1.0e-10;
 
 pub fn laguerre_delta(f: f64, f_prime: f64, f_prime_prime: f64) -> f64 {
@@ -10,7 +12,7 @@ pub fn laguerre_delta(f: f64, f_prime: f64, f_prime_prime: f64) -> f64 {
     - (n*f) / (f_prime + b)
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EllipseSolver {
     eccentricity: f64
 }
@@ -20,12 +22,12 @@ impl EllipseSolver {
         Self { eccentricity }
     }
 
-    /// Assumes 0 < mean_anomaly < 2pi
+    /// Assumes 0 < mean anomaly < 2pi
     pub fn solve(&self, mean_anomaly: f64) -> f64 {
         // Choosing an initial seed: https://www.aanda.org/articles/aa/full_html/2022/02/aa41423-21/aa41423-21.html#S5
         // Yes, they're actually serious about that 0.999999 thing (lmao)
         let mut eccentric_anomaly = mean_anomaly
-            + (0.999999 * 4.0 * self.eccentricity * mean_anomaly * (PI - mean_anomaly))
+            + (0.999_999 * 4.0 * self.eccentricity * mean_anomaly * (PI - mean_anomaly))
             / (8.0 * self.eccentricity * mean_anomaly + 4.0 * self.eccentricity * (self.eccentricity - PI) + PI.powi(2));
 
         // Iteration using laguerre method
@@ -41,7 +43,7 @@ impl EllipseSolver {
             if delta.abs() < DELTA_THRESHOLD {
                 break;
             }
-            eccentric_anomaly = eccentric_anomaly + delta;
+            eccentric_anomaly += delta;
         }
         eccentric_anomaly
     }

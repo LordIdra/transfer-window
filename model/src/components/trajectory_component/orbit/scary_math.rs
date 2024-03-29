@@ -82,7 +82,7 @@ mod tests {
     #[test]
     fn test_eccentricity_2() {
         // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/hyperbolic-trajectory-example.html
-        let position = vec2(6678100.0 * f64::cos(-PI / 6.0), 6678100.0 * f64::sin(-PI / 6.0));
+        let position = vec2(6_678_100.0 * f64::cos(-PI / 6.0), 6_678_100.0 * f64::sin(-PI / 6.0));
         let velocity = vec2(15000.0 * f64::cos(-PI / 6.0 + PI / 2.0), 15000.0 * f64::sin(-PI / 6.0 + PI / 2.0));
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
@@ -113,8 +113,8 @@ mod tests {
 
     #[test]
     fn test_argument_of_periapsis_3() {
-        let position = vec2(369236029.3588132, 143598629.71966434);
-        let velocity = vec2(47.79968959560202, -607.3920534306773);
+        let position = vec2(369_236_029.358_813_2, 143_598_629.719_664_34);
+        let velocity = vec2(47.799_689_595_602_02, -607.392_053_430_677_3);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
         let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
         let expected_argument_of_periapsis = PI / 6.0 - PI;
@@ -123,8 +123,8 @@ mod tests {
 
     #[test]
     fn test_argument_of_periapsis_4() {
-        let position = vec2(221244867.9581085, 278127601.0974563);
-        let velocity = vec2(772.33035113478, -73.80334890759599);
+        let position = vec2(221_244_867.958_108_5, 278_127_601.097_456_3);
+        let velocity = vec2(772.330_351_134_78, -73.803_348_907_595_99);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
         let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
         let expected_argument_of_periapsis = PI / 6.0 - PI;
@@ -133,11 +133,11 @@ mod tests {
 
     #[test]
     fn test_argument_of_periapsis_5() {
-        let position = vec2(321699434.0757532, 238177462.81333557);
-        let velocity = vec2(-448.8853759438255, 386.13875843572083);
+        let position = vec2(321_699_434.075_753_2, 238_177_462.813_335_57);
+        let velocity = vec2(-448.885_375_943_825_5, 386.138_758_435_720_83);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
         let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
-        let expected_argument_of_periapsis = -2.615930001576588;
+        let expected_argument_of_periapsis = -2.615_930_001_576_588;
         assert!((argument_of_periapsis - expected_argument_of_periapsis).abs() < 0.01);
     }
 

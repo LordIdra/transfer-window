@@ -1,7 +1,7 @@
 #[cfg(feature = "profiling")]
 use tracy_client::span;
 
-use crate::{model::Model, storage::entity_allocator::Entity};
+use crate::{Model, storage::entity_allocator::Entity};
 
 use self::{ellipse::get_ellipse_bound, hyperbola::get_hyperbola_bound, window::Window};
 
@@ -18,17 +18,15 @@ pub fn get_initial_windows(model: &Model, entity: Entity, siblings: Vec<Entity>,
     let orbit = model.get_trajectory_component(entity).get_end_segment().as_orbit();
     let mut windows = vec![];
 
-    for sibling in &siblings {
-        let sibling_orbit = model.get_trajectory_component(*sibling).get_segment_at_time(start_time).as_orbit();
-        if !sibling_orbit.is_ellipse() {
-            panic!("Orbitable is on hyperbolic trajectory")
-        }
+    for sibling in siblings {
+        let sibling_orbit = model.get_trajectory_component(sibling).get_segment_at_time(start_time).as_orbit();
+        assert!(sibling_orbit.is_ellipse(), "Orbitable is on hyperbolic trajectory");
         if orbit.is_ellipse() {
-            for window in get_ellipse_bound(orbit, sibling_orbit, *sibling, start_time, end_time) {
+            for window in get_ellipse_bound(orbit, sibling_orbit, sibling, start_time) {
                 windows.push(window);
             }
         } else {
-            for window in get_hyperbola_bound(orbit, sibling_orbit, *sibling, start_time, end_time) {
+            for window in get_hyperbola_bound(orbit, sibling_orbit, sibling) {
                 windows.push(window);
             }
         }
@@ -39,7 +37,7 @@ pub fn get_initial_windows(model: &Model, entity: Entity, siblings: Vec<Entity>,
     for window in &mut windows {
         if window.is_periodic() {
             while window.get_soonest_time() < start_time && window.get_latest_time() < start_time {
-                *window = window.next()
+                *window = window.next();
             }
         }
     }

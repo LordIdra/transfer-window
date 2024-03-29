@@ -42,7 +42,7 @@ pub fn angle_window_to_time_window(orbit: &Orbit, mut window: (f64, f64)) -> (f6
         orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.0), 
         orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.1));
     if window.1 < window.0 {
-        window.1 += orbit.get_period().unwrap()
+        window.1 += orbit.get_period().unwrap();
     }
     window
 }
@@ -68,10 +68,6 @@ mod test {
     use std::f64::consts::PI;
 
     use crate::systems::trajectory_prediction::fast_solver::bounding::util::make_range_containing;
-
-    fn compare_f64_pairs(pair_1: (f64, f64), pair_2: (f64, f64)) -> bool {
-        (pair_1.0 - pair_2.0).abs() < 1.0e-6 && (pair_1.1 - pair_2.1).abs() < 1.0e-6
-    }
 
     #[test]
     fn test_make_range_containing() {

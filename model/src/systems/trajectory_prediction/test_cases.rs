@@ -3,7 +3,7 @@ use std::{collections::{HashMap, VecDeque}, fs};
 use nalgebra_glm::vec2;
 use serde::Deserialize;
 
-use crate::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, model::Model, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
+use crate::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, Model, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -58,31 +58,25 @@ struct CaseObjectData {
     parent_name: Option<String>,
 }
 
-struct Case {
-    metadata: CaseMetaData,
-    object_data: Vec<CaseObjectData>,
-    encounters: Vec<CaseEncounter>,
-}
-
 fn load_case_metadata(name: &str) -> CaseMetaData {
     let file = fs::read_to_string("resources/prediction-test-cases/".to_string() + name + "/metadata.json")
-        .expect(format!("Failed to load metadata {}", name).as_str());
+        .unwrap_or_else(|_| panic!("Failed to load metadata {name}"));
     serde_json::from_str(file.as_str())
-        .expect(format!("Failed to deserialize metadata {}", name).as_str())
+        .unwrap_or_else(|_| panic!("Failed to deserialize metadata {name}"))
 }
 
 fn load_case_object_data(name: &str) -> HashMap<String, CaseObjectData> {
     let file = fs::read_to_string("resources/prediction-test-cases/".to_string() + name + "/objects.json")
-        .expect(format!("Failed to load objects {}", name).as_str());
+        .unwrap_or_else(|_| panic!("Failed to load objects {name}"));
     serde_json::from_str(file.as_str())
-        .expect(format!("Failed to deserialize objects {}", name).as_str())
+        .unwrap_or_else(|_| panic!("Failed to deserialize objects {name}"))
 }
 
 fn load_case_encounters(name: &str) -> VecDeque<CaseEncounter> {
     let file = fs::read_to_string("resources/prediction-test-cases/".to_string() + name + "/encounters.json")
-    .expect(format!("Failed to load encounters {}", name).as_str());
+    .unwrap_or_else(|_| panic!("Failed to load encounters {name}"));
     serde_json::from_str(file.as_str())
-        .expect(format!("Failed to deserialize objects {}", name).as_str())
+        .unwrap_or_else(|_| panic!("Failed to deserialize objects {name}"))
 }
 
 pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f64) {
@@ -90,12 +84,12 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
     let mut object_data = load_case_object_data(name);
     let encounters = load_case_encounters(name);
 
-    let mut model = Model::mock();
+    let mut model = Model::default();
     let mut object_entities: HashMap<String, Entity> = HashMap::new();
     let mut non_orbitable_entity = None;
     while !object_data.is_empty() {
         for (name, data) in object_data.clone() {
-            let mut entity_builder = EntityBuilder::new()
+            let mut entity_builder = EntityBuilder::default()
                 .with_name_component(NameComponent::new(name.clone()))
                 .with_mass_component(MassComponent::new(data.mass));
 
@@ -108,7 +102,7 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                     let parent_mass = model.get_mass_component(*parent).get_mass();
                     let position = vec2(data.position[0], data.position[1]);
                     let velocity = vec2(data.velocity.unwrap()[0], data.velocity.unwrap()[1]);
-                    let mut trajectory_component = TrajectoryComponent::new();
+                    let mut trajectory_component = TrajectoryComponent::default();
                     trajectory_component.add_segment(Segment::Orbit(Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0)));
                     entity_builder = entity_builder.with_trajectory_component(trajectory_component);
                 } else {
@@ -116,11 +110,11 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                 }
 
             } else {
-                panic!("Object {} has only one of velocity and parent_name, ", name);
+                panic!("Object {name} has only one of velocity and parent_name");
             }
 
             if data.orbitable {
-                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new());
+                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(0.0));
             }
 
             let entity = model.allocate(entity_builder);
