@@ -1,5 +1,5 @@
 use eframe::{egui::Pos2, epaint::Rect};
-use log::{error, trace};
+use log::trace;
 use nalgebra_glm::{scale2d, translate2d, vec2, DMat3, DVec2, Mat3, Vec2};
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
@@ -48,18 +48,9 @@ impl Camera {
     }
 
     pub fn get_translation(&self, model: &Model) -> DVec2 {
-        let focus_position = if let Some(focus) = self.focus {
-            if let Some(component) = model.try_get_stationary_component(focus) {
-                component.get_position()
-            } else if let Some(component) = model.try_get_trajectory_component(focus) {
-                component.get_current_segment().get_current_position()
-            } else {
-                error!("Focus has neither stationary nor trajectory component");
-                error!("Defaulting back to focus_position");
-                self.focus_position
-            }
-        } else {
-            self.focus_position
+        let focus_position = match self.focus {
+            Some(focus) => model.get_absolute_position(focus),
+            None => self.focus_position,
         };
         focus_position + self.panning
     }

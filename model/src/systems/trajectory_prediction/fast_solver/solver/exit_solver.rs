@@ -2,8 +2,9 @@ use std::f64::consts::PI;
 
 #[cfg(feature = "profiling")]
 use tracy_client::span;
+use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::trajectory_component::orbit::Orbit, Model, storage::entity_allocator::Entity, systems::trajectory_prediction::{encounter::{Encounter, EncounterType}, numerical_methods::itp::itp}};
+use crate::{components::trajectory_component::orbit::Orbit, Model, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
 
 use super::MIN_TIME_BEFORE_ENCOUNTER;
 

@@ -30,7 +30,7 @@ pub fn bisection(function: &impl Fn(f64) -> f64, min: f64, max: f64, max_interva
 mod tests {
     use std::f64::consts::PI;
 
-    use crate::systems::trajectory_prediction::numerical_methods::bisection::bisection;
+    use crate::numerical_methods::bisection::bisection;
 
     #[test]
     fn test_bisection_1() {

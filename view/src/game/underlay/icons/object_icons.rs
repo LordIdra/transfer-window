@@ -5,7 +5,7 @@ use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use crate::{events::Event, game::{util::add_textured_square, Scene}};
+use crate::game::{util::add_textured_square, Scene};
 
 const ICON_RADIUS: f64 = 10.0;
 
@@ -37,7 +37,8 @@ impl Icon {
 }
 
 fn get_icon(model: &Model, entity: Entity) -> Option<Icon> {
-    let position = model.get_position(entity)?;
+    model.get_position(entity)?; // make sure the entity actually has a position, otherwise next line will panic
+    let position = model.get_absolute_position(entity);
 
     if model.try_get_orbitable_component(entity).is_some() {
         // We divide here to make sure the usize doesn't overflow
@@ -86,13 +87,13 @@ fn draw_icons(view: &Scene, icons: Vec<Icon>) {
     }
 }
 
-fn get_mouse_over_icon(view: &Scene, model: &Model, mouse_position: Pos2, screen_size: Rect, icons: &Vec<Icon>) -> Option<Icon> {
+fn get_mouse_over_icon(view: &Scene, model: &Model, mouse_position: Pos2, screen_size: Rect, icons: &[Icon]) -> Option<Icon> {
     let focus = view.camera.window_space_to_world_space(model, mouse_position, screen_size);
     let radius = ICON_RADIUS / view.camera.get_zoom();
     icons.iter().find(|icon| (icon.position - focus).magnitude() < radius).cloned()
 }
 
-pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
     let mut icons = get_initial_icons(model);
     icons.sort_by(Icon::cmp);
     icons.reverse(); // sorted from HIGHEST to LOWEST priority

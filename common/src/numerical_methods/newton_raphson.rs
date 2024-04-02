@@ -1,7 +1,7 @@
-use crate::systems::trajectory_prediction::numerical_methods::util::differentiate_2;
-
 #[cfg(feature = "profiling")]
 use tracy_client::span;
+
+use crate::numerical_methods::util::differentiate_2;
 
 use super::util::differentiate_1;
 
@@ -46,7 +46,7 @@ pub fn newton_raphson_to_find_stationary_point(function: &impl Fn(f64) -> f64, s
 
 #[cfg(test)]
 mod test {
-    use crate::systems::trajectory_prediction::numerical_methods::newton_raphson::{newton_raphson, newton_raphson_to_find_stationary_point};
+    use crate::numerical_methods::newton_raphson::{newton_raphson, newton_raphson_to_find_stationary_point};
 
     #[test]
     fn test_newton_raphson() {

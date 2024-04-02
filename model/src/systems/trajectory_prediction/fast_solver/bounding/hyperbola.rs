@@ -1,9 +1,10 @@
-use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::{fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}, numerical_methods::{itp::itp, util::differentiate_1}}};
+use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
 
 use super::{sdf::make_sdf, window::Window};
 
 #[cfg(feature = "profiling")]
 use tracy_client::span;
+use transfer_window_common::numerical_methods::{itp::itp, util::differentiate_1};
 
 // Hyperbolic SDF only has a maximum, no minimum
 fn find_max(sdf: &impl Fn(f64) -> f64, min_asymptote_theta: f64, max_asymptote_theta: f64) -> f64 {

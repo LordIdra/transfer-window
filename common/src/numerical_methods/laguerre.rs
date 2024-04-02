@@ -1,7 +1,7 @@
 #[cfg(feature = "profiling")]
 use tracy_client::span;
 
-use crate::systems::trajectory_prediction::numerical_methods::util::{differentiate_2, differentiate_3};
+use crate::numerical_methods::util::{differentiate_2, differentiate_3};
 
 fn delta(f: f64, f_prime: f64, f_prime_prime: f64) -> f64 {
     if f == 0.0 {
@@ -54,7 +54,8 @@ pub fn laguerre_to_find_stationary_point(function: &impl Fn(f64) -> f64, startin
 
 #[cfg(test)]
 mod test {
-    use crate::systems::trajectory_prediction::numerical_methods::laguerre::{laguerre, laguerre_to_find_stationary_point};
+    use crate::numerical_methods::laguerre::{laguerre, laguerre_to_find_stationary_point};
+
 
 
     #[test]

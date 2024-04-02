@@ -3110,6 +3110,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "transfer-window-common"
+version = "0.1.0"
+dependencies = [
+ "kurbo",
+ "log",
+ "nalgebra-glm",
+ "tracing-tracy",
+ "tracy-client",
+]
+
+[[package]]
 name = "transfer-window-controller"
 version = "0.1.0"
 dependencies = [
@@ -3125,8 +3136,6 @@ dependencies = [
 name = "transfer-window-model"
 version = "0.1.0"
 dependencies = [
- "env_logger",
- "kurbo",
  "lazy_static",
  "log",
  "nalgebra-glm",
@@ -3135,6 +3144,7 @@ dependencies = [
  "serde_json",
  "tracing-tracy",
  "tracy-client",
+ "transfer-window-common",
 ]
 
 [[package]]
@@ -3142,10 +3152,10 @@ name = "transfer-window-view"
 version = "0.1.0"
 dependencies = [
  "eframe",
- "env_logger",
  "image 0.25.0",
  "log",
  "nalgebra-glm",
+ "transfer-window-common",
  "transfer-window-model",
 ]
 

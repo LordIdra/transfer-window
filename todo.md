@@ -9,21 +9,24 @@
 - [1|x] Speed up / slow down time
 - [1|x] Build default model
 - [1|x] Render icons (different types for different objects)
-- [1| ] Click icon to focus object
-- [1| ] Overlapping icons render with a priority system
-- [1| ] Update orbit state
+- [1|x] Click icon to focus object
+- [1|x] Overlapping icons render with a priority system
 - [1| ] Intelligent conic rendering
+- [1| ] Update orbit state
 - [1| ] Select a point on orbit
+- [1| ] Intelligent burn rendering
 - [1| ] Warp to point on orbit
 - [1| ] View N orbits into future on the selected orbit
+- [1| ] Show scale somewhere (how long 1m, 1k, etc is)
+- [1| ] Can create burn
+- [1| ] Burn can be adjusted (at all)
 
 - [1| ] Display warp speed
 - [1| ] Games have names
 - [1| ] Choose game to load
 
 # Burns
-- [1| ] Can create burn
-- [1| ] Burn can be adjusted (at all)
+
 - [1| ] Smooth burn adjustment at different levels
 - [1| ] Adjusting a burn with subsequent burns deletes them, but required confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)

@@ -2,8 +2,9 @@ use std::f64::consts::PI;
 
 #[cfg(feature = "profiling")]
 use tracy_client::span;
+use transfer_window_common::numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point};
 
-use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::{fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point}}, util::normalize_angle};
+use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, util::normalize_angle};
 
 use super::{sdf::make_sdf, util::find_other_stationary_point, window::Window};
 

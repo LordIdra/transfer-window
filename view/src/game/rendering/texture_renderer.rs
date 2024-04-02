@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use eframe::glow;
 use glow::Context;
-use log::trace;
 use nalgebra_glm::Mat3;
 
 use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}, texture::Texture};
@@ -35,7 +34,6 @@ impl TextureRenderer {
 
     pub fn render(&mut self, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
         self.vertex_array_object.data(&self.vertices);
-        trace!("{:?}", self.vertices);
         self.texture.bind();
         self.program.use_program();
         self.program.uniform_mat3("zoom_matrix", zoom_matrix.as_slice());

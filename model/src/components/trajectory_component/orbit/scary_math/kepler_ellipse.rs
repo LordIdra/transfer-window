@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 const DELTA_THRESHOLD: f64 = 1.0e-10;
 
-pub fn laguerre_delta(f: f64, f_prime: f64, f_prime_prime: f64) -> f64 {
+fn laguerre_delta(f: f64, f_prime: f64, f_prime_prime: f64) -> f64 {
     let n: f64 = 2.0; // N=2, modified Newton-Raphson
     let a = (n-1.0).powi(2) * f_prime.powi(2) - n*(n-1.0)*f*f_prime_prime;
     let mut b = f64::sqrt(a.abs());

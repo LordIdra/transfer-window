@@ -1,7 +1,7 @@
-use crate::systems::trajectory_prediction::numerical_methods::util::{differentiate_2, differentiate_3};
-
 #[cfg(feature = "profiling")]
 use tracy_client::span;
+
+use crate::numerical_methods::util::{differentiate_2, differentiate_3};
 
 fn delta(f: f64, f_prime: f64, f_prime_prime: f64) -> f64 {
     -2.0 * f * f_prime / (2.0 * f_prime.powi(2) - f * f_prime_prime)
@@ -48,7 +48,8 @@ pub fn halley_to_find_stationary_point(function: &impl Fn(f64) -> f64, starting_
 
 #[cfg(test)]
 mod test {
-    use crate::systems::trajectory_prediction::numerical_methods::halley::{halley, halley_to_find_stationary_point};
+    use crate::numerical_methods::halley::{halley, halley_to_find_stationary_point};
+
 
     #[test]
     fn test_halley() {

@@ -1,7 +1,8 @@
-use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_prediction::numerical_methods::itp::itp};
+use crate::components::trajectory_component::orbit::Orbit;
 
 #[cfg(feature = "profiling")]
 use tracy_client::span;
+use transfer_window_common::numerical_methods::itp::itp;
 
 /// There exists an incredibly powerful technique to find encounters between two times:
 /// - We first evaluate the derivatives of distance D between the opbjects with respect to time t (dD/dt) on both sides of the window

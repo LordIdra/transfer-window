@@ -1,9 +1,10 @@
 use std::{f64::consts::PI, mem::swap};
 
-use crate::{components::trajectory_component::orbit::Orbit, systems::trajectory_prediction::numerical_methods::itp::itp, util::normalize_angle};
+use crate::{components::trajectory_component::orbit::Orbit, util::normalize_angle};
 
 #[cfg(feature = "profiling")]
 use tracy_client::span;
+use transfer_window_common::numerical_methods::itp::itp;
 
 // Constructs a range with theta 1 and theta 2 containing 'containing'
 // This is harder than it first appears, because for example the range 5.9 to 5.8 contains the angle 1.4
