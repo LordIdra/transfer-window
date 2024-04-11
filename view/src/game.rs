@@ -49,7 +49,7 @@ impl Scene {
         CentralPanel::default().show(context, |ui| {
             input::update(self, context, &mut events);
             underlay::draw(self, model, context);
-            overlay::draw(model, context);
+            overlay::draw(self, model, context);
             debug::draw(self, model, context);
             rendering::update(self, model, context);
             
