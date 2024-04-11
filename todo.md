@@ -14,6 +14,7 @@
 - [1|x] Intelligent conic rendering
 - [1|x] Update orbit state
 - [1|x] Select a point on orbit
+- [1| ] Show time of selected point
 - [1| ] Display warp speed
 - [1| ] Warp to point on orbit
 - [1| ] Can create burn
@@ -36,6 +37,8 @@
 
 - [1| ] Games have names
 - [1| ] Choose game to load
+
+- [1| ] More logical time step system
 
 # Ships
 - [1| ] Fighters
