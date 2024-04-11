@@ -47,6 +47,13 @@ fn get_icon(model: &Model, entity: Entity) -> Option<Icon> {
         return Some(Icon::new(entity, 2, priority, "planet".to_string(), position));
     }
 
+    if model.try_get_vessel_component(entity).is_some() {
+        // We divide here to make sure the usize doesn't overflow
+        #[allow(clippy::cast_sign_loss)]
+        let priority = (model.get_mass_component(entity).get_mass() / 1.0e22) as usize;
+        return Some(Icon::new(entity, 1, priority, "spacecraft".to_string(), position));
+    }
+
     None
 }
 
