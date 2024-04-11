@@ -42,7 +42,7 @@ impl<T> ComponentStorage<T> {
         } else {
             // This should never happen
             error!("Detected allocator and storage desync");
-            panic!("Error recoverable, but exiting anyway before something bad happens")
+            panic!("Error recoverable, but exiting anyway before something bad happens");
         }
     }
 
@@ -53,7 +53,7 @@ impl<T> ComponentStorage<T> {
             if let Some(entry) = entry {
                 if entry.generation != entity.get_generation() {
                     error!("Attempt to remove a component with an entity that has a different generation");
-                    panic!("Error recoverable, but exiting anyway before something bad happens")
+                    panic!("Error recoverable, but exiting anyway before something bad happens");
                 }
                 self.entities.remove(&entity);
             }

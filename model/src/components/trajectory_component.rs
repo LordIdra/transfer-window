@@ -1,3 +1,4 @@
+use log::error;
 use serde::{Deserialize, Serialize};
 
 use self::segment::Segment;
@@ -71,6 +72,33 @@ impl TrajectoryComponent {
 
     pub fn add_segment(&mut self, segment: Segment) {
         self.segments.push(Some(segment));
+    }
+
+    pub fn remove_segments_after(&mut self, time: f64) {
+        loop {
+            match self.segments.last_mut().unwrap().as_mut().unwrap() {
+                Segment::Burn(burn) => {
+                    // The >= is important, because we might try and remove segments after exactly the start time of a burn (ie when deleting a burn)
+                    if burn.get_start_point().get_time() >= time {
+                        self.segments.pop();
+                    } else if burn.is_time_within_burn(time) {
+                        error!("Attempt to split a burn");
+                        panic!("Error recoverable, but exiting anyway before something bad happens");
+                    } else {
+                        return;
+                    }
+                },
+                Segment::Orbit(orbit) => {
+                    if orbit.get_start_point().get_time() > time {
+                        self.segments.pop();
+                    } else if orbit.is_time_within_orbit(time) {
+                        orbit.end_at(time);
+                    } else {
+                        return;
+                    }
+                },
+            }
+        }
     }
 
     pub fn next(&mut self, time: f64, delta_time: f64) {

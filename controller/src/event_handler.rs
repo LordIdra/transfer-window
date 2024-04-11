@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -102,6 +102,19 @@ pub fn decrease_time_step_level(controller: &mut Controller) {
 
 pub fn start_warp(controller: &mut Controller, end_time: f64) {
     controller.get_model_mut().start_warp(end_time);
+}
+
+pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
+    let model = controller.get_model_mut();
+    let parent_mass = model.get_mass_component(entity).get_mass();
+    let trajectory_component = model.get_trajectory_component_mut(entity);
+    trajectory_component.remove_segments_after(time);
+    let parent = trajectory_component.get_end_segment().get_parent();
+    let tangent = trajectory_component.get_end_segment().get_end_velocity().normalize();
+    let start_position = trajectory_component.get_end_segment().get_end_position();
+    let start_velocity = trajectory_component.get_end_segment().get_end_velocity();
+    let burn = Burn::new(entity, parent, parent_mass, tangent, vec2(0.0, 0.0), time, start_position, start_velocity);
+    trajectory_component.add_segment(Segment::Burn(burn))
 }
 
 pub fn debug_add_entity(controller: &mut Controller, entity_builder: EntityBuilder) {
