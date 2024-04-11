@@ -1,3 +1,4 @@
+use log::trace;
 use serde::{Deserialize, Serialize};
 
 use crate::Model;
@@ -44,7 +45,9 @@ pub fn update(model: &mut Model, dt: f64) {
     } else {
         return;
     };
+    
     if warp_finished {
+        trace!("Warp finished");
         model.warp = None;
         model.time_step = TimeStep::Level { level: 1, paused: false };
     }
@@ -56,7 +59,9 @@ pub fn update(model: &mut Model, dt: f64) {
             // Oh no, we're about to overshoot
             // Calculate required warp speed to perfectly land at target point
             // Add small amount so next frame actually counts this as 'finished'
-            speed = (warp.end_time - model.time) / dt + 1.0e-3;
+            let overshot_time = warp.end_time - model.time;
+            speed = overshot_time / dt + 1.0e-3;
+            trace!("Compensating for warp overshoot of {overshot_time}");
         }
         model.time_step = TimeStep::Warp { speed, paused: false };
     }
