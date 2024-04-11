@@ -58,6 +58,7 @@ impl Controller {
                 Event::DecreaseTimeStepLevel => decrease_time_step_level(self),
                 Event::StartWarp { end_time } => start_warp(self, end_time),
                 Event::DebugAddEntity { entity_builder } => debug_add_entity(self, entity_builder),
+                Event::CreateBurn { entity, time } => todo!(),
             }
         }
     }

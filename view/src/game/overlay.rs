@@ -41,7 +41,7 @@ pub fn draw(view: &Scene, model: &Model, context: &Context, events: &mut Vec<Eve
                         events.push(Event::StartWarp { end_time: time });
                     }
                     if ui.button("Create burn").clicked() {
-                        todo!();
+                        events.push(Event::CreateBurn { entity, time });
                     }
             });
         }
