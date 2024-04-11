@@ -21,6 +21,7 @@ pub fn draw(model: &Model, context: &Context) {
         .resizable(false)
         .anchor(Align2::CENTER_TOP, epaint::vec2(0.0, 30.0))
         .show(context, |ui| {
-            ui.label("Time: ".to_string() + format_time(model.get_time()).as_str())
+            ui.label("Time: ".to_string() + format_time(model.get_time()).as_str());
+            ui.label("Time step: ".to_string() + model.get_time_step().get_time_step().to_string().as_str() + "s");
     });
 }
