@@ -35,7 +35,7 @@ pub fn new_game(controller: &mut Controller) {
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
     let mut trajectory_component = TrajectoryComponent::default();
-    let mut orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e10, 0.0), vec2(0.0, 1.082e3), 0.0);
+    let mut orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.502e3), 0.0);
     orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _moon = model.allocate(EntityBuilder::default()

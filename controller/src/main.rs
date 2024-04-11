@@ -43,6 +43,9 @@ impl Controller {
     }
 
     fn handle_events(&mut self, mut events: Vec<Event>, frame: &mut Frame) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Event handling");
+
         while let Some(event) = events.pop() {
             debug!("Handling event {:?}", event);
             match event {
@@ -61,6 +64,9 @@ impl Controller {
 
 impl App for Controller {
     fn update(&mut self, context: &Context, frame: &mut Frame) {
+        #[cfg(feature = "profiling")]
+        tracy_client::frame_mark();
+        
         let dt = self.last_frame.elapsed().as_secs_f64();
         self.last_frame = Instant::now();
 

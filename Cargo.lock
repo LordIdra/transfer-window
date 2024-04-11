@@ -2565,6 +2565,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "roots"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "082f11ffa03bbef6c2c6ea6bea1acafaade2fd9050ae0234ab44a2153742b058"
+
+[[package]]
 name = "rustix"
 version = "0.37.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3128,6 +3134,8 @@ dependencies = [
  "env_logger",
  "log",
  "nalgebra-glm",
+ "tracing-tracy",
+ "tracy-client",
  "transfer-window-model",
  "transfer-window-view",
 ]
@@ -3140,6 +3148,7 @@ dependencies = [
  "log",
  "nalgebra-glm",
  "rand",
+ "roots",
  "serde",
  "serde_json",
  "tracing-tracy",
@@ -3155,6 +3164,8 @@ dependencies = [
  "image 0.25.0",
  "log",
  "nalgebra-glm",
+ "tracing-tracy",
+ "tracy-client",
  "transfer-window-common",
  "transfer-window-model",
 ]

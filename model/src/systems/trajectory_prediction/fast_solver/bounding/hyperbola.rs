@@ -2,17 +2,15 @@ use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allo
 
 use super::{sdf::make_sdf, window::Window};
 
-#[cfg(feature = "profiling")]
-use tracy_client::span;
 use transfer_window_common::numerical_methods::{itp::itp, util::differentiate_1};
 
 // Hyperbolic SDF only has a maximum, no minimum
 fn find_max(sdf: &impl Fn(f64) -> f64, min_asymptote_theta: f64, max_asymptote_theta: f64) -> f64 {
     #[cfg(feature = "profiling")]
-    let _span = span!("Max signed distance");
+    let _span = tracy_client::span!("Max signed distance");
     let min_derivative_theta = max_asymptote_theta;
     let max_derivative_theta = min_asymptote_theta;
-    let f = |theta: f64| differentiate_1(&sdf, theta).1;
+    let f = |theta: f64| differentiate_1(&sdf, theta, 1.0e-4).1;
     itp(&f, min_derivative_theta, max_derivative_theta)
 }
 
@@ -29,13 +27,13 @@ struct BounderData<'a> {
 impl<'a> BounderData<'a> {
     fn no_encounters() -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
-        let _span = span!("No encounters");
+        let _span = tracy_client::span!("No encounters");
         vec![]
     }
 
     fn one_bound(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
-        let _span = span!("One bound");
+        let _span = tracy_client::span!("One bound");
         let f = |theta: f64| (sdf)(theta) + self.soi;
         let theta_1 = itp(&f, self.min_asymptote_theta, self.max_theta);
         let theta_2 = itp(&f, self.max_asymptote_theta, self.max_theta);
@@ -47,7 +45,7 @@ impl<'a> BounderData<'a> {
 
     fn two_bounds(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
-        let _span = span!("Two bounds");
+        let _span = tracy_client::span!("Two bounds");
         let f_inner = |theta: f64| (sdf)(theta) + self.soi;
         let f_outer = |theta: f64| (sdf)(theta) - self.soi;
 

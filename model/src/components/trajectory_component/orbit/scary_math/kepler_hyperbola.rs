@@ -100,6 +100,7 @@ impl HyperbolaSolver {
 
     /// Works with all values of mean anomaly
     pub fn solve(&self, mean_anomaly: f64) -> f64 {
+        assert!(!mean_anomaly.is_nan());
         // Solver assumes mean anomaly > 0
         // The equation is symmetric, so for mean anomaly < 0, we just flip the sign o the output
         let ec = self.eccentricity;

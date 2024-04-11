@@ -1,7 +1,5 @@
 use std::f64::consts::PI;
 
-#[cfg(feature = "profiling")]
-use tracy_client::span;
 use transfer_window_common::numerical_methods::itp::itp;
 
 use crate::{components::trajectory_component::orbit::Orbit, Model, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
@@ -98,7 +96,7 @@ fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 /// If the given entity is not on a hyperbolic trajectory, returns none when a call to solve is made
 pub fn solve_for_exit(model: &Model, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     #[cfg(feature = "profiling")]
-    let _span = span!("Solve for exit");
+    let _span = tracy_client::span!("Solve for exit");
     let orbit = model.get_trajectory_component(entity).get_end_segment().as_orbit(); 
     let Some(parent_trajectory_component) = model.try_get_trajectory_component(orbit.get_parent()) else {
         // Parent cannot be exited as it is a root entity

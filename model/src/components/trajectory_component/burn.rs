@@ -125,7 +125,7 @@ impl Burn {
         self.current_point = self.get_start_point().clone();
     }
 
-    pub fn update(&mut self, delta_time: f64) {
+    pub fn next(&mut self, delta_time: f64) {
         self.current_point = self.get_point_at_time(self.current_point.get_time() + delta_time);
     }
 }
@@ -164,7 +164,7 @@ mod test {
 
         let mut tester = BruteForceTester::new(parent_mass, start_position, start_velocity, acceleration, BURN_TIME_STEP);
         tester.update(0.5 * duration);
-        burn.update(0.5 * duration);
+        burn.next(0.5 * duration);
         assert!((tester.get_time() - burn.get_current_point().get_time()).abs() < 1.0);
         assert!((tester.get_position() - burn.get_current_point().get_position()).magnitude() < 1.0);
         assert!((tester.get_velocity() - burn.get_current_point().get_velocity()).magnitude() < 1.0);

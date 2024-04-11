@@ -1,11 +1,8 @@
-#[cfg(feature = "profiling")]
-use tracy_client::span;
-
 /// Terminates when solution interval is lower than `max_interval`
 /// Panics when `max_iterations` is exceeded
 pub fn bisection(function: &impl Fn(f64) -> f64, min: f64, max: f64, max_interval: f64, max_iterations: usize) -> f64 {
     #[cfg(feature = "profiling")]
-    let _span = span!("Bisection");
+    let _span = tracy_client::span!("Bisection");
     let mut low = min;
     let mut high = max;
     let mut mid = (min + max) / 2.0;

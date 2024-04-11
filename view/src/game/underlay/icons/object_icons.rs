@@ -74,7 +74,7 @@ fn remove_overlapping_icons(view: &Scene, icons: Vec<Icon>) -> Vec<Icon> {
     new_icons
 }
 
-fn draw_icons(view: &Scene, icons: Vec<Icon>) {
+fn draw_icons(view: &Scene, icons: &Vec<Icon>) {
     let radius = ICON_RADIUS / view.camera.get_zoom();
     for icon in icons {
         let mut vertices = vec![];
@@ -93,24 +93,26 @@ fn get_mouse_over_icon(view: &Scene, model: &Model, mouse_position: Pos2, screen
     icons.iter().find(|icon| (icon.position - focus).magnitude() < radius).cloned()
 }
 
-pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
+pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
     let mut icons = get_initial_icons(model);
     icons.sort_by(Icon::cmp);
     icons.reverse(); // sorted from HIGHEST to LOWEST priority
     icons = remove_overlapping_icons(view, icons);
+    draw_icons(view, &icons);
+    let mut any_icon_clicked = false;
     context.input(|input| {
-        if !input.pointer.primary_clicked() {
-            return;
-        }
         let Some(latest_position) = input.pointer.latest_pos() else {
             return;
         };
         if let Some(icon) = get_mouse_over_icon(view, model, latest_position, context.screen_rect(), &icons) {
-            view.camera.reset_panning();
-            view.camera.set_focus(Some(icon.entity));
+            any_icon_clicked = true;
+            if input.pointer.primary_clicked() {
+                view.camera.reset_panning();
+                view.camera.set_focus(Some(icon.entity));
+            }
         }
     });
-    draw_icons(view, icons);
+    return any_icon_clicked;
 }
 
 // - global mutable state, mutable state, and state should be avoided when possible (in that order)

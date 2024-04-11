@@ -1,5 +1,6 @@
 /// <https://en.wikipedia.org/wiki/Bisection_method>
 pub mod bisection;
+pub mod closest_ellipse_point;
 /// <https://en.wikipedia.org/wiki/Halley%27s_method>
 pub mod halley;
 /// <https://en.wikipedia.org/wiki/ITP_method>

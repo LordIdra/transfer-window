@@ -1,8 +1,5 @@
 use std::collections::HashSet;
 
-#[cfg(feature = "profiling")]
-use tracy_client::span;
-
 use crate::{components::ComponentType, Model, storage::entity_allocator::Entity, systems::trajectory_prediction::encounter::{Encounter, EncounterType}};
 
 use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
@@ -41,7 +38,7 @@ pub fn get_final_siblings(model: &Model, candidates: &HashSet<Entity>, entity: E
 // - If an encounter is found, bring the end time forward to the time of the encounter (so we don't continue to uselessly compute encounters after the soonest known encounter)
 pub fn find_next_encounter(model: &Model, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     #[cfg(feature = "profiling")]
-    let _span = span!("Find next encounter");
+    let _span = tracy_client::span!("Find next encounter");
 
     // Find entrance windows
     let can_enter = &model.get_entities(vec![ComponentType::TrajectoryComponent, ComponentType::OrbitableComponent]);
@@ -56,7 +53,7 @@ pub fn find_next_encounter(model: &Model, entity: Entity, start_time: f64, end_t
     };
 
     #[cfg(feature = "profiling")]
-    let _span = span!("Solving windows");
+    let _span = tracy_client::span!("Solving windows");
     // Evaluate entrance windows from soonest to latest until an encounter is found or no windows remain
     // Once an encounter is found, we'll have to evaluate all the remaining windows that are not entirely after the time of the discovered encounter
     // Because an encounter with another object could possibly happen sooner than the encounter we just found

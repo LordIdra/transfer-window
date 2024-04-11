@@ -73,11 +73,12 @@ impl TrajectoryComponent {
         self.segments.push(Some(segment));
     }
 
-    pub fn update(&mut self, delta_time: f64) {
-        let current_segment = self.get_current_segment_mut();
-        current_segment.update(delta_time);
-        if current_segment.is_finished() {
+    pub fn next(&mut self, time: f64, delta_time: f64) {
+        self.get_current_segment_mut().next(delta_time);
+        while self.get_current_segment().is_finished() {
+            let overshot_time = self.get_current_segment().get_overshot_time(time);
             self.current_index += 1;
+            self.get_current_segment_mut().next(overshot_time);
         }
     }
 }
@@ -103,7 +104,7 @@ mod test {
             let position = vec2(2.0e6, 0.0);
             let velocity = vec2(0.0, 1.0e5);
             let start_time = 0.0;
-            let end_time = 100.0;
+            let end_time = 99.9;
             let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
             orbit.end_at(end_time);
             orbit
@@ -116,7 +117,7 @@ mod test {
             let parent_mass = 5.9722e24;
             let position = vec2(2.0e6, 0.0);
             let velocity = vec2(0.0, -1.0e5); 
-            let start_time = 100.0;
+            let start_time = 99.9;
             let end_time = 200.0;
             let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
             orbit.end_at(end_time);
@@ -127,7 +128,7 @@ mod test {
         trajectory.add_segment(Segment::Orbit(orbit_2));
 
         assert!(trajectory.current_index == 0);
-        assert!(trajectory.get_segment_at_time(105.0).get_start_time() == 100.0);
+        assert!(trajectory.get_segment_at_time(105.0).get_start_time() == 99.9);
 
         let end_position_1 = trajectory.get_segment_at_time(43.65).get_end_position();
         let end_position_2 = trajectory.get_segment_at_time(172.01).get_end_position();
@@ -136,10 +137,13 @@ mod test {
         let difference = (m1 - m2) / m1;
         assert!(difference < 1.0e-4);
 
-        for _ in 0..200 {
-            trajectory.update(1.0);
+        let mut time = 0.0;
+        for _ in 0..100 {
+            time += 1.0;
+            trajectory.next(time, 1.0);
         }
 
+        assert!((trajectory.get_current_segment().as_orbit().get_current_point().get_time() - 100.0).abs() < 1.0e-6);
         assert!(trajectory.current_index == 1);
     }
 }

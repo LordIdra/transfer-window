@@ -1,7 +1,5 @@
 use std::f64::consts::PI;
 
-#[cfg(feature = "profiling")]
-use tracy_client::span;
 use transfer_window_common::numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point};
 
 use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, systems::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, util::normalize_angle};
@@ -24,8 +22,8 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
 
 fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> (f64, f64) {
     #[cfg(feature = "profiling")]
-    let _span = span!("Min max signed distance");
-    let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-6, 256);
+    let _span = tracy_client::span!("Min max signed distance");
+    let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-4, 1.0e-6, 256).expect("Failed to converge while solving for ellipse bounds");
     let theta_2 = find_other_stationary_point(sdf, theta_1);
     let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
     if sdf(theta_1) < sdf(theta_2) { 
@@ -59,7 +57,7 @@ impl<'a> BounderData<'a> {
 
     fn no_bounds(self) -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
-        let _span = span!("No bounds");
+        let _span = tracy_client::span!("No bounds");
         // Well, this is awkward, the orbit is ALWAYS within the sibling's SOI
         // We split the orbit up into many segments
         // It's incredibly unlikely that a segment will contain multiple minimums, 
@@ -69,13 +67,13 @@ impl<'a> BounderData<'a> {
 
     fn no_encounters() -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
-        let _span = span!("No encounters");
+        let _span = tracy_client::span!("No encounters");
         vec![]
     }
 
     fn one_bound_inner(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
-        let _span = span!("One bound inner");
+        let _span = tracy_client::span!("One bound inner");
         // Bound start/end points are on the INSIDE
         let f = |theta: f64| (sdf)(theta) - self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
@@ -89,7 +87,7 @@ impl<'a> BounderData<'a> {
 
     fn one_bound_outer(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
-        let _span = span!("One bound outer");
+        let _span = tracy_client::span!("One bound outer");
         // Bound start/end points are on the OUTSIDE
         let f = |theta: f64| (sdf)(theta) + self.soi;
         let intersections = find_intersections(&f, self.min_theta, self.max_theta);
@@ -103,11 +101,11 @@ impl<'a> BounderData<'a> {
 
     fn two_bounds(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
         #[cfg(feature = "profiling")]
-        let _span = span!("Two bounds");
+        let _span = tracy_client::span!("Two bounds");
         let f_inner = |theta: f64| (sdf)(theta) - self.soi;
         let f_outer = |theta: f64| (sdf)(theta) + self.soi;
         #[cfg(feature = "profiling")]
-        let _span1 = span!("Finding intersections");
+        let _span1 = tracy_client::span!("Finding intersections");
         let inner_intersections = find_intersections(&f_inner, self.min_theta, self.max_theta);
         let outer_intersections = find_intersections(&f_outer, self.min_theta, self.max_theta);
         let zero_intersections = find_intersections(&sdf, self.min_theta, self.max_theta);
@@ -144,7 +142,7 @@ impl<'a> BounderData<'a> {
 
 pub fn get_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64) -> Vec<Window<'a>> {
     #[cfg(feature = "profiling")]
-    let _span = span!("Ellipse bounding");
+    let _span = tracy_client::span!("Ellipse bounding");
     let argument_of_apoapsis = orbit.get_argument_of_periapsis() + PI;
     let sdf = make_sdf(orbit, sibling_orbit);
     let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis);

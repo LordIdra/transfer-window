@@ -24,6 +24,7 @@ impl EllipseSolver {
 
     /// Assumes 0 < mean anomaly < 2pi
     pub fn solve(&self, mean_anomaly: f64) -> f64 {
+        assert!(!mean_anomaly.is_nan());
         // Choosing an initial seed: https://www.aanda.org/articles/aa/full_html/2022/02/aa41423-21/aa41423-21.html#S5
         // Yes, they're actually serious about that 0.999999 thing (lmao)
         let mut eccentric_anomaly = mean_anomaly

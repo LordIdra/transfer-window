@@ -17,6 +17,9 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
         return;
     }
     
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Draw debug");
+    
     Window::new("Debug")
         .show(context, |ui| {
 

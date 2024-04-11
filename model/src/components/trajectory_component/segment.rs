@@ -82,6 +82,13 @@ impl Segment {
         }
     }
 
+    pub fn get_overshot_time(&self, time: f64) -> f64 {
+        match self {
+            Segment::Burn(burn) => burn.get_overshot_time(time),
+            Segment::Orbit(orbit) => orbit.get_overshot_time(time),
+        }
+    }
+
     /// # Panics
     /// Panics if the segment is not an orbit
     pub fn as_orbit(&self) -> &Orbit {
@@ -100,10 +107,10 @@ impl Segment {
         }
     }
 
-    pub fn update(&mut self, delta_time: f64) {
+    pub fn next(&mut self, delta_time: f64) {
         match self {
-            Segment::Orbit(orbit) => orbit.update(delta_time),
-            Segment::Burn(burn) => burn.update(delta_time),
+            Segment::Orbit(orbit) => orbit.next(delta_time),
+            Segment::Burn(burn) => burn.next(delta_time),
         }
     }
 }

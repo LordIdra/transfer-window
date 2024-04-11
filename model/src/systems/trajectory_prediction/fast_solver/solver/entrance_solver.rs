@@ -1,7 +1,5 @@
 use crate::components::trajectory_component::orbit::Orbit;
 
-#[cfg(feature = "profiling")]
-use tracy_client::span;
 use transfer_window_common::numerical_methods::itp::itp;
 
 /// There exists an incredibly powerful technique to find encounters between two times:
@@ -18,7 +16,7 @@ use transfer_window_common::numerical_methods::itp::itp;
 /// The solution to this is to keep moving it back by a fixed amount until it's positive, then deploy ITP
 pub fn solve_for_entrance(orbit: &Orbit, sibling_orbit: &Orbit, start_time: f64, end_time: f64) -> Option<f64> {
     #[cfg(feature = "profiling")]
-    let _span = span!("Solve for entrance");
+    let _span = tracy_client::span!("Solve for entrance");
     let distance = |time: f64| (orbit.get_position_from_theta(orbit.get_theta_from_time(time)) - sibling_orbit.get_position_from_theta(sibling_orbit.get_theta_from_time(time))).magnitude();
     let distance_prime = |time: f64| (distance(time + 0.001) - distance(time)) / 0.001;
     let distance_prime_start = distance_prime(start_time);

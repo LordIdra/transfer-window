@@ -4,6 +4,8 @@ use transfer_window_model::Model;
 use super::util::format_time;
 
 pub fn draw(model: &Model, context: &Context) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Draw overlay");
     if model.get_time_step().is_paused() {
         Window::new("Paused")
             .title_bar(false)

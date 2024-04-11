@@ -12,6 +12,9 @@ pub mod texture;
 mod vertex_array_object;
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update rendering");
+    
     let rect = context.screen_rect();
     let object_renderer = view.object_renderer.clone();
     let segment_renderer = view.segment_renderer.clone();

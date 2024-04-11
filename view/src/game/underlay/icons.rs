@@ -5,6 +5,7 @@ use crate::game::Scene;
 
 mod object_icons;
 
-pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
-    object_icons::draw(view, model, context);
+/// Returns true if any icon is hovered over
+pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
+    object_icons::draw(view, model, context)
 }

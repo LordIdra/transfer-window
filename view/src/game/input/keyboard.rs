@@ -1,5 +1,4 @@
 use eframe::egui::{Context, Key};
-use nalgebra_glm::vec2;
 
 use crate::events::Event;
 

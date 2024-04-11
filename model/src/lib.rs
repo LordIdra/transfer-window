@@ -1,9 +1,11 @@
 use std::collections::HashSet;
 
+use components::trajectory_component::segment::Segment;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
-use systems::time::{self, TimeStep};
+use systems::{time::{self, TimeStep}, trajectory_update};
+use util::find_closest_point_on_orbit;
 
 use self::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
@@ -62,7 +64,10 @@ impl Model {
     }
 
     pub fn update(&mut self, dt: f64) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Model update");
         time::update(self, dt);
+        trajectory_update::update(self, dt);
     }
 
     pub fn toggle_paused(&mut self) {
@@ -92,6 +97,31 @@ impl Model {
 
         if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
             return Some(trajectory_component.get_current_segment().get_current_position())
+        }
+
+        None
+    }
+
+    /// Returns the entity and time of the closest point on ANY segment anywhere provided the closest
+    /// distance from the point to a segment is less than `max_distance`
+    /// Short circuits; if there are multiple points, the first one found is returned
+    pub fn get_closest_point_on_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
+        for entity in self.get_entities(vec![ComponentType::TrajectoryComponent]) {
+            for segment in self.get_trajectory_component(entity).get_segments().iter().flatten() {
+                match segment {
+                    Segment::Orbit(orbit) => {
+                        let parent_position = self.get_absolute_position(orbit.get_parent());
+                        if let Some(closest_point) = find_closest_point_on_orbit(orbit, point - parent_position, max_distance) {
+                            let theta = f64::atan2(closest_point.y, closest_point.x);
+                            let time = orbit.get_time_since_last_periapsis(theta);
+                            if time > orbit.get_start_point().get_time() && time < orbit.get_end_point().get_time() {
+                                return Some((entity, time));
+                            }
+                        }
+                    }
+                    Segment::Burn(_) => unreachable!(),
+                }
+            }
         }
 
         None

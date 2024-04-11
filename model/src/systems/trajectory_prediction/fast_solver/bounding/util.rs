@@ -2,8 +2,6 @@ use std::{f64::consts::PI, mem::swap};
 
 use crate::{components::trajectory_component::orbit::Orbit, util::normalize_angle};
 
-#[cfg(feature = "profiling")]
-use tracy_client::span;
 use transfer_window_common::numerical_methods::itp::itp;
 
 // Constructs a range with theta 1 and theta 2 containing 'containing'
@@ -53,7 +51,7 @@ pub fn angle_window_to_time_window(orbit: &Orbit, mut window: (f64, f64)) -> (f6
 // Should only be used on ellipse SDFs
 pub fn find_other_stationary_point(distance_function: impl Fn(f64) -> f64, known_stationary_point_theta: f64) -> f64 {
     #[cfg(feature = "profiling")]
-    let _span = span!("Find other stationary point");
+    let _span = tracy_client::span!("Find other stationary point");
     let mut min = known_stationary_point_theta - 0.001;
     let mut max = known_stationary_point_theta + 0.001 - 2.0*PI;
     let derivative = |theta: f64| (distance_function(theta + 0.0001) - distance_function(theta)) / 0.0001;

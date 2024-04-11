@@ -7,6 +7,9 @@ pub struct Scene {}
 
 impl Scene {
     pub fn update(&mut self, context: &Context) -> Vec<Event> {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("View update");
+
         let mut events = vec![];
         CentralPanel::default().show(context, |ui| {
             ui.label("The best menu ever created");

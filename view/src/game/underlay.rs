@@ -6,9 +6,14 @@ use super::Scene;
 mod celestial_objects;
 mod icons;
 mod segments;
+pub mod trajectory_point;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Draw underlay");
     celestial_objects::draw(view, model);
-    icons::draw(view, model, context);
-    segments::draw(view, model, context);
+    segments::draw(view, model);
+    if !icons::draw(view, model, context) {
+        trajectory_point::update(view, model, context);
+    }
 }

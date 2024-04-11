@@ -176,7 +176,7 @@ impl Orbit {
         self.current_point = self.start_point.clone();
     }
 
-    pub fn update(&mut self, delta_time: f64) {
+    pub fn next(&mut self, delta_time: f64) {
         self.current_point = self.current_point.next(&self.conic, delta_time);
     }
 }

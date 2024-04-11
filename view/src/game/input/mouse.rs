@@ -1,5 +1,6 @@
 use eframe::egui::{self, Context, Pos2, Rect};
 use nalgebra_glm::vec2;
+use transfer_window_model::Model;
 
 use super::Scene;
 
@@ -16,7 +17,9 @@ fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui
     view.camera.set_zoom(new_zoom);
 }
 
-pub fn update(view: &mut Scene, context: &Context) {
+
+
+pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     context.input(|input| {
         if input.pointer.secondary_down() {
             let mouse_delta = input.pointer.delta();
