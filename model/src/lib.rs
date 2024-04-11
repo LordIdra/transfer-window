@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use components::trajectory_component::segment::Segment;
+use components::{trajectory_component::segment::Segment, vessel_component::VesselComponent};
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
@@ -24,6 +24,7 @@ pub struct Model {
     orbitable_components: ComponentStorage<OrbitableComponent>,
     stationary_components: ComponentStorage<StationaryComponent>,
     trajectory_components: ComponentStorage<TrajectoryComponent>,
+    vessel_components: ComponentStorage<VesselComponent>,
     time: f64,
     time_step: TimeStep,
     warp: Option<TimeWarp>,
@@ -38,6 +39,7 @@ impl Default for Model {
             orbitable_components: ComponentStorage::default(),
             trajectory_components: ComponentStorage::default(),
             stationary_components: ComponentStorage::default(),
+            vessel_components: ComponentStorage::default(),
             time: 0.0,
             time_step: TimeStep::Level{ level: 1, paused: false },
             warp: None,
@@ -286,6 +288,22 @@ impl Model {
 
     pub fn try_get_trajectory_component(&self, entity: Entity) -> Option<&TrajectoryComponent> {
         self.trajectory_components.try_get(entity)
+    }
+
+    pub fn get_vessel_component_mut(&mut self, entity: Entity) -> &mut VesselComponent {
+        self.vessel_components.get_mut(entity)
+    }
+
+    pub fn get_vessel_component(&self, entity: Entity) -> &VesselComponent {
+        self.vessel_components.get(entity)
+    }
+
+    pub fn try_get_vessel_component_mut(&mut self, entity: Entity) -> Option<&mut VesselComponent> {
+        self.vessel_components.try_get_mut(entity)
+    }
+
+    pub fn try_get_vessel_component(&self, entity: Entity) -> Option<&VesselComponent> {
+        self.vessel_components.try_get(entity)
     }
 }
 
