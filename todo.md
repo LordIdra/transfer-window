@@ -14,7 +14,7 @@
 - [1|x] Intelligent conic rendering
 - [1|x] Update orbit state
 - [1|x] Select a point on orbit
-- [1| ] Display warp speed
+- [1|x] Display warp speed
 - [1| ] Warp to point on orbit
 - [1| ] Can create burn
 - [1| ] Fast solver for burns

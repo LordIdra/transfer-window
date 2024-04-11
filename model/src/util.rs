@@ -1,12 +1,9 @@
 use std::{f64::consts::PI, mem::swap};
 
 use nalgebra_glm::DVec2;
-use transfer_window_common::numerical_methods::{halley::halley_to_find_stationary_point, itp::itp, laguerre::laguerre_to_find_stationary_point};
+use transfer_window_common::numerical_methods::itp::itp;
 
 use crate::components::trajectory_component::orbit::Orbit;
-
-const ANGLE_DELTA: f64 = 0.3;
-const ASYMPTOTE_DELTA: f64 = 1.0e-3;
 
 /// Normalizes between 0 and 2pi
 /// <https://stackoverflow.com/questions/31210357/is-there-a-modulus-not-remainder-function-operation>
