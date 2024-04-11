@@ -15,7 +15,7 @@
 - [1|x] Update orbit state
 - [1|x] Select a point on orbit
 - [1|x] Display warp speed
-- [1| ] Show time of selected point
+- [1|x] Show time of selected point
 - [1| ] Warp to point on orbit
 - [1| ] Can create burn
 - [1| ] Fast solver for burns

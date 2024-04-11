@@ -5,7 +5,7 @@ use log::{debug, error, info};
 use transfer_window_model::Model;
 use transfer_window_view::{events::Event, menu::Scene, View};
 
-use crate::event_handler::{debug_add_entity, decrease_time_step_level, increase_time_step_level, load_game, new_game, quit, save_game, toggle_paused};
+use crate::event_handler::{debug_add_entity, decrease_time_step_level, increase_time_step_level, load_game, new_game, quit, save_game, start_warp, toggle_paused};
 
 mod event_handler;
 
@@ -56,6 +56,7 @@ impl Controller {
                 Event::TogglePaused => toggle_paused(self),
                 Event::IncreaseTimeStepLevel => increase_time_step_level(self),
                 Event::DecreaseTimeStepLevel => decrease_time_step_level(self),
+                Event::StartWarp { end_time } => start_warp(self, end_time),
                 Event::DebugAddEntity { entity_builder } => debug_add_entity(self, entity_builder),
             }
         }

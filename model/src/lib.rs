@@ -4,7 +4,7 @@ use components::trajectory_component::segment::Segment;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
-use systems::{time::{self, TimeStep}, trajectory_update};
+use systems::{time::{self, TimeStep}, trajectory_update, warp_update_system::{self, TimeWarp}};
 use util::find_closest_point_on_orbit;
 
 use self::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
@@ -26,6 +26,7 @@ pub struct Model {
     trajectory_components: ComponentStorage<TrajectoryComponent>,
     time: f64,
     time_step: TimeStep,
+    warp: Option<TimeWarp>,
 }
 
 impl Default for Model {
@@ -38,7 +39,8 @@ impl Default for Model {
             trajectory_components: ComponentStorage::default(),
             stationary_components: ComponentStorage::default(),
             time: 0.0,
-            time_step: TimeStep::Level{ level: 1, paused: false } ,
+            time_step: TimeStep::Level{ level: 1, paused: false },
+            warp: None,
         }
     }
 }
@@ -66,6 +68,7 @@ impl Model {
     pub fn update(&mut self, dt: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Model update");
+        warp_update_system::update(self, dt);
         time::update(self, dt);
         trajectory_update::update(self, dt);
     }
@@ -74,20 +77,24 @@ impl Model {
         self.time_step.toggle_paused();
     }
 
-    pub fn get_time_step(&self) -> &TimeStep {
-        &self.time_step
-    }
-
-    pub fn get_time(&self) -> f64 {
-        self.time
-    }
-
     pub fn increase_time_step_level(&mut self) {
         self.time_step.increase_level();
     }
 
     pub fn decrease_time_step_level(&mut self) {
         self.time_step.decrease_level();
+    }
+
+    pub fn start_warp(&mut self, end_time: f64) {
+        self.warp = Some(TimeWarp::new(self.time, end_time));
+    }
+
+    pub fn get_time_step(&self) -> &TimeStep {
+        &self.time_step
+    }
+
+    pub fn get_time(&self) -> f64 {
+        self.time
     }
 
     pub fn get_position(&self, entity: Entity) -> Option<DVec2> {

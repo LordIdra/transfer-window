@@ -91,6 +91,10 @@ pub fn decrease_time_step_level(controller: &mut Controller) {
     controller.get_model_mut().decrease_time_step_level();
 }
 
+pub fn start_warp(controller: &mut Controller, end_time: f64) {
+    controller.get_model_mut().start_warp(end_time);
+}
+
 pub fn debug_add_entity(controller: &mut Controller, entity_builder: EntityBuilder) {
     controller.get_model_mut().allocate(entity_builder);
 }

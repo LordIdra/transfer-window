@@ -1,9 +1,11 @@
 use eframe::{egui::{Align2, Context, Window}, epaint};
 use transfer_window_model::Model;
 
+use crate::events::Event;
+
 use super::{underlay::trajectory_point::SelectedPoint, util::format_time, Scene};
 
-pub fn draw(view: &Scene, model: &Model, context: &Context) {
+pub fn draw(view: &Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw overlay");
     if model.get_time_step().is_paused() {
@@ -33,8 +35,11 @@ pub fn draw(view: &Scene, model: &Model, context: &Context) {
             .show(context, |ui| {
                 ui.label(model.get_name_component(entity).get_name());
                 ui.label("T-".to_string() + format_time(time - model.get_time()).as_str());
+                if ui.button("Warp here").clicked() {
+                    events.push(Event::StartWarp { end_time: time });
+                }
                 if ui.button("Create burn").clicked() {
-                    todo!("Create burn");
+                    todo!();
                 }
         });
     }

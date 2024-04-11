@@ -9,5 +9,6 @@ pub enum Event {
     TogglePaused,
     IncreaseTimeStepLevel,
     DecreaseTimeStepLevel,
+    StartWarp { end_time: f64 },
     DebugAddEntity { entity_builder: EntityBuilder },
 }
