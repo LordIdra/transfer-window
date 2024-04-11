@@ -5,7 +5,7 @@ use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::events::Event;
 
-use self::{camera::Camera, debug::DebugWindowTab, rendering::{geometry_renderer::GeometryRenderer, texture_renderer::TextureRenderer}, resources::Resources, underlay::trajectory_point::SelectedPoint};
+use self::{camera::Camera, debug::DebugWindowTab, rendering::{geometry_renderer::GeometryRenderer, texture_renderer::TextureRenderer}, resources::Resources, underlay::selected::Selected};
 
 mod camera;
 mod debug;
@@ -22,7 +22,7 @@ pub struct Scene {
     object_renderer: Arc<Mutex<GeometryRenderer>>,
     segment_renderer: Arc<Mutex<GeometryRenderer>>,
     texture_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
-    selected_point: SelectedPoint,
+    selected: Selected,
     debug_window_open: bool,
     debug_window_tab: DebugWindowTab,
 }
@@ -35,10 +35,10 @@ impl Scene {
         let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let texture_renderers = resources.build_renderers(gl);
-        let selected_point = SelectedPoint::None;
+        let selected_point = Selected::None;
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::Overview;
-        Self { camera, object_renderer, segment_renderer, texture_renderers, selected_point, debug_window_open, debug_window_tab }
+        Self { camera, object_renderer, segment_renderer, texture_renderers, selected: selected_point, debug_window_open, debug_window_tab }
     }
 
     pub fn update(&mut self, model: &Model, context: &Context) -> Vec<Event> {

@@ -3,7 +3,7 @@ use transfer_window_model::Model;
 
 use crate::events::Event;
 
-use super::{underlay::trajectory_point::SelectedPoint, util::format_time, Scene};
+use super::{underlay::selected::Selected, util::format_time, Scene};
 
 pub fn draw(view: &Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]
@@ -27,7 +27,7 @@ pub fn draw(view: &Scene, model: &Model, context: &Context, events: &mut Vec<Eve
             ui.label("Time step: ".to_string() + model.get_time_step().get_time_step().to_string().as_str() + "s");
     });
 
-    if let SelectedPoint::Selected((entity, time)) = view.selected_point {
+    if let Selected::Point { entity, time, state: _ } = view.selected.clone() {
         Window::new("Selected point")
             .title_bar(false)
             .resizable(false)

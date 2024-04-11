@@ -6,7 +6,7 @@ use super::Scene;
 mod celestial_objects;
 mod icons;
 mod segments;
-pub mod trajectory_point;
+pub mod selected;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
     #[cfg(feature = "profiling")]
@@ -14,6 +14,6 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
     celestial_objects::draw(view, model);
     segments::draw(view, model);
     if !icons::draw(view, model, context) {
-        trajectory_point::update(view, model, context);
+        selected::update(view, model, context);
     }
 }

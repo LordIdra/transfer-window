@@ -16,10 +16,10 @@
 - [1|x] Select a point on orbit
 - [1|x] Display warp speed
 - [1|x] Show time of selected point
-- [1| ] Warp to point on orbit
+- [1|x] Warp to point on orbit
 - [1| ] Can create burn
-- [1| ] Fast solver for burns
 - [1| ] Burn can be adjusted (at all)
+- [1| ] Fast solver for burns
 - [1| ] Warp to burn button
 - [1| ] Intelligent burn rendering
 - [1| ] Smooth burn adjustment at different levels
