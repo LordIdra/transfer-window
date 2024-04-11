@@ -18,17 +18,11 @@ pub enum SelectedPoint {
 
 impl SelectedPoint {
     fn is_hover(&self) -> bool {
-        match self {
-            Self::Hover((_, _)) => true,
-            _ => false,
-        }
+        matches!(self, Self::Hover((_, _)))
     }
 
     fn is_selected(&self) -> bool {
-        match self {
-            Self::Selected((_, _)) => true,
-            _ => false,
-        }
+        matches!(self, Self::Selected((_, _)))
     }
 }
 
@@ -73,7 +67,7 @@ fn draw_selected(view: &mut Scene, model: &Model) {
             let segment = trajectory_component.get_segment_at_time(time);
             let point = model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(time);
             add_textured_square(&mut vertices, point, select_radius, HOVER_COLOR);
-            view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices)
+            view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);
         }
         SelectedPoint::Selected((entity, time)) => {
             let mut vertices = vec![];
@@ -81,7 +75,7 @@ fn draw_selected(view: &mut Scene, model: &Model) {
             let segment = trajectory_component.get_segment_at_time(time);
             let point = model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(time);
             add_textured_square(&mut vertices, point, select_radius, SELECTED_COLOR);
-            view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices)
+            view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);
         }
     }
 }

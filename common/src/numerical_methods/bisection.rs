@@ -1,4 +1,5 @@
 /// Terminates when solution interval is lower than `max_interval`
+/// # Panics
 /// Panics when `max_iterations` is exceeded
 pub fn bisection(function: &impl Fn(f64) -> f64, min: f64, max: f64, max_interval: f64, max_iterations: usize) -> f64 {
     #[cfg(feature = "profiling")]

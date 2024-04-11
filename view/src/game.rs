@@ -47,7 +47,7 @@ impl Scene {
         let mut events = vec![];
         
         CentralPanel::default().show(context, |ui| {
-            input::update(self, model, context, &mut events);
+            input::update(self, context, &mut events);
             underlay::draw(self, model, context);
             overlay::draw(model, context);
             debug::draw(self, model, context);

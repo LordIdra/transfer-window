@@ -2571,6 +2571,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "082f11ffa03bbef6c2c6ea6bea1acafaade2fd9050ae0234ab44a2153742b058"
 
 [[package]]
+name = "rust-kepler-solver"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15335694341d7d15ca8772fec4139bfeb600a38b38b1695661c9ea4cf63a6a1e"
+dependencies = [
+ "lazy_static",
+ "serde",
+]
+
+[[package]]
 name = "rustix"
 version = "0.37.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3149,6 +3159,7 @@ dependencies = [
  "nalgebra-glm",
  "rand",
  "roots",
+ "rust-kepler-solver",
  "serde",
  "serde_json",
  "tracing-tracy",

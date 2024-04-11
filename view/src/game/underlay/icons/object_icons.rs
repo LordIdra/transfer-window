@@ -112,7 +112,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
             }
         }
     });
-    return any_icon_clicked;
+    any_icon_clicked
 }
 
 // - global mutable state, mutable state, and state should be avoided when possible (in that order)

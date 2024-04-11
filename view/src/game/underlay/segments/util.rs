@@ -2,7 +2,7 @@ use nalgebra_glm::DVec2;
 
 const TESSELLATION_THRESHOLD: f64 = 1.0e-4;
 
-/// Uses triangle heuristic as described in https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation
+/// Uses triangle heuristic as described in <https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation>
 pub fn tessellate(interpolate: impl Fn(DVec2, DVec2) -> DVec2, mut points: Vec<DVec2>, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<DVec2> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Tessellate");

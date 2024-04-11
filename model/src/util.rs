@@ -40,7 +40,7 @@ pub fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f6
     }
     
     if min.is_sign_positive() && max.is_sign_negative() {
-        swap(&mut min_time, &mut max_time)
+        swap(&mut min_time, &mut max_time);
     }
 
     if orbit.is_ellipse() && min_time > max_time {

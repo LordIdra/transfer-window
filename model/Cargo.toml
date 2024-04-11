@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 transfer-window-common = { path = "../common" }
+rust-kepler-solver = "0.1.0"
 log = "0.4.21"
 lazy_static = "1.4.0"
 nalgebra-glm = { version = "0.18.0", features = ["serde-serialize"] }

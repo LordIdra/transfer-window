@@ -27,14 +27,14 @@ fn add_orbit_line(vertices: &mut Vec<f32>, previous_point: &DVec2, new_point: &D
     add_triangle(vertices, v2, v3, v4, rgba);
 }
 
-fn draw_from_points(view: &mut Scene, points: Vec<DVec2>, zoom: f64) {
+fn draw_from_points(view: &mut Scene, points: &[DVec2], zoom: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw from points");
     let mut vertices = vec![];
     let mut previous_point = None;
-    for new_point in &points {
+    for new_point in points {
         if let Some(previous_point) = previous_point {
-            add_orbit_line(&mut vertices, previous_point, new_point, zoom)
+            add_orbit_line(&mut vertices, previous_point, new_point, zoom);
         }
         previous_point = Some(new_point);
     }
@@ -51,7 +51,7 @@ fn draw_entity_orbits(view: &mut Scene, model: &Model, entity: Entity, camera_ce
         let _span = tracy_client::span!("Draw segment");
         let absolute_parent_position = model.get_absolute_position(segment.get_parent());
         match segment {
-            Segment::Orbit(orbit) => draw_from_points(view, orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom), zoom),
+            Segment::Orbit(orbit) => draw_from_points(view, &orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom), zoom),
             Segment::Burn(_) => todo!(),
         };
     }

@@ -1,9 +1,10 @@
 use std::f64::consts::PI;
 
 use nalgebra_glm::{vec2, DVec2};
+use rust_kepler_solver::hyperbola::HyperbolaSolver;
 use serde::{Deserialize, Serialize};
 
-use crate::components::trajectory_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, kepler_hyperbola::HyperbolaSolver, specific_angular_momentum}};
+use crate::components::trajectory_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, specific_angular_momentum}};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Hyperbola {

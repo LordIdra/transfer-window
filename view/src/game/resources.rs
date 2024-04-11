@@ -73,6 +73,7 @@ impl Resources {
         &self.texture_names
     }
 
+    #[allow(unused)]
     pub fn get_texture_image(&self, name: &str) -> ImageSource {
         self.textures.get(name).unwrap_or_else(|| panic!("Texture {name} does not exist")).image.clone()
     }

@@ -2,6 +2,8 @@ use kurbo::common::solve_itp;
 
 const MAX_DELTA: f64 = 1.0e-6;
 
+/// # Panics
+/// Panics if f(min) >= 0 or f(max) <= 0
 pub fn itp(f: &impl Fn(f64) -> f64, min: f64, max: f64) -> f64 {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("ITP solver");
