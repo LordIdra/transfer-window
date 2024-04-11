@@ -195,6 +195,7 @@ impl Model {
             orbitable_component,
             stationary_component,
             trajectory_component,
+            vessel_component,
         } = entity_builder;
         let entity = self.entity_allocator.allocate();
         self.mass_components.set(entity, mass_component);
@@ -202,6 +203,7 @@ impl Model {
         self.orbitable_components.set(entity, orbitable_component);
         self.stationary_components.set(entity, stationary_component);
         self.trajectory_components.set(entity, trajectory_component);
+        self.vessel_components.set(entity, vessel_component);
         entity
     }
 
