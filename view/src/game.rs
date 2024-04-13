@@ -35,10 +35,10 @@ impl Scene {
         let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let texture_renderers = resources.build_renderers(gl);
-        let selected_point = Selected::None;
+        let selected = Selected::None;
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::Overview;
-        Self { camera, object_renderer, segment_renderer, texture_renderers, selected: selected_point, debug_window_open, debug_window_tab }
+        Self { camera, object_renderer, segment_renderer, texture_renderers, selected, debug_window_open, debug_window_tab }
     }
 
     pub fn update(&mut self, model: &Model, context: &Context) -> Vec<Event> {

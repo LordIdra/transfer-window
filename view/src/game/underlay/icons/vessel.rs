@@ -32,19 +32,28 @@ impl Icon for Vessel {
         Rgba::from_rgb(0.7, 0.85, 1.0)
     }
 
-    fn get_group_priority(&self) -> usize {
-        1
+    fn get_radius(&self) -> f64 {
+        10.0
     }
 
-    fn get_priority(&self, model: &Model) -> usize {
-        model.get_mass_component(self.entity).get_mass() as usize
+    fn get_priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
+        [
+            0,
+            u64::from(self.is_selected(view, model)),
+            1,
+            model.get_mass_component(self.entity).get_mass() as u64
+        ]
     }
 
-    fn get_position(&self, model: &Model) -> DVec2 {
+    fn get_position(&self, _view: &Scene, model: &Model) -> DVec2 {
         model.get_absolute_position(self.entity)
     }
 
-    fn is_selected(&self, view: &Scene) -> bool {
+    fn get_facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {
+        None
+    }
+
+    fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
         if let Some(focus) = view.camera.get_focus() {
             focus == self.entity
         } else {
@@ -52,7 +61,7 @@ impl Icon for Vessel {
         }
     }
 
-    fn on_clicked(&self, view: &mut Scene) {
+    fn on_clicked(&self, view: &mut Scene, _model: &Model) {
         view.camera.reset_panning();
         view.camera.set_focus(Some(self.entity));
     }

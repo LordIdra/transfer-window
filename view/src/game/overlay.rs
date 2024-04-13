@@ -3,9 +3,9 @@ use transfer_window_model::Model;
 
 use crate::events::Event;
 
-use super::{underlay::selected::Selected, util::format_time, Scene};
+use super::{underlay::selected::{BurnState, Selected}, util::format_time, Scene};
 
-pub fn draw(view: &Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw overlay");
     if model.get_time_step().is_paused() {
@@ -42,6 +42,7 @@ pub fn draw(view: &Scene, model: &Model, context: &Context, events: &mut Vec<Eve
                     }
                     if ui.button("Create burn").clicked() {
                         events.push(Event::CreateBurn { entity, time });
+                        view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
                     }
             });
         }

@@ -21,6 +21,8 @@ fn get_celestial_object_vertices(absolute_position: DVec2, radius: f64) -> Vec<f
 }
 
 pub fn draw(view: &Scene, model: &Model) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Draw celestial objects");
     for entity in model.get_entities(vec![ComponentType::OrbitableComponent]) {
         let position = model.get_absolute_position(entity);
         let radius = model.get_orbitable_component(entity).get_radius();

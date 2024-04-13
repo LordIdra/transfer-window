@@ -31,20 +31,28 @@ impl Icon for Orbitable {
         Rgba::from_rgb(1.0, 1.0, 1.0)
     }
 
-    fn get_group_priority(&self) -> usize {
-        2
+    fn get_radius(&self) -> f64 {
+        10.0
     }
 
-    fn get_priority(&self, model: &Model) -> usize {
-        // Divide to prevent overflow
-        (model.get_mass_component(self.entity).get_mass() / 1.0e22) as usize
+    fn get_priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
+        [
+            0,
+            u64::from(self.is_selected(view, model)),
+            2,
+            (model.get_mass_component(self.entity).get_mass() / 1.0e20) as u64
+        ]
     }
 
-    fn get_position(&self, model: &Model) -> DVec2 {
+    fn get_position(&self, _view: &Scene, model: &Model) -> DVec2 {
         model.get_absolute_position(self.entity)
     }
 
-    fn is_selected(&self, view: &Scene) -> bool {
+    fn get_facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {
+        None
+    }
+
+    fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
         if let Some(focus) = view.camera.get_focus() {
             focus == self.entity
         } else {
@@ -52,7 +60,7 @@ impl Icon for Orbitable {
         }
     }
 
-    fn on_clicked(&self, view: &mut Scene) {
+    fn on_clicked(&self, view: &mut Scene, _model: &Model) {
         view.camera.reset_panning();
         view.camera.set_focus(Some(self.entity));
     }

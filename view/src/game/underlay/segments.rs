@@ -41,9 +41,9 @@ fn draw_from_points(view: &mut Scene, points: &[DVec2], zoom: f64) {
     view.segment_renderer.lock().unwrap().add_vertices(&mut vertices);
 }
 
-fn draw_entity_orbits(view: &mut Scene, model: &Model, entity: Entity, camera_centre: DVec2) {
+fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_centre: DVec2) {
     #[cfg(feature = "profiling")]
-    let _span = tracy_client::span!("Draw entity orbits");
+    let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.get_zoom();
     let trajectory_component = model.get_trajectory_component(entity);
     for segment in trajectory_component.get_segments().iter().flatten() {
@@ -59,9 +59,9 @@ fn draw_entity_orbits(view: &mut Scene, model: &Model, entity: Entity, camera_ce
 
 pub fn draw(view: &mut Scene, model: &Model) {
     #[cfg(feature = "profiling")]
-    let _span = tracy_client::span!("Draw orbits");
+    let _span = tracy_client::span!("Draw segments");
     let camera_centre = view.camera.get_translation(model);
     for entity in model.get_entities(vec![ComponentType::TrajectoryComponent]) {
-        draw_entity_orbits(view, model, entity, camera_centre);
+        draw_entity_segments(view, model, entity, camera_centre);
     }
 }

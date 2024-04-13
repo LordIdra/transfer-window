@@ -1,4 +1,4 @@
-use nalgebra_glm::{DVec2, vec2};
+use nalgebra_glm::{DMat2, DVec2};
 use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
@@ -92,10 +92,14 @@ impl Burn {
         time - self.get_end_point().get_time()
     }
 
+    pub fn get_rotation_matrix(&self) -> DMat2 {
+        DMat2::new(
+            self.tangent.x, -self.tangent.y, 
+            self.tangent.y, self.tangent.x)
+    }
+
     fn get_absolute_delta_v(&self) -> DVec2 {
-        vec2(
-            self.delta_v.x * self.tangent.x - self.delta_v.y * self.tangent.y,
-            self.delta_v.x * self.tangent.y + self.delta_v.y * self.tangent.x)
+        self.get_rotation_matrix() * self.delta_v
     }
 
     fn get_absolute_acceleration(&self) -> DVec2 {

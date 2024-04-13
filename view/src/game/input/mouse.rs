@@ -19,6 +19,8 @@ fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui
 
 
 pub fn update(view: &mut Scene, context: &Context) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update mouse");
     context.input(|input| {
         if input.pointer.secondary_down() {
             let mouse_delta = input.pointer.delta();

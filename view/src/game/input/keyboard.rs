@@ -5,6 +5,9 @@ use crate::events::Event;
 use super::Scene;
 
 pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update keyboard");
+
     context.input(|input| {
         if input.key_pressed(Key::R) {
             view.camera.reset_panning();
