@@ -1,4 +1,4 @@
-use eframe::egui::Rgba;
+use eframe::egui::{PointerState, Rgba};
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
@@ -28,7 +28,7 @@ impl Icon for Vessel {
         "spacecraft"
     }
 
-    fn get_color(&self) -> Rgba {
+    fn get_color(&self, _view: &Scene) -> Rgba {
         Rgba::from_rgb(0.7, 0.85, 1.0)
     }
 
@@ -61,8 +61,10 @@ impl Icon for Vessel {
         }
     }
 
-    fn on_clicked(&self, view: &mut Scene, _model: &Model) {
-        view.camera.reset_panning();
-        view.camera.set_focus(Some(self.entity));
+    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+        if pointer.primary_clicked() {
+            view.camera.reset_panning();
+            view.camera.set_focus(Some(self.entity));
+        }
     }
 }

@@ -1,4 +1,4 @@
-use log::error;
+use log::{error, trace};
 
 use crate::components::ComponentType;
 
@@ -13,4 +13,26 @@ pub fn get_entity_by_name(model: &Model, name: &str) -> Entity {
     }
     error!("No entity '{}' found", name);
     Entity::mock()
+}
+
+#[allow(unused)]
+pub fn log_components(model: &Model, entity: Entity) {
+    if let Some(component) = model.try_get_mass_component(entity) {
+        trace!("{component:?}");
+    }
+    if let Some(component) = model.try_get_name_component(entity) {
+        trace!("{component:?}");
+    }
+    if let Some(component) = model.try_get_orbitable_component(entity) {
+        trace!("{component:?}");
+    }
+    if let Some(component) = model.try_get_stationary_component(entity) {
+        trace!("{component:?}");
+    }
+    if let Some(component) = model.try_get_trajectory_component(entity) {
+        trace!("{component:?}");
+    }
+    if let Some(component) = model.try_get_vessel_component(entity) {
+        trace!("{component:?}");
+    }
 }

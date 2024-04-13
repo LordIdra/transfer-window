@@ -4,14 +4,16 @@ use transfer_window_model::{components::{trajectory_component::segment::Segment,
 
 use crate::game::{util::add_triangle, Scene};
 
+mod burn;
 mod orbit;
-mod util;
 
 const RADIUS: f64 = 0.8;
 
 /// Draws a line between two points so that all the lines on a segment are connected together
 /// This should be called multiple times with different i's to create a blur effect, where i represents how far away from the 'real' line this line is
 fn add_orbit_line(vertices: &mut Vec<f32>, previous_point: &DVec2, new_point: &DVec2, zoom: f64) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Add orbit line");
     let radius = RADIUS;
     let rgba = Rgba::from_rgba_unmultiplied(0.0, 0.6, 1.0, 1.0);
 
@@ -52,7 +54,7 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
         let absolute_parent_position = model.get_absolute_position(segment.get_parent());
         match segment {
             Segment::Orbit(orbit) => draw_from_points(view, &orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom), zoom),
-            Segment::Burn(_) => (), //TODO
+            Segment::Burn(burn) => draw_from_points(view, &burn::compute_points(burn, absolute_parent_position, camera_centre, zoom), zoom),
         };
     }
 }

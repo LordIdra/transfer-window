@@ -2,17 +2,23 @@ use std::fs;
 
 use eframe::Frame;
 use log::error;
-use nalgebra_glm::vec2;
+use nalgebra_glm::{vec2, DVec2};
 use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::VesselComponent}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
 
 pub fn quit(frame: &mut Frame) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Quit");
+
     frame.close();
 }
 
 pub fn new_game(controller: &mut Controller) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("New game");
+
     let mut model = Model::default();
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html
@@ -59,6 +65,9 @@ pub fn new_game(controller: &mut Controller) {
 }
 
 pub fn save_game(controller: &Controller, name: &str) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Save game");
+
     let model = controller.get_model();
 
     let serialized = model.serialize();
@@ -73,6 +82,8 @@ pub fn save_game(controller: &Controller, name: &str) {
 }
 
 pub fn load_game(controller: &mut Controller, name: &str) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Load game");
      let serialized = fs::read_to_string("saves/".to_string() + name + ".json");
      let Ok(serialized) = serialized else {
          error!("Failed to handle load game; error while loading file: {}", serialized.err().unwrap());
@@ -90,22 +101,32 @@ pub fn load_game(controller: &mut Controller, name: &str) {
 }
 
 pub fn toggle_paused(controller: &mut Controller) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Toggle paused");
     controller.get_model_mut().toggle_paused();
 }
 
 pub fn increase_time_step_level(controller: &mut Controller) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Increase time step level");
     controller.get_model_mut().increase_time_step_level();
 }
 
 pub fn decrease_time_step_level(controller: &mut Controller) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Decrease time step level");
     controller.get_model_mut().decrease_time_step_level();
 }
 
 pub fn start_warp(controller: &mut Controller, end_time: f64) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Start warp");
     controller.get_model_mut().start_warp(end_time);
 }
 
 pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Create burn");
     let model = controller.get_model_mut();
     let parent_mass = model.get_mass_component(entity).get_mass();
     let trajectory_component = model.get_trajectory_component_mut(entity);
@@ -118,6 +139,17 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     trajectory_component.add_segment(Segment::Burn(burn));
 }
 
+pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Adjust burn");
+    let model = controller.get_model_mut();
+    let trajectory_component = model.get_trajectory_component_mut(entity);
+    let burn = trajectory_component.get_segment_at_time_mut(time).as_burn_mut();
+    burn.adjust(amount);
+}
+
 pub fn debug_add_entity(controller: &mut Controller, entity_builder: EntityBuilder) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Debug add entity");
     controller.get_model_mut().allocate(entity_builder);
 }

@@ -1,4 +1,5 @@
-use eframe::egui::Rgba;
+use eframe::egui::{PointerState, Rgba};
+use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::{trajectory_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model};
 
@@ -33,7 +34,7 @@ impl Icon for Burn {
         "burn"
     }
 
-    fn get_color(&self) -> eframe::egui::Rgba {
+    fn get_color(&self, _view: &Scene) -> eframe::egui::Rgba {
         Rgba::from_rgb(1.0, 0.7, 0.5)
     }
 
@@ -67,14 +68,20 @@ impl Icon for Burn {
         }
     }
 
-    fn on_clicked(&self, view: &mut Scene, _model: &Model) {
+    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+        if !pointer.primary_clicked() {
+            return;
+        }
         if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
             if state.is_selected() {
+                trace!("Burn icon clicked; switching Selected -> Adjusting");
                 *state = BurnState::Adjusting;
             } else if state.is_adjusting() {
+                trace!("Burn icon clicked; switching Adjusting -> Selected");
                 *state = BurnState::Selected;
             }
         } else {
+            trace!("Burn icon clicked; switching to Selected");
             view.selected = Selected::Burn { entity: self.entity, time: self.time, state: BurnState::Selected }
         }
     }

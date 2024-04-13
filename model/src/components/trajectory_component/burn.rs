@@ -58,6 +58,10 @@ impl Burn {
         self.delta_v.magnitude()
     }
 
+    pub fn get_remaining_time(&self) -> f64 {
+        self.get_end_point().get_time() - self.get_start_point().get_time()
+    }
+
     pub fn is_time_within_burn(&self, time: f64) -> bool {
         time > self.get_start_point().get_time() && time < self.get_end_point().get_time()
     }
@@ -113,6 +117,8 @@ impl Burn {
     }
 
     fn recompute_burn_points(&mut self, start_point: &BurnPoint) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Recompute burn points");
         let mut points = vec![start_point.clone()];
         // We don't use a while loop because we need to compute at least 1 point (otherwise the duration of the burn is 0 which may break stuff)
         loop {

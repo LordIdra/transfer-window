@@ -1,4 +1,4 @@
-use eframe::egui::Rgba;
+use eframe::egui::{PointerState, Rgba};
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
@@ -27,7 +27,7 @@ impl Icon for Orbitable {
         "planet"
     }
 
-    fn get_color(&self) -> eframe::egui::Rgba {
+    fn get_color(&self, _view: &Scene) -> eframe::egui::Rgba {
         Rgba::from_rgb(1.0, 1.0, 1.0)
     }
 
@@ -60,8 +60,10 @@ impl Icon for Orbitable {
         }
     }
 
-    fn on_clicked(&self, view: &mut Scene, _model: &Model) {
-        view.camera.reset_panning();
-        view.camera.set_focus(Some(self.entity));
+    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+        if pointer.primary_clicked() {
+            view.camera.reset_panning();
+            view.camera.set_focus(Some(self.entity));
+        }
     }
 }

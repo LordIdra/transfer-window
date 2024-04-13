@@ -21,11 +21,11 @@
 - [1|x] Burn icons
 - [1|x] Select burns by default
 - [1|x] Prioritise currently selected icon
-- [1| ] Burn can be adjusted (at all)
-- [1| ] Intelligent burn rendering
-- [1| ] Warp to burn button
+- [1|x] Burn can be adjusted (at all)
+- [1|x] Better burn adjustment system
+- [1|x] Intelligent burn rendering
 - [1| ] Fast solver for burns
-- [1| ] Better burn adjustment system
+- [1| ] Warp to burn button
 - [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
 - [1| ] Visual indicator of how much DV burn will use

@@ -1,7 +1,7 @@
 use std::{cmp::Ordering, fmt::Debug};
 
-use eframe::egui::{Context, Pos2, Rect, Rgba};
-use log::{error, trace};
+use eframe::egui::{Context, PointerState, Pos2, Rect, Rgba};
+use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::Model;
 
@@ -29,13 +29,13 @@ mod vessel;
 /// is chosen.
 trait Icon: Debug {
     fn get_texture(&self) -> &str;
-    fn get_color(&self) -> Rgba;
+    fn get_color(&self, view: &Scene) -> Rgba;
     fn get_radius(&self) -> f64;
     fn get_priorities(&self, view: &Scene, model: &Model) -> [u64; 4];
     fn get_position(&self, view: &Scene, model: &Model) -> DVec2;
     fn get_facing(&self, view: &Scene, model: &Model) -> Option<DVec2>;
     fn is_selected(&self, view: &Scene, model: &Model) -> bool;
-    fn on_clicked(&self, view: &mut Scene, model: &Model);
+    fn on_mouse_over(&self, view: &mut Scene, model: &Model, pointer: &PointerState);
 
     fn is_hovered(&self, view: &Scene, model: &Model, mouse_position_window: Pos2, screen_size: Rect) -> bool {
         let mouse_position_world = view.camera.window_space_to_world_space(model, mouse_position_window, screen_size);
@@ -65,9 +65,9 @@ trait Icon: Debug {
     }
 }
 
-fn get_initial_icons(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
+fn get_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, screen_rect: Rect) -> Vec<Box<dyn Icon>> {
     let mut icons: Vec<Box<dyn Icon>> = vec![];
-        icons.append(&mut AdjustBurn::generate(view, model));
+        icons.append(&mut AdjustBurn::generate(view, model, pointer, screen_rect));
         icons.append(&mut Burn::generate(model));
         icons.append(&mut Orbitable::generate(model));
     icons.append(&mut Vessel::generate(model));
@@ -105,7 +105,7 @@ fn draw_icons(view: &Scene, model: &Model, icons: &Vec<Box<dyn Icon>>, mouse_pos
         let radius = icon.get_radius() / view.camera.get_zoom();
         let mut vertices = vec![];
         let alpha = get_alpha(view, model, &**icon, mouse_position_window, screen_size);
-        let color = icon.get_color().multiply(alpha);
+        let color = icon.get_color(view).multiply(alpha);
         if let Some(facing) = icon.get_facing(view, model) {
             add_textured_square_facing(&mut vertices, icon.get_position(view, model), radius, color, facing);
         } else {
@@ -135,26 +135,22 @@ fn get_mouse_over_icon<'a>(view: &Scene, model: &Model, mouse_position: Pos2, sc
 pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw icons");
-    let mut icons = get_initial_icons(view, model);
-    icons.sort_by(|a, b| a.cmp(view, model, &**b));
-    icons.reverse(); // sorted from HIGHEST to LOWEST priority
-    icons = remove_overlapping_icons(view, model, icons);
-
     let mut any_icon_hovered = false;
     context.input(|input| {
+        let mut icons = get_initial_icons(view, model, &input.pointer, context.screen_rect());
+        icons.sort_by(|a, b| a.cmp(view, model, &**b));
+        icons.reverse(); // sorted from HIGHEST to LOWEST priority
+        icons = remove_overlapping_icons(view, model, icons);
+
         if let Some(mouse_position_window) = input.pointer.latest_pos() {
             if let Some(icon) = get_mouse_over_icon(view, model, mouse_position_window, context.screen_rect(), &mut icons) {
                 any_icon_hovered = true;
-                if input.pointer.primary_clicked() {
-                    trace!("Icon clicked: {:?}", icon);
-                    icon.on_clicked(view, model);
-                }
+                icon.on_mouse_over(view, model, &input.pointer);
             }
         }
 
         draw_icons(view, model, &icons, input.pointer.latest_pos(), context.screen_rect());
     });
-
 
     any_icon_hovered
 }

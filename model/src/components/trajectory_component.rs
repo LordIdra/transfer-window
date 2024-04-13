@@ -33,6 +33,17 @@ impl TrajectoryComponent {
     }
 
     /// # Panics
+    /// Panics if the trajectory has no segment at the given time
+    pub fn get_segment_at_time_mut(&mut self, time: f64) -> &mut Segment {
+        for segment in self.segments.iter_mut().flatten() {
+            if segment.get_start_time() <= time && segment.get_end_time() > time {
+                return segment
+            }
+        }
+        panic!("No segment exists at the given time")
+    }
+
+    /// # Panics
     /// Panics if the trajectory has no current segment
     pub fn get_current_segment(&self) -> &Segment {
         self.segments
