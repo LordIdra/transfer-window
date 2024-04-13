@@ -107,6 +107,15 @@ impl Segment {
         }
     }
 
+    /// # Panics
+    /// Panics if the segment is not an orbit
+    pub fn as_burn(&self) -> &Burn {
+        match self {
+            Segment::Burn(burn) => burn,
+            Segment::Orbit(_) => panic!("Attempted to get non-burn segment as burn"),
+        }
+    }
+
     pub fn next(&mut self, delta_time: f64) {
         match self {
             Segment::Orbit(orbit) => orbit.next(delta_time),

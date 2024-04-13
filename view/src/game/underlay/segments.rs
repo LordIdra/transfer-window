@@ -52,7 +52,7 @@ fn draw_entity_orbits(view: &mut Scene, model: &Model, entity: Entity, camera_ce
         let absolute_parent_position = model.get_absolute_position(segment.get_parent());
         match segment {
             Segment::Orbit(orbit) => draw_from_points(view, &orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom), zoom),
-            Segment::Burn(burn) => (),
+            Segment::Burn(_) => (), //TODO
         };
     }
 }

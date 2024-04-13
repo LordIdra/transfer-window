@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VesselComponent {}
 
+#[allow(clippy::new_without_default)]
 impl VesselComponent {
     pub fn new() -> Self {
         Self {}

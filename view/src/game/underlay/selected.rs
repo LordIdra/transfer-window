@@ -41,7 +41,8 @@ fn update_none(view: &mut Scene, model: &Model, context: &Context, latest_window
     }
 }
 
-fn update_point(view: &mut Scene, model: &Model, context: &Context, latest_window: Pos2, primary_clicked: bool, entity: Entity, time: f64, state: SelectedState) {
+#[allow(clippy::too_many_arguments)]
+fn update_point(view: &mut Scene, model: &Model, context: &Context, latest_window: Pos2, primary_clicked: bool, entity: Entity, time: f64, state: &SelectedState) {
     // Remove if expired
     if state.is_selected() && time < model.get_time() {
         trace!("Selected point expired at time={time}");
@@ -70,11 +71,10 @@ fn update_point(view: &mut Scene, model: &Model, context: &Context, latest_windo
     if state.is_hover() && primary_clicked {
         trace!("Selected point at time={}", time);
         view.selected = Selected::Point { entity, time, state: SelectedState::Selected };
-        return;
     }
 }
 
-fn update_burn(view: &mut Scene, model: &Model, primary_clicked: bool, entity: Entity, time: f64, state: SelectedState) {
+fn update_burn(view: &mut Scene, model: &Model, primary_clicked: bool, entity: Entity, time: f64, state: &SelectedState) {
     // Remove if expired
     if state.is_selected() && time < model.get_time() {
         trace!("Selected burn expired at time={time}");
@@ -93,49 +93,33 @@ fn update_burn(view: &mut Scene, model: &Model, primary_clicked: bool, entity: E
     if state.is_hover() && primary_clicked {
         trace!("Selected burn at time={}", time);
         view.selected = Selected::Burn { entity, time, state: SelectedState::Selected };
-        return;
     }
 }
 
 fn draw_selected(view: &mut Scene, model: &Model) {
     let select_radius = SELECT_RADIUS / view.camera.get_zoom();
-    match view.selected.clone() {
-        Selected::None => (),
-        Selected::Point { entity, time, state } => {
-            let color = match state { 
-                SelectedState::Hover => HOVER_COLOR,
-                SelectedState::Selected => SELECTED_COLOR,
-            };
-            let mut vertices = vec![];
-            let trajectory_component = model.get_trajectory_component(entity);
-            let segment = trajectory_component.get_segment_at_time(time);
-            let point = model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(time);
-            add_textured_square(&mut vertices, point, select_radius, color);
-            view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);
-        }
-        Selected::Burn { entity, time, state } => {
-            let color = match state { 
-                SelectedState::Hover => HOVER_COLOR,
-                SelectedState::Selected => SELECTED_COLOR,
-            };
-            let mut vertices = vec![];
-            let trajectory_component = model.get_trajectory_component(entity);
-            let segment = trajectory_component.get_segment_at_time(time);
-            let point = model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(time);
-            add_textured_square(&mut vertices, point, select_radius, color);
-            view.texture_renderers.get("burn").unwrap().lock().unwrap().add_vertices(&mut vertices);
-        },
+    if let Selected::Point { entity, time, state } = view.selected.clone() {
+        let color = match state { 
+            SelectedState::Hover => HOVER_COLOR,
+            SelectedState::Selected => SELECTED_COLOR,
+        };
+        let mut vertices = vec![];
+        let trajectory_component = model.get_trajectory_component(entity);
+        let segment = trajectory_component.get_segment_at_time(time);
+        let point = model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(time);
+        add_textured_square(&mut vertices, point, select_radius, color);
+        view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);
     }
 }
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context) {
+pub fn update(view: &mut Scene, model: &Model, context: &Context, is_mouse_over_any_icon: bool) {
     context.input(|input| {
         if let Some(latest_window) = input.pointer.latest_pos() {
-            if !context.is_pointer_over_area() {
+            if !context.is_pointer_over_area() && !is_mouse_over_any_icon {
                 match view.selected.clone() {
                     Selected::None => update_none(view, model, context, latest_window),
-                    Selected::Point { entity, time, state } => update_point(view, model, context, latest_window, input.pointer.primary_clicked(), entity, time, state),
-                    Selected::Burn { entity, time, state } => update_burn(view, model, input.pointer.primary_clicked(), entity, time, state),
+                    Selected::Point { entity, time, state } => update_point(view, model, context, latest_window, input.pointer.primary_clicked(), entity, time, &state),
+                    Selected::Burn { entity, time, state } => update_burn(view, model, input.pointer.primary_clicked(), entity, time, &state),
                 }
             }
         }

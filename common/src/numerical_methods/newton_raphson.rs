@@ -31,11 +31,9 @@ pub fn newton_raphson_to_find_stationary_point(function: &impl Fn(f64) -> f64, s
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Newton-Raphson iteration");
         let (_, f_prime, f_prime_prime) = differentiate_2(function, x, derivative_delta);
-        dbg!(f_prime, f_prime_prime);
         let delta = -f_prime/f_prime_prime;
         x += delta;
         i += 1;
-        dbg!(delta);
         if delta.abs() < max_delta {
             break;
         }

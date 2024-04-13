@@ -11,4 +11,5 @@ pub enum ComponentType {
     OrbitableComponent,
     TrajectoryComponent,
     StationaryComponent,
+    VesselComponent,
 }

@@ -25,7 +25,7 @@ impl TrajectoryComponent {
     /// Panics if the trajectory has no segment at the given time
     pub fn get_segment_at_time(&self, time: f64) -> &Segment {
         for segment in self.segments.iter().flatten() {
-            if segment.get_start_time() <= time && segment.get_end_time() >= time {
+            if segment.get_start_time() <= time && segment.get_end_time() > time {
                 return segment
             }
         }
@@ -74,6 +74,8 @@ impl TrajectoryComponent {
         self.segments.push(Some(segment));
     }
 
+    /// # Panics
+    /// Panics if the segment at `time` is a burn
     pub fn remove_segments_after(&mut self, time: f64) {
         loop {
             match self.segments.last_mut().unwrap().as_mut().unwrap() {

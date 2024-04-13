@@ -56,7 +56,6 @@ mod test {
     fn test_halley() {
         let function = |x: f64| x.powi(2) - 4.0;
         let starting_x = 4.0;
-        dbg!(halley(&function, starting_x, 1.0e-6, 1.0e-6, 50).unwrap() - 2.0);
         assert!((halley(&function, starting_x, 1.0e-6, 1.0e-6, 50).unwrap().abs() - 2.0).abs() < 1.0e-3);
     }
 

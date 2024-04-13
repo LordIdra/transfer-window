@@ -182,6 +182,7 @@ impl Model {
                 ComponentType::OrbitableComponent => self.orbitable_components.get_entities(),
                 ComponentType::StationaryComponent => self.stationary_components.get_entities(),
                 ComponentType::TrajectoryComponent => self.trajectory_components.get_entities(),
+                ComponentType::VesselComponent => self.vessel_components.get_entities(),
             };
             entities.retain(|entity| other_entities.contains(entity));
         }

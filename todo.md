@@ -18,7 +18,9 @@
 - [1|x] Show time of selected point
 - [1|x] Warp to point on orbit
 - [1|x] Can create burn
-- [1| ] Burn icons
+- [1|x] Burn icons
+- [1|x] Select burns by default
+- [1|x] Prioritise currently selected icon
 - [1| ] Burn can be adjusted (at all)
 - [1| ] Intelligent burn rendering
 - [1| ] Warp to burn button

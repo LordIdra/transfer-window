@@ -115,7 +115,7 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let start_position = trajectory_component.get_end_segment().get_end_position();
     let start_velocity = trajectory_component.get_end_segment().get_end_velocity();
     let burn = Burn::new(entity, parent, parent_mass, tangent, vec2(0.0, 0.0), time, start_position, start_velocity);
-    trajectory_component.add_segment(Segment::Burn(burn))
+    trajectory_component.add_segment(Segment::Burn(burn));
 }
 
 pub fn debug_add_entity(controller: &mut Controller, entity_builder: EntityBuilder) {
