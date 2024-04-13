@@ -17,13 +17,14 @@
 - [1|x] Display warp speed
 - [1|x] Show time of selected point
 - [1|x] Warp to point on orbit
-- [1| ] Can create burn
+- [1|x] Can create burn
+- [1| ] Burn icons
 - [1| ] Burn can be adjusted (at all)
-- [1| ] Fast solver for burns
-- [1| ] Warp to burn button
 - [1| ] Intelligent burn rendering
-- [1| ] Smooth burn adjustment at different levels
-- [1| ] Adjusting a burn with subsequent burns deletes them, but required confirmation by clicking unlock button
+- [1| ] Warp to burn button
+- [1| ] Fast solver for burns
+- [1| ] Better burn adjustment system
+- [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
 - [1| ] Visual indicator of how much DV burn will use
 - [1| ] Burns using more DV than possible display a warning indicator

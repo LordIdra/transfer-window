@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::VesselComponent}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -51,6 +51,7 @@ pub fn new_game(controller: &mut Controller) {
     let _spacecraft = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Spacecraft".to_string()))
         .with_mass_component(MassComponent::new(1.0e4))
+        .with_vessel_component(VesselComponent::new())
         .with_trajectory_component(trajectory_component));
 
     controller.model = Some(model);

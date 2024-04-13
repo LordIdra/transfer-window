@@ -135,7 +135,7 @@ impl Model {
                             }
                         }
                     }
-                    Segment::Burn(_) => unreachable!(),
+                    Segment::Burn(_) => (),
                 }
             }
         }
