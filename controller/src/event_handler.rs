@@ -144,7 +144,7 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     
     model.get_trajectory_component_mut(entity).add_segment(Segment::Burn(burn));
     model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
-    model.predict(entity, 1.0e9);
+    model.predict(entity, 5.0e7);
 }
 
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
@@ -168,7 +168,7 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
 
     model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
-    model.predict(entity, 1.0e7);
+    model.predict(entity, 5.0e7);
 }
 
 pub fn debug_add_entity(controller: &mut Controller, entity_builder: EntityBuilder) {
