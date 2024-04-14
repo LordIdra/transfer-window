@@ -24,6 +24,7 @@ impl BurnLocked {
             for segment in model.get_trajectory_component(entity).get_segments().iter().flatten().rev() {
                 if let Segment::Burn(burn) = segment {
                     let time = burn.get_start_point().get_time();
+                    #[allow(clippy::float_cmp)] // No, they should be exactly equal
                     if time > model.get_time() && time != last_burn_time {
                         let icon = Self { entity, time };
                         icons.push(Box::new(icon) as Box<dyn Icon>);
