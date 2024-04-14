@@ -20,8 +20,10 @@ impl Burn {
             for segment in model.get_trajectory_component(entity).get_segments().iter().flatten() {
                 if let Segment::Burn(burn) = segment {
                     let time = burn.get_start_point().get_time();
-                    let icon = Self { entity, time };
-                    icons.push(Box::new(icon) as Box<dyn Icon>);
+                    if time > model.get_time() {
+                        let icon = Self { entity, time };
+                        icons.push(Box::new(icon) as Box<dyn Icon>);
+                    }
                 }
             }
         }

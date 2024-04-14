@@ -37,11 +37,11 @@
 - [1|x] Show scale somewhere (how long 1m, 1k, etc is)
 - [1|x] Fix clicking another burn point causes state change on selected one
 - [1|x] Visual indicator of how much DV burn will use
+- [1|x] Fix icons showing for burns that are underway
 - [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
 
 - [1| ] Fix being able to select orbits that overlap burns (may be difficult)
-- [1| ] Fix icons showing for burns that are underway
 
 - [1| ] Better color scheme for orbits/burns
 
