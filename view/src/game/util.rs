@@ -1,5 +1,10 @@
 use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
+use transfer_window_model::{storage::entity_allocator::Entity, Model};
+
+use super::{underlay::selected::burn::BurnAdjustDirection, Scene};
+
+pub const BURN_OFFSET: f64 = 40.0;
 
 pub fn add_triangle(vertices: &mut Vec<f32>, v1: DVec2, v2: DVec2, v3: DVec2, color: Rgba) {
     let v1 = dvec2_to_f32_tuple(v1);
@@ -87,4 +92,11 @@ pub fn format_time(time: f64) -> String {
         start_string
             + seconds.to_string().as_str() + "s"
     }
+}
+
+pub fn get_burn_arrow_position(view: &Scene, model: &Model, entity: Entity, time: f64, direction: &BurnAdjustDirection) -> DVec2 {
+    let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
+    let burn_position = model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position();
+    let burn_to_arrow_unit = burn.get_rotation_matrix() * direction.get_vector();
+    burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.get_zoom()
 }

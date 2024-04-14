@@ -3,9 +3,9 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::trajectory_component::burn::Burn, storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, Scene};
+use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, util::get_burn_arrow_position, Scene};
 
-use super::{Icon, BURN_OFFSET};
+use super::Icon;
 
 fn offset(amount: f64) -> f64 {
     if amount.is_sign_positive() {
@@ -26,16 +26,14 @@ pub struct AdjustBurn {
 impl AdjustBurn {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
         let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
-        let burn_position = model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position();
         let burn_to_arrow_unit = burn.get_rotation_matrix() * direction.get_vector();
-        let relative_arrow_position = BURN_OFFSET * burn_to_arrow_unit / view.camera.get_zoom();
-        let mut position = burn_position + relative_arrow_position;
+        let mut position = get_burn_arrow_position(view, model, entity, time, &direction);
 
         // Additional offset if arrow is being dragged
         if let Some(mouse_position) = pointer.latest_pos() {
             if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(drag_direction) } = &view.selected {
                 if *drag_direction == direction {
-                    let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, screen_rect) - burn_position - relative_arrow_position;
+                    let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, screen_rect) - position;
                     let amount = arrow_to_mouse.dot(&burn_to_arrow_unit);
                     position += offset(amount) * burn_to_arrow_unit;
                 }

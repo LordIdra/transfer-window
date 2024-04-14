@@ -1,3 +1,5 @@
+//! The overlay constitutes everything that *does not* move with the camera
+
 use eframe::{egui::{Color32, Context, Rounding, Stroke, Visuals}, epaint::Shadow};
 use transfer_window_model::Model;
 

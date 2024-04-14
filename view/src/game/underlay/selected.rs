@@ -28,13 +28,19 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update selected");
     let is_mouse_over_ui_element = context.is_pointer_over_area() || is_mouse_over_any_icon;
-    context.input(|input| {
-        match view.selected.clone() {
-            Selected::None => segment_point::update_not_selected(view, model, context, &input.pointer, is_mouse_over_ui_element),
-            Selected::Point { entity, time, state } => segment_point::update_selected(view, model, context, &input.pointer, is_mouse_over_ui_element, entity, time, &state),
-            Selected::Burn { entity: _, time: _, state: _ } => burn::update_selected(view, model, events, &input.pointer, is_mouse_over_ui_element, context.screen_rect()),
-        }
+
+    // IMPORTANT: the update functions may lock the context, so they
+    // must not be called within an input closure, otherwise a
+    // deadlock will occur!!
+    let pointer = context.input(|input| {
+        input.pointer.clone()
     });
+
+    match view.selected.clone() {
+        Selected::None => segment_point::update_not_selected(view, model, context, &pointer, is_mouse_over_ui_element),
+        Selected::Point { entity, time, state } => segment_point::update_selected(view, model, context, &pointer, is_mouse_over_ui_element, entity, time, &state),
+        Selected::Burn { entity: _, time: _, state: _ } => burn::update_selected(view, model, context, events, &pointer, is_mouse_over_ui_element),
+    }
 
     segment_point::draw(view, model);
 }

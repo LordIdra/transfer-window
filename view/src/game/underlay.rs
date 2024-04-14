@@ -1,3 +1,5 @@
+//! The underlay constitutes everything that *does* move with the camera
+
 use eframe::egui::Context;
 use transfer_window_model::Model;
 

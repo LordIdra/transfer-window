@@ -1,9 +1,9 @@
-use eframe::egui::{PointerState, Rect};
+use eframe::egui::{Context, PointerState};
 use log::trace;
 use nalgebra_glm::{vec2, DVec2};
 use transfer_window_model::Model;
 
-use crate::{events::Event, game::{underlay::{icons::BURN_OFFSET, selected::Selected}, Scene}};
+use crate::{events::Event, game::{underlay::selected::Selected, util::get_burn_arrow_position, Scene}};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum BurnAdjustDirection {
@@ -60,7 +60,7 @@ pub fn remove_if_expired(view: &mut Scene, model: &Model, time: f64) {
     }
 }
 
-pub fn update_selected(view: &mut Scene, model: &Model, events: &mut Vec<Event>, pointer: &PointerState, is_mouse_over_ui_element: bool, screen_rect: Rect) {
+pub fn update_selected(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, pointer: &PointerState, is_mouse_over_ui_element: bool) {
     // Deselected by clicking elsewhere
     if !is_mouse_over_ui_element && pointer.primary_clicked() {
         trace!("Selected burn deselected");
@@ -82,10 +82,9 @@ pub fn update_selected(view: &mut Scene, model: &Model, events: &mut Vec<Event>,
     if let Selected::Burn { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
         if let Some(mouse_position) = pointer.latest_pos() {
             let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
-            let burn_position = model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position();
             let burn_to_arrow_unit = burn.get_rotation_matrix() * direction.get_vector();
-            let relative_arrow_position = BURN_OFFSET * burn_to_arrow_unit / view.camera.get_zoom();
-            let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, screen_rect) - burn_position - relative_arrow_position;
+            let arrow_position = get_burn_arrow_position(view, model, entity, time, &direction);
+            let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, context.screen_rect()) - arrow_position;
             let amount = burn_adjustment_amount(arrow_to_mouse.dot(&burn_to_arrow_unit)) * direction.get_vector() * view.camera.get_zoom().powi(2);
             events.push(Event::AdjustBurn { entity, time, amount });
         }
