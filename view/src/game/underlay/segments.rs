@@ -11,7 +11,7 @@ const RADIUS: f64 = 0.8;
 fn get_orbit_color(index: usize) -> Rgba {
     let colors = vec![
         Rgba::from_srgba_premultiplied(0, 150, 255, 255),
-        Rgba::from_srgba_premultiplied(0, 170, 240, 255),
+        Rgba::from_srgba_premultiplied(0, 200, 255, 255),
         Rgba::from_srgba_premultiplied(150, 205, 220, 255),
         Rgba::from_srgba_premultiplied(75, 170, 200, 255),
         Rgba::from_srgba_premultiplied(30, 130, 180, 255),
@@ -68,9 +68,12 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
     let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.get_zoom();
     let trajectory_component = model.get_trajectory_component(entity);
-    let mut orbit_index = 0;
-    let mut burn_index = 0;
-    for segment in trajectory_component.get_segments().iter().flatten() {
+    let mut orbit_index = trajectory_component.get_previous_orbits();
+    let mut burn_index = trajectory_component.get_previous_burns();
+    // Reverse to make sure that the segments are rendered in order
+    // of how soon they are, so that closer segments take priority
+    // over further ones
+    for segment in trajectory_component.get_segments().iter().rev().flatten() {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Draw segment");
         let absolute_parent_position = model.get_absolute_position(segment.get_parent());

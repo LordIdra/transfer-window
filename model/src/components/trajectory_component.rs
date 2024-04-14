@@ -12,6 +12,8 @@ pub mod segment;
 /// Must have `MassComponent`, cannot have `StationaryComponent`
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TrajectoryComponent {
+    previous_orbits: usize,
+    previous_burns: usize,
     current_index: usize,
     segments: Vec<Option<Segment>>,
 }
@@ -19,6 +21,14 @@ pub struct TrajectoryComponent {
 impl TrajectoryComponent {
     pub fn get_segments(&self) -> &Vec<Option<Segment>> {
         &self.segments
+    }
+
+    pub fn get_previous_orbits(&self) -> usize {
+        self.previous_orbits
+    }
+
+    pub fn get_previous_burns(&self) -> usize {
+        self.previous_burns
     }
 
     /// Returns the first segment it finds matching the time
@@ -134,6 +144,10 @@ impl TrajectoryComponent {
     pub fn next(&mut self, time: f64, delta_time: f64) {
         self.get_current_segment_mut().next(delta_time);
         while self.get_current_segment().is_finished() {
+            match self.get_current_segment() {
+                Segment::Orbit(_) => self.previous_orbits += 1,
+                Segment::Burn(_) => self.previous_burns += 1,
+            }
             trace!("Segment finished at time={time}");
             let overshot_time = self.get_current_segment().get_overshot_time(time);
             self.segments[self.current_index] = None;
