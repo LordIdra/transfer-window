@@ -34,11 +34,11 @@
 - [1|x] Make segment point selection snap to nearest segment
 - [1|x] View N orbits into future on the selected orbit
 - [1|x] Fix freezes when focus enters burn
-- [1| ] Show scale somewhere (how long 1m, 1k, etc is)
+- [1|x] Show scale somewhere (how long 1m, 1k, etc is)
+- [1|x] Fix clicking another burn point causes state change on selected one
+- [1| ] Visual indicator of how much DV burn will use
 - [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
-- [1| ] Visual indicator of how much DV burn will use
-- [1| ] Burns using more DV than possible display a warning indicator
 
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
@@ -46,9 +46,9 @@
 - [1| ] Show closest encounter for target and selected
 - [1| ] Deselect target when selected deselected (word salad)
 
+- [1| ] Burns using more DV than possible display a warning indicator
 - [1| ] Games have names
 - [1| ] Choose game to load
-
 - [1| ] More logical time step system
 
 # Ships

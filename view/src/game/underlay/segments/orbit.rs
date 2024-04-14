@@ -87,8 +87,7 @@ pub fn compute_points(orbit: &Orbit, absolute_parent_position: DVec2, camera_cen
         let theta_2 = f64::atan2(point2.y, point2.x);
         orbit.get_position_from_theta(interpolate_angles(theta_1, theta_2))
     };
-    let x = tessellate(interpolate, points, absolute_parent_position, camera_centre, zoom);
-    x
+    tessellate(interpolate, points, absolute_parent_position, camera_centre, zoom)
 }
 
 #[cfg(test)]
