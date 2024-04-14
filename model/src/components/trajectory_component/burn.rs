@@ -125,13 +125,8 @@ impl Burn {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Recompute burn points");
         let mut points = vec![start_point.clone()];
-        // We don't use a while loop because we need to compute at least 1 point (otherwise the duration of the burn is 0 which may break stuff)
-        loop {
-            let point = points.last().unwrap();
-            if point.get_time() > start_point.get_time() + self.get_duration() {
-                break;
-            }
-            points.push(point.next(BURN_TIME_STEP, self.get_absolute_acceleration()));
+        while points.last().unwrap().get_time() <= start_point.get_time() + self.get_duration() {
+            points.push(points.last().unwrap().next(BURN_TIME_STEP, self.get_absolute_acceleration()));
         }
         self.points = points;
     }
