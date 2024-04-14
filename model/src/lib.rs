@@ -117,33 +117,46 @@ impl Model {
     /// distance from the point to a segment is less than `max_distance`
     /// Short circuits; if there are multiple points, the first one found is returned
     pub fn get_closest_point_on_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
+        let mut closest_point = None;
+        let mut closest_distance = f64::MAX;
         for entity in self.get_entities(vec![ComponentType::TrajectoryComponent]) {
             for segment in self.get_trajectory_component(entity).get_segments().iter().flatten() {
-                match segment {
-                    Segment::Orbit(orbit) => {
-                        let parent_position = self.get_absolute_position(orbit.get_parent());
-                        if let Some(closest_point) = find_closest_point_on_orbit(orbit, point - parent_position, max_distance) {
-                            let theta = f64::atan2(closest_point.y, closest_point.x);
-                            let time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
-                            if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
-                                return Some((entity, time));
-                            }
+                let Segment::Orbit(orbit) = segment else { 
+                    continue 
+                };
+                
+                let parent_position = self.get_absolute_position(orbit.get_parent());
+                let point = point - parent_position;
+                let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {
+                    continue;
+                };
 
-                            // If the orbit has a period, we might have calculated an invalid time that's one period behind a valid time
-                            if let Some(period) = orbit.get_period() {
-                                let time = time + period;
-                                if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
-                                    return Some((entity, time));
-                                }
-                            }
-                        }
+                let distance = (closest_position - point).magnitude();
+                let theta = f64::atan2(closest_position.y, closest_position.x);
+                let time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
+                if distance > closest_distance {
+                    continue
+                }
+
+                closest_distance = distance;
+                if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
+                    closest_point = Some((entity, time));
+                    closest_distance = distance;
+                    continue;
+                }
+                
+                if let Some(period) = orbit.get_period() {
+                    // If the orbit has a period, we might have calculated an invalid time that's one period behind a valid time
+                    let time = time + period;
+                    if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
+                        closest_point = Some((entity, time));
+                        closest_distance = distance
                     }
-                    Segment::Burn(_) => (),
                 }
             }
         }
 
-        None
+        closest_point
     }
 
     #[allow(clippy::missing_panics_doc)]
