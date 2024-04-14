@@ -12,9 +12,9 @@ pub mod segment;
 /// Must have `MassComponent`, cannot have `StationaryComponent`
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct TrajectoryComponent {
+    current_index: usize,
     previous_orbits: usize,
     previous_burns: usize,
-    current_index: usize,
     segments: Vec<Option<Segment>>,
 }
 
@@ -29,6 +29,20 @@ impl TrajectoryComponent {
 
     pub fn get_previous_burns(&self) -> usize {
         self.previous_burns
+    }
+
+    pub fn get_remaining_orbits(&self) -> usize {
+        self.segments.iter()
+            .flatten()
+            .filter(|segment| matches!(segment, Segment::Orbit(_)))
+            .count()
+    }
+
+    pub fn get_remaining_burns(&self) -> usize {
+        self.segments.iter()
+            .flatten()
+            .filter(|segment| matches!(segment, Segment::Burn(_)))
+            .count()
     }
 
     pub fn get_final_burn(&self) -> Option<&Burn> {

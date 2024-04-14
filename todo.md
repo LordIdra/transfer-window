@@ -42,7 +42,7 @@
 - [1|x] Allow deleting burns
 - [1|x] Fix selection breaking down on high eccentricity orbits
 - [1|x] More logical time step system
-- [1| ] Adjusting/deleting/creating a burn with subsequent burns cannot be done, other burns must be deleted first
+- [1|x] Adjusting/deleting/creating a burn with subsequent burns cannot be done, other burns must be deleted first
 
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel

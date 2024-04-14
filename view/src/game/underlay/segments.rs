@@ -68,8 +68,8 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
     let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.get_zoom();
     let trajectory_component = model.get_trajectory_component(entity);
-    let mut orbit_index = trajectory_component.get_previous_orbits();
-    let mut burn_index = trajectory_component.get_previous_burns();
+    let mut orbit_index = trajectory_component.get_previous_orbits() + trajectory_component.get_remaining_orbits();
+    let mut burn_index = trajectory_component.get_previous_burns() + trajectory_component.get_remaining_burns();
     // Reverse to make sure that the segments are rendered in order
     // of how soon they are, so that closer segments take priority
     // over further ones
@@ -81,12 +81,12 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
             Segment::Orbit(orbit) => {
                 let color = get_orbit_color(orbit_index);
                 draw_from_points(view, &orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom), zoom, color);
-                orbit_index += 1;
+                orbit_index -= 1;
             },
             Segment::Burn(burn) => {
                 let color = get_burn_color(burn_index);
                 draw_from_points(view, &burn::compute_points(burn, absolute_parent_position, camera_centre, zoom), zoom, color);
-                burn_index += 1;
+                burn_index -= 1;
             }
         };
     }
