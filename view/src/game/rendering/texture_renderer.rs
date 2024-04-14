@@ -21,7 +21,7 @@ impl TextureRenderer {
         let vertex_array_object = VertexArrayObject::new(gl, vec![
             VertexAttribute { index: 0, count: 2 }, // x
             VertexAttribute { index: 1, count: 2 }, // y
-            VertexAttribute { index: 2, count: 4 }, // rgba
+            VertexAttribute { index: 2, count: 1 }, // alpha
             VertexAttribute { index: 3, count: 2 }, // texture coordinates
         ]);
         let vertices = vec![];

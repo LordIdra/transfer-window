@@ -1,6 +1,6 @@
 use std::{cmp::Ordering, fmt::Debug};
 
-use eframe::egui::{Context, PointerState, Pos2, Rect, Rgba};
+use eframe::egui::{Context, PointerState, Pos2, Rect};
 use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::Model;
@@ -8,10 +8,6 @@ use transfer_window_model::Model;
 use crate::game::{util::{add_textured_square, add_textured_square_facing}, Scene};
 
 use self::{adjust_burn::AdjustBurn, burn::Burn, orbitable::Orbitable, vessel::Vessel};
-
-const REGULAR_ALPHA: f32 = 0.6;
-const HOVERED_ALPHA: f32 = 0.8;
-const SELECTED_ALPHA: f32 = 1.0;
 
 mod adjust_burn;
 mod burn;
@@ -28,7 +24,7 @@ mod vessel;
 /// is chosen.
 trait Icon: Debug {
     fn get_texture(&self) -> &str;
-    fn get_color(&self, view: &Scene) -> Rgba;
+    fn get_alpha(&self, view: &Scene, model: &Model, is_selected: bool, is_hovered: bool) -> f32;
     fn get_radius(&self) -> f64;
     fn get_priorities(&self, view: &Scene, model: &Model) -> [u64; 4];
     fn get_position(&self, view: &Scene, model: &Model) -> DVec2;
@@ -87,29 +83,24 @@ fn remove_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon
     new_icons
 }
 
-fn get_alpha(view: &Scene, model: &Model, icon: &dyn Icon, mouse_position_window: Option<Pos2>, screen_size: Rect) -> f32 {
-    if icon.is_selected(view, model) {
-        return SELECTED_ALPHA;
-    }
-    if let Some(mouse_position_window) = mouse_position_window {
-        if icon.is_hovered(view, model, mouse_position_window, screen_size) {
-            return HOVERED_ALPHA;
-        }
-    }
-    REGULAR_ALPHA
-}
-
 fn draw_icons(view: &Scene, model: &Model, icons: &Vec<Box<dyn Icon>>, mouse_position_window: Option<Pos2>, screen_size: Rect) {
     for icon in icons {
         let radius = icon.get_radius() / view.camera.get_zoom();
-        let mut vertices = vec![];
-        let alpha = get_alpha(view, model, &**icon, mouse_position_window, screen_size);
-        let color = icon.get_color(view).multiply(alpha);
-        if let Some(facing) = icon.get_facing(view, model) {
-            add_textured_square_facing(&mut vertices, icon.get_position(view, model), radius, color, facing);
+        let is_selected = icon.is_selected(view, model);
+        let is_hovered = if let Some(mouse_position_window) = mouse_position_window{
+            icon.is_hovered(view, model, mouse_position_window, screen_size)
         } else {
-            add_textured_square(&mut vertices, icon.get_position(view, model), radius, color);
+            false
+        };
+        let alpha = icon.get_alpha(view, model, is_selected, is_hovered);
+
+        let mut vertices = vec![];
+        if let Some(facing) = icon.get_facing(view, model) {
+            add_textured_square_facing(&mut vertices, icon.get_position(view, model), radius, alpha, facing);
+        } else {
+            add_textured_square(&mut vertices, icon.get_position(view, model), radius, alpha);
         }
+        
         let Some(texture_renderer) = view.texture_renderers.get(icon.get_texture()) else {
             error!("Texture {} does not exist ", icon.get_texture());
             continue;

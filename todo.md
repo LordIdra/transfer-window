@@ -51,6 +51,8 @@
 - [1| ] Show closest encounter for target and selected
 - [1| ] Deselect target when selected deselected (word salad)
 
+- [1| ] Limit prediction by number of conics as well as time
+
 - [1| ] Burns using more DV than possible display a warning indicator
 - [1| ] Better color scheme for orbits/burns
 
@@ -70,8 +72,8 @@
 - [1| ] Ballistic weaponry
 - [1| ] Lock weapons onto current target
 - [1| ] Show current weapon lock
-- [1| ] Spawn in enemy ships
-- [1| ] Edit enemy ship modules
+- [1| ] Spawn in ships
+- [1| ] Edit ship modules
 
 # Weapons
 - [1| ] Torpedoes

@@ -1,4 +1,4 @@
-use eframe::egui::{Context, PointerState, Rgba};
+use eframe::egui::{Context, PointerState};
 use log::trace;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
@@ -6,8 +6,8 @@ use crate::game::{underlay::selected::Selected, util::add_textured_square, Scene
 
 const SELECT_DISTANCE: f64 = 32.0;
 const SELECT_RADIUS: f64 = 4.0;
-const HOVER_COLOR: Rgba = Rgba::from_rgba_premultiplied(0.7, 0.7, 0.7, 0.7);
-const SELECTED_COLOR: Rgba = Rgba::from_rgba_premultiplied(1.0, 1.0, 1.0, 1.0);
+const HOVER_ALPHA: f32 = 0.8;
+const SELECTED_ALPHA: f32 = 1.0;
 
 #[derive(Debug, Clone)]
 pub enum SegmentPointState {
@@ -75,15 +75,15 @@ pub fn update_not_selected(view: &mut Scene, model: &Model, context: &Context, p
 pub fn draw(view: &mut Scene, model: &Model) {
     let select_radius = SELECT_RADIUS / view.camera.get_zoom();
     if let Selected::Point { entity, time, state } = view.selected.clone() {
-        let color = match state { 
-            SegmentPointState::Hover => HOVER_COLOR,
-            SegmentPointState::Selected => SELECTED_COLOR,
+        let alpha = match state { 
+            SegmentPointState::Hover => HOVER_ALPHA,
+            SegmentPointState::Selected => SELECTED_ALPHA,
         };
         let mut vertices = vec![];
         let trajectory_component = model.get_trajectory_component(entity);
         let segment = trajectory_component.get_last_segment_at_time(time);
         let point = model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(time);
-        add_textured_square(&mut vertices, point, select_radius, color);
+        add_textured_square(&mut vertices, point, select_radius, alpha);
         view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);
     }
 }

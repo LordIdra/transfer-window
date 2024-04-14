@@ -1,4 +1,4 @@
-use eframe::egui::{PointerState, Rect, Rgba};
+use eframe::egui::{PointerState, Rect};
 use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::trajectory_component::burn::Burn, storage::entity_allocator::Entity, Model};
@@ -73,15 +73,19 @@ impl Icon for AdjustBurn {
         "adjust-burn-arrow"
     }
 
-    fn get_color(&self, view: &Scene) -> eframe::egui::Rgba {
+    fn get_alpha(&self, view: &Scene, _model: &Model, _is_selected: bool, is_hovered: bool) -> f32 {
         if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(direction) } = &view.selected {
             if *direction == self.direction {
-                return Rgba::from_rgba_unmultiplied(0.4, 0.8, 1.0, 1.0)
+                return 1.0;
             }
             // Dim the other arrows if we are dragging one
-            return Rgba::from_rgba_unmultiplied(0.4, 0.8, 1.0, 0.8)
-        };
-        Rgba::from_rgba_unmultiplied(0.4, 0.8, 1.0, 1.0)
+            return 0.4;
+        }
+        if is_hovered {
+            0.8
+        } else {
+            0.6
+        }
     }
 
     fn get_radius(&self) -> f64 {

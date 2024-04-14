@@ -1,4 +1,4 @@
-use eframe::egui::{PointerState, Rgba};
+use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::{trajectory_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model};
@@ -36,8 +36,14 @@ impl Icon for Burn {
         "burn"
     }
 
-    fn get_color(&self, _view: &Scene) -> eframe::egui::Rgba {
-        Rgba::from_rgb(1.0, 0.7, 0.5)
+    fn get_alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool) -> f32 {
+        if is_selected {
+            return 1.0;
+        }
+        if is_hovered {
+            return 0.7
+        }
+        0.4
     }
 
     fn get_radius(&self) -> f64 {
