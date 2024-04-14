@@ -128,24 +128,47 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Create burn");
     let model = controller.get_model_mut();
-    let parent_mass = model.get_mass_component(entity).get_mass();
+    
     let trajectory_component = model.get_trajectory_component_mut(entity);
     trajectory_component.remove_segments_after(time);
+    
     let parent = trajectory_component.get_end_segment().get_parent();
     let tangent = trajectory_component.get_end_segment().get_end_velocity().normalize();
     let start_position = trajectory_component.get_end_segment().get_end_position();
     let start_velocity = trajectory_component.get_end_segment().get_end_velocity();
+    let parent_mass = model.get_mass_component(parent).get_mass();
+    let mass = model.get_mass_component(entity).get_mass();
+
     let burn = Burn::new(entity, parent, parent_mass, tangent, vec2(0.0, 0.0), time, start_position, start_velocity);
-    trajectory_component.add_segment(Segment::Burn(burn));
+    let orbit = Orbit::new(parent, mass, parent_mass, burn.get_end_point().get_position(), burn.get_end_point().get_velocity(), burn.get_end_point().get_time());
+    
+    model.get_trajectory_component_mut(entity).add_segment(Segment::Burn(burn));
+    model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
+    model.predict(entity, 1.0e9);
 }
 
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Adjust burn");
     let model = controller.get_model_mut();
-    let trajectory_component = model.get_trajectory_component_mut(entity);
-    let burn = trajectory_component.get_segment_at_time_mut(time).as_burn_mut();
-    burn.adjust(amount);
+    
+    let end_time = model.get_trajectory_component_mut(entity).get_segment_at_time(time).get_end_time();
+    model.get_trajectory_component_mut(entity).remove_segments_after(end_time);
+    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_burn_mut().adjust(amount);
+
+    let parent = model.get_trajectory_component(entity).get_end_segment().get_parent();
+    let position = model.get_trajectory_component_mut(entity).get_end_segment().get_end_position();
+    let velocity = model.get_trajectory_component_mut(entity).get_end_segment().get_end_velocity();
+    let parent_mass = model.get_mass_component(parent).get_mass();
+    let mass = model.get_mass_component(entity).get_mass();
+
+    // Needs to be recalculated after we adjust the burn
+    let end_time = model.get_trajectory_component_mut(entity).get_segment_at_time(time).get_end_time();
+
+    let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
+
+    model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
+    model.predict(entity, 1.0e9);
 }
 
 pub fn debug_add_entity(controller: &mut Controller, entity_builder: EntityBuilder) {

@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use components::{trajectory_component::segment::Segment, vessel_component::VesselComponent};
 use log::error;
+use modules::trajectory_prediction;
 use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 use systems::{time::{self, TimeStep}, trajectory_update, warp_update_system::{self, TimeWarp}};
@@ -188,6 +189,10 @@ impl Model {
             entities.retain(|entity| other_entities.contains(entity));
         }
         entities
+    }
+
+    pub fn predict(&mut self, entity: Entity, end_time: f64) {
+        trajectory_prediction::predict(self, entity, end_time);
     }
 
     pub fn allocate(&mut self, entity_builder: EntityBuilder) -> Entity {

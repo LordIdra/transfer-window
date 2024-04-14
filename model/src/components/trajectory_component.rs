@@ -102,7 +102,7 @@ impl TrajectoryComponent {
                     }
                 },
                 Segment::Orbit(orbit) => {
-                    if orbit.get_start_point().get_time() > time {
+                    if orbit.get_start_point().get_time() >= time {
                         self.segments.pop();
                     } else if orbit.is_time_within_orbit(time) {
                         orbit.end_at(time);

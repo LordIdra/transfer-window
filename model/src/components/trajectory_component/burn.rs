@@ -1,4 +1,4 @@
-use nalgebra_glm::{DMat2, DVec2};
+use nalgebra_glm::{vec2, DMat2, DVec2};
 use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
@@ -107,7 +107,12 @@ impl Burn {
     }
 
     fn get_absolute_acceleration(&self) -> DVec2 {
-        self.get_absolute_delta_v().normalize() * BURN_ACCELERATION_MAGNITUDE
+        let dv = self.get_absolute_delta_v();
+        if dv.magnitude() == 0.0 {
+            vec2(0.0, 0.0)
+        } else {
+            dv.normalize() * BURN_ACCELERATION_MAGNITUDE
+        }
     }
 
     pub fn adjust(&mut self, adjustment: DVec2) {
