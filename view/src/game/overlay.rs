@@ -3,7 +3,7 @@ use transfer_window_model::Model;
 
 use crate::events::Event;
 
-use super::{underlay::selected::{BurnState, Selected}, util::format_time, Scene};
+use super::{underlay::selected::{burn::BurnState, Selected}, util::format_time, Scene};
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]
