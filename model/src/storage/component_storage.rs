@@ -115,7 +115,6 @@ mod test {
     use super::ComponentStorage;
 
     #[test]
-    #[allow(clippy::float_cmp)]
     fn test() {
         let mut allocator = EntityAllocator::default();
         let mut storage: ComponentStorage<f64> = ComponentStorage::default();

@@ -24,7 +24,6 @@ impl BurnLocked {
             for segment in model.get_trajectory_component(entity).get_segments().iter().flatten().rev() {
                 if let Segment::Burn(burn) = segment {
                     let time = burn.get_start_point().get_time();
-                    #[allow(clippy::float_cmp)] // No, they should be exactly equal
                     if time > model.get_time() && time != last_burn_time {
                         let icon = Self { entity, time };
                         icons.push(Box::new(icon) as Box<dyn Icon>);
@@ -74,7 +73,6 @@ impl Icon for BurnLocked {
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
-        #[allow(clippy::float_cmp)] // time and self.time should be *exactly* the same
         match &view.selected {
             Selected::None | Selected::Point { entity: _, time: _, state: _ } => false,
             Selected::Burn { entity, time, state: _ } => *entity == self.entity && *time == self.time,

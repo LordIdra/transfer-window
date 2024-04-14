@@ -70,7 +70,6 @@ impl Icon for Burn {
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
-        #[allow(clippy::float_cmp)] // time and self.time should be *exactly* the same
         match &view.selected {
             Selected::None | Selected::Point { entity: _, time: _, state: _ } => false,
             Selected::Burn { entity, time, state: _ } => *entity == self.entity && *time == self.time,
@@ -83,7 +82,6 @@ impl Icon for Burn {
         }
         
         if let Selected::Burn { entity, time, state } = &mut view.selected {
-            #[allow(clippy::float_cmp)] // time and self.time should be *exactly* the same
             if *entity == self.entity && *time == self.time {
                 if state.is_selected() {
                     trace!("Burn icon clicked; switching Selected -> Adjusting");

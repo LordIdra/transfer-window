@@ -26,7 +26,6 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 events.push(Event::StartWarp { end_time: time });
             }
 
-            #[allow(clippy::float_cmp)] // No, they should be exactly equal
             let can_delete = model.get_trajectory_component(entity).get_final_burn().unwrap().get_start_point().get_time() == time;
             let delete_button = Button::new("Delete burn");
             if ui.add_enabled(can_delete, delete_button).clicked() {

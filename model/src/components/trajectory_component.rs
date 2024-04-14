@@ -176,7 +176,6 @@ mod test {
 
 
     #[test]
-    #[allow(clippy::float_cmp)]
     pub fn test() {
         let mut trajectory = TrajectoryComponent::default();
 
