@@ -45,6 +45,17 @@ impl TrajectoryComponent {
             .count()
     }
 
+    pub fn get_remaining_orbits_after_final_burn(&self) -> usize {
+        let mut remaining_orbits = 0;
+        for segment in self.segments.iter().rev().flatten() {
+            match segment {
+                Segment::Burn(_) => break,
+                Segment::Orbit(_) => remaining_orbits += 1,
+            }
+        }
+        remaining_orbits
+    }
+
     pub fn get_final_burn(&self) -> Option<&Burn> {
         for segment in self.segments.iter().rev().flatten() {
             if let Segment::Burn(burn) = segment {

@@ -10,6 +10,7 @@ use util::find_closest_point_on_orbit;
 
 use self::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
+pub const SEGMENTS_TO_PREDICT: usize = 5;
 
 pub mod components;
 mod debug;
@@ -205,8 +206,8 @@ impl Model {
         entities
     }
 
-    pub fn predict(&mut self, entity: Entity, end_time: f64) {
-        trajectory_prediction::predict(self, entity, end_time);
+    pub fn predict(&mut self, entity: Entity, end_time: f64, segment_count: usize) {
+        trajectory_prediction::predict(self, entity, end_time, segment_count);
     }
 
     pub fn allocate(&mut self, entity_builder: EntityBuilder) -> Entity {

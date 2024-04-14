@@ -44,6 +44,8 @@
 - [1|x] More logical time step system
 - [1|x] Adjusting/deleting/creating a burn with subsequent burns cannot be done, other burns must be deleted first
 - [1|x] Better color scheme for orbits/burns
+- [1| ] Limit prediction by number of conics as well as time
+- [1| ] Periapsis/apoapsis indicators
 
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
@@ -51,12 +53,10 @@
 - [1| ] Show closest encounter for target and selected
 - [1| ] Deselect target when selected deselected (word salad)
 
-- [1| ] Limit prediction by number of conics as well as time
-
-- [1| ] Burns using more DV than possible display a warning indicator
 
 - [1| ] Games have names
 - [1| ] Choose game to load
+- [1| ] Burns using more DV than possible display a warning indicator
 
 # Ships
 - [1| ] Fighters

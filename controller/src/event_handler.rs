@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::VesselComponent}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::VesselComponent}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model, SEGMENTS_TO_PREDICT};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -31,7 +31,7 @@ pub fn new_game(controller: &mut Controller) {
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
     let mut trajectory_component = TrajectoryComponent::default();
     let mut orbit = Orbit::new(sun, 5.9722e24, 1_988_500e24, vec2(147.095e9, 0.0), vec2(0.0, 30.29e3), 0.0);
-    orbit.end_at(1.0e9);
+    orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
@@ -42,7 +42,7 @@ pub fn new_game(controller: &mut Controller) {
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
     let mut trajectory_component = TrajectoryComponent::default();
     let mut orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0);
-    orbit.end_at(1.0e9);
+    orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
@@ -52,7 +52,7 @@ pub fn new_game(controller: &mut Controller) {
 
     let mut trajectory_component = TrajectoryComponent::default();
     let mut orbit = Orbit::new(earth, 1.0e4, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
-    orbit.end_at(1.0e9);
+    orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _spacecraft = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Spacecraft".to_string()))
@@ -144,7 +144,7 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     
     model.get_trajectory_component_mut(entity).add_segment(Segment::Burn(burn));
     model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
-    model.predict(entity, 5.0e7);
+    model.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
 }
 
 pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
@@ -154,7 +154,7 @@ pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
     
     let trajectory_component = model.get_trajectory_component_mut(entity);
     trajectory_component.remove_segments_after(time);
-    model.predict(entity, 5.0e7);
+    model.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
 }
 
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
@@ -178,7 +178,7 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
 
     model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
-    model.predict(entity, 5.0e7);
+    model.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
 }
 
 pub fn debug_add_entity(controller: &mut Controller, entity_builder: EntityBuilder) {
