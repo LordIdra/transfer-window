@@ -9,7 +9,7 @@ mod orbit;
 
 const RADIUS: f64 = 0.8;
 fn get_orbit_color(index: usize) -> Rgba {
-    let colors = vec![
+    let colors = [
         Rgba::from_srgba_premultiplied(0, 150, 255, 255),
         Rgba::from_srgba_premultiplied(0, 200, 255, 255),
         Rgba::from_srgba_premultiplied(150, 205, 220, 255),
@@ -20,7 +20,7 @@ fn get_orbit_color(index: usize) -> Rgba {
 }
 
 fn get_burn_color(index: usize) -> Rgba {
-    let colors = vec![
+    let colors = [
         Rgba::from_srgba_premultiplied(255, 0, 0, 255),
         Rgba::from_srgba_premultiplied(220, 110, 100, 255),
         Rgba::from_srgba_premultiplied(200, 55, 35, 255),

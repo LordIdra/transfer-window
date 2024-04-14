@@ -12,6 +12,7 @@ pub enum Event {
     DecreaseTimeStepLevel,
     StartWarp { end_time: f64 },
     CreateBurn { entity: Entity, time: f64 },
+    DeleteBurn { entity: Entity, time: f64 },
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
     DebugAddEntity { entity_builder: EntityBuilder },
 }

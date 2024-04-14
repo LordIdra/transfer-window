@@ -147,6 +147,16 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     model.predict(entity, 5.0e7);
 }
 
+pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Delete burn");
+    let model = controller.get_model_mut();
+    
+    let trajectory_component = model.get_trajectory_component_mut(entity);
+    trajectory_component.remove_segments_after(time);
+    model.predict(entity, 5.0e7);
+}
+
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Adjust burn");

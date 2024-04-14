@@ -21,6 +21,12 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             ui.label(model.get_name_component(entity).get_name());
             ui.label("T-".to_string() + format_time(time - model.get_time()).as_str());
             ui.label(dv.to_string() + " ΔV");
+            if ui.button("Delete burn").clicked() {
+                events.push(Event::DeleteBurn { entity, time });
+                if let Selected::Burn { entity: _, time: _, state: _ } = view.selected {
+                    view.selected = Selected::None;
+                }
+            }
             if ui.button("Warp to burn").clicked() {
                 events.push(Event::StartWarp { end_time: time });
             }

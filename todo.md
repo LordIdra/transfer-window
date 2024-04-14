@@ -39,12 +39,11 @@
 - [1|x] Visual indicator of how much DV burn will use
 - [1|x] Fix icons showing for burns that are underway
 - [1|x] The next segment should take precedence over orbits when rendering (ie render segments backwards)
+- [1| ] Allow deleting burns
 - [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
 
-- [1| ] Fix being able to select orbits that overlap burns (may be difficult)
-
-- [1| ] Better color scheme for orbits/burns
+- [1| ] Fix selection breaking down on high eccentricity orbits
 
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
@@ -53,9 +52,11 @@
 - [1| ] Deselect target when selected deselected (word salad)
 
 - [1| ] Burns using more DV than possible display a warning indicator
+- [1| ] Better color scheme for orbits/burns
+- [1| ] More logical time step system
+
 - [1| ] Games have names
 - [1| ] Choose game to load
-- [1| ] More logical time step system
 
 # Ships
 - [1| ] Fighters
