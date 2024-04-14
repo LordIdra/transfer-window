@@ -8,6 +8,25 @@ use super::{underlay::selected::{burn::BurnState, Selected}, util::format_time, 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw overlay");
+
+    Window::new("Save")
+        .title_bar(false)
+        .resizable(false)
+        .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
+        .show(context, |ui| {
+            if ui.button("Save").clicked() {
+                    events.push(Event::SaveGame { name: "test".to_owned() });
+            }
+        });
+    
+    Window::new("FPS")
+        .title_bar(false)
+        .resizable(false)
+        .anchor(Align2::RIGHT_TOP, epaint::vec2(0.0, 0.0))
+        .show(context, |ui| {
+            ui.label("FPS: ".to_string() + view.frame_history.fps().to_string().as_str());
+        });
+
     if model.get_time_step().is_paused() {
         Window::new("Paused")
             .title_bar(false)
@@ -15,7 +34,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
             .anchor(Align2::CENTER_BOTTOM, epaint::vec2(0.0, -30.0))
             .show(context, |ui| {
                 ui.label("SIMULATION PAUSED")
-        });
+            });
     }
 
     Window::new("Time")
@@ -26,7 +45,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
             let time_step = f64::round(model.get_time_step().get_time_step());
             ui.label("Time: ".to_string() + format_time(model.get_time()).as_str());
             ui.label("Time step: ".to_string() + time_step.to_string().as_str() + "s");
-    });
+        });
 
     if let Selected::Point { entity, time, state } = view.selected.clone() {
         if state.is_selected() {
@@ -44,7 +63,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
                         events.push(Event::CreateBurn { entity, time });
                         view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
                     }
-            });
+                });
         }
     }
 
@@ -60,7 +79,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
                     if ui.button("Warp to burn").clicked() {
                         events.push(Event::StartWarp { end_time: time });
                     }
-            });
+                });
         }
     }
 }
