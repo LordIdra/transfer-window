@@ -32,11 +32,11 @@
 - [1|x] Add FPS counter
 - [1|x] Fix being able to create burns for orbitables
 - [1|x] Make segment point selection snap to nearest segment
+- [1|x] View N orbits into future on the selected orbit
 - [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
 - [1| ] Visual indicator of how much DV burn will use
 - [1| ] Burns using more DV than possible display a warning indicator
-- [1| ] View N orbits into future on the selected orbit
 - [1| ] Show scale somewhere (how long 1m, 1k, etc is)
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
