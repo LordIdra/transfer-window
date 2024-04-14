@@ -8,7 +8,7 @@ pub fn update(model: &Model, context: &Context) {
     Window::new("Time")
         .title_bar(false)
         .resizable(false)
-        .anchor(Align2::CENTER_TOP, epaint::vec2(0.0, 30.0))
+        .anchor(Align2::CENTER_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
             let time_step = f64::round(model.get_time_step().get_time_step());
             ui.label("Time: ".to_string() + format_time(model.get_time()).as_str());

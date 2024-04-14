@@ -11,7 +11,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
     Window::new("Selected burn")
         .title_bar(false)
         .resizable(false)
-        .anchor(Align2::LEFT_TOP, epaint::vec2(30.0, 30.0))
+        .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
             ui.label(model.get_name_component(entity).get_name());
             ui.label("T-".to_string() + format_time(time - model.get_time()).as_str());
