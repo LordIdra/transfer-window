@@ -27,7 +27,7 @@
 - [1|x] Fast solver for burns
 - [1|x] Fix burn adjustment logic not triggering when over icon??
 - [1|x] Fix adjusting burn while spacecraft encounters it causing crash
-- [1| ] Fix only granular adjustments to burn
+- [1|x] Fix only granular adjustments to burn
 - [1| ] Add FPS counter
 - [1| ] Warp to burn button
 - [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button

@@ -47,7 +47,7 @@ impl BurnState {
 
 fn burn_adjustment_amount(amount: f64) -> f64 {
     if amount.is_sign_positive() {
-        (8.0e-3 * amount).powi(2)
+        1.0e-8 * amount.powf(2.5)
     } else {
         1.0e3 * amount
     }

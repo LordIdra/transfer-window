@@ -7,8 +7,9 @@ use self::burn_point::BurnPoint;
 
 pub mod burn_point;
 
-pub const BURN_TIME_STEP: f64 = 0.1;
-pub const BURN_ACCELERATION_MAGNITUDE: f64 = 10.0;
+const MIN_DURATION: f64 = 0.1;
+const BURN_TIME_STEP: f64 = 0.1;
+const BURN_ACCELERATION_MAGNITUDE: f64 = 10.0;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Burn {
@@ -71,7 +72,7 @@ impl Burn {
     }
 
     pub fn get_duration(&self) -> f64 {
-        self.get_total_dv() / BURN_ACCELERATION_MAGNITUDE
+        f64::max(MIN_DURATION, self.get_total_dv() / BURN_ACCELERATION_MAGNITUDE)
     }
 
     pub fn get_parent(&self) -> Entity {
@@ -124,10 +125,13 @@ impl Burn {
     fn recompute_burn_points(&mut self, start_point: &BurnPoint) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Recompute burn points");
+        let end_time = start_point.get_time() + self.get_duration();
         let mut points = vec![start_point.clone()];
-        while points.last().unwrap().get_time() <= start_point.get_time() + self.get_duration() {
+        while points.last().unwrap().get_time() + BURN_TIME_STEP < end_time {
             points.push(points.last().unwrap().next(BURN_TIME_STEP, self.get_absolute_acceleration()));
         }
+        let undershot_time = end_time - points.last().unwrap().get_time();
+        points.push(points.last().unwrap().next(undershot_time, self.get_absolute_acceleration()));
         self.points = points;
     }
 
