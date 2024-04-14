@@ -59,9 +59,11 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
                     if ui.button("Warp here").clicked() {
                         events.push(Event::StartWarp { end_time: time });
                     }
-                    if ui.button("Create burn").clicked() {
-                        events.push(Event::CreateBurn { entity, time });
-                        view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
+                    if model.try_get_vessel_component(entity).is_some() {
+                        if ui.button("Create burn").clicked() {
+                            events.push(Event::CreateBurn { entity, time });
+                            view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
+                        }
                     }
                 });
         }

@@ -30,7 +30,8 @@
 - [1|x] Fix only granular adjustments to burn
 - [1|x] Warp to burn button
 - [1|x] Add FPS counter
-- [1| ] Fix being able to create burns for orbitables
+- [1|x] Fix being able to create burns for orbitables
+- [1| ] Make segment point selection snap to nearest segment
 - [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
 - [1| ] Visual indicator of how much DV burn will use
