@@ -1,8 +1,8 @@
 use nalgebra_glm::DVec2;
 use transfer_window_model::components::trajectory_component::burn::Burn;
 
-const INITIAL_POINT_COUNT: usize = 30;
-const TESSELLATION_THRESHOLD: f64 = 1.0e-4;
+const INITIAL_POINT_COUNT: usize = 50;
+const TESSELLATION_THRESHOLD: f64 = 1.0e-3;
 const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
 /// Uses triangle heuristic as described in <https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation>
