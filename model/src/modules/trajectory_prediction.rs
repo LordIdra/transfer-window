@@ -13,7 +13,8 @@ mod test_cases;
 /// segment but before `end_time`. Obviously, `entity` is
 /// expected to have a trajectory component. Additionally,
 /// the final segment of entity's trajectory MUST be an Orbit.
-/// Trajectory prediction is extremely complex, good luck
+/// Trajectory prediction is extremely complex, good luck if
+/// you need to modify this...
 pub fn predict(model: &mut Model, entity: Entity, end_time: f64) {
     let mut start_time = model.get_trajectory_component(entity).get_end_segment().get_end_time();
     while let Some(encounter) = find_next_encounter(model, entity, start_time, end_time) {
