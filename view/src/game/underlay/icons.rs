@@ -12,6 +12,7 @@ use self::{adjust_burn::AdjustBurn, burn::Burn, orbitable::Orbitable, vessel::Ve
 const REGULAR_ALPHA: f32 = 0.6;
 const HOVERED_ALPHA: f32 = 0.8;
 const SELECTED_ALPHA: f32 = 1.0;
+pub const BURN_OFFSET: f64 = 40.0;
 
 mod adjust_burn;
 mod burn;

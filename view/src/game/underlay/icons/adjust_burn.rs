@@ -5,15 +5,13 @@ use transfer_window_model::{components::trajectory_component::burn::Burn, storag
 
 use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, Scene};
 
-use super::Icon;
-
-const OFFSET: f64 = 40.0;
+use super::{Icon, BURN_OFFSET};
 
 fn offset(amount: f64) -> f64 {
     if amount.is_sign_positive() {
-        0.1 * amount
+        0.2 * amount
     } else {
-        0.01 * amount
+        0.02 * amount
     }
 }
 
@@ -29,17 +27,17 @@ impl AdjustBurn {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
         let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
         let burn_position = model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position();
-        let arrow_position = burn.get_rotation_matrix() * direction.get_vector();
-        let mut position = burn_position + OFFSET * arrow_position / view.camera.get_zoom();
+        let burn_to_arrow_unit = burn.get_rotation_matrix() * direction.get_vector();
+        let relative_arrow_position = BURN_OFFSET * burn_to_arrow_unit / view.camera.get_zoom();
+        let mut position = burn_position + relative_arrow_position;
 
         // Additional offset if arrow is being dragged
         if let Some(mouse_position) = pointer.latest_pos() {
             if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(drag_direction) } = &view.selected {
                 if *drag_direction == direction {
-                    let burn_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, screen_rect) - burn_position;
-                    let burn_to_arrow = burn.get_rotation_matrix() * direction.get_vector();
-                    let amount = burn_to_mouse.dot(&burn_to_arrow);
-                    position += offset(amount) * burn.get_rotation_matrix() * direction.get_vector();
+                    let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, screen_rect) - burn_position - relative_arrow_position;
+                    let amount = arrow_to_mouse.dot(&burn_to_arrow_unit);
+                    position += offset(amount) * burn_to_arrow_unit;
                 }
             }
         }
