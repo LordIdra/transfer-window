@@ -31,7 +31,7 @@ pub fn new_game(controller: &mut Controller) {
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
     let mut trajectory_component = TrajectoryComponent::default();
     let mut orbit = Orbit::new(sun, 5.9722e24, 1_988_500e24, vec2(147.095e9, 0.0), vec2(0.0, 30.29e3), 0.0);
-    orbit.end_at(1.0e10);
+    orbit.end_at(1.0e9);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
@@ -42,7 +42,7 @@ pub fn new_game(controller: &mut Controller) {
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
     let mut trajectory_component = TrajectoryComponent::default();
     let mut orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0);
-    orbit.end_at(1.0e10);
+    orbit.end_at(1.0e9);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
@@ -52,7 +52,7 @@ pub fn new_game(controller: &mut Controller) {
 
     let mut trajectory_component = TrajectoryComponent::default();
     let mut orbit = Orbit::new(earth, 1.0e4, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
-    orbit.end_at(1.0e10);
+    orbit.end_at(1.0e9);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _spacecraft = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Spacecraft".to_string()))

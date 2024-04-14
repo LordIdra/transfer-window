@@ -12,6 +12,7 @@ use self::{components::{mass_component::MassComponent, name_component::NameCompo
 
 pub mod components;
 mod debug;
+mod modules;
 pub mod storage;
 mod systems;
 mod util;
