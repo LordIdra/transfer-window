@@ -25,15 +25,15 @@ impl SegmentPointState {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
-pub fn update_selected(view: &mut Scene, model: &Model, context: &Context, pointer: &PointerState, is_mouse_over_ui_element: bool, entity: Entity, time: f64, state: &SegmentPointState) {
-    // Remove if expired
+pub fn remove_if_expired(view: &mut Scene, model: &Model, time: f64, state: &SegmentPointState) {
     if state.is_selected() && time < model.get_time() {
         trace!("Selected segment point expired at time={time}");
         view.selected = Selected::None;
-        return;
     }
+}
 
+#[allow(clippy::too_many_arguments)]
+pub fn update_selected(view: &mut Scene, model: &Model, context: &Context, pointer: &PointerState, is_mouse_over_ui_element: bool, entity: Entity, time: f64, state: &SegmentPointState) {
     // Deselected by clicking elsewhere
     if !is_mouse_over_ui_element && state.is_selected() && pointer.primary_clicked() {
         trace!("Selected segment point deselected");

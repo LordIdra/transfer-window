@@ -19,7 +19,6 @@ mod orbitable;
 mod vessel;
 
 /// The icon trait represents a single 'type' of icon
-/// 
 /// # Priority
 /// Icons are sorted based on a priority system with
 /// multiple levels of priority. Priorities are

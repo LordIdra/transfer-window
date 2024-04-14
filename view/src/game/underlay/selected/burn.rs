@@ -53,14 +53,14 @@ fn burn_adjustment_amount(amount: f64) -> f64 {
     }
 }
 
-pub fn update_selected(view: &mut Scene, model: &Model, events: &mut Vec<Event>, pointer: &PointerState, is_mouse_over_ui_element: bool, screen_rect: Rect, time: f64) {
-    // Remove if expired
+pub fn remove_if_expired(view: &mut Scene, model: &Model, time: f64) {
     if time < model.get_time() {
         trace!("Selected burn expired at time={time}");
         view.selected = Selected::None;
-        return;
     }
+}
 
+pub fn update_selected(view: &mut Scene, model: &Model, events: &mut Vec<Event>, pointer: &PointerState, is_mouse_over_ui_element: bool, screen_rect: Rect) {
     // Deselected by clicking elsewhere
     if !is_mouse_over_ui_element && pointer.primary_clicked() {
         trace!("Selected burn deselected");
