@@ -5,6 +5,7 @@ use transfer_window_model::components::trajectory_component::orbit::Orbit;
 
 const INITIAL_POINT_COUNT: usize = 30;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-4;
+const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
 /// Uses triangle heuristic as described in <https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation>
 pub fn tessellate(interpolate: impl Fn(DVec2, DVec2) -> DVec2, mut points: Vec<DVec2>, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<DVec2> {
@@ -29,8 +30,10 @@ pub fn tessellate(interpolate: impl Fn(DVec2, DVec2) -> DVec2, mut points: Vec<D
         let c = (point2_screen_space - point3_screen_space).magnitude();
         let p = (a + b + c) / 2.0;
         let area = f64::sqrt(p * (p - a) * (p - b) * (p - c));
-
-        let min_distance = f64::min(point1_screen_space.magnitude_squared(), f64::min(point2_screen_space.magnitude_squared(), point3_screen_space.magnitude_squared()));
+        
+        // If the min distance is very small, area / min_distance can get very large, causing tessellation loops
+        // We add EXTRA_MIN_DISTANCE to make sure this doesn't happen 
+        let min_distance = EXTRA_MIN_DISTANCE + f64::min(point1_screen_space.magnitude_squared(), f64::min(point2_screen_space.magnitude_squared(), point3_screen_space.magnitude_squared()));
 
         if area / min_distance > TESSELLATION_THRESHOLD {
             let new_point_1 = interpolate(point1 - absolute_parent_position, point2 - absolute_parent_position);
@@ -84,7 +87,8 @@ pub fn compute_points(orbit: &Orbit, absolute_parent_position: DVec2, camera_cen
         let theta_2 = f64::atan2(point2.y, point2.x);
         orbit.get_position_from_theta(interpolate_angles(theta_1, theta_2))
     };
-    tessellate(interpolate, points, absolute_parent_position, camera_centre, zoom)
+    let x = tessellate(interpolate, points, absolute_parent_position, camera_centre, zoom);
+    x
 }
 
 #[cfg(test)]
