@@ -8,22 +8,25 @@ use crate::game::{underlay::selected::{burn::BurnState, Selected}, Scene};
 use super::Icon;
 
 #[derive(Debug)]
-pub struct Burn {
+pub struct BurnLocked {
     entity: Entity,
     time: f64,
 }
 
-impl Burn {
+impl BurnLocked {
     pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.get_entities(vec![ComponentType::VesselComponent]) {
+            let Some(last_burn) = model.get_trajectory_component(entity).get_final_burn() else {
+                continue;
+            };
+            let last_burn_time = last_burn.get_start_point().get_time();
             for segment in model.get_trajectory_component(entity).get_segments().iter().flatten().rev() {
                 if let Segment::Burn(burn) = segment {
                     let time = burn.get_start_point().get_time();
-                    if time > model.get_time() {
+                    if time > model.get_time() && time != last_burn_time {
                         let icon = Self { entity, time };
                         icons.push(Box::new(icon) as Box<dyn Icon>);
-                        break
                     }
                 }
             }
@@ -32,9 +35,9 @@ impl Burn {
     }
 }
 
-impl Icon for Burn {
+impl Icon for BurnLocked {
     fn get_texture(&self) -> &str {
-        "burn"
+        "burn-locked"
     }
 
     fn get_alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool) -> f32 {
@@ -81,22 +84,8 @@ impl Icon for Burn {
         if !pointer.primary_clicked() {
             return;
         }
-        
-        if let Selected::Burn { entity, time, state } = &mut view.selected {
-            #[allow(clippy::float_cmp)] // time and self.time should be *exactly* the same
-            if *entity == self.entity && *time == self.time {
-                if state.is_selected() {
-                    trace!("Burn icon clicked; switching Selected -> Adjusting");
-                    *state = BurnState::Adjusting;
-                } else if state.is_adjusting() {
-                    trace!("Burn icon clicked; switching Adjusting -> Selected");
-                    *state = BurnState::Selected;
-                }
-                return;
-            }
-        }
 
-        trace!("Burn icon clicked; switching to Selected");
+        trace!("Locked burn icon clicked; switching to Selected");
         view.selected = Selected::Burn { entity: self.entity, time: self.time, state: BurnState::Selected }
     }
 }

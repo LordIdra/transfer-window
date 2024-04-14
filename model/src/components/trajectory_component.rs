@@ -1,7 +1,7 @@
 use log::{error, trace};
 use serde::{Deserialize, Serialize};
 
-use self::segment::Segment;
+use self::{burn::Burn, segment::Segment};
 
 #[cfg(test)]
 mod brute_force_tester;
@@ -29,6 +29,15 @@ impl TrajectoryComponent {
 
     pub fn get_previous_burns(&self) -> usize {
         self.previous_burns
+    }
+
+    pub fn get_final_burn(&self) -> Option<&Burn> {
+        for segment in self.segments.iter().rev().flatten() {
+            if let Segment::Burn(burn) = segment {
+                return Some(burn)
+            }
+        }
+        None
     }
 
     /// Returns the first segment it finds matching the time

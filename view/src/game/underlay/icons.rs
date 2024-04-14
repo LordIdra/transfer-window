@@ -7,9 +7,10 @@ use transfer_window_model::Model;
 
 use crate::game::{util::{add_textured_square, add_textured_square_facing}, Scene};
 
-use self::{adjust_burn::AdjustBurn, burn::Burn, orbitable::Orbitable, vessel::Vessel};
+use self::{adjust_burn::AdjustBurn, burn::Burn, burn_locked::BurnLocked, orbitable::Orbitable, vessel::Vessel};
 
 mod adjust_burn;
+mod burn_locked;
 mod burn;
 mod orbitable;
 mod vessel;
@@ -62,9 +63,10 @@ trait Icon: Debug {
 
 fn get_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, screen_rect: Rect) -> Vec<Box<dyn Icon>> {
     let mut icons: Vec<Box<dyn Icon>> = vec![];
-        icons.append(&mut AdjustBurn::generate(view, model, pointer, screen_rect));
-        icons.append(&mut Burn::generate(model));
-        icons.append(&mut Orbitable::generate(model));
+    icons.append(&mut AdjustBurn::generate(view, model, pointer, screen_rect));
+    icons.append(&mut BurnLocked::generate(model));
+    icons.append(&mut Burn::generate(model));
+    icons.append(&mut Orbitable::generate(model));
     icons.append(&mut Vessel::generate(model));
     icons
 }
