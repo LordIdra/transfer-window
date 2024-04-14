@@ -124,10 +124,12 @@ impl Model {
                         let parent_position = self.get_absolute_position(orbit.get_parent());
                         if let Some(closest_point) = find_closest_point_on_orbit(orbit, point - parent_position, max_distance) {
                             let theta = f64::atan2(closest_point.y, closest_point.x);
-                            let time = orbit.get_time_since_first_periapsis(theta);
+                            let time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
+                            dbg!(time);
                             if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
                                 return Some((entity, time));
                             }
+
                             // If the orbit has a period, we might have calculated an invalid time that's one period behind a valid time
                             if let Some(period) = orbit.get_period() {
                                 let time = time + period;

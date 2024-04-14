@@ -11,6 +11,7 @@ fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
     let new_parent_mass = model.get_mass_component(new_parent).get_mass();
     let position = model.get_trajectory_component(entity).get_end_segment().get_end_position() + model.get_trajectory_component(old_parent).get_end_segment().get_end_position();
     let velocity = model.get_trajectory_component(entity).get_end_segment().get_end_velocity() + model.get_trajectory_component(old_parent).get_end_segment().get_end_velocity();
+    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(time);
     let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
     model.get_trajectory_component_mut(entity).add_segment(segment);
 }
@@ -20,6 +21,7 @@ fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64)
     let mass = model.get_mass_component(entity).get_mass();
     let position = model.get_trajectory_component(entity).get_end_segment().get_end_position() - model.get_trajectory_component(new_parent).get_end_segment().get_end_position();
     let velocity = model.get_trajectory_component(entity).get_end_segment().get_end_velocity() - model.get_trajectory_component(new_parent).get_end_segment().get_end_velocity();
+    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(time);
     let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
     model.get_trajectory_component_mut(entity).add_segment(segment);
 }

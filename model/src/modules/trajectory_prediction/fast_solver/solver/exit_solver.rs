@@ -102,7 +102,7 @@ pub fn solve_for_exit(model: &Model, entity: Entity, start_time: f64, end_time: 
         // Parent cannot be exited as it is a root entity
         return None;
     };
-    let parent_orbit = parent_trajectory_component.get_segment_at_time(start_time).as_orbit();
+    let parent_orbit = parent_trajectory_component.get_first_segment_at_time(start_time).as_orbit();
 
     let encounter_time = if orbit.is_ellipse() {
         find_elliptical_exit_time(orbit, parent_orbit.get_sphere_of_influence(), start_time, end_time)

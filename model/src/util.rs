@@ -15,13 +15,6 @@ pub fn normalize_angle(mut theta: f64) -> f64 {
 /// Returns the closest point to `point` on the given orbit if it is less than `radius` away from the orbit
 /// Returns none if the closest distance to `point` is further than the radius
 /// `point` is assumed to be relative to the parent of the orbit
-/// Strategy:
-
-/// 2) Construct a quartic representing the intersection between the orbit's conic, and a circle centered on
-///    `point` with radius `max_distance`
-/// 3) Solve the quartic
-/// 4) If there are not exactly two solutions, return none
-/// 5) Otherwise, use ITP bounded by the two solutions to find the minimum
 pub fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f64) -> Option<DVec2> {
     let starting_theta = f64::atan2(point.y, point.x);
     let distance = |time: f64| (orbit.get_position_from_theta(orbit.get_theta_from_time(time)) - point).magnitude();
@@ -33,7 +26,8 @@ pub fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f6
         (orbit.get_min_asymptote_theta().unwrap() + 1.0e-2, orbit.get_max_asymptote_theta().unwrap() - 1.0e-2)
     };
 
-    let (mut min_time, mut max_time) = (orbit.get_time_since_last_periapsis(min_theta), orbit.get_time_since_last_periapsis(max_theta));
+    let mut min_time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(min_theta);
+    let mut max_time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(max_theta);
     let (min, max) = (distance_prime(min_time), distance_prime(max_time));
     if min.is_sign_positive() && max.is_sign_positive() || min.is_sign_negative() && max.is_sign_negative() {
         return None;

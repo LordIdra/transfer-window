@@ -26,6 +26,8 @@
 - [1|x] Intelligent burn rendering
 - [1| ] Fast solver for burns
 - [1| ] Warp to burn button
+- [1| ] Why the hell does selecting spacecraft as focus cause freeze
+- [1| ] Fix adjusting burn while spacecraft encounters it causing crash
 - [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
 - [1| ] Visual indicator of how much DV burn will use

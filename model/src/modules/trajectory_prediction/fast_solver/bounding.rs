@@ -16,7 +16,7 @@ pub fn get_initial_windows(model: &Model, entity: Entity, siblings: Vec<Entity>,
     let mut windows = vec![];
 
     for sibling in siblings {
-        let sibling_orbit = model.get_trajectory_component(sibling).get_segment_at_time(start_time).as_orbit();
+        let sibling_orbit = model.get_trajectory_component(sibling).get_first_segment_at_time(start_time).as_orbit();
         assert!(sibling_orbit.is_ellipse(), "Orbitable is on hyperbolic trajectory");
         if orbit.is_ellipse() {
             for window in get_ellipse_bound(orbit, sibling_orbit, sibling, start_time) {

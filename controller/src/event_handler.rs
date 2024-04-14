@@ -152,7 +152,7 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let _span = tracy_client::span!("Adjust burn");
     let model = controller.get_model_mut();
     
-    let end_time = model.get_trajectory_component_mut(entity).get_segment_at_time(time).get_end_time();
+    let end_time = model.get_trajectory_component_mut(entity).get_last_segment_at_time(time).get_end_time();
     model.get_trajectory_component_mut(entity).remove_segments_after(end_time);
     model.get_trajectory_component_mut(entity).get_end_segment_mut().as_burn_mut().adjust(amount);
 
@@ -163,7 +163,7 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let mass = model.get_mass_component(entity).get_mass();
 
     // Needs to be recalculated after we adjust the burn
-    let end_time = model.get_trajectory_component_mut(entity).get_segment_at_time(time).get_end_time();
+    let end_time = model.get_trajectory_component_mut(entity).get_last_segment_at_time(time).get_end_time();
 
     let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
 

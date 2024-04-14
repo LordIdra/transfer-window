@@ -52,7 +52,7 @@ impl Icon for Burn {
     }
 
     fn get_position(&self, _view: &Scene, model: &Model) -> DVec2 {
-        let burn = model.get_trajectory_component(self.entity).get_segment_at_time(self.time).as_burn();
+        let burn = model.get_trajectory_component(self.entity).get_last_segment_at_time(self.time).as_burn();
         model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position()
     }
 

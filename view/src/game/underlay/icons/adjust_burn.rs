@@ -27,7 +27,7 @@ pub struct AdjustBurn {
 
 impl AdjustBurn {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
-        let burn = model.get_trajectory_component(entity).get_segment_at_time(time).as_burn();
+        let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
         let burn_position = model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position();
         let arrow_position = burn.get_rotation_matrix() * direction.get_vector();
         let mut position = burn_position + OFFSET * arrow_position / view.camera.get_zoom();
@@ -51,7 +51,7 @@ impl AdjustBurn {
         let mut icons = vec![];
         if let Selected::Burn { entity, time, state } = view.selected.clone() {
             if state.is_adjusting() || state.is_dragging() {
-                let burn = model.get_trajectory_component(entity).get_segment_at_time(time).as_burn();
+                let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
                 let time = burn.get_start_point().get_time();
                 burn.get_tangent_direction();
                 let icon = Self::new(view, model, entity, time, BurnAdjustDirection::Prograde, pointer, screen_rect);
@@ -68,7 +68,7 @@ impl AdjustBurn {
     }
 
     fn get_burn<'a>(&self, model: &'a Model) -> &'a Burn {
-        model.get_trajectory_component(self.entity).get_segment_at_time(self.time).as_burn()
+        model.get_trajectory_component(self.entity).get_last_segment_at_time(self.time).as_burn()
     }
 }
 

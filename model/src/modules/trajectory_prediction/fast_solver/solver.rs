@@ -22,7 +22,7 @@ fn get_final_siblings(model: &Model, candidates: &HashSet<Entity>, entity: Entit
         if entity == *other_entity {
             continue;
         }
-        let other_end_segment = model.get_trajectory_component(*other_entity).get_segment_at_time(time);
+        let other_end_segment = model.get_trajectory_component(*other_entity).get_first_segment_at_time(time);
         if parent != other_end_segment.get_parent() {
             continue;
         }

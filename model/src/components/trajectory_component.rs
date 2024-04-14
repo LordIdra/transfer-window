@@ -1,4 +1,4 @@
-use log::error;
+use log::{error, trace};
 use serde::{Deserialize, Serialize};
 
 use self::segment::Segment;
@@ -21,9 +21,26 @@ impl TrajectoryComponent {
         &self.segments
     }
 
+    /// Returns the first segment it finds matching the time
+    /// If the time is exactly on the border between two segments,
+    /// returns the first one
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn get_segment_at_time(&self, time: f64) -> &Segment {
+    pub fn get_first_segment_at_time(&self, time: f64) -> &Segment {
+        for segment in self.segments.iter().flatten() {
+            if segment.get_start_time() <= time && segment.get_end_time() >= time {
+                return segment
+            }
+        }
+        panic!("No segment exists at the given time")
+    }
+
+    /// Returns the first segment it finds matching the time
+    /// If the time is exactly on the border between two segments,
+    /// returns the last one
+    /// # Panics
+    /// Panics if the trajectory has no segment at the given time
+    pub fn get_last_segment_at_time(&self, time: f64) -> &Segment {
         for segment in self.segments.iter().flatten() {
             if segment.get_start_time() <= time && segment.get_end_time() > time {
                 return segment
@@ -117,7 +134,9 @@ impl TrajectoryComponent {
     pub fn next(&mut self, time: f64, delta_time: f64) {
         self.get_current_segment_mut().next(delta_time);
         while self.get_current_segment().is_finished() {
+            trace!("Segment finished at time={time}");
             let overshot_time = self.get_current_segment().get_overshot_time(time);
+            self.segments[self.current_index] = None;
             self.current_index += 1;
             self.get_current_segment_mut().next(overshot_time);
         }
@@ -169,10 +188,10 @@ mod test {
         trajectory.add_segment(Segment::Orbit(orbit_2));
 
         assert!(trajectory.current_index == 0);
-        assert!(trajectory.get_segment_at_time(105.0).get_start_time() == 99.9);
+        assert!(trajectory.get_first_segment_at_time(105.0).get_start_time() == 99.9);
 
-        let end_position_1 = trajectory.get_segment_at_time(43.65).get_end_position();
-        let end_position_2 = trajectory.get_segment_at_time(172.01).get_end_position();
+        let end_position_1 = trajectory.get_first_segment_at_time(43.65).get_end_position();
+        let end_position_2 = trajectory.get_first_segment_at_time(172.01).get_end_position();
         let m1 = end_position_1.magnitude();
         let m2 = end_position_2.magnitude();
         let difference = (m1 - m2) / m1;

@@ -151,7 +151,7 @@ fn update_burn(view: &mut Scene, model: &Model, events: &mut Vec<Event>, pointer
     // Do drag adjustment
     if let Selected::Burn { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
         if let Some(mouse_position) = pointer.latest_pos() {
-            let burn = model.get_trajectory_component(entity).get_segment_at_time(time).as_burn();
+            let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
             let burn_position = model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position();
             let burn_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, screen_rect) - burn_position;
             let burn_to_arrow = burn.get_rotation_matrix() * direction.get_vector();
@@ -170,7 +170,7 @@ fn draw_selected(view: &mut Scene, model: &Model) {
         };
         let mut vertices = vec![];
         let trajectory_component = model.get_trajectory_component(entity);
-        let segment = trajectory_component.get_segment_at_time(time);
+        let segment = trajectory_component.get_last_segment_at_time(time);
         let point = model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(time);
         add_textured_square(&mut vertices, point, select_radius, color);
         view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);

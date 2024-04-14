@@ -1,3 +1,4 @@
+use log::trace;
 use nalgebra_glm::{vec2, DMat2, DVec2};
 use serde::{Deserialize, Serialize};
 
@@ -84,12 +85,13 @@ impl Burn {
             let delta_time = time_after_start % BURN_TIME_STEP;
             closest_previous_point.next(delta_time, self.get_absolute_acceleration())
         } else {
+            trace!("bruh");
             self.get_end_point().clone()
         }
     }
 
     pub fn is_finished(&self) -> bool {
-        self.current_point.get_time() > self.get_end_point().get_time()
+        self.current_point.get_time() >= self.get_end_point().get_time()
     }
 
     pub fn get_overshot_time(&self, time: f64) -> f64 {
