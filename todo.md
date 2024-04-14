@@ -39,11 +39,11 @@
 - [1|x] Visual indicator of how much DV burn will use
 - [1|x] Fix icons showing for burns that are underway
 - [1|x] The next segment should take precedence over orbits when rendering (ie render segments backwards)
-- [1| ] Allow deleting burns
-- [1| ] Adjusting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
+- [1|x] Allow deleting burns
+- [1|x] Fix selection breaking down on high eccentricity orbits
+- [1| ] Adjusting/deleting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
 
-- [1| ] Fix selection breaking down on high eccentricity orbits
 
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel

@@ -1,7 +1,7 @@
 use std::{f64::consts::PI, mem::swap};
 
-use nalgebra_glm::DVec2;
-use transfer_window_common::numerical_methods::itp::itp;
+use nalgebra_glm::{vec2, DMat2, DVec2};
+use transfer_window_common::numerical_methods::{closest_ellipse_point::solve_for_closest_point_on_ellipse, itp::itp};
 
 use crate::components::trajectory_component::orbit::Orbit;
 
@@ -12,22 +12,46 @@ pub fn normalize_angle(mut theta: f64) -> f64 {
     (theta + 2.0 * PI) % (2.0 * PI)
 }
 
+/// Returns a function that will return the closest point on the given orbit from an arbitrary point
+pub fn make_closest_point_on_ellipse_orbit_function(orbit: &Orbit) -> impl Fn(DVec2) -> DVec2 + '_ {
+    assert!(orbit.is_ellipse());
+    let a = orbit.get_semi_major_axis();
+    let b = orbit.get_semi_minor_axis();
+    let aop = orbit.get_argument_of_periapsis();
+    let periapsis_position = orbit.get_position_from_theta(aop);
+    let periapsis_to_center_vector = -orbit.get_semi_major_axis() * vec2(f64::cos(aop), f64::sin(aop));
+    let center = periapsis_position + periapsis_to_center_vector;
+    let rotate_aop = DMat2::new(aop.cos(), -aop.sin(), aop.sin(), aop.cos());
+    let rotate_negative_aop = DMat2::new(aop.cos(), aop.sin(), -aop.sin(), aop.cos());
+
+    move |point: DVec2| {
+        let point = rotate_negative_aop * (point - center);
+        let point = solve_for_closest_point_on_ellipse(a, b, point);
+        rotate_aop * point + center
+    }
+}
+
 /// Returns the closest point to `point` on the given orbit if it is less than `radius` away from the orbit
 /// Returns none if the closest distance to `point` is further than the radius
 /// `point` is assumed to be relative to the parent of the orbit
 pub fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f64) -> Option<DVec2> {
-    let starting_theta = f64::atan2(point.y, point.x);
+    if orbit.is_ellipse() {
+        let position = make_closest_point_on_ellipse_orbit_function(orbit)(point);
+        if (position - point).magnitude() < max_distance {
+            return Some(position);
+        }
+        return None;
+    }
+
     let distance = |time: f64| (orbit.get_position_from_theta(orbit.get_theta_from_time(time)) - point).magnitude();
     let distance_prime = |time: f64| (distance(time + 1.0e-2) - distance(time)) / 1.0e-2;
-
-    let (min_theta, max_theta) = if orbit.is_ellipse() {
-        (starting_theta - 0.7, starting_theta + 0.7)
-    } else {
-        (orbit.get_min_asymptote_theta().unwrap() + 1.0e-2, orbit.get_max_asymptote_theta().unwrap() - 1.0e-2)
-    };
+    
+    let min_theta = orbit.get_min_asymptote_theta().unwrap() + 1.0e-2;
+    let max_theta = orbit.get_max_asymptote_theta().unwrap() - 1.0e-2;
 
     let mut min_time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(min_theta);
     let mut max_time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(max_theta);
+
     let (min, max) = (distance_prime(min_time), distance_prime(max_time));
     if min.is_sign_positive() && max.is_sign_positive() || min.is_sign_negative() && max.is_sign_negative() {
         return None;
@@ -37,16 +61,11 @@ pub fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f6
         swap(&mut min_time, &mut max_time);
     }
 
-    if orbit.is_ellipse() && min_time > max_time {
-        max_time += orbit.get_period().unwrap();
-    }
-
     let time = itp(&distance_prime, min_time, max_time);
     let position = orbit.get_position_from_theta(orbit.get_theta_from_time(time));
     if (position - point).magnitude() < max_distance {
         return Some(position);
     }
-    
     None
 }
 
