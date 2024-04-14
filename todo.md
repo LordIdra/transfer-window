@@ -24,7 +24,7 @@
 - [1|x] Burn can be adjusted (at all)
 - [1|x] Better burn adjustment system
 - [1|x] Intelligent burn rendering
-- [1| ] Fast solver for burns
+- [1|x] Fast solver for burns
 - [1| ] Warp to burn button
 - [1| ] Why the hell does selecting spacecraft as focus cause freeze
 - [1| ] Fix adjusting burn while spacecraft encounters it causing crash

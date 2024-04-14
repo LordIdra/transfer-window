@@ -6,28 +6,29 @@ mod bounding;
 pub mod solver;
 
 fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
+    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(time);
     let old_parent = model.get_trajectory_component(entity).get_end_segment().get_parent();
     let mass = model.get_mass_component(entity).get_mass();
     let new_parent_mass = model.get_mass_component(new_parent).get_mass();
-    let position = model.get_trajectory_component(entity).get_end_segment().get_end_position() + model.get_trajectory_component(old_parent).get_end_segment().get_end_position();
-    let velocity = model.get_trajectory_component(entity).get_end_segment().get_end_velocity() + model.get_trajectory_component(old_parent).get_end_segment().get_end_velocity();
-    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(time);
+    let position = model.get_trajectory_component(entity).get_end_segment().get_end_position() + model.get_trajectory_component(old_parent).get_first_segment_at_time(time).get_position_at_time(time);
+    let velocity = model.get_trajectory_component(entity).get_end_segment().get_end_velocity() + model.get_trajectory_component(old_parent).get_first_segment_at_time(time).get_velocity_at_time(time);
     let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
     model.get_trajectory_component_mut(entity).add_segment(segment);
 }
 
 fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
+    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(time);
     let new_parent_mass = model.get_mass_component(new_parent).get_mass();
     let mass = model.get_mass_component(entity).get_mass();
-    let position = model.get_trajectory_component(entity).get_end_segment().get_end_position() - model.get_trajectory_component(new_parent).get_end_segment().get_end_position();
-    let velocity = model.get_trajectory_component(entity).get_end_segment().get_end_velocity() - model.get_trajectory_component(new_parent).get_end_segment().get_end_velocity();
-    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(time);
+    let position = model.get_trajectory_component(entity).get_end_segment().get_end_position() - model.get_trajectory_component(new_parent).get_first_segment_at_time(time).get_position_at_time(time);
+    let velocity = model.get_trajectory_component(entity).get_end_segment().get_end_velocity() - model.get_trajectory_component(new_parent).get_first_segment_at_time(time).get_velocity_at_time(time);
     let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
     model.get_trajectory_component_mut(entity).add_segment(segment);
 }
 
-/// This detachment of encounter solving and application allows the solver to be much more easily tested
-/// As well as leading to cleaner overall design
+/// This detachment of encounter solving and application 
+/// allows the solver to be much more easily tested, as well 
+/// as leading to cleaner overall design
 pub fn apply_encounter(model: &mut Model, encounter: &Encounter) {
     match encounter.get_type() {
         EncounterType::Entrance => do_entrance(model, encounter.get_entity(), encounter.get_new_parent(), encounter.get_time()),
