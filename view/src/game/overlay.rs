@@ -47,4 +47,20 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
             });
         }
     }
+
+    if let Selected::Burn { entity, time, state } = view.selected.clone() {
+        if state.is_selected() {
+            Window::new("Selected burn")
+                .title_bar(false)
+                .resizable(false)
+                .anchor(Align2::LEFT_TOP, epaint::vec2(30.0, 30.0))
+                .show(context, |ui| {
+                    ui.label(model.get_name_component(entity).get_name());
+                    ui.label("T-".to_string() + format_time(time - model.get_time()).as_str());
+                    if ui.button("Warp to burn").clicked() {
+                        events.push(Event::StartWarp { end_time: time });
+                    }
+            });
+        }
+    }
 }
