@@ -74,7 +74,7 @@ impl App for Controller {
         self.last_frame = Instant::now();
 
         let events = match &mut self.view {
-            View::GameScene(scene) => scene.update(self.model.as_ref().unwrap(), context, &frame),
+            View::GameScene(scene) => scene.update(self.model.as_ref().unwrap(), context, frame),
             View::MenuScene(scene) => scene.update(context),
         };
 

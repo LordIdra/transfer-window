@@ -150,7 +150,7 @@ impl Model {
                     let time = time + period;
                     if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
                         closest_point = Some((entity, time));
-                        closest_distance = distance
+                        closest_distance = distance;
                     }
                 }
             }

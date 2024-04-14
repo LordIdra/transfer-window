@@ -1,4 +1,4 @@
-//! https://github.com/emilk/egui/blob/78d95f430b09e3040d3f383fde8fea2ae1592afb/crates/egui_demo_app/src/frame_history.rs
+//! <https://github.com/emilk/egui/blob/78d95f430b09e3040d3f383fde8fea2ae1592afb/crates/egui_demo_app/src/frame_history.rs>
 
 use eframe::emath::History;
 
