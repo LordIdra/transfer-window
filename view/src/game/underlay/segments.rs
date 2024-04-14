@@ -10,24 +10,17 @@ mod orbit;
 const RADIUS: f64 = 0.8;
 fn get_orbit_color(index: usize) -> Rgba {
     let colors = [
-        Rgba::from_srgba_premultiplied(0, 150, 255, 255),
-        Rgba::from_srgba_premultiplied(0, 200, 255, 255),
-        Rgba::from_srgba_premultiplied(150, 205, 220, 255),
-        Rgba::from_srgba_premultiplied(75, 170, 200, 255),
-        Rgba::from_srgba_premultiplied(30, 130, 180, 255),
+        Rgba::from_srgba_premultiplied(0, 255, 255, 255),
+        Rgba::from_srgba_premultiplied(125, 235, 255, 255),
+        Rgba::from_srgba_premultiplied(115, 205, 255, 255),
+        Rgba::from_srgba_premultiplied(70, 160, 245, 255),
+        Rgba::from_srgba_premultiplied(40, 110, 245, 255),
     ];
-    colors[index % (colors.len() - 1)]
+    colors[colors.len() - (index % (colors.len() - 1))]
 }
 
-fn get_burn_color(index: usize) -> Rgba {
-    let colors = [
-        Rgba::from_srgba_premultiplied(255, 0, 0, 255),
-        Rgba::from_srgba_premultiplied(220, 110, 100, 255),
-        Rgba::from_srgba_premultiplied(200, 55, 35, 255),
-        Rgba::from_srgba_premultiplied(160, 50, 40, 255),
-        Rgba::from_srgba_premultiplied(235, 65, 65, 255),
-    ];
-    colors[index % (colors.len() - 1)]
+fn get_burn_color() -> Rgba {
+    Rgba::from_srgba_premultiplied(255, 0, 0, 255)
 }
 
 /// Draws a line between two points so that all the lines on a segment are connected together
@@ -69,7 +62,6 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
     let zoom = view.camera.get_zoom();
     let trajectory_component = model.get_trajectory_component(entity);
     let mut orbit_index = trajectory_component.get_previous_orbits() + trajectory_component.get_remaining_orbits();
-    let mut burn_index = trajectory_component.get_previous_burns() + trajectory_component.get_remaining_burns();
     // Reverse to make sure that the segments are rendered in order
     // of how soon they are, so that closer segments take priority
     // over further ones
@@ -84,9 +76,8 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
                 orbit_index -= 1;
             },
             Segment::Burn(burn) => {
-                let color = get_burn_color(burn_index);
+                let color = get_burn_color();
                 draw_from_points(view, &burn::compute_points(burn, absolute_parent_position, camera_centre, zoom), zoom, color);
-                burn_index -= 1;
             }
         };
     }

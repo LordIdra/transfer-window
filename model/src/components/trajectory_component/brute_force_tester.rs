@@ -16,15 +16,20 @@ impl BruteForceTester {
         Self { parent_mass, position, velocity, constant_acceleration, time: 0.0, time_step }
     }
 
+    fn step(&mut self, dt: f64) {
+        let gravity_acceleration = -self.position.normalize() * GRAVITATIONAL_CONSTANT * self.parent_mass / self.position.magnitude_squared();
+        let acceleration = self.constant_acceleration + gravity_acceleration;
+        self.time += dt;
+        self.velocity += acceleration * dt;
+        self.position += self.velocity * dt;
+    }
+
     pub fn update(&mut self, duration: f64) {
         let end_time = self.time + duration;
-        while self.time < end_time {
-            let gravity_acceleration = -self.position.normalize() * GRAVITATIONAL_CONSTANT * self.parent_mass / self.position.magnitude_squared();
-            let acceleration = self.constant_acceleration + gravity_acceleration;
-            self.time += self.time_step;
-            self.velocity += acceleration * self.time_step;
-            self.position += self.velocity * self.time_step;
+        while self.time + self.time_step < end_time {
+            self.step(self.time_step);
         }
+        self.step(end_time - self.time);
     }
 
     pub fn get_position(&self) -> DVec2 {
