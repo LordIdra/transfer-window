@@ -3,7 +3,7 @@ use transfer_window_model::Model;
 
 use crate::{events::Event, game::{underlay::selected::Selected, util::format_time, Scene}};
 
-pub fn update(view: &mut Scene, context: &Context, model: &Model, events: &mut Vec<Event>) {
+pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     let Selected::Burn { entity, time, state: _ } = view.selected.clone() else { 
         return
     };

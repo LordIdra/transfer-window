@@ -4,7 +4,7 @@ use eframe::{egui::{Align2, Context, Window}, epaint};
 
 use transfer_window_model::Model;
 
-pub fn update(context: &Context, model: &Model) {
+pub fn update(model: &Model, context: &Context) {
     Window::new("Time")
         .title_bar(false)
         .resizable(false)

@@ -7,9 +7,10 @@ use super::Scene;
 
 mod fps;
 mod paused;
-mod time;
-mod selected_point;
+mod scale;
 mod selected_burn;
+mod selected_point;
+mod time;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]
@@ -17,7 +18,8 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
     
     fps::update(view, context);
     paused::update(model, context);
-    time::update(context, model);
-    selected_point::update(view, context, model, events);
-    selected_burn::update(view, context, model, events);
+    scale::update(view, context);
+    time::update(model, context);
+    selected_point::update(view, model, context, events);
+    selected_burn::update(view, model, context, events);
 }

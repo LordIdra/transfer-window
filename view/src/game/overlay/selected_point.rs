@@ -42,7 +42,7 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
     }
 }
 
-pub fn update(view: &mut Scene, context: &Context, model: &Model, events: &mut Vec<Event>) {
+pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     let Selected::Point { entity, time, state } = view.selected.clone() else {
         return;
     };

@@ -36,7 +36,7 @@ pub fn new_game(controller: &mut Controller) {
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_mass_component(MassComponent::new(5.9722e24))
-        .with_orbitable_component(OrbitableComponent::new(1.0))
+        .with_orbitable_component(OrbitableComponent::new(0.5))
         .with_trajectory_component(trajectory_component));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
