@@ -3,8 +3,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::Model;
 
-const MIN_LEVEL: i32 = 1;
-const MAX_LEVEL: i32 = 10;
+const LEVELS: [f64; 13] = [
+    1.0, 5.0, 15.0,  // 1s, 5s, 15s
+    60.0, 300.0, 900.0, // 1m, 5m, 15m
+    3600.0, 21600.0, // 1h, 6h
+    86400.0, 432_000.0, 2_160_000.0, 8_640_000.0, // 1d, 5d, 25d, 100d
+    31_536_000.0 // 1y
+];
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum TimeStep {
@@ -19,7 +24,7 @@ impl TimeStep {
         }
 
         match self {
-            TimeStep::Level { level, paused: _ } => 5.0_f64.powi(*level - 1),
+            TimeStep::Level { level, paused: _ } => LEVELS[(*level - 1) as usize],
             TimeStep::Warp { speed, paused: _ } => *speed,
         }
     }
@@ -40,7 +45,7 @@ impl TimeStep {
     pub fn increase_level(&mut self) {
         match self {
             TimeStep::Level { level, paused: _ } => {
-                if *level < MAX_LEVEL {
+                if *level < LEVELS.len() as i32 {
                     *level += 1;
                 } else {
                     trace!("Could not increase time step level past max");
@@ -56,7 +61,7 @@ impl TimeStep {
     pub fn decrease_level(&mut self) {
         match self {
             TimeStep::Level { level, paused: _ } => {
-                if *level > MIN_LEVEL {
+                if *level > 1 {
                     *level -= 1;
                 } else {
                     trace!("Could not decrease time step level past min");

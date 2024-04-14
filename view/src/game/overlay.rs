@@ -8,7 +8,6 @@ use crate::events::Event;
 use super::Scene;
 
 mod fps;
-mod paused;
 mod scale;
 mod selected_burn;
 mod selected_point;
@@ -28,7 +27,6 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
     });
     
     fps::update(view, context);
-    paused::update(model, context);
     scale::update(view, context);
     time::update(model, context);
     selected_point::update(view, model, context, events);

@@ -41,9 +41,9 @@
 - [1|x] The next segment should take precedence over orbits when rendering (ie render segments backwards)
 - [1|x] Allow deleting burns
 - [1|x] Fix selection breaking down on high eccentricity orbits
+- [1|x] More logical time step system
 - [1| ] Adjusting/deleting a burn with subsequent burns deletes them, but requires confirmation by clicking unlock button
 - [1| ] Hovering over unlock button shows text informing player that adjusting this burn will delete future burns (and click to confirm)
-
 
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
@@ -53,7 +53,6 @@
 
 - [1| ] Burns using more DV than possible display a warning indicator
 - [1| ] Better color scheme for orbits/burns
-- [1| ] More logical time step system
 
 - [1| ] Games have names
 - [1| ] Choose game to load
