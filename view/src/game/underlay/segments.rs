@@ -16,7 +16,7 @@ fn get_orbit_color(index: usize) -> Rgba {
         Rgba::from_srgba_premultiplied(70, 160, 245, 255),
         Rgba::from_srgba_premultiplied(40, 110, 245, 255),
     ];
-    colors[colors.len() - (index % (colors.len() - 1))]
+    colors[index % (colors.len() - 1)]
 }
 
 fn get_burn_color() -> Rgba {
