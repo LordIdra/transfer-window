@@ -11,6 +11,7 @@ mod celestial_objects;
 mod icons;
 mod segments;
 pub mod selected;
+mod vessel_menu;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]
@@ -20,4 +21,5 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
     selected::remove_if_expired(view, model);
     let is_mouse_over_any_icon = icons::draw(view, model, context);
     selected::update(view, model, context, events, is_mouse_over_any_icon);
+    vessel_menu::update(view, model, context, events, is_mouse_over_any_icon);
 }

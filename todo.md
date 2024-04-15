@@ -55,7 +55,7 @@
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
 - [1| ] Target is highlighted/circled
 - [1| ] Show closest encounter for target and selected
-- [1| ] Deselect target when selected deselected (word salad)
+- [1| ] Allow vessels to be deleted (oh god)
 
 - [1| ] Games have names
 - [1| ] Choose game to load
