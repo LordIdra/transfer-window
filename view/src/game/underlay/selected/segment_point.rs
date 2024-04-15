@@ -43,12 +43,16 @@ pub fn update_selected(view: &mut Scene, model: &Model, context: &Context, point
 
     // Update if hovered
     if let Some(latest_window) = pointer.latest_pos() {
-        if !is_mouse_over_ui_element && state.is_hover() {
-            let select_distance = SELECT_DISTANCE / view.camera.get_zoom();
-            let latest_world = view.camera.window_space_to_world_space(model, latest_window, context.screen_rect());
-            view.selected = match model.get_closest_point_on_trajectory(latest_world, select_distance) {
-                Some((entity, time)) => Selected::Point { entity, time, state: SegmentPointState::Hover },
-                None => Selected::None,
+        if state.is_hover() {
+            if is_mouse_over_ui_element {
+                view.selected = Selected::None;
+            } else {
+                let select_distance = SELECT_DISTANCE / view.camera.get_zoom();
+                let latest_world = view.camera.window_space_to_world_space(model, latest_window, context.screen_rect());
+                view.selected = match model.get_closest_point_on_trajectory(latest_world, select_distance) {
+                    Some((entity, time)) => Selected::Point { entity, time, state: SegmentPointState::Hover },
+                    None => Selected::None,
+                }
             }
         }
     }

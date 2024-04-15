@@ -48,7 +48,8 @@
 - [1|x] Periapsis/apoapsis indicators
 - [1|x] Fix current segment does not exist nonsense
 - [1|x] Just fade icons when overlapped instead of hiding completely 
-- [1| ] Completely deselect when UI hovered
+- [1|x] Completely deselect segment point when UI hovered
+- [1| ] Dim P/A icons when moused over and don't count as hovered
 - [1| ] More robust logging to find/fix issues with solver, it keeps panicking
 - [1| ] Hide all child icons and segments of object when zoomed out far enough
 
