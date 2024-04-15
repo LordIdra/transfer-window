@@ -82,9 +82,7 @@ impl Burn {
     pub fn get_point_at_time(&self, time: f64) -> BurnPoint {
         let time_after_start = time - self.get_start_point().get_time();
         let mut index = (time_after_start / BURN_TIME_STEP) as usize;
-        if index != 0 {
-            index -= 1;
-        }
+        index = index.saturating_sub(1);
         if let Some(closest_previous_point) = self.points.get(index) {
             let delta_time = time_after_start % BURN_TIME_STEP;
             closest_previous_point.next(delta_time, self.get_absolute_acceleration())
