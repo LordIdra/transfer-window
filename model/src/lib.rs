@@ -1,12 +1,8 @@
 use std::collections::HashSet;
 
-use components::{trajectory_component::segment::Segment, vessel_component::VesselComponent};
-use log::error;
-use modules::trajectory_prediction;
-use nalgebra_glm::{vec2, DVec2};
+use components::vessel_component::VesselComponent;
 use serde::{Deserialize, Serialize};
 use systems::{time::{self, TimeStep}, trajectory_update, warp_update_system::{self, TimeWarp}};
-use util::find_closest_point_on_orbit;
 
 use self::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
@@ -14,7 +10,7 @@ pub const SEGMENTS_TO_PREDICT: usize = 4;
 
 pub mod components;
 mod debug;
-mod modules;
+pub mod api;
 pub mod storage;
 mod systems;
 mod util;
@@ -55,6 +51,8 @@ impl Model {
     /// # Errors
     /// Forwards serde deserialization error if deserialization fails
     pub fn deserialize(serialized: &str) -> Result<Self, String> {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Deserialize");
         match serde_json::from_str(serialized) {
             Ok(model) => Ok(model),
             Err(error) => Err(error.to_string()),
@@ -64,6 +62,8 @@ impl Model {
     /// # Errors
     /// Forwards serde serialization error if serialization fails
     pub fn serialize(&self) -> Result<String, String> {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Serialize");
         match serde_json::to_string(self) {
             Ok(serialized) => Ok(serialized),
             Err(error) => Err(error.to_string()),
@@ -76,118 +76,6 @@ impl Model {
         warp_update_system::update(self, dt);
         time::update(self, dt);
         trajectory_update::update(self, dt);
-    }
-
-    pub fn toggle_paused(&mut self) {
-        self.time_step.toggle_paused();
-    }
-
-    pub fn increase_time_step_level(&mut self) {
-        self.time_step.increase_level();
-    }
-
-    pub fn decrease_time_step_level(&mut self) {
-        self.time_step.decrease_level();
-    }
-
-    pub fn start_warp(&mut self, end_time: f64) {
-        self.warp = Some(TimeWarp::new(self.time, end_time));
-    }
-
-    pub fn get_time_step(&self) -> &TimeStep {
-        &self.time_step
-    }
-
-    pub fn get_time(&self) -> f64 {
-        self.time
-    }
-
-    pub fn get_position(&self, entity: Entity) -> Option<DVec2> {
-        if let Some(stationary_component) = self.try_get_stationary_component(entity) {
-            return Some(stationary_component.get_position())
-        }
-
-        if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
-            return Some(trajectory_component.get_current_segment().get_current_position())
-        }
-
-        None
-    }
-
-    /// Returns the entity and time of the closest point on ANY segment anywhere provided the closest
-    /// distance from the point to a segment is less than `max_distance`
-    /// Short circuits; if there are multiple points, the first one found is returned
-    pub fn get_closest_point_on_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
-        let mut closest_point = None;
-        let mut closest_distance = f64::MAX;
-        for entity in self.get_entities(vec![ComponentType::TrajectoryComponent]) {
-            for segment in self.get_trajectory_component(entity).get_segments().iter().flatten() {
-                let Segment::Orbit(orbit) = segment else { 
-                    continue 
-                };
-                
-                let parent_position = self.get_absolute_position(orbit.get_parent());
-                let point = point - parent_position;
-                let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {
-                    continue;
-                };
-
-                let distance = (closest_position - point).magnitude();
-                let theta = f64::atan2(closest_position.y, closest_position.x);
-                let time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
-                if distance > closest_distance {
-                    continue
-                }
-
-                closest_distance = distance;
-                if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
-                    closest_point = Some((entity, time));
-                    closest_distance = distance;
-                    continue;
-                }
-                
-                if let Some(period) = orbit.get_period() {
-                    // If the orbit has a period, we might have calculated an invalid time that's one period behind a valid time
-                    let time = time + period;
-                    if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
-                        closest_point = Some((entity, time));
-                        closest_distance = distance;
-                    }
-                }
-            }
-        }
-
-        closest_point
-    }
-
-    #[allow(clippy::missing_panics_doc)]
-    pub fn get_absolute_position(&self, entity: Entity) -> DVec2 {
-        if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
-            let current_segment = trajectory_component.get_current_segment();
-            return self.get_absolute_position(current_segment.get_parent()) + current_segment.get_current_position();
-        }
-
-        if let Some(stationary_component) = self.try_get_stationary_component(entity) {
-            return stationary_component.get_position();
-        }
-
-        error!("Request to get absolute position of entity without trajectory or stationary components");
-        panic!("Error recoverable, but exiting anyway before something bad happens");
-    }
-
-    #[allow(clippy::missing_panics_doc)]
-    pub fn get_absolute_velocity(&self, entity: Entity) -> DVec2 {
-        if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
-            let current_segment = trajectory_component.get_current_segment();
-            return self.get_absolute_velocity(current_segment.get_parent()) + current_segment.get_current_velocity();
-        }
-
-        if self.try_get_stationary_component(entity).is_some() {
-            return vec2(0.0, 0.0);
-        }
-
-        error!("Request to get absolute position of entity without trajectory or stationary components");
-        panic!("Error recoverable, but exiting anyway before something bad happens");
     }
 
     pub fn get_entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
@@ -204,10 +92,6 @@ impl Model {
             entities.retain(|entity| other_entities.contains(entity));
         }
         entities
-    }
-
-    pub fn predict(&mut self, entity: Entity, end_time: f64, segment_count: usize) {
-        trajectory_prediction::predict(self, entity, end_time, segment_count);
     }
 
     pub fn allocate(&mut self, entity_builder: EntityBuilder) -> Entity {

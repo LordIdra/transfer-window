@@ -3132,7 +3132,6 @@ dependencies = [
  "kurbo",
  "log",
  "nalgebra-glm",
- "tracing-tracy",
  "tracy-client",
 ]
 
@@ -3162,7 +3161,6 @@ dependencies = [
  "rust-kepler-solver",
  "serde",
  "serde_json",
- "tracing-tracy",
  "tracy-client",
  "transfer-window-common",
 ]
@@ -3175,7 +3173,6 @@ dependencies = [
  "image 0.25.0",
  "log",
  "nalgebra-glm",
- "tracing-tracy",
  "tracy-client",
  "transfer-window-common",
  "transfer-window-model",
