@@ -44,7 +44,7 @@ pub fn new_game(controller: &mut Controller) {
     let mut orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0);
     orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
-    let _moon = model.allocate(EntityBuilder::default()
+    let moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
         .with_mass_component(MassComponent::new(0.07346e24))
         .with_orbitable_component(OrbitableComponent::new(1737.4e3))
@@ -54,8 +54,18 @@ pub fn new_game(controller: &mut Controller) {
     let mut orbit = Orbit::new(earth, 1.0e4, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
     orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
-    let _spacecraft = model.allocate(EntityBuilder::default()
-        .with_name_component(NameComponent::new("Spacecraft".to_string()))
+    let _spacecraft_1 = model.allocate(EntityBuilder::default()
+        .with_name_component(NameComponent::new("Spacecraft 1".to_string()))
+        .with_mass_component(MassComponent::new(1.0e4))
+        .with_vessel_component(VesselComponent::new())
+        .with_trajectory_component(trajectory_component));
+
+    let mut trajectory_component = TrajectoryComponent::default();
+    let mut orbit = Orbit::new(moon, 1.0e4, 0.07346e24, vec2(0.3e8, 0.0), vec2(0.0, 4.0e2), 0.0);
+    orbit.end_at(1.0e10);
+    trajectory_component.add_segment(Segment::Orbit(orbit));
+    let _spacecraft_2 = model.allocate(EntityBuilder::default()
+        .with_name_component(NameComponent::new("Spacecraft 2".to_string()))
         .with_mass_component(MassComponent::new(1.0e4))
         .with_vessel_component(VesselComponent::new())
         .with_trajectory_component(trajectory_component));
