@@ -10,7 +10,7 @@ use util::find_closest_point_on_orbit;
 
 use self::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
-pub const SEGMENTS_TO_PREDICT: usize = 5;
+pub const SEGMENTS_TO_PREDICT: usize = 3;
 
 pub mod components;
 mod debug;
