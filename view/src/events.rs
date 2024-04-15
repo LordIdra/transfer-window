@@ -14,5 +14,6 @@ pub enum Event {
     CreateBurn { entity: Entity, time: f64 },
     DeleteBurn { entity: Entity, time: f64 },
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
+    SetTarget { entity: Entity, target: Option<Entity> },
     DebugAddEntity { entity_builder: EntityBuilder },
 }

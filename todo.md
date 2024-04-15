@@ -51,8 +51,8 @@
 - [1|x] Completely deselect segment point when UI hovered
 - [1|x] Add logging to find/fix issues with solver, it keeps panicking
 
-- [1| ] Right clicking vessels brings up context menu
-- [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
+- [1|x] Right clicking vessels brings up context menu
+- [1|x] Target option in the vessel menu selects vessel as 'target' relative to current vessel
 - [1| ] Target is highlighted/circled
 - [1| ] Show closest encounter for target and selected
 - [1| ] Allow vessels to be deleted (oh god)

@@ -181,6 +181,14 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     model.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
 }
 
+pub fn set_target(controller: &mut Controller, entity: Entity, target: Option<Entity>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Set target");
+    let model = controller.get_model_mut();
+
+    model.get_vessel_component_mut(entity).set_target(target);
+}
+
 pub fn debug_add_entity(controller: &mut Controller, entity_builder: EntityBuilder) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Debug add entity");
