@@ -22,7 +22,7 @@ fn draw_previous(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui, view: &mut 
 }
 
 fn draw_orbits(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui) {
-    let orbits = ((time - orbit.get_start_point().get_time()) / period) as usize;
+    let orbits = ((time - orbit.get_current_point().get_time()) / period) as usize;
     if orbits != 0 {
         ui.label("Orbits: ".to_string() + orbits.to_string().as_str());
     }
