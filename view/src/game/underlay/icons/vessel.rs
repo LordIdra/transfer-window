@@ -24,7 +24,16 @@ impl Vessel {
 }
 
 impl Icon for Vessel {
-    fn get_texture(&self) -> &str {
+    fn get_texture(&self, view: &Scene, model: &Model) -> &str {
+        if let Some(focus) = view.camera.get_focus() {
+            if let Some(vessel_component) = model.try_get_vessel_component(focus) {
+                if let Some(target) = vessel_component.get_target() {
+                    if target == self.entity {
+                        return "spacecraft-target"
+                    }
+                }
+            }
+        }
         "spacecraft"
     }
 
@@ -41,7 +50,7 @@ impl Icon for Vessel {
         0.4
     }
 
-    fn get_radius(&self) -> f64 {
+    fn get_radius(&self, _view: &Scene, _model: &Model) -> f64 {
         10.0
     }
 

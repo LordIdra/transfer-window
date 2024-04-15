@@ -23,7 +23,7 @@ impl Orbitable {
 }
 
 impl Icon for Orbitable {
-    fn get_texture(&self) -> &str {
+    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
         "planet"
     }
 
@@ -40,7 +40,7 @@ impl Icon for Orbitable {
         0.4
     }
 
-    fn get_radius(&self) -> f64 {
+    fn get_radius(&self, _view: &Scene, _model: &Model) -> f64 {
         10.0
     }
 

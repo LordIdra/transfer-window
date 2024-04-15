@@ -69,7 +69,7 @@ impl AdjustBurn {
 }
 
 impl Icon for AdjustBurn {
-    fn get_texture(&self) -> &str {
+    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
         "adjust-burn-arrow"
     }
 
@@ -91,7 +91,7 @@ impl Icon for AdjustBurn {
         }
     }
 
-    fn get_radius(&self) -> f64 {
+    fn get_radius(&self, _view: &Scene, _model: &Model) -> f64 {
         10.0
     }
 

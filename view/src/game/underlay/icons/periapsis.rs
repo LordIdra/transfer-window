@@ -48,7 +48,7 @@ impl Periapsis {
 }
 
 impl Icon for Periapsis {
-    fn get_texture(&self) -> &str {
+    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
         "periapsis"
     }
 
@@ -60,7 +60,7 @@ impl Icon for Periapsis {
         }
     }
 
-    fn get_radius(&self) -> f64 {
+    fn get_radius(&self, _view: &Scene, _model: &Model) -> f64 {
         10.0
     }
 
@@ -75,7 +75,7 @@ impl Icon for Periapsis {
 
     fn get_position(&self, view: &Scene, model: &Model) -> DVec2 {
         let orbit = model.get_trajectory_component(self.entity).get_last_segment_at_time(self.time).as_orbit();
-        let offset = vec2(0.0, self.get_radius() / view.camera.get_zoom());
+        let offset = vec2(0.0, self.get_radius(view, model) / view.camera.get_zoom());
         model.get_absolute_position(orbit.get_parent()) + orbit.get_position_from_theta(orbit.get_theta_from_time(self.time)) + offset
     }
 

@@ -26,9 +26,9 @@ mod vessel;
 /// the icon with the highest priority at that level 
 /// is chosen.
 trait Icon: Debug {
-    fn get_texture(&self) -> &str;
+    fn get_texture(&self, view: &Scene, model: &Model) -> &str;
     fn get_alpha(&self, view: &Scene, model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32;
-    fn get_radius(&self) -> f64;
+    fn get_radius(&self, view: &Scene, model: &Model) -> f64;
     fn get_priorities(&self, view: &Scene, model: &Model) -> [u64; 4];
     fn get_position(&self, view: &Scene, model: &Model) -> DVec2;
     fn get_facing(&self, view: &Scene, model: &Model) -> Option<DVec2>;
@@ -37,12 +37,12 @@ trait Icon: Debug {
 
     fn is_hovered(&self, view: &Scene, model: &Model, mouse_position_window: Pos2, screen_size: Rect) -> bool {
         let mouse_position_world = view.camera.window_space_to_world_space(model, mouse_position_window, screen_size);
-        let radius = self.get_radius() / view.camera.get_zoom();
+        let radius = self.get_radius(view, model) / view.camera.get_zoom();
         (self.get_position(view, model) - mouse_position_world).magnitude() < radius
     }
 
     fn overlaps(&self, view: &Scene, model: &Model, other_icon: &dyn Icon) -> bool {
-        let min_distance_between_icons = (self.get_radius() + other_icon.get_radius()) / view.camera.get_zoom();
+        let min_distance_between_icons = (self.get_radius(view, model) + other_icon.get_radius(view, model)) / view.camera.get_zoom();
         (self.get_position(view, model) - other_icon.get_position(view, model)).magnitude() < min_distance_between_icons
     }
 
@@ -95,7 +95,7 @@ fn split_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon>
 }
 
 fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, screen_size: Rect, icon: &dyn Icon, is_overlapped: bool) {
-    let radius = icon.get_radius() / view.camera.get_zoom();
+    let radius = icon.get_radius(view, model) / view.camera.get_zoom();
     let is_selected = icon.is_selected(view, model);
     let is_hovered = if let Some(mouse_position_window) = mouse_position_window{
         icon.is_hovered(view, model, mouse_position_window, screen_size)
@@ -114,8 +114,8 @@ fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, s
         add_textured_square(&mut vertices, icon.get_position(view, model), radius, alpha);
     }
     
-    let Some(texture_renderer) = view.texture_renderers.get(icon.get_texture()) else {
-        error!("Texture {} does not exist ", icon.get_texture());
+    let Some(texture_renderer) = view.texture_renderers.get(icon.get_texture(view, model)) else {
+        error!("Texture {} does not exist ", icon.get_texture(view, model));
         return
     };
     texture_renderer.lock().unwrap().add_vertices(&mut vertices);
@@ -125,7 +125,7 @@ fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, s
 fn get_mouse_over_icon<'a>(view: &Scene, model: &Model, mouse_position: Pos2, screen_size: Rect, icons: &'a Vec<Box<dyn Icon>>) -> Option<&'a dyn Icon> {
     let focus = view.camera.window_space_to_world_space(model, mouse_position, screen_size);
     for icon in icons {
-        let radius = icon.get_radius() / view.camera.get_zoom();
+        let radius = icon.get_radius(view, model) / view.camera.get_zoom();
         if (icon.get_position(view, model) - focus).magnitude() < radius {
             return Some(&**icon)
         }
