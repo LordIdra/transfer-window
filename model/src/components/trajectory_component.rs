@@ -134,7 +134,9 @@ impl TrajectoryComponent {
             .unwrap() // end segment value should never be None
     }
 
-    fn get_current_segment_mut(&mut self) -> &mut Segment {
+    /// # Panics
+    /// Panics if the trajectory has no current segment
+    pub fn get_current_segment_mut(&mut self) -> &mut Segment {
         self.segments
             .get_mut(self.current_index)
             .expect("Current segment does not exist")
@@ -175,19 +177,16 @@ impl TrajectoryComponent {
         }
     }
 
-    pub fn next(&mut self, time: f64, delta_time: f64) {
-        self.get_current_segment_mut().next(delta_time);
-        while self.get_current_segment().is_finished() {
-            match self.get_current_segment() {
-                Segment::Orbit(_) => self.previous_orbits += 1,
-                Segment::Burn(_) => self.previous_burns += 1,
-            }
-            trace!("Segment finished at time={time}");
-            let overshot_time = self.get_current_segment().get_overshot_time(time);
-            self.segments[self.current_index] = None;
-            self.current_index += 1;
-            self.get_current_segment_mut().next(overshot_time);
+    pub fn on_segment_finished(&mut self, time: f64) {
+        match self.get_current_segment() {
+            Segment::Orbit(_) => self.previous_orbits += 1,
+            Segment::Burn(_) => self.previous_burns += 1,
         }
+        trace!("Segment finished at time={time}");
+        let overshot_time = self.get_current_segment().get_overshot_time(time);
+        self.segments[self.current_index] = None;
+        self.current_index += 1;
+        self.get_current_segment_mut().next(overshot_time);
     }
 }
 
@@ -247,7 +246,10 @@ mod test {
         let mut time = 0.0;
         for _ in 0..100 {
             time += 1.0;
-            trajectory.next(time, 1.0);
+            trajectory.get_current_segment_mut().next(1.0);
+            while trajectory.get_current_segment().is_finished() {
+                trajectory.on_segment_finished(time);
+            }
         }
 
         assert!((trajectory.get_current_segment().as_orbit().get_current_point().get_time() - 100.0).abs() < 1.0e-6);

@@ -46,10 +46,11 @@
 - [1|x] Better color scheme for orbits/burns
 - [1|x] Limit prediction by number of conics as well as time
 - [1|x] Periapsis/apoapsis indicators
+- [1|x] Fix current segment does not exist nonsense
 - [1| ] Completely deselect when UI hovered
 - [1| ] Just fade icons when overlapped instead of hiding completely 
-- [1| ] Fix current segment does not exist nonsense
-^ AFTER THE ABOVE FINISH OFF BURNS BRANCH
+- [1| ] More robust logging to find/fix issues with solver, it keeps panicking
+- [1| ] Hide all child icons and segments of object when zoomed out far enough
 
 - [1| ] Right clicking vessels brings up context menu
 - [1| ] Target option in the vessel menu selects vessel as 'target' relative to current vessel
@@ -60,8 +61,6 @@
 - [1| ] Games have names
 - [1| ] Choose game to load
 - [1| ] Burns using more DV than possible display a warning indicator
-- [1| ] More robust logging to find/fix issues with solver, it keeps panicking
-- [1| ] Hide all child icons of object when zoomed out far enough
 
 # Ships
 - [1| ] Fighters
