@@ -4,6 +4,7 @@ use crate::{components::trajectory_component::orbit::Orbit, util::make_closest_p
 /// Negative when `orbit_a` is OUTSIDE `orbit_b`
 pub fn make_sdf<'a>(orbit_a: &'a Orbit, orbit_b: &'a Orbit) -> impl Fn(f64) -> f64 + 'a  {
     let closest_point_function = make_closest_point_on_ellipse_orbit_function(orbit_b);
+    dbg!(orbit_a, orbit_b);
     move |theta: f64| -> f64 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("SDF");
