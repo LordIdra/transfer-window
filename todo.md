@@ -53,9 +53,10 @@
 
 - [1|x] Right clicking vessels brings up context menu
 - [1|x] Target option in the vessel menu selects vessel as 'target' relative to current vessel
-- [1| ] Target is highlighted/circled
+- [1|x] Target is highlighted/circled
 - [1| ] Show closest encounter for target and selected
-- [1| ] Allow vessels to be deleted (oh god)
+- [1| ] Allow new vessels to be added (oh god)
+- [1| ] Allow vessels to be deleted without crashing everything (oh god)
 
 - [1| ] Games have names
 - [1| ] Choose game to load
@@ -76,14 +77,13 @@
 - [1| ] Ballistic weaponry
 - [1| ] Lock weapons onto current target
 - [1| ] Show current weapon lock
-- [1| ] Spawn in ships
 - [1| ] Edit ship modules
 
-# Weapons
-- [1| ] Torpedoes
+# Modules
 - [1| ] Point defense
 - [1| ] Chemical propulsion
 - [1| ] Chemical fuel/lox reserves
+- [1| ] Torpedoes
 - [1| ] Torpedo guidance system (may be difficult)
 - [1| ] PDC automatic targeting system
 - [1| ] PDC range or time dropoff after which they are deleted to prevent bullet lag

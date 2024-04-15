@@ -94,6 +94,10 @@ impl Orbit {
         self.conic.get_argument_of_periapsis()
     }
 
+    pub fn get_duration(&self) -> f64 {
+        self.end_point.get_time() - self.start_point.get_time()
+    }
+
     pub fn get_min_asymptote_theta(&self) -> Option<f64> {
         self.conic.get_min_asymptote_theta()
     }

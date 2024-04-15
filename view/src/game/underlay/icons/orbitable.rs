@@ -23,7 +23,16 @@ impl Orbitable {
 }
 
 impl Icon for Orbitable {
-    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
+    fn get_texture(&self, view: &Scene, model: &Model) -> &str {
+        if let Some(focus) = view.camera.get_focus() {
+            if let Some(vessel_component) = model.try_get_vessel_component(focus) {
+                if let Some(target) = vessel_component.get_target() {
+                    if target == self.entity {
+                        return "planet-target"
+                    }
+                }
+            }
+        }
         "planet"
     }
 
@@ -73,6 +82,8 @@ impl Icon for Orbitable {
         if pointer.primary_clicked() {
             view.camera.reset_panning();
             view.camera.set_focus(Some(self.entity));
+        } else if pointer.secondary_clicked() {
+            view.right_click_menu = Some(self.entity);
         }
     }
 }

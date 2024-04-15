@@ -1,6 +1,6 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{trajectory_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{trajectory_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
 
 use crate::game::{util::add_triangle, Scene};
 
@@ -8,19 +8,44 @@ mod burn;
 mod orbit;
 
 const RADIUS: f64 = 0.8;
-fn get_orbit_color(index: usize) -> Rgba {
-    let colors = [
-        Rgba::from_srgba_premultiplied(0, 255, 255, 255),
-        Rgba::from_srgba_premultiplied(125, 235, 255, 255),
-        Rgba::from_srgba_premultiplied(115, 205, 255, 255),
-        Rgba::from_srgba_premultiplied(70, 160, 245, 255),
-        Rgba::from_srgba_premultiplied(40, 110, 245, 255),
-    ];
-    colors[index % (colors.len() - 1)]
+
+fn is_selected(view: &Scene, entity: Entity) -> bool {
+    if let Some(focus) = view.camera.get_focus() {
+        if focus == entity {
+            return true;
+        }
+    }
+    false
+}
+
+fn get_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
+    let is_vessel = model.try_get_vessel_component(entity).is_some();
+    let is_selected = is_selected(view, entity);
+
+    let colors: [Rgba; SEGMENTS_TO_PREDICT] = if is_vessel {
+        if is_selected {
+            [
+                Rgba::from_srgba_unmultiplied(0, 255, 255, 255),
+                Rgba::from_srgba_unmultiplied(0, 255, 255, 170),
+                Rgba::from_srgba_unmultiplied(0, 255, 255, 130),
+                Rgba::from_srgba_unmultiplied(0, 255, 255, 100),
+            ]
+        } else {
+            [Rgba::from_srgba_unmultiplied(0, 255, 255, 60); SEGMENTS_TO_PREDICT]
+        }
+    } else {
+        if is_selected {
+            [Rgba::from_srgba_unmultiplied(255, 255, 255, 160); SEGMENTS_TO_PREDICT]
+        } else {
+            [Rgba::from_srgba_unmultiplied(255, 255, 255, 50); SEGMENTS_TO_PREDICT]
+        }
+    };
+
+    colors[index]
 }
 
 fn get_burn_color() -> Rgba {
-    Rgba::from_srgba_premultiplied(255, 0, 0, 255)
+    Rgba::from_srgba_premultiplied(255, 255, 255, 255)
 }
 
 /// Draws a line between two points so that all the lines on a segment are connected together
@@ -61,25 +86,38 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
     let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.get_zoom();
     let trajectory_component = model.get_trajectory_component(entity);
-    let mut orbit_index = trajectory_component.get_previous_orbits() + trajectory_component.get_remaining_orbits();
-    // Reverse to make sure that the segments are rendered in order
-    // of how soon they are, so that closer segments take priority
-    // over further ones
-    for segment in trajectory_component.get_segments().iter().rev().flatten() {
+
+    let mut segment_points_data = vec![];
+    let mut orbit_index = 0;
+    for segment in trajectory_component.get_segments().iter().flatten() {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Draw segment");
         let absolute_parent_position = model.get_absolute_position(segment.get_parent());
         match segment {
             Segment::Orbit(orbit) => {
-                let color = get_orbit_color(orbit_index);
-                draw_from_points(view, &orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom), zoom, color);
-                orbit_index -= 1;
+                // When predicting trajectories, the last orbit will have duration zero, so skip it
+                if orbit.get_duration().abs() == 0.0 {
+                    continue;
+                }
+                let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
+                let color = get_orbit_color(view, model, entity, orbit_index);
+                segment_points_data.push((points, color));
+                orbit_index += 1;
             },
             Segment::Burn(burn) => {
+                let points = burn::compute_points(burn, absolute_parent_position, camera_centre, zoom);
                 let color = get_burn_color();
-                draw_from_points(view, &burn::compute_points(burn, absolute_parent_position, camera_centre, zoom), zoom, color);
+                segment_points_data.push((points, color));
+                orbit_index = 0;
             }
         };
+    }
+
+    // Reverse to make sure that the segments are rendered in order
+    // of how soon they are, so that closer segments take priority
+    // over further ones
+    for (segment_points, color) in segment_points_data.iter().rev() {
+        draw_from_points(view, &segment_points, zoom, *color);
     }
 }
 

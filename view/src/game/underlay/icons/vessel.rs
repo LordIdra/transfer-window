@@ -84,7 +84,7 @@ impl Icon for Vessel {
             view.camera.reset_panning();
             view.camera.set_focus(Some(self.entity));
         } else if pointer.secondary_clicked() {
-            view.vessel_menu = Some(self.entity);
+            view.right_click_menu = Some(self.entity);
         }
     }
 }

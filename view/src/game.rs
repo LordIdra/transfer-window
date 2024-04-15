@@ -23,7 +23,7 @@ pub struct Scene {
     segment_renderer: Arc<Mutex<GeometryRenderer>>,
     texture_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
     selected: Selected,
-    vessel_menu: Option<Entity>,
+    right_click_menu: Option<Entity>,
     frame_history: FrameHistory,
     debug_window_open: bool,
     debug_window_tab: DebugWindowTab,
@@ -42,7 +42,7 @@ impl Scene {
         let frame_history = FrameHistory::default();
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::Overview;
-        Self { camera, object_renderer, segment_renderer, texture_renderers, selected, vessel_menu, frame_history, debug_window_open, debug_window_tab }
+        Self { camera, object_renderer, segment_renderer, texture_renderers, selected, right_click_menu: vessel_menu, frame_history, debug_window_open, debug_window_tab }
     }
 
     pub fn update(&mut self, model: &Model, context: &Context, frame: &Frame) -> Vec<Event> {
