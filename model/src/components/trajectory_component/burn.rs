@@ -81,11 +81,10 @@ impl Burn {
 
     pub fn get_point_at_time(&self, time: f64) -> BurnPoint {
         let time_after_start = time - self.get_start_point().get_time();
-        let mut index = (time_after_start / BURN_TIME_STEP) as usize;
-        index = index.saturating_sub(1);
+        let index = (time_after_start / BURN_TIME_STEP) as usize;
         if let Some(closest_previous_point) = self.points.get(index) {
-            let delta_time = time_after_start % BURN_TIME_STEP;
-            closest_previous_point.next(delta_time, self.get_absolute_acceleration())
+            let undershot_time = time - closest_previous_point.get_time();
+            closest_previous_point.next(undershot_time, self.get_absolute_acceleration())
         } else {
             self.get_end_point().clone()
         }
@@ -168,14 +167,12 @@ mod test {
         
         let mut tester = BruteForceTester::new(parent_mass, start_position, start_velocity, acceleration, BURN_TIME_STEP);
         tester.update(duration);
-        dbg!(tester.get_position(), burn.get_end_point().get_position());
         assert!((tester.get_time() - burn.get_end_point().get_time()).abs() < 1.0);
         assert!((tester.get_position() - burn.get_end_point().get_position()).magnitude() < 1.0);
         assert!((tester.get_velocity() - burn.get_end_point().get_velocity()).magnitude() < 1.0);
         
         let mut tester = BruteForceTester::new(parent_mass, start_position, start_velocity, acceleration, BURN_TIME_STEP);
         tester.update(0.5 * duration);
-        dbg!(tester.get_position(), burn.get_point_at_time(0.5 * duration).get_position());
         assert!((tester.get_time() - burn.get_point_at_time(0.5 * duration).get_time()).abs() < 1.0);
         assert!((tester.get_position() - burn.get_point_at_time(0.5 * duration).get_position()).magnitude() < 1.0);
         assert!((tester.get_velocity() - burn.get_point_at_time(0.5 * duration).get_velocity()).magnitude() < 1.0);
