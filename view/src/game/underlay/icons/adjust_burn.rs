@@ -73,7 +73,10 @@ impl Icon for AdjustBurn {
         "adjust-burn-arrow"
     }
 
-    fn get_alpha(&self, view: &Scene, _model: &Model, _is_selected: bool, is_hovered: bool) -> f32 {
+    fn get_alpha(&self, view: &Scene, _model: &Model, _is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+        if is_overlapped {
+            return 0.0;
+        }
         if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(direction) } = &view.selected {
             if *direction == self.direction {
                 return 1.0;

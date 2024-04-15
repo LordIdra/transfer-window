@@ -50,8 +50,12 @@ impl Icon for Apoapsis {
         "apoapsis"
     }
 
-    fn get_alpha(&self, _view: &Scene, _model: &Model, _is_selected: bool, _is_hovered: bool) -> f32 {
-        1.0
+    fn get_alpha(&self, _view: &Scene, _model: &Model, _is_selected: bool, _is_hovered: bool, is_overlapped: bool) -> f32 {
+        if is_overlapped {
+            0.2
+        } else {
+            1.0
+        }
     }
 
     fn get_radius(&self) -> f64 {

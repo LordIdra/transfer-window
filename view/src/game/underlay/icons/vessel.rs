@@ -28,7 +28,10 @@ impl Icon for Vessel {
         "spacecraft"
     }
 
-    fn get_alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool) -> f32 {
+    fn get_alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+        if is_overlapped {
+            return 0.2;
+        }
         if is_selected {
             return 1.0;
         }

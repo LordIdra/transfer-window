@@ -27,7 +27,7 @@ mod vessel;
 /// is chosen.
 trait Icon: Debug {
     fn get_texture(&self) -> &str;
-    fn get_alpha(&self, view: &Scene, model: &Model, is_selected: bool, is_hovered: bool) -> f32;
+    fn get_alpha(&self, view: &Scene, model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32;
     fn get_radius(&self) -> f64;
     fn get_priorities(&self, view: &Scene, model: &Model) -> [u64; 4];
     fn get_position(&self, view: &Scene, model: &Model) -> DVec2;
@@ -42,7 +42,7 @@ trait Icon: Debug {
     }
 
     fn overlaps(&self, view: &Scene, model: &Model, other_icon: &dyn Icon) -> bool {
-        let min_distance_between_icons = 2.05 * self.get_radius() / view.camera.get_zoom();
+        let min_distance_between_icons = (self.get_radius() + other_icon.get_radius()) / view.camera.get_zoom();
         (self.get_position(view, model) - other_icon.get_position(view, model)).magnitude() < min_distance_between_icons
     }
 
@@ -78,50 +78,56 @@ fn get_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, screen
 /// Assumes the input is sorted already from highest to lowest
 /// Continually adds the highest priority remaining icon if it does not overlap any icons already added
 /// This means that when icons overlap, only the one with the highest priority is added
-fn remove_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon>>) -> Vec<Box<dyn Icon>> {
-    let mut new_icons = vec![];
+/// Returns (`not_overlapped`, `overlapped`)
+#[allow(clippy::type_complexity)]
+fn split_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon>>) -> (Vec<Box<dyn Icon>>, Vec<Box<dyn Icon>>) {
+    let mut not_overlapped = vec![];
+    let mut overlapped = vec![];
     for icon in icons {
         #[allow(clippy::borrowed_box)] // false positive
-        if !new_icons.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, model, &*icon)) {
-            new_icons.push(icon);
+        if not_overlapped.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, model, &*icon)) {
+            overlapped.push(icon);
+        } else {
+            not_overlapped.push(icon);
         }
     }
-    new_icons
+    (not_overlapped, overlapped)
 }
 
-fn draw_icons(view: &Scene, model: &Model, icons: &Vec<Box<dyn Icon>>, mouse_position_window: Option<Pos2>, screen_size: Rect) {
-    for icon in icons {
-        let radius = icon.get_radius() / view.camera.get_zoom();
-        let is_selected = icon.is_selected(view, model);
-        let is_hovered = if let Some(mouse_position_window) = mouse_position_window{
-            icon.is_hovered(view, model, mouse_position_window, screen_size)
-        } else {
-            false
-        };
-        let alpha = icon.get_alpha(view, model, is_selected, is_hovered);
-
-        let mut vertices = vec![];
-        if let Some(facing) = icon.get_facing(view, model) {
-            add_textured_square_facing(&mut vertices, icon.get_position(view, model), radius, alpha, facing);
-        } else {
-            add_textured_square(&mut vertices, icon.get_position(view, model), radius, alpha);
-        }
-        
-        let Some(texture_renderer) = view.texture_renderers.get(icon.get_texture()) else {
-            error!("Texture {} does not exist ", icon.get_texture());
-            continue;
-        };
-        texture_renderer.lock().unwrap().add_vertices(&mut vertices);
+fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, screen_size: Rect, icon: &dyn Icon, is_overlapped: bool) {
+    let radius = icon.get_radius() / view.camera.get_zoom();
+    let is_selected = icon.is_selected(view, model);
+    let is_hovered = if let Some(mouse_position_window) = mouse_position_window{
+        icon.is_hovered(view, model, mouse_position_window, screen_size)
+    } else {
+        false
+    };
+    let alpha = icon.get_alpha(view, model, is_selected, is_hovered, is_overlapped);
+    if alpha == 0.0 {
+        return;
     }
+
+    let mut vertices = vec![];
+    if let Some(facing) = icon.get_facing(view, model) {
+        add_textured_square_facing(&mut vertices, icon.get_position(view, model), radius, alpha, facing);
+    } else {
+        add_textured_square(&mut vertices, icon.get_position(view, model), radius, alpha);
+    }
+    
+    let Some(texture_renderer) = view.texture_renderers.get(icon.get_texture()) else {
+        error!("Texture {} does not exist ", icon.get_texture());
+        return
+    };
+    texture_renderer.lock().unwrap().add_vertices(&mut vertices);
 }
 
 // 'rust is simple' said no one ever
-fn get_mouse_over_icon<'a>(view: &Scene, model: &Model, mouse_position: Pos2, screen_size: Rect, icons: &'a mut Vec<Box<dyn Icon>>) -> Option<&'a mut dyn Icon> {
+fn get_mouse_over_icon<'a>(view: &Scene, model: &Model, mouse_position: Pos2, screen_size: Rect, icons: &'a Vec<Box<dyn Icon>>) -> Option<&'a dyn Icon> {
     let focus = view.camera.window_space_to_world_space(model, mouse_position, screen_size);
     for icon in icons {
         let radius = icon.get_radius() / view.camera.get_zoom();
         if (icon.get_position(view, model) - focus).magnitude() < radius {
-            return Some(&mut **icon)
+            return Some(&**icon)
         }
     }
     None
@@ -136,16 +142,22 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
         let mut icons = get_initial_icons(view, model, &input.pointer, context.screen_rect());
         icons.sort_by(|a, b| a.cmp(view, model, &**b));
         icons.reverse(); // sorted from HIGHEST to LOWEST priority
-        icons = remove_overlapping_icons(view, model, icons);
-
+        
+        let (not_overlapped, overlapped) = split_overlapping_icons(view, model, icons);
         if let Some(mouse_position_window) = input.pointer.latest_pos() {
-            if let Some(icon) = get_mouse_over_icon(view, model, mouse_position_window, context.screen_rect(), &mut icons) {
+            if let Some(icon) = get_mouse_over_icon(view, model, mouse_position_window, context.screen_rect(), &not_overlapped) {
                 any_icon_hovered = true;
                 icon.on_mouse_over(view, model, &input.pointer);
             }
         }
 
-        draw_icons(view, model, &icons, input.pointer.latest_pos(), context.screen_rect());
+        for icon in not_overlapped {
+            draw_icon(view, model, input.pointer.latest_pos(), context.screen_rect(), &*icon, false);
+        }
+
+        for icon in overlapped {
+            draw_icon(view, model, input.pointer.latest_pos(), context.screen_rect(), &*icon, true);
+        }
     });
 
     any_icon_hovered
