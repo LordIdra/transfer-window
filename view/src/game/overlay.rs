@@ -9,10 +9,7 @@ use super::Scene;
 
 mod fps;
 mod scale;
-mod selected_burn;
-mod selected_point;
-mod focus_vessel;
-mod focus_orbitable;
+mod selected;
 mod time;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
@@ -31,6 +28,5 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
     fps::update(view, context);
     scale::update(view, context);
     time::update(model, context);
-    selected_point::update(view, model, context, events);
-    selected_burn::update(view, model, context, events);
+    selected::update(view, model, context, events);
 }

@@ -1,5 +1,5 @@
 use nalgebra_glm::DVec2;
-use transfer_window_model::storage::{entity_allocator::Entity, entity_builder::EntityBuilder};
+use transfer_window_model::storage::entity_allocator::Entity;
 
 #[derive(Debug)]
 pub enum Event {
@@ -14,6 +14,6 @@ pub enum Event {
     CreateBurn { entity: Entity, time: f64 },
     DeleteBurn { entity: Entity, time: f64 },
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
+    Destroy { entity: Entity },
     SetTarget { entity: Entity, target: Option<Entity> },
-    DebugAddEntity { entity_builder: EntityBuilder },
 }

@@ -9,6 +9,7 @@ use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, r
 
 mod camera;
 mod debug;
+mod expiry;
 mod frame_history;
 mod input;
 mod overlay;
@@ -51,6 +52,7 @@ impl Scene {
         let mut events = vec![];
         
         self.frame_history.update(context.input(|i| i.time), frame.info().cpu_usage);
+        expiry::update(self, model);
         input::update(self, context, &mut events);
         underlay::draw(self, model, context, &mut events);
         overlay::draw(self, model, context, &mut events);

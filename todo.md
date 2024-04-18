@@ -55,7 +55,6 @@
 - [1|x] Target is highlighted/circled
 - [1|x] Show closest encounter for target and selected
 
-- [1| ] Allow new vessels to be added (oh god)
 - [1| ] Allow vessels to be deleted without crashing everything (oh god)
 
 - [1| ] Games have names

@@ -19,13 +19,6 @@ fn draw_selected_circle(view: &mut Scene, model: &Model, entity: Entity, time: f
     view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);
 }
 
-pub fn remove_if_expired(view: &mut Scene, model: &Model, time: f64) {
-    if time < model.get_time() {
-        trace!("Selected segment point expired at time={time}");
-        view.selected = Selected::None;
-    }
-}
-
 #[allow(clippy::too_many_arguments)]
 pub fn draw_selected(view: &mut Scene, model: &Model) {
     if let Selected::Point { entity, time } = view.selected.clone() {

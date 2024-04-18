@@ -32,14 +32,6 @@ impl Selected {
     }
 }
 
-pub fn remove_if_expired(view: &mut Scene, model: &Model) {
-    match view.selected.clone() {
-        Selected::Point { entity: _, time } => segment_point::remove_if_expired(view, model, time),
-        Selected::Burn { entity: _, time, state: _ } => burn::remove_if_expired(view, model, time),
-        _ => ()
-    }
-}
-
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, is_mouse_over_any_icon: bool) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update selected");

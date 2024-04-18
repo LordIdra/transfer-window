@@ -34,6 +34,7 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, is_mouse_over_any_icon: bool) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update right click menu");
+
     let is_mouse_over_ui_element = context.is_pointer_over_area() || is_mouse_over_any_icon;
     if !is_mouse_over_ui_element {
         let pointer = context.input(|input| {

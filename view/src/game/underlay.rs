@@ -18,7 +18,6 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
     let _span = tracy_client::span!("Draw underlay");
     celestial_objects::draw(view, model);
     segments::draw(view, model);
-    selected::remove_if_expired(view, model);
     let is_mouse_over_any_icon = icons::draw(view, model, context);
     selected::update(view, model, context, events, is_mouse_over_any_icon);
     right_click_menu::update(view, model, context, events, is_mouse_over_any_icon);

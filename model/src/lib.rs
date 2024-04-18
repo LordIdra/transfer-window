@@ -115,7 +115,16 @@ impl Model {
 
     pub fn deallocate(&mut self, entity: Entity) {
         self.entity_allocator.deallocate(entity);
+        self.mass_components.remove_if_exists(entity);
         self.name_components.remove_if_exists(entity);
+        self.orbitable_components.remove_if_exists(entity);
+        self.stationary_components.remove_if_exists(entity);
+        self.trajectory_components.remove_if_exists(entity);
+        self.vessel_components.remove_if_exists(entity);
+    }
+
+    pub fn entity_exists(&self, entity: Entity) -> bool {
+        self.entity_allocator.get_entities().contains(&entity)
     }
 
     pub fn get_mass_component_mut(&mut self, entity: Entity) -> &mut MassComponent {
