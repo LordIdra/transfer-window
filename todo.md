@@ -54,37 +54,42 @@
 - [1|x] Target option in the vessel menu selects vessel as 'target' relative to current vessel
 - [1|x] Target is highlighted/circled
 - [1|x] Show closest encounter for target and selected
+- [1|x] Allow vessels to be deleted without crashing everything (oh god)
+- [1| ] Add ship classes with system slot schema
+- [1| ] Add system slots for propulsion, fuel tanks, and weapons
+- [1| ] Add frigate
+- [1| ] Add fuel tank schema
+- [1| ] Add propulsion schema
+- [1| ] Add weapon schema
+- [1| ] Add chemical fuel tank and 2 chemical rockets
+- [1| ] Create GUI for editing system slots and add ship layout texture
+- [1| ] Show current systems in system slots
+- [1| ] Allow editing current systems
+- [1| ] Show remaining DV + fuel bar in vessel top left GUI
+- [1| ] Reduce DV while burning
+- [1| ] Burns cannot use more DV than ship has including previous burns
+- [1| ] Add torpedo system
+- [1| ] Show active weapons at bottom of screen (simple for now)
+- [1| ] Allow a weapon to be locked onto a target
+- [1| ] Cannot fire until firing solution computed
+- [1| ] Once a weapon is locked, click button to confirm fire
+- [1| ] Add torpedo component
+- [1| ] Spawn new torpedo at ship location
+- [1| ] Torpedo burns directly towards target until fuel expended
+- [1| ] Yeet torpedo target when torpedo gets close enough
+- [1| ] Torpedo guidance system
 
-- [1| ] Allow vessels to be deleted without crashing everything (oh god)
-
+# Stuff to do later because more stuff needs to be in place first
 - [1| ] Games have names
 - [1| ] Choose game to load
-- [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Dim P/A icons when moused over and don't count as hovered????
 - [1| ] Hide all child icons and segments of object when zoomed out far enough
 - [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
-
-# Ships
-- [1| ] Fighters
-- [1| ] System slots
-- [1| ] System slots have types
-- [1| ] Show current systems
-- [1| ] Allow changing systems
-- [1| ] Show current fuel reserves
-- [1| ] Show remaining DV
 - [1| ] Show orbital parameters
-- [1| ] Frigates
-- [1| ] Ballistic weaponry
-- [1| ] Lock weapons onto current target
-- [1| ] Show current weapon lock
-- [1| ] Edit ship modules
 
-# Modules
+# On TODO list
+- [1| ] Ballistic weaponry
 - [1| ] Point defense
-- [1| ] Chemical propulsion
-- [1| ] Chemical fuel/lox reserves
-- [1| ] Torpedoes
-- [1| ] Torpedo guidance system (may be difficult)
 - [1| ] PDC automatic targeting system
 - [1| ] PDC range or time dropoff after which they are deleted to prevent bullet lag
-- [1| ] PDC shells not affected by gravity
+- [1| ] PDC shells not affected by gravity?
