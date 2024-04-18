@@ -55,13 +55,17 @@
 - [1|x] Target option in the vessel menu selects vessel as 'target' relative to current vessel
 - [1|x] Target is highlighted/circled
 - [1| ] Show closest encounter for target and selected
+
 - [1| ] Allow new vessels to be added (oh god)
 - [1| ] Allow vessels to be deleted without crashing everything (oh god)
+
+- [1| ] Some way to see the numbers at apoapsis/periapsis and especially at closest encounters
+- [1| ] Dim apoapsis/periapsis for non-selected? - how to do this with dimemd by default?
 
 - [1| ] Games have names
 - [1| ] Choose game to load
 - [1| ] Burns using more DV than possible display a warning indicator
-- [1| ] Dim P/A icons when moused over and don't count as hovered
+- [1| ] Dim P/A icons when moused over and don't count as hovered????
 - [1| ] Hide all child icons and segments of object when zoomed out far enough
 
 # Ships

@@ -82,6 +82,18 @@ impl Segment {
         }
     }
 
+    pub fn is_orbit(&self) -> bool {
+        matches!(self, Segment::Orbit(_))
+    }
+
+    pub fn is_burn(&self) -> bool {
+        matches!(self, Segment::Burn(_))
+    }
+
+    pub fn get_duration(&self) -> f64 {
+        self.get_end_time() - self.get_start_time()
+    }
+
     pub fn get_overshot_time(&self, time: f64) -> f64 {
         match self {
             Segment::Burn(burn) => burn.get_overshot_time(time),

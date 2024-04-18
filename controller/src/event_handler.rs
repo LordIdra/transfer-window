@@ -168,7 +168,7 @@ pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
     // This is needed to make sure we recompute the conic WITHOUT the burn
     // Add 1 because the final orbit will have duration 0
     let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - trajectory_component.get_remaining_orbits_after_final_burn();
-    model.predict(entity, 1.0e10, segments_to_predict)
+    model.predict(entity, 1.0e10, segments_to_predict);
 }
 
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {

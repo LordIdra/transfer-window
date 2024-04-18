@@ -33,12 +33,10 @@ fn get_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) ->
         } else {
             [Rgba::from_srgba_unmultiplied(0, 255, 255, 60); SEGMENTS_TO_PREDICT]
         }
+    } else if is_selected {
+        [Rgba::from_srgba_unmultiplied(255, 255, 255, 160); SEGMENTS_TO_PREDICT]
     } else {
-        if is_selected {
-            [Rgba::from_srgba_unmultiplied(255, 255, 255, 160); SEGMENTS_TO_PREDICT]
-        } else {
-            [Rgba::from_srgba_unmultiplied(255, 255, 255, 50); SEGMENTS_TO_PREDICT]
-        }
+        [Rgba::from_srgba_unmultiplied(255, 255, 255, 50); SEGMENTS_TO_PREDICT]
     };
 
     colors[index]
@@ -117,7 +115,7 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
     // of how soon they are, so that closer segments take priority
     // over further ones
     for (segment_points, color) in segment_points_data.iter().rev() {
-        draw_from_points(view, &segment_points, zoom, *color);
+        draw_from_points(view, segment_points, zoom, *color);
     }
 }
 
