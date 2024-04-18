@@ -54,7 +54,7 @@
 - [1|x] Right clicking vessels brings up context menu
 - [1|x] Target option in the vessel menu selects vessel as 'target' relative to current vessel
 - [1|x] Target is highlighted/circled
-- [1| ] Show closest encounter for target and selected
+- [1|x] Show closest encounter for target and selected
 
 - [1| ] Allow new vessels to be added (oh god)
 - [1| ] Allow vessels to be deleted without crashing everything (oh god)
