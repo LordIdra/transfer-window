@@ -50,17 +50,16 @@
 - [1|x] Just fade icons when overlapped instead of hiding completely 
 - [1|x] Completely deselect segment point when UI hovered
 - [1|x] Add logging to find/fix issues with solver, it keeps panicking
-
 - [1|x] Right clicking vessels brings up context menu
 - [1|x] Target option in the vessel menu selects vessel as 'target' relative to current vessel
 - [1|x] Target is highlighted/circled
 - [1|x] Show closest encounter for target and selected
 
+
 - [1| ] Allow new vessels to be added (oh god)
 - [1| ] Allow vessels to be deleted without crashing everything (oh god)
 
-- [1| ] Some way to see the numbers at apoapsis/periapsis and especially at closest encounters
-- [1| ] Dim apoapsis/periapsis for non-selected? - how to do this with dimemd by default?
+- [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
 
 - [1| ] Games have names
 - [1| ] Choose game to load
