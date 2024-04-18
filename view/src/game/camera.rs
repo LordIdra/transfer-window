@@ -43,10 +43,6 @@ impl Camera {
         self.focus = focus;
     }
 
-    pub fn get_focus(&self) -> Option<Entity> {
-        self.focus
-    }
-
     pub fn get_zoom(&self) -> f64 {
         self.zoom
     }

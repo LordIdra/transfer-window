@@ -2,7 +2,7 @@ use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
-use crate::game::Scene;
+use crate::game::{underlay::selected::Selected, Scene};
 
 use super::Icon;
 
@@ -24,12 +24,10 @@ impl Orbitable {
 
 impl Icon for Orbitable {
     fn get_texture(&self, view: &Scene, model: &Model) -> String {
-        if let Some(focus) = view.camera.get_focus() {
-            if let Some(vessel_component) = model.try_get_vessel_component(focus) {
-                if let Some(target) = vessel_component.get_target() {
-                    if target == self.entity {
-                        return "planet-target".to_string()
-                    }
+        if let Selected::Vessel(entity) = view.selected {
+            if let Some(target) = model.get_vessel_component(entity).get_target() {
+                if target == self.entity {
+                    return "planet-target".to_string()
                 }
             }
         }
@@ -71,8 +69,8 @@ impl Icon for Orbitable {
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
-        if let Some(focus) = view.camera.get_focus() {
-            focus == self.entity
+        if let Selected::Orbitable(entity) = view.selected {
+            entity == self.entity
         } else {
             false
         }
@@ -80,8 +78,7 @@ impl Icon for Orbitable {
 
     fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
         if pointer.primary_clicked() {
-            view.camera.reset_panning();
-            view.camera.set_focus(Some(self.entity));
+            view.selected = Selected::Orbitable(self.entity);
         } else if pointer.secondary_clicked() {
             view.right_click_menu = Some(self.entity);
         }

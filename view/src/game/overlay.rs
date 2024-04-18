@@ -11,6 +11,8 @@ mod fps;
 mod scale;
 mod selected_burn;
 mod selected_point;
+mod focus_vessel;
+mod focus_orbitable;
 mod time;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {

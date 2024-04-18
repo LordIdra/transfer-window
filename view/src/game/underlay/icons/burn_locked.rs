@@ -76,9 +76,10 @@ impl Icon for BurnLocked {
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
-        match &view.selected {
-            Selected::None | Selected::Point { entity: _, time: _, state: _ } => false,
-            Selected::Burn { entity, time, state: _ } => *entity == self.entity && *time == self.time,
+        if let Selected::Burn { entity, time, state: _ } = &view.selected {
+            *entity == self.entity && *time == self.time
+        } else {
+            false
         }
     }
 

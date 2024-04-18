@@ -9,18 +9,13 @@ mod orbit;
 
 const RADIUS: f64 = 0.8;
 
-fn is_selected(view: &Scene, entity: Entity) -> bool {
-    if let Some(focus) = view.camera.get_focus() {
-        if focus == entity {
-            return true;
-        }
-    }
-    false
-}
-
 fn get_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
     let is_vessel = model.try_get_vessel_component(entity).is_some();
-    let is_selected = is_selected(view, entity);
+    let is_selected = if let Some(selected) = view.selected.get_selected_entity() {
+        selected == entity
+    } else {
+        false
+    };
 
     let colors: [Rgba; SEGMENTS_TO_PREDICT] = if is_vessel {
         if is_selected {

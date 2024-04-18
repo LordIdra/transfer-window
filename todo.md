@@ -55,17 +55,15 @@
 - [1|x] Target is highlighted/circled
 - [1|x] Show closest encounter for target and selected
 
-
 - [1| ] Allow new vessels to be added (oh god)
 - [1| ] Allow vessels to be deleted without crashing everything (oh god)
 
-- [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
-
 - [1| ] Games have names
 - [1| ] Choose game to load
-- [1| ] Burns using more DV than possible display a warning indicator
+- [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Dim P/A icons when moused over and don't count as hovered????
 - [1| ] Hide all child icons and segments of object when zoomed out far enough
+- [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
 
 # Ships
 - [1| ] Fighters

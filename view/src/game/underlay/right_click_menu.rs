@@ -12,13 +12,17 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
         .resizable(false)
         .anchor(Align2::LEFT_BOTTOM, window_position.to_vec2())
         .show(context, |ui| {
-            if let Some(focus) = view.camera.get_focus() {
-                if model.try_get_vessel_component(focus).is_some() {
-                    let can_target = focus != entity;
+            if ui.button("Focus").clicked() {
+                view.camera.reset_panning();
+                view.camera.set_focus(Some(entity));
+            }
+            if let Some(selected) = view.selected.get_selected_entity() {
+                if model.try_get_vessel_component(selected).is_some() {
+                    let can_target = selected != entity;
                     let target_button = Button::new("Set target");
                     if ui.add_enabled(can_target, target_button).clicked() {
                         events.push(Event::SetTarget { 
-                            entity: view.camera.get_focus().unwrap(), 
+                            entity: selected, 
                             target: Some(entity) 
                         });
                     }

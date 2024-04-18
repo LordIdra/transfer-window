@@ -60,13 +60,7 @@ pub fn remove_if_expired(view: &mut Scene, model: &Model, time: f64) {
     }
 }
 
-pub fn update_selected(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, pointer: &PointerState, is_mouse_over_ui_element: bool) {
-    // Deselected by clicking elsewhere
-    if !is_mouse_over_ui_element && pointer.primary_clicked() {
-        trace!("Selected burn deselected");
-        view.selected = Selected::None;
-    }
-    
+pub fn update_drag(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, pointer: &PointerState) {
     // Finished dragging
     if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
         if state.is_dragging() {
