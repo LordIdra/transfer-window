@@ -36,8 +36,8 @@ impl BurnLocked {
 }
 
 impl Icon for BurnLocked {
-    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
-        "burn-locked"
+    fn get_texture(&self, _view: &Scene, _model: &Model) -> String {
+        "burn-locked".to_string()
     }
 
     fn get_alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {

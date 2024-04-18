@@ -23,17 +23,17 @@ impl Orbitable {
 }
 
 impl Icon for Orbitable {
-    fn get_texture(&self, view: &Scene, model: &Model) -> &str {
+    fn get_texture(&self, view: &Scene, model: &Model) -> String {
         if let Some(focus) = view.camera.get_focus() {
             if let Some(vessel_component) = model.try_get_vessel_component(focus) {
                 if let Some(target) = vessel_component.get_target() {
                     if target == self.entity {
-                        return "planet-target"
+                        return "planet-target".to_string()
                     }
                 }
             }
         }
-        "planet"
+        "planet".to_string()
     }
 
     fn get_alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {

@@ -16,7 +16,13 @@ fn find_same_parent_orbit_pairs(model: &Model, entity_a: Entity, entity_b: Entit
         let segment_a = segments_a[index_a];
         let segment_b = segments_b[index_b];
 
-        if !segment_a.is_orbit() || !segment_b.is_orbit() {
+        if !segment_a.is_orbit() {
+            index_a += 1;
+            continue;
+        }
+
+        if !segment_b.is_orbit() {
+            index_a += 1;
             continue;
         }
 
@@ -50,7 +56,7 @@ fn get_time_step(segment_a: &Segment, segment_b: &Segment, start_time: f64, end_
             step_time = f64::min(step_time, period);
         }
     }
-    step_time / 32.0
+    step_time / 16.0
 }
 impl Model {
     /// Returns the time at which the next closest approach will occur.
@@ -60,7 +66,7 @@ impl Model {
     /// and makes sense, but in practice is very counterintuitive and
     /// isn't really useful information eg when trying to plan a
     /// rendezvous.
-    pub fn find_next_closest_approach(&self, entity_a: Entity, entity_b: Entity) -> Option<f64> {
+    pub fn find_next_closest_approach(&self, entity_a: Entity, entity_b: Entity, start_time: f64) -> Option<f64> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Find next closest approach");
         let same_parent_orbit_pairs = find_same_parent_orbit_pairs(self, entity_a, entity_b);
@@ -68,11 +74,15 @@ impl Model {
         for pair in same_parent_orbit_pairs {
             let segment_a = pair.0;
             let segment_b = pair.1;
-            let start_time = f64::max(f64::max(segment_b.get_start_time(), segment_a.get_start_time()), self.get_time());
+            let start_time = f64::max(f64::max(segment_b.get_start_time(), segment_a.get_start_time()), start_time);
             let end_time = f64::min(segment_a.get_end_time(), segment_b.get_end_time());
             let time_step = get_time_step(segment_a, segment_b, start_time, end_time);
             let distance = |time: f64| (segment_a.get_position_at_time(time) - segment_b.get_position_at_time(time)).magnitude();
             let distance_prime = |time: f64| (distance(time + 2.0) - distance(time)) / 2.0;
+
+            if start_time > end_time {
+                continue;
+            }
 
             let mut time = start_time;
             let mut previous_time = time;

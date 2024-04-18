@@ -46,8 +46,8 @@ impl Apoapsis {
 }
 
 impl Icon for Apoapsis {
-    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
-        "apoapsis"
+    fn get_texture(&self, _view: &Scene, _model: &Model) -> String {
+        "apoapsis".to_string()
     }
 
     fn get_alpha(&self, _view: &Scene, _model: &Model, _is_selected: bool, _is_hovered: bool, is_overlapped: bool) -> f32 {

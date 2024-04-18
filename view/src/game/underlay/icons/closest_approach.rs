@@ -10,6 +10,7 @@ use super::Icon;
 pub struct ClosestApproach {
     entity: Entity,
     time: f64,
+    approach_number: usize,
 }
 
 impl ClosestApproach {
@@ -18,11 +19,21 @@ impl ClosestApproach {
         if let Some(entity) = view.camera.get_focus() {
             if let Some(vessel_component) = model.try_get_vessel_component(entity) {
                 if let Some(target) = vessel_component.get_target() {
-                    if let Some(time) = model.find_next_closest_approach(entity, target) {
-                        let icon = Self { entity, time };
+                    if let Some(time) = model.find_next_closest_approach(entity, target, model.get_time()) {
+                        // 1st closest approach
+                        let icon = Self { entity, time, approach_number: 1 };
                         icons.push(Box::new(icon) as Box<dyn Icon>);
-                        let icon = Self { entity: target, time };
+                        let icon = Self { entity: target, time, approach_number: 1 };
                         icons.push(Box::new(icon) as Box<dyn Icon>);
+
+                        // 2nd closest approach
+                        // Add 1.0 to make sure we don't find the same approach by accident
+                        if let Some(time) = model.find_next_closest_approach(entity, target, time + 1.0) {
+                            let icon = Self { entity, time, approach_number: 2 };
+                            icons.push(Box::new(icon) as Box<dyn Icon>);
+                            let icon = Self { entity: target, time, approach_number: 2 };
+                            icons.push(Box::new(icon) as Box<dyn Icon>);
+                        }
                     }
                 }
             }
@@ -32,8 +43,8 @@ impl ClosestApproach {
 }
 
 impl Icon for ClosestApproach {
-    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
-        "closest-approach-1"
+    fn get_texture(&self, _view: &Scene, _model: &Model) -> String {
+        "closest-approach-".to_string() + self.approach_number.to_string().as_str()
     }
 
     fn get_alpha(&self, _view: &Scene, _model: &Model, _is_selected: bool, _is_hovered: bool, is_overlapped: bool) -> f32 {

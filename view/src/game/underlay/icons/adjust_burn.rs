@@ -69,8 +69,8 @@ impl AdjustBurn {
 }
 
 impl Icon for AdjustBurn {
-    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
-        "adjust-burn-arrow"
+    fn get_texture(&self, _view: &Scene, _model: &Model) -> String {
+        "adjust-burn-arrow".to_string()
     }
 
     fn get_alpha(&self, view: &Scene, _model: &Model, _is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {

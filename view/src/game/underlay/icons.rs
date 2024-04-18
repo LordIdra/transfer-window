@@ -27,7 +27,7 @@ mod vessel;
 /// the icon with the highest priority at that level 
 /// is chosen.
 trait Icon: Debug {
-    fn get_texture(&self, view: &Scene, model: &Model) -> &str;
+    fn get_texture(&self, view: &Scene, model: &Model) -> String;
     fn get_alpha(&self, view: &Scene, model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32;
     fn get_radius(&self, view: &Scene, model: &Model) -> f64;
     fn get_priorities(&self, view: &Scene, model: &Model) -> [u64; 4];
@@ -116,7 +116,7 @@ fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, s
         add_textured_square(&mut vertices, icon.get_position(view, model), radius, alpha);
     }
     
-    let Some(texture_renderer) = view.texture_renderers.get(icon.get_texture(view, model)) else {
+    let Some(texture_renderer) = view.texture_renderers.get(&icon.get_texture(view, model)) else {
         error!("Texture {} does not exist ", icon.get_texture(view, model));
         return
     };

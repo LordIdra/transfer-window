@@ -48,8 +48,8 @@ impl Periapsis {
 }
 
 impl Icon for Periapsis {
-    fn get_texture(&self, _view: &Scene, _model: &Model) -> &str {
-        "periapsis"
+    fn get_texture(&self, _view: &Scene, _model: &Model) -> String {
+        "periapsis".to_string()
     }
 
     fn get_alpha(&self, _view: &Scene, _model: &Model, _is_selected: bool, _is_hovered: bool, is_overlapped: bool) -> f32 {
