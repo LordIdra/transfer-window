@@ -55,18 +55,17 @@
 - [1|x] Target is highlighted/circled
 - [1|x] Show closest encounter for target and selected
 - [1|x] Allow vessels to be deleted without crashing everything (oh god)
-- [1| ] Add ship classes with system slot schema
-- [1| ] Add system slots for propulsion, fuel tanks, and weapons
-- [1| ] Add frigate
-- [1| ] Add fuel tank schema
-- [1| ] Add propulsion schema
-- [1| ] Add weapon schema
-- [1| ] Add chemical fuel tank and 2 chemical rockets
+- [1|x] Add ship classes with system slot schema
+- [1|x] Add system slots for propulsion + fuel tanks
+- [1|x] Add light/heavy ships
+- [1|x] Add fuel tanks
+- [1|x] Add engines
 - [1| ] Create GUI for editing system slots and add ship layout texture
 - [1| ] Show current systems in system slots
 - [1| ] Allow editing current systems
 - [1| ] Show remaining DV + fuel bar in vessel top left GUI
-- [1| ] Reduce DV while burning
+- [1| ] Cannot create new burns if no engines or out of fuel
+- [1| ] Reduce DV/fuel while burning
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Add torpedo system
 - [1| ] Show active weapons at bottom of screen (simple for now)

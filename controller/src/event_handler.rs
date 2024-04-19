@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::VesselComponent}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model, SEGMENTS_TO_PREDICT};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -51,23 +51,23 @@ pub fn new_game(controller: &mut Controller) {
         .with_trajectory_component(trajectory_component));
 
     let mut trajectory_component = TrajectoryComponent::default();
-    let mut orbit = Orbit::new(earth, 1.0e4, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
+    let mut orbit = Orbit::new(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
     orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _spacecraft_1 = model.allocate(EntityBuilder::default()
-        .with_name_component(NameComponent::new("Spacecraft 1".to_string()))
-        .with_mass_component(MassComponent::new(1.0e4))
-        .with_vessel_component(VesselComponent::new())
+        .with_name_component(NameComponent::new("Heavy Spacecraft".to_string()))
+        .with_mass_component(MassComponent::new(3.0e2))
+        .with_vessel_component(VesselComponent::new(VesselClass::Heavy))
         .with_trajectory_component(trajectory_component));
 
     let mut trajectory_component = TrajectoryComponent::default();
-    let mut orbit = Orbit::new(moon, 1.0e4, 0.07346e24, vec2(0.3e8, 0.0), vec2(0.0, 4.0e2), 0.0);
+    let mut orbit = Orbit::new(moon, 2.0e2, 0.07346e24, vec2(0.3e8, 0.0), vec2(0.0, 4.0e2), 0.0);
     orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _spacecraft_2 = model.allocate(EntityBuilder::default()
-        .with_name_component(NameComponent::new("Spacecraft 2".to_string()))
-        .with_mass_component(MassComponent::new(1.0e4))
-        .with_vessel_component(VesselComponent::new())
+        .with_name_component(NameComponent::new("Light Spacecraft".to_string()))
+        .with_mass_component(MassComponent::new(2.0e2))
+        .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_trajectory_component(trajectory_component));
 
     controller.model = Some(model);
