@@ -1,26 +1,43 @@
 use serde::{Deserialize, Serialize};
 
-use self::{engine::Engine, fuel_tank::FuelTank};
+use self::{engine::Engine, fuel_tank::FuelTank, weapon::Weapon};
 
 use super::VesselClass;
 
-mod engine;
-mod fuel_tank;
+pub mod engine;
+pub mod fuel_tank;
+pub mod weapon;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum SystemSlots {
-    Light(Option<FuelTank>, Option<Engine>),
-    Heavy(Option<FuelTank>, Option<FuelTank>, Option<FuelTank>, Option<Engine>),
+    Light(LightSlots),
 }
 
 impl SystemSlots {
-    const LIGHT_DEFAULT: SystemSlots = SystemSlots::Light(None, None);
-    const HEAVY_DEFAULT: SystemSlots = SystemSlots::Heavy(None, None, None, None);
-
-    pub fn get_default(class: &VesselClass) -> SystemSlots {
+    pub fn new(class: VesselClass) -> SystemSlots {
         match class {
-            VesselClass::Light => Self::LIGHT_DEFAULT,
-            VesselClass::Heavy => Self::HEAVY_DEFAULT,
+            VesselClass::Light => SystemSlots::Light(LightSlots::default()),
         }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct LightSlots {
+    weapon: Option<Weapon>, 
+    fuel_tank: Option<FuelTank>, 
+    engine: Option<Engine>,
+}
+
+impl LightSlots {
+    pub fn weapon(&self) -> Option<&Weapon> {
+        self.weapon.as_ref()
+    }
+    
+    pub fn fuel_tank(&self) -> Option<&FuelTank> {
+        self.fuel_tank.as_ref()
+    }
+    
+    pub fn engine(&self) -> Option<&Engine> {
+        self.engine.as_ref()
     }
 }

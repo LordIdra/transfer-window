@@ -55,9 +55,9 @@ pub fn new_game(controller: &mut Controller) {
     orbit.end_at(1.0e10);
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _spacecraft_1 = model.allocate(EntityBuilder::default()
-        .with_name_component(NameComponent::new("Heavy Spacecraft".to_string()))
+        .with_name_component(NameComponent::new("Light Spacecraft".to_string()))
         .with_mass_component(MassComponent::new(3.0e2))
-        .with_vessel_component(VesselComponent::new(VesselClass::Heavy))
+        .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_trajectory_component(trajectory_component));
 
     let mut trajectory_component = TrajectoryComponent::default();

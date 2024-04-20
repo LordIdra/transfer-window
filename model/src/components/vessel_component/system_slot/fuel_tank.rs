@@ -1,22 +1,37 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum FuelTankType {
+    Small,
+    Medium,
+    Large
+}
+
+impl FuelTankType {
+    pub fn get_capacity(&self) -> f64 {
+        match self {
+            FuelTankType::Small => 10000.0,
+            FuelTankType::Medium => 15000.0,
+            FuelTankType::Large => 20000.0,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct FuelTank {
-    name: String,
-    capacity: f64,
+    type_: FuelTankType,
     remaining: f64,
 }
 
 impl FuelTank {
-    pub fn small_tank() -> FuelTank {
-        FuelTank { name: "Small Tank".to_string(), capacity: 10000.0, remaining: 10000.0 }
+    pub fn new(type_: FuelTankType) -> Self {
+        FuelTank { 
+            type_: type_.clone(), 
+            remaining: type_.get_capacity() 
+        }
     }
     
-    pub fn medium_tank() -> FuelTank {
-        FuelTank { name: "Medium Tank".to_string(), capacity: 15000.0, remaining: 15000.0 }
-    }
-
-    pub fn large_tank() -> FuelTank {
-        FuelTank { name: "Large Tank".to_string(), capacity: 20000.0, remaining: 20000.0 }
+    pub fn type_(&self) -> &FuelTankType {
+        &self.type_
     }
 }

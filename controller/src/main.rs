@@ -19,6 +19,7 @@ struct Controller {
 impl Controller {
     pub fn init(creation_context: &CreationContext) -> Box<dyn eframe::App> {
         info!("Initialising controller");
+        egui_extras::install_image_loaders(&creation_context.egui_ctx);
         let gl = creation_context.gl.as_ref().unwrap().clone();
         let model = None;
         let view = View::MenuScene(Scene::default());

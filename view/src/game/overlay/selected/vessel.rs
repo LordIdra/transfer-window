@@ -12,6 +12,9 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
         .resizable(false)
         .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
+            if ui.button("Edit").clicked() {
+                view.vessel_editor = Some(entity);
+            }
             if ui.button("Yeet").clicked() {
                 events.push(Event::Destroy { entity });
             }

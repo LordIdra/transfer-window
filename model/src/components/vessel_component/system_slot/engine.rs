@@ -1,18 +1,40 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum EngineType {
+    Efficient,
+    HighThrust,
+}
+
+impl EngineType {
+    pub fn get_fuel_per_second(&self) -> f64 {
+        match self {
+            EngineType::Efficient => 50.0,
+            EngineType::HighThrust => 200.0,
+        }
+    }
+
+    pub fn get_thrust_newtons(&self) -> f64 {
+        match self {
+            EngineType::Efficient => 15000.0,
+            EngineType::HighThrust => 75000.0,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Engine {
-    name: String,
-    fuel_per_second: f64,
-    thrust_newtons: f64,
+    type_: EngineType,
 }
 
 impl Engine {
-    pub fn efficient_engine() -> Engine{
-        Engine { name: "Efficient engine".to_string(), fuel_per_second: 50.0, thrust_newtons: 15000.0 }
+    pub fn new(type_: EngineType) -> Self {
+        Engine { 
+            type_: type_.clone(), 
+        }
     }
     
-    pub fn high_thrust_engine() -> Engine{
-        Engine { name: "High thrust engine".to_string(), fuel_per_second: 200.0, thrust_newtons: 75000.0 }
+    pub fn type_(&self) -> &EngineType {
+        &self.type_
     }
 }
