@@ -43,8 +43,8 @@ pub fn update(view: &mut Scene, model: &Model) {
     }
 
     // Delete current vessel editor if the entity no longer exists
-    if let Some(entity) = view.vessel_editor {
-        if !model.entity_exists(entity) {
+    if let Some(vessel_editor) = view.vessel_editor.as_ref() {
+        if !model.entity_exists(vessel_editor.entity()) {
             view.vessel_editor = None;
         }
     }

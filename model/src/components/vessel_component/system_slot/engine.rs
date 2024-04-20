@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum EngineType {
     Efficient,
     HighThrust,
@@ -29,9 +29,7 @@ pub struct Engine {
 
 impl Engine {
     pub fn new(type_: EngineType) -> Self {
-        Engine { 
-            type_: type_.clone(), 
-        }
+        Engine { type_ }
     }
     
     pub fn type_(&self) -> &EngineType {

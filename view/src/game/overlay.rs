@@ -11,7 +11,7 @@ mod fps;
 mod scale;
 mod selected;
 mod time;
-mod vessel_editor;
+pub mod vessel_editor;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]

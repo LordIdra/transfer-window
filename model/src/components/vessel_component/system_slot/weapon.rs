@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum WeaponType {
     Torpedo
 }
@@ -13,7 +13,7 @@ pub struct Weapon {
 impl Weapon {
     pub fn new(type_: WeaponType) -> Self {
         Weapon { 
-            type_: type_, 
+            type_, 
         }
     }
     

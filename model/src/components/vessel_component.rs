@@ -2,10 +2,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use self::system_slot::SystemSlots;
+use self::system_slot::Slots;
 
 pub mod system_slot;
 
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum VesselClass {
     Light,
 }
@@ -13,15 +14,16 @@ pub enum VesselClass {
 /// Must have `MassComponent` and `TrajectoryComponent`
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VesselComponent {
-    slots: SystemSlots,
+    class: VesselClass,
+    slots: Slots,
     target: Option<Entity>,
 }
 
 #[allow(clippy::new_without_default)]
 impl VesselComponent {
     pub fn new(class: VesselClass) -> Self {
-        let slots = SystemSlots::new(class);
-        Self { slots, target: None }
+        let slots = Slots::new(class);
+        Self { class, slots, target: None }
     }
 
     pub fn set_target(&mut self, target: Option<Entity>) {
@@ -32,7 +34,11 @@ impl VesselComponent {
         self.target
     }
 
-    pub fn get_slots(&self) -> &SystemSlots {
+    pub fn class(&self) -> VesselClass {
+        self.class
+    }
+
+    pub fn slots(&self) -> &Slots {
         &self.slots
     }
 }

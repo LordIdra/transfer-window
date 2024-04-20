@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum FuelTankType {
     Small,
     Medium,
@@ -25,10 +25,7 @@ pub struct FuelTank {
 
 impl FuelTank {
     pub fn new(type_: FuelTankType) -> Self {
-        FuelTank { 
-            type_: type_.clone(), 
-            remaining: type_.get_capacity() 
-        }
+        FuelTank { type_, remaining: type_.get_capacity() }
     }
     
     pub fn type_(&self) -> &FuelTankType {

@@ -5,7 +5,7 @@ use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::events::Event;
 
-use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, rendering::{geometry_renderer::GeometryRenderer, texture_renderer::TextureRenderer}, resources::Resources, underlay::selected::Selected};
+use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, rendering::{geometry_renderer::GeometryRenderer, texture_renderer::TextureRenderer}, resources::Resources, underlay::selected::Selected};
 
 mod camera;
 mod debug;
@@ -26,7 +26,7 @@ pub struct Scene {
     texture_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
     selected: Selected,
     right_click_menu: Option<Entity>,
-    vessel_editor: Option<Entity>,
+    vessel_editor: Option<VesselEditor>,
     frame_history: FrameHistory,
     debug_window_open: bool,
     debug_window_tab: DebugWindowTab,
