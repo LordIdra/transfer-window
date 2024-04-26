@@ -60,8 +60,8 @@
 - [1|x] Add light/heavy ships
 - [1|x] Add fuel tanks
 - [1|x] Add engines
-- [1| ] Create GUI for editing system slots and add ship layout texture
-- [1| ] Show current systems in system slots
+- [1|x] Create GUI for editing system slots and add ship layout texture
+- [1|x] Show current systems in system slots
 - [1| ] Allow editing current systems
 - [1| ] Show remaining DV + fuel bar in vessel top left GUI
 - [1| ] Cannot create new burns if no engines or out of fuel
