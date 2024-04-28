@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Instant};
 
-use eframe::{egui::Context, glow, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
+use eframe::{egui::{Context, FontData, FontDefinitions, FontFamily}, glow, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
 use log::{debug, error, info};
 use transfer_window_model::Model;
 use transfer_window_view::{events::Event, menu::Scene, View};
@@ -19,6 +19,20 @@ struct Controller {
 impl Controller {
     pub fn init(creation_context: &CreationContext) -> Box<dyn eframe::App> {
         info!("Initialising controller");
+
+        // https://github.com/amPerl/egui-phosphor/blob/main/src/lib.rs
+        let mut font_definition = FontDefinitions::default();
+        font_definition.font_data.insert("mdi".into(), FontData::from_static(include_bytes!("../resources/fonts/MaterialIcons-Regular.ttf")));
+        if let Some(font_keys) = font_definition.families.get_mut(&FontFamily::Proportional) {
+            debug!("Loading proportional MDI font");
+            font_keys.push("mdi".into());
+        }
+        if let Some(font_keys) = font_definition.families.get_mut(&FontFamily::Monospace) {
+            debug!("Loading monospace MDI font");
+            font_keys.push("mdi".into());
+        }
+        creation_context.egui_ctx.set_fonts(font_definition);
+
         egui_extras::install_image_loaders(&creation_context.egui_ctx);
         let gl = creation_context.gl.as_ref().unwrap().clone();
         let model = None;

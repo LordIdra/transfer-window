@@ -1,7 +1,7 @@
-use eframe::{egui::{style::WidgetVisuals, Color32, ImageButton, Pos2, Rect, Rounding, Stroke, Ui}, epaint};
-use transfer_window_model::{components::vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::{Weapon, WeaponType}, Slot, SlotLocation}, VesselClass}, storage::entity_allocator::Entity};
+use eframe::{egui::{style::WidgetVisuals, Color32, ImageButton, Pos2, Rect, RichText, Rounding, Stroke, Ui}, epaint};
+use transfer_window_model::{components::vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::{Weapon, WeaponType}, Slot, SlotLocation, System}, VesselClass}, storage::entity_allocator::Entity};
 
-use crate::{events::Event, game::Scene};
+use crate::{events::Event, game::Scene, icons::ICON_WAREHOUSE};
 
 use super::util::{get_slot_locations, get_slot_size, TexturedSlot};
 
@@ -12,6 +12,57 @@ const SLOT_SELECTOR_HEIGHT_OFFSET: f32 = 40.0;
 /// Space between slot centers, not slot edges
 const SLOT_SELECTOR_SPACING: f32 = 65.0;
 const SLOT_SELECTOR_SIZE: f32 = 60.0;
+
+fn show_tooltip_weapon(ui: &mut Ui, weapon: &Option<Weapon>) {
+    let Some(weapon) = weapon else {
+        ui.label("None");
+        return;
+    };
+
+    let name = match weapon.get_type() {
+        WeaponType::Torpedo => "Torpedo",
+    };
+
+    ui.label(name);
+}
+
+fn show_tooltip_fuel_tank(ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
+    let Some(fuel_tank) = fuel_tank else {
+        ui.label("None");
+        return;
+    };
+
+    let name = match fuel_tank.get_type() {
+        FuelTankType::Small => "Small Fuel Tank",
+        FuelTankType::Medium => "Medium Fuel Tank",
+        FuelTankType::Large => "Large Fuel Tank",
+    };
+
+    ui.label(name);
+    ui.label(RichText::new("BRUH ".to_string() + ICON_WAREHOUSE));
+}
+
+fn show_tooltip_engine(ui: &mut Ui, engine: &Option<Engine>) {
+    let Some(engine) = engine else {
+        ui.label("None");
+        return;
+    };
+
+    let name = match engine.get_type() {
+        EngineType::Efficient => "Efficient",
+        EngineType::HighThrust => "High Thrust",
+    };
+
+    ui.label(name);
+}
+
+fn show_tooltip(ui: &mut Ui, slot: &Slot) {
+    match slot {
+        Slot::Weapon(weapon) => show_tooltip_weapon(ui, weapon),
+        Slot::FuelTank(fuel_tank) => show_tooltip_fuel_tank(ui, fuel_tank),
+        Slot::Engine(engine) => show_tooltip_engine(ui, engine),
+    };
+}
 
 /// 1 individual item that could be equipped in the slot
 struct SlotSelector {
@@ -34,7 +85,7 @@ impl SlotSelector {
             let response = ui.add(image_button);
             let clicked = response.clicked();
             response.on_hover_ui(|ui| { 
-                ui.label("bruh"); 
+                show_tooltip(ui, &self.slot)
             });
             clicked
         }).inner
