@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use super::{System, SystemType};
 
+pub const FUEL_DENSITY: f64 = 1.0; // both RP-1 and LOX are very roughly 1.0kg/L
+
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum FuelTankType {
     Small,
@@ -18,7 +20,7 @@ impl FuelTankType {
         FuelTankType::Large,
     ];
 
-    pub fn get_capacity(&self) -> f64 {
+    pub fn get_capacity_litres(&self) -> f64 {
         match self {
             FuelTankType::Small => 10000.0,
             FuelTankType::Medium => 15000.0,
@@ -43,6 +45,6 @@ impl System for FuelTank {
 
 impl FuelTank {
     pub fn new(type_: FuelTankType) -> Self {
-        FuelTank { type_, remaining: type_.get_capacity() }
+        FuelTank { type_, remaining: type_.get_capacity_litres() }
     }
 }

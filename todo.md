@@ -63,6 +63,7 @@
 - [1|x] Create GUI for editing system slots and add ship layout texture
 - [1|x] Show current systems in system slots
 - [1|x] Allow editing current systems
+- [1| ] System tooltips
 - [1| ] Show remaining DV + fuel bar in vessel top left GUI
 - [1| ] Cannot create new burns if no engines or out of fuel
 - [1| ] Reduce DV/fuel while burning

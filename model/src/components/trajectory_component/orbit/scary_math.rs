@@ -3,6 +3,7 @@ use std::f64::consts::PI;
 use nalgebra_glm::{DVec2, vec2};
 
 pub const GRAVITATIONAL_CONSTANT: f64 = 6.67430e-11;
+pub const STANDARD_GRAVITY: f64 = 9.81;
 
 // https://phys.libretexts.org/Bookshelves/Astronomy__Cosmology/Celestial_Mechanics_(Tatum)/09%3A_The_Two_Body_Problem_in_Two_Dimensions/9.08%3A_Orbital_Elements_and_Velocity_Vector#mjx-eqn-9.5.31
 // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/elliptical-orbits.html
