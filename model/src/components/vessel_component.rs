@@ -38,7 +38,7 @@ impl VesselComponent {
         self.class
     }
 
-    pub fn slots(&self) -> &Slots {
+    pub fn get_slots(&self) -> &Slots {
         &self.slots
     }
 

@@ -1,10 +1,14 @@
 use serde::{Deserialize, Serialize};
 
+use super::{System, SystemType};
+
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum EngineType {
     Efficient,
     HighThrust,
 }
+
+impl SystemType for EngineType {}
 
 impl EngineType {
     pub const TYPES: [EngineType; 2] = [
@@ -32,12 +36,16 @@ pub struct Engine {
     type_: EngineType,
 }
 
+impl System for Engine {
+    type Type = EngineType;
+    
+    fn get_type(&self) -> &Self::Type {
+        &self.type_
+    }
+}
+
 impl Engine {
     pub fn new(type_: EngineType) -> Self {
         Engine { type_ }
-    }
-    
-    pub fn type_(&self) -> &EngineType {
-        &self.type_
     }
 }

@@ -10,6 +10,13 @@ pub mod engine;
 pub mod fuel_tank;
 pub mod weapon;
 
+pub trait System {
+    type Type: SystemType;
+    fn get_type(&self) -> &Self::Type;
+}
+
+pub trait SystemType {}
+
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SlotLocation {
     Front,
@@ -17,7 +24,7 @@ pub enum SlotLocation {
     Back,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Slot {
     Weapon(Option<Weapon>),
     FuelTank(Option<FuelTank>),

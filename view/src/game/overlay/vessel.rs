@@ -3,7 +3,7 @@ use transfer_window_model::{components::vessel_component::system_slot::SlotLocat
 
 use crate::{events::Event, game::Scene};
 
-use self::vessel_editor::draw_vessel_editor;
+use self::{slot_editor::SlotEditor, vessel_editor::draw_vessel_editor};
 
 mod slot_editor;
 mod util;
@@ -37,15 +37,16 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             let vessel_editor = view.vessel_editor.as_ref().unwrap();
             ui.label(model.get_name_component(vessel_editor.entity).get_name().to_uppercase());
             let vessel_component = model.get_vessel_component(vessel_editor.entity);
-            let class = vessel_component.class();
-            let rect = draw_vessel_editor(view, context, ui, class, vessel_component.slots());
+            let vessel_class = vessel_component.class();
+            let rect = draw_vessel_editor(view, context, ui, vessel_class, vessel_component.get_slots());
             let center = rect.center();
-            let size_x = rect.size().x;
+            let scalar = rect.size().x;
 
             // Vessel editor is queried again to satisfy borrow checker (draw_editor needs mutable access)
             let vessel_editor = view.vessel_editor.as_ref().unwrap();
             if let Some(location) = vessel_editor.slot_editor {
-                slot_editor::draw(view, ui, vessel_component.slots(), class, location, center, size_x, vessel_editor.entity, events);
+                let slot = vessel_component.get_slots().get(location);
+                SlotEditor::new(vessel_editor.entity, vessel_class, location, slot).draw(view, ui, center, scalar, events);
             }
         });
 }

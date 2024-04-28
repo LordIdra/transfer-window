@@ -78,12 +78,12 @@ fn draw_ship_underlay(view: &mut Scene, context: &Context, ui: &mut Ui, class: V
     ui.add(Image::new(texture).fit_to_exact_size(size))
 }
 
-pub fn draw_vessel_editor(view: &mut Scene, context: &Context, ui: &mut Ui, class: VesselClass, slots: &Slots) -> Rect {
+pub fn draw_vessel_editor(view: &mut Scene, context: &Context, ui: &mut Ui, vessel_class: VesselClass, slots: &Slots) -> Rect {
     let response = draw_ship_underlay(view, context, ui, VesselClass::Light);
     let center = response.rect.center();
     let size = response.rect.size();
-    let slot_size = get_slot_size(class) * size.x;
-    for (slot_location, translation) in get_slot_locations(class) {
+    let slot_size = get_slot_size(vessel_class) * size.x;
+    for (slot_location, translation) in get_slot_locations(vessel_class) {
         draw_slot(view, ui, slots.get(slot_location), slot_location, center, slot_size, translation * size.x);
     }
     response.rect
