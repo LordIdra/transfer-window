@@ -1,7 +1,7 @@
 use eframe::{egui::{style::WidgetVisuals, Color32, ImageButton, Pos2, Rect, RichText, Rounding, Stroke, Ui}, epaint};
 use transfer_window_model::{components::vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::{Weapon, WeaponType}, Slot, SlotLocation, System}, VesselClass}, storage::entity_allocator::Entity};
 
-use crate::{events::Event, game::Scene, icons::ICON_WAREHOUSE};
+use crate::{events::Event, game::Scene, icons::{ICON_FAST_FORWARD, ICON_OIL_BARREL, ICON_PIE_CHART_OUTLINE}};
 
 use super::util::{get_slot_locations, get_slot_size, TexturedSlot};
 
@@ -32,14 +32,15 @@ fn show_tooltip_fuel_tank(ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
         return;
     };
 
-    let name = match fuel_tank.get_type() {
+    let type_ = fuel_tank.get_type();
+    let name = match type_ {
         FuelTankType::Small => "Small Fuel Tank",
         FuelTankType::Medium => "Medium Fuel Tank",
         FuelTankType::Large => "Large Fuel Tank",
     };
 
     ui.label(name);
-    ui.label(RichText::new("BRUH ".to_string() + ICON_WAREHOUSE));
+    ui.label(RichText::new(format!("{} Capacity: {} L", ICON_OIL_BARREL, type_.get_capacity_litres())));
 }
 
 fn show_tooltip_engine(ui: &mut Ui, engine: &Option<Engine>) {
@@ -48,12 +49,17 @@ fn show_tooltip_engine(ui: &mut Ui, engine: &Option<Engine>) {
         return;
     };
 
-    let name = match engine.get_type() {
-        EngineType::Efficient => "Efficient",
-        EngineType::HighThrust => "High Thrust",
+    let type_ = engine.get_type();
+    let name = match type_ {
+        EngineType::Efficient => "Efficient Engine",
+        EngineType::HighThrust => "High Thrust Engine",
     };
 
+
     ui.label(name);
+    ui.label(RichText::new(format!("{} Fuel Consumption: {} L/s", ICON_OIL_BARREL, type_.get_fuel_per_second())));
+    ui.label(RichText::new(format!("{} Thrust: {} kN", ICON_FAST_FORWARD, type_.get_thrust_newtons() / 1000.0)));
+    ui.label(RichText::new(format!("{} Specific Impulse (vacuum): {} s", ICON_PIE_CHART_OUTLINE, type_.get_specific_impulse_space().round())));
 }
 
 fn show_tooltip(ui: &mut Ui, slot: &Slot) {

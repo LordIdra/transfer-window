@@ -20,8 +20,8 @@ impl EngineType {
 
     pub fn get_fuel_per_second(&self) -> f64 {
         match self {
-            EngineType::Efficient => 50.0,
-            EngineType::HighThrust => 200.0,
+            EngineType::Efficient => 5.0,
+            EngineType::HighThrust => 30.0,
         }
     }
 
