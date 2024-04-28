@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use self::system_slot::Slots;
+use self::system_slot::{Slot, SlotLocation, Slots};
 
 pub mod system_slot;
 
@@ -40,5 +40,9 @@ impl VesselComponent {
 
     pub fn slots(&self) -> &Slots {
         &self.slots
+    }
+
+    pub fn set_slot(&mut self, location: SlotLocation, slot: Slot) {
+        self.slots.set(location, slot);
     }
 }

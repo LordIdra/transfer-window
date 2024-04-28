@@ -46,6 +46,10 @@ impl Slots {
         Self { slots }
     }
 
+    pub(crate) fn set(&mut self, location: SlotLocation, slot: Slot) {
+        *self.slots.get_mut(&location).expect("Location does not contain slot") = slot;
+    }
+
     /// # Panics
     /// Panics if the location does not contain a slot
     pub fn get(&self, location: SlotLocation) -> &Slot {

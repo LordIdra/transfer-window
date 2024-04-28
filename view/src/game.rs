@@ -5,7 +5,7 @@ use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::events::Event;
 
-use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, rendering::{geometry_renderer::GeometryRenderer, texture_renderer::TextureRenderer}, resources::Resources, underlay::selected::Selected};
+use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel::VesselEditor, rendering::{geometry_renderer::GeometryRenderer, texture_renderer::TextureRenderer}, resources::Resources, underlay::selected::Selected};
 
 mod camera;
 mod debug;

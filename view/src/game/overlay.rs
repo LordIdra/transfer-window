@@ -11,7 +11,7 @@ mod fps;
 mod scale;
 mod selected;
 mod time;
-pub mod vessel_editor;
+pub mod vessel;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]
@@ -46,7 +46,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
         ..Style::default()
     });
 
-    vessel_editor::update(view, model, context);
+    vessel::update(view, model, context, events);
 
     context.set_style(Style::default());
 }

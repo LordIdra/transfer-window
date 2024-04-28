@@ -8,6 +8,12 @@ pub enum FuelTankType {
 }
 
 impl FuelTankType {
+    pub const TYPES: [FuelTankType; 3] = [
+        FuelTankType::Small, 
+        FuelTankType::Medium,
+        FuelTankType::Large,
+    ];
+
     pub fn get_capacity(&self) -> f64 {
         match self {
             FuelTankType::Small => 10000.0,

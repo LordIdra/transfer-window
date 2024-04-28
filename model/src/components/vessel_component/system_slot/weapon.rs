@@ -5,6 +5,12 @@ pub enum WeaponType {
     Torpedo
 }
 
+impl WeaponType {
+    pub const TYPES: [WeaponType; 1] = [
+        WeaponType::Torpedo,
+    ];
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Weapon {
     type_: WeaponType,

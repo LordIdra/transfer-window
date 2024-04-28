@@ -7,6 +7,11 @@ pub enum EngineType {
 }
 
 impl EngineType {
+    pub const TYPES: [EngineType; 2] = [
+        EngineType::Efficient, 
+        EngineType::HighThrust,
+    ];
+
     pub fn get_fuel_per_second(&self) -> f64 {
         match self {
             EngineType::Efficient => 50.0,

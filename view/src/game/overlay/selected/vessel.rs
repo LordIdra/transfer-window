@@ -1,6 +1,6 @@
 use eframe::{egui::{Align2, Context, Window}, epaint};
 
-use crate::{events::Event, game::{overlay::vessel_editor::VesselEditor, underlay::selected::Selected, Scene}};
+use crate::{events::Event, game::{overlay::vessel::VesselEditor, underlay::selected::Selected, Scene}};
 
 pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
     let Selected::Vessel(entity) = view.selected.clone() else { 

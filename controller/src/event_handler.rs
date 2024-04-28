@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model, SEGMENTS_TO_PREDICT};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -209,4 +209,12 @@ pub fn set_target(controller: &mut Controller, entity: Entity, target: Option<En
     let model = controller.get_model_mut();
 
     model.get_vessel_component_mut(entity).set_target(target);
+}
+
+pub fn set_slot(controller: &mut Controller, entity: Entity, location: SlotLocation, slot: Slot) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Set slot");
+    let model = controller.get_model_mut();
+
+    model.get_vessel_component_mut(entity).set_slot(location, slot);
 }

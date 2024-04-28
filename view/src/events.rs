@@ -1,5 +1,5 @@
 use nalgebra_glm::DVec2;
-use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::{components::vessel_component::system_slot::{Slot, SlotLocation}, storage::entity_allocator::Entity};
 
 #[derive(Debug)]
 pub enum Event {
@@ -16,4 +16,5 @@ pub enum Event {
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
     Destroy { entity: Entity },
     SetTarget { entity: Entity, target: Option<Entity> },
+    SetSlot { entity: Entity, location: SlotLocation, slot: Slot },
 }
