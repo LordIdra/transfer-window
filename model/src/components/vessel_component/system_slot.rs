@@ -62,4 +62,20 @@ impl Slots {
     pub fn get(&self, location: SlotLocation) -> &Slot {
         self.slots.get(&location).expect("Location does not contain slot")
     }
+
+    pub fn get_filled_slot_locations(&self) -> Vec<SlotLocation> {
+        self.slots.keys().cloned().into_iter().collect()
+    }
+
+    pub fn get_fuel_tanks(&self) -> Vec<&FuelTank> {
+        let mut fuel_tanks = vec![];
+        for location in self.get_filled_slot_locations() {
+            if let Slot::FuelTank(fuel_tank) = self.get(location) {
+                if let Some(fuel_tank) = fuel_tank {
+                    fuel_tanks.push(fuel_tank);
+                }
+            }
+        }
+        fuel_tanks
+    }
 }

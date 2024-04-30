@@ -47,4 +47,8 @@ impl FuelTank {
     pub fn new(type_: FuelTankType) -> Self {
         FuelTank { type_, remaining: type_.get_capacity_litres() }
     }
+
+    pub fn get_remaining(&self) -> f64 {
+        self.remaining
+    }
 }

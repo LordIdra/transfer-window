@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use self::system_slot::{Slot, SlotLocation, Slots};
+use self::system_slot::{Slot, SlotLocation, Slots, System};
 
 pub mod system_slot;
 
@@ -44,5 +44,21 @@ impl VesselComponent {
 
     pub fn set_slot(&mut self, location: SlotLocation, slot: Slot) {
         self.slots.set(location, slot);
+    }
+
+    pub fn get_remaining_fuel(&self) -> f64 {
+        let mut current_fuel = 0.0;
+        for fuel_tank in self.slots.get_fuel_tanks() {
+            current_fuel += fuel_tank.get_remaining();
+        }
+        current_fuel
+    }
+
+    pub fn get_fuel_capacity(&self) -> f64 {
+        let mut current_fuel = 0.0;
+        for fuel_tank in self.slots.get_fuel_tanks() {
+            current_fuel += fuel_tank.get_type().get_capacity_litres();
+        }
+        current_fuel
     }
 }
