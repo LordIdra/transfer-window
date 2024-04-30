@@ -142,6 +142,13 @@ impl SlotEditor {
     }
 
     pub fn draw(&self, view: &Scene, ui: &mut Ui, slot_center: Pos2, scalar: f32, events: &mut Vec<Event>) {
+        let slot_translation = scalar * get_slot_locations(self.vessel_class)
+            .get(&self.location)
+            .expect("Slot editor location does not exist");
+        let first_slot_selector_position = slot_center + epaint::vec2(
+            slot_translation - SLOT_SELECTOR_SPACING * (self.selectors.len() - 1) as f32 / 2.0, 
+            -SLOT_SELECTOR_HEIGHT_OFFSET - SLOT_SELECTOR_HEIGHT_PROPORTION * get_slot_size(self.vessel_class) * scalar);
+
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: Color32::from_rgba_unmultiplied(40, 40, 40, 220),
             weak_bg_fill: Color32::from_rgba_unmultiplied(40, 40, 40, 220),
@@ -168,13 +175,6 @@ impl SlotEditor {
             fg_stroke: Stroke::NONE,
             expansion: 0.0,
         };
-
-        let slot_translation = scalar * get_slot_locations(self.vessel_class)
-            .get(&self.location)
-            .expect("Slot editor location does not exist");
-        let first_slot_selector_position = slot_center + epaint::vec2(
-            slot_translation - SLOT_SELECTOR_SPACING * (self.selectors.len() - 1) as f32 / 2.0, 
-            -SLOT_SELECTOR_HEIGHT_OFFSET - SLOT_SELECTOR_HEIGHT_PROPORTION * get_slot_size(self.vessel_class) * scalar);
 
         for (i, selector) in self.selectors.iter().enumerate() {
             if selector.draw(view, ui, i, first_slot_selector_position) {

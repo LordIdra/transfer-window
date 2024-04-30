@@ -1,4 +1,4 @@
-use eframe::{egui::{Align2, Context, Window}, epaint};
+use eframe::{egui::{Align, Align2, Context, ImageButton, Layout, Window}, epaint};
 use transfer_window_model::{components::vessel_component::system_slot::SlotLocation, storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::Scene};
@@ -35,7 +35,16 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
         .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
             let vessel_editor = view.vessel_editor.as_ref().unwrap();
-            ui.label(model.get_name_component(vessel_editor.entity).get_name().to_uppercase());
+            let mut should_close = false;
+            ui.with_layout(Layout::right_to_left(Align::Min), |ui| {
+                let button = ImageButton::new(view.resources.get_texture_image("close"));
+                if ui.add_sized(epaint::vec2(20.0, 20.0), button).clicked() {
+                    should_close = true;
+                }
+                ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
+                    ui.label(model.get_name_component(vessel_editor.entity).get_name().to_uppercase());
+                });
+            });
             let vessel_component = model.get_vessel_component(vessel_editor.entity);
             let vessel_class = vessel_component.class();
             let rect = draw_vessel_editor(view, context, ui, vessel_class, vessel_component.get_slots());
@@ -47,6 +56,10 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             if let Some(location) = vessel_editor.slot_editor {
                 let slot = vessel_component.get_slots().get(location);
                 SlotEditor::new(vessel_editor.entity, vessel_class, location, slot).draw(view, ui, center, scalar, events);
+            }
+
+            if should_close {
+                view.vessel_editor = None;
             }
         });
 }

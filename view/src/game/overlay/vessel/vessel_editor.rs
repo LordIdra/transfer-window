@@ -5,7 +5,7 @@ use crate::game::Scene;
 
 use super::util::{get_slot_locations, get_slot_size, TexturedSlot};
 
-const UNDERLAY_SIZE_PROPORTION: f32 = 0.75;
+const UNDERLAY_SIZE_PROPORTION: f32 = 0.9;
 const WEAPON_SLOT_COLOR: Color32 = Color32::from_rgb(212, 11, 24);
 const FUEL_TANK_SLOT_COLOR: Color32 = Color32::from_rgb(240, 200, 0);
 const ENGINE_SLOT_COLOR: Color32 = Color32::from_rgb(2, 192, 240);
