@@ -64,8 +64,7 @@
 - [1|x] Show current systems in system slots
 - [1|x] Allow editing current systems
 - [1|x] System tooltips
-- [1| ] Fix UI expanding to fit slot editors by creating new window for slot editor
-- [1| ] Close button for vessel editor
+- [1|x] Close button for vessel editor
 - [1| ] Show remaining DV + fuel bar in vessel top left GUI
 - [1| ] Cannot create new burns if no engines or out of fuel
 - [1| ] Reduce DV/fuel while burning
