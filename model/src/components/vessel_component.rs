@@ -4,6 +4,8 @@ use crate::storage::entity_allocator::Entity;
 
 use self::system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System};
 
+use super::trajectory_component::orbit::scary_math::STANDARD_GRAVITY;
+
 pub mod system_slot;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
@@ -88,6 +90,20 @@ impl VesselComponent {
 
     pub fn get_mass(&self) -> f64 {
         self.get_dry_mass() + self.get_remaining_fuel_kg() * FUEL_DENSITY
+    }
+
+    pub fn get_max_dv(&self) -> Option<f64> {
+        let initial_mass = self.get_dry_mass() + self.get_max_fuel_kg();
+        let final_mass = self.get_dry_mass();
+        let isp = self.get_slots().get_engine()?.get_type().get_specific_impulse_space();
+        Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
+    }
+
+    pub fn get_remaining_dv(&self) -> Option<f64> {
+        let initial_mass = self.get_mass();
+        let final_mass = self.get_dry_mass();
+        let isp = self.get_slots().get_engine()?.get_type().get_specific_impulse_space();
+        Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
     }
 
     pub fn deplete_fuel(&mut self, fuel_to_deplete_kg: f64) {
