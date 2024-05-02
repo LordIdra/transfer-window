@@ -1,4 +1,4 @@
-use nalgebra_glm::DVec2;
+use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 
 use self::{ellipse::Ellipse, hyperbola::Hyperbola};
@@ -32,6 +32,10 @@ impl Conic {
             if (eccentricity - 1.0).abs() < 1.0e-4 {
                 eccentricity -= 1.0e-4;
             }
+            // Ellipse may not be able to model orbits with eccentricity extremely close to 0 - this small adjustment should not make a difference
+            if eccentricity.abs() < 1.0e-4 {
+                eccentricity += 1.0e-4;
+            }
             Conic::Ellipse(Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction))
         } else {
             // Hyperbola cannot model orbits with eccentricity extremely close to 1 - this small adjustment should not make a difference
@@ -40,6 +44,19 @@ impl Conic {
             }
             Conic::Hyperbola(Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction))
         }
+    }
+
+    pub fn circle(parent_mass: f64, position: DVec2, direction: OrbitDirection) -> Self {
+        let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * parent_mass;
+        let semi_major_axis = position.magnitude();
+        let eccentricity: f64 = 1.0e-4;
+        let speed = f64::sqrt(standard_gravitational_parameter * semi_major_axis * (1.0 - eccentricity.powi(2)) / position.magnitude_squared());
+        let mut velocity_unit = vec2(-position.y, position.x).normalize();
+        if direction.is_clockwise() {
+            velocity_unit = -velocity_unit;
+        }
+        let velocity = velocity_unit * speed;
+        Self::new(parent_mass, position, velocity)
     }
 
     pub fn get_theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
@@ -138,5 +155,27 @@ impl Conic {
             Conic::Ellipse(ellipse) => ellipse.get_orbits(time),
             Conic::Hyperbola(_) => 0
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use nalgebra_glm::vec2;
+
+    use crate::components::trajectory_component::orbit::orbit_direction::OrbitDirection;
+
+    use super::Conic;
+
+    #[test]
+    fn test_circle() {
+        let conic = Conic::circle(1.0e23, vec2(1.0e9, -1.0e8), OrbitDirection::AntiClockwise);
+        println!("e={} direction={:?}", conic.get_eccentricity(), conic.get_direction());
+        assert!(conic.get_eccentricity().abs() < 1.0e-2);
+        assert!(conic.get_direction().is_anticlockwise());
+
+        let conic = Conic::circle(1.0e17, vec2(-1.0e3, 0.0), OrbitDirection::Clockwise);
+        println!("e={} direction={:?}", conic.get_eccentricity(), conic.get_direction());
+        assert!(conic.get_eccentricity().abs() < 1.0e-2);
+        assert!(conic.get_direction().is_clockwise());
     }
 }

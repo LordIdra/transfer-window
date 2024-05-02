@@ -205,6 +205,7 @@ mod test {
         }
     }
 
+    #[test]
     fn test_find_next_closest_approach() {
         let mut model = Model::default();
 
@@ -219,12 +220,15 @@ mod test {
         let vessel_a = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
 
         let mut trajectory = TrajectoryComponent::default();
-        let mut orbit = Orbit::new(earth, 3.0e2, 5.9722e24, vec2(-0.1e9, 0.0), vec2(0.0, -2.0e3), 0.0);
+        let mut orbit = Orbit::new(earth, 3.0e2, 5.9722e24, vec2(-0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
         orbit.end_at(1.0e10);
         trajectory.add_segment(Segment::Orbit(orbit.clone()));
         let vessel_b = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
 
         let expected = orbit.get_period().unwrap() / 4.0;
-        let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0);
+        let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0).unwrap();
+
+        println!("Actual: {} Expected: {}", actual, expected);
+        assert!((expected - actual).abs() < 1.0e-3);
     }
 }
