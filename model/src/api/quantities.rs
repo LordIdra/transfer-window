@@ -55,7 +55,7 @@ impl Model {
             if let Segment::Burn(burn) = self.get_trajectory_component(entity).get_current_segment() {
                 return burn.get_current_point().get_mass();
             }
-            return vessel_component.get_dry_mass()
+            return vessel_component.get_mass()
         }
 
         error!("Request to get mass of entity without orbitable or vessel components");
@@ -86,7 +86,7 @@ impl Model {
                     return burn.get_rocket_equation_function().end().get_mass()
                 }
             }
-            return vessel_component.get_dry_mass()
+            return vessel_component.get_mass()
         }
 
         error!("Request to get mass of entity without orbitable or vessel components");

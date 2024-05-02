@@ -50,11 +50,15 @@ impl VesselComponent {
         &self.slots
     }
 
+    pub fn get_slots_mut(&mut self) -> &mut Slots {
+        &mut self.slots
+    }
+
     pub fn set_slot(&mut self, location: SlotLocation, slot: Slot) {
         self.slots.set(location, slot);
     }
 
-    pub fn get_remaining_fuel(&self) -> f64 {
+    pub fn get_remaining_fuel_litres(&self) -> f64 {
         let mut current_fuel = 0.0;
         for fuel_tank in self.slots.get_fuel_tanks() {
             current_fuel += fuel_tank.get_remaining_litres();
@@ -76,5 +80,14 @@ impl VesselComponent {
 
     pub fn get_fuel_mass(&self) -> f64 {
         self.get_fuel_capacity() * FUEL_DENSITY
+    }
+
+    pub fn get_mass(&self) -> f64 {
+        self.get_dry_mass() + self.get_remaining_fuel_litres() * FUEL_DENSITY
+    }
+
+    pub fn deplete_fuel(&mut self, fuel_to_deplete_kg: f64) {
+        dbg!(fuel_to_deplete_kg);
+        self.slots.deplete_fuel(fuel_to_deplete_kg)
     }
 }

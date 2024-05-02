@@ -24,7 +24,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                         response.rect,
                     );
 
-                    let width = 114.0 * vessel_component.get_remaining_fuel() / vessel_component.get_fuel_capacity();
+                    let width = 114.0 * vessel_component.get_remaining_fuel_litres() / vessel_component.get_fuel_capacity();
                     let from = to_screen.transform_pos(Pos2::new(2.0, 2.0));
                     let to = to_screen.transform_pos(Pos2::new(118.0, 8.0));
                     painter.rect(Rect::from_min_max(from, to), Rounding::same(3.0), Color32::DARK_GRAY, Stroke::NONE);
@@ -33,7 +33,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                     let to = to_screen.transform_pos(Pos2::new(2.0 + width as f32, 8.0));
                     painter.rect(Rect::from_min_max(from, to), Rounding::same(3.0), Color32::WHITE, Stroke::NONE);
 
-                    ui.label(format!("{} / {}", vessel_component.get_remaining_fuel(), vessel_component.get_fuel_capacity()));
+                    ui.label(format!("{} / {}", vessel_component.get_remaining_fuel_litres(), vessel_component.get_fuel_capacity()));
                 });
             }
             

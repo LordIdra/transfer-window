@@ -64,6 +64,12 @@ impl Slots {
         self.slots.get(&location).expect("Location does not contain slot")
     }
 
+    /// # Panics
+    /// Panics if the location does not contain a slot
+    pub fn get_mut(&mut self, location: SlotLocation) -> &mut Slot {
+        self.slots.get_mut(&location).expect("Location does not contain slot")
+    }
+
     pub fn get_filled_slot_locations(&self) -> Vec<SlotLocation> {
         self.slots.keys().cloned().into_iter().collect()
     }
@@ -78,6 +84,19 @@ impl Slots {
             }
         }
         fuel_tanks
+    }
+
+    pub fn deplete_fuel(&mut self, fuel_to_deplete_kg: f64) {
+        let fuel_tank_count = self.get_fuel_tanks().len();
+        let deplete_per_fuel_tank = fuel_to_deplete_kg / fuel_tank_count as f64;
+
+        for location in self.get_filled_slot_locations() {
+            if let Slot::FuelTank(fuel_tank) = self.get_mut(location) {
+                if let Some(fuel_tank) = fuel_tank {
+                    fuel_tank.deplete(deplete_per_fuel_tank);
+                }
+            }
+        }
     }
 
     /// For now, we assume the ship only has one engine

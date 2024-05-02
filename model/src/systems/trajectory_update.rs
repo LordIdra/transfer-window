@@ -1,15 +1,14 @@
-use crate::{components::{trajectory_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use crate::{components::ComponentType, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
 
 fn update_trajectory_component(model: &mut Model, entity: Entity, time: f64, simulation_dt: f64) {
     model.get_trajectory_component_mut(entity).get_current_segment_mut().next(simulation_dt);
-    if let Segment::Burn(burn) = model.get_trajectory_component(entity).get_current_segment() {
-        let start_mass = burn.get_rocket_equation_function().step_by_time(burn.get_time_since_start(time)).unwrap().get_mass();
-    }
-
-    while model.get_trajectory_component(entity).get_current_segment().is_finished() {
+    loop {
+        let current_segment = model.get_trajectory_component(entity).get_current_segment();
+        if !current_segment.is_finished() {
+            break;
+        }
 
         model.get_trajectory_component_mut(entity).on_segment_finished(time);
-
 
         // Add one because one of the orbits will be duration zero right at the end
         // due to how trajectory prediction works

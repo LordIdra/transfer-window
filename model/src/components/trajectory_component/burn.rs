@@ -143,20 +143,20 @@ impl Burn {
     fn recompute_burn_points(&mut self, start_point: &BurnPoint) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Recompute burn points");
+        self.points.clear();
         let end_time = start_point.get_time() + self.get_duration();
-        let mut points = vec![start_point.clone()];
-        while points.last().unwrap().get_time() + BURN_TIME_STEP < end_time {
-            let last = points.last().unwrap();
+        self.points.push(start_point.clone());
+        while self.get_end_point().get_time() + BURN_TIME_STEP < end_time {
+            let last = self.points.last().unwrap();
             let time_since_start = self.get_time_since_start(last.get_time());
             let mass = self.rocket_equation_function.step_by_time(time_since_start).unwrap().get_mass();
-            points.push(last.next(BURN_TIME_STEP, mass, self.get_absolute_acceleration(time_since_start)));
+            self.points.push(last.next(BURN_TIME_STEP, mass, self.get_absolute_acceleration(time_since_start)));
         }
-        let undershot_time = end_time - points.last().unwrap().get_time();
-        let last = points.last().unwrap();
+        let undershot_time = end_time - self.get_end_point().get_time();
+        let last = self.points.last().unwrap();
         let time_since_start = self.get_time_since_start(last.get_time());
         let mass = self.rocket_equation_function.step_by_time(time_since_start).unwrap().get_mass();
-        points.push(last.next(undershot_time, mass, self.get_absolute_acceleration(time_since_start)));
-        self.points = points;
+        self.points.push(last.next(undershot_time, mass, self.get_absolute_acceleration(time_since_start)));
     }
 
     pub fn reset(&mut self) {

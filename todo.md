@@ -66,6 +66,7 @@
 - [1|x] System tooltips
 - [1|x] Close button for vessel editor
 - [1| ] Show remaining DV + fuel bar in vessel top left GUI
+- [1| ] Disallow changing modules to change burns
 - [1| ] Vessel mass should account for remaining fuel
 - [1| ] Cannot create new burns if no engines or out of fuel
 - [1| ] Reduce DV/fuel while burning

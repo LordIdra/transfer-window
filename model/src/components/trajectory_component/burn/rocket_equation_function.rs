@@ -70,6 +70,10 @@ impl RocketEquationFunction {
         start_mass - burnt_mass
     }
 
+    pub fn get_fuel_kg_burnt(&self) -> f64 {
+        self.fuel_consumption_kg_per_second * self.burn_time
+    }
+
     pub fn get_acceleration(&self) -> f64 {
         let force = STANDARD_GRAVITY * self.specific_impulse * self.fuel_consumption_kg_per_second;
         force / self.get_mass()
