@@ -5,10 +5,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{storage::entity_allocator::Entity, util::normalize_angle};
 
-use self::{conic::{Conic, ConicType}, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::sphere_of_influence};
+use self::{conic::{Conic, ConicType}, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{sphere_of_influence, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT}};
 
 pub mod conic;
-mod orbit_direction;
+pub(crate) mod orbit_direction;
 pub mod orbit_point;
 pub mod scary_math;
 
@@ -25,6 +25,17 @@ pub struct Orbit {
 impl Orbit {
     pub fn new(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
         let conic = Conic::new(parent_mass, position, velocity);
+        let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
+        let start_point = OrbitPoint::new(&conic, position, time);
+        let end_point = start_point.clone();
+        let current_point = start_point.clone();
+        Self { parent, conic, sphere_of_influence, start_point, end_point, current_point }
+    }
+
+    pub fn circle(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, time: f64, direction: OrbitDirection) -> Self {
+        let conic = Conic::circle(parent_mass, position, direction);
+        let standard_gravitational_parameter = parent_mass * GRAVITATIONAL_CONSTANT;
+        let velocity = velocity_to_obtain_eccentricity(position, conic.get_eccentricity(), standard_gravitational_parameter, conic.get_semi_major_axis(), direction);
         let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();

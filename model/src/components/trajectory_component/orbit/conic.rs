@@ -1,9 +1,9 @@
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
 use self::{ellipse::Ellipse, hyperbola::Hyperbola};
 
-use super::{orbit_direction::OrbitDirection, scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT}};
+use super::{orbit_direction::OrbitDirection, scary_math::{eccentricity, semi_major_axis, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT}};
 
 mod ellipse;
 mod hyperbola;
@@ -50,12 +50,7 @@ impl Conic {
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * parent_mass;
         let semi_major_axis = position.magnitude();
         let eccentricity: f64 = 1.0e-4;
-        let speed = f64::sqrt(standard_gravitational_parameter * semi_major_axis * (1.0 - eccentricity.powi(2)) / position.magnitude_squared());
-        let mut velocity_unit = vec2(-position.y, position.x).normalize();
-        if direction.is_clockwise() {
-            velocity_unit = -velocity_unit;
-        }
-        let velocity = velocity_unit * speed;
+        let velocity = velocity_to_obtain_eccentricity(position, eccentricity, standard_gravitational_parameter, semi_major_axis, direction);
         Self::new(parent_mass, position, velocity)
     }
 

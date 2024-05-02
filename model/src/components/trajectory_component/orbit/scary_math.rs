@@ -2,6 +2,8 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::{DVec2, vec2};
 
+use super::orbit_direction::OrbitDirection;
+
 pub const GRAVITATIONAL_CONSTANT: f64 = 6.67430e-11;
 pub const STANDARD_GRAVITY: f64 = 9.81;
 
@@ -21,6 +23,19 @@ pub fn semi_major_axis(position: DVec2, velocity: DVec2, standard_gravitational_
 
 pub fn eccentricity(position: DVec2, velocity: DVec2, standard_gravitational_parameter: f64, semi_major_axis: f64) -> f64 {
     (1.0 - ((position.magnitude_squared() * transverse_velocity(position, velocity).powi(2)) / (standard_gravitational_parameter * semi_major_axis))).sqrt()
+}
+
+pub fn speed_to_obtain_eccentricity(position: DVec2, eccentricity: f64, standard_gravitational_parameter: f64, semi_major_axis: f64) -> f64 {
+    f64::sqrt(standard_gravitational_parameter * semi_major_axis * (1.0 - eccentricity.powi(2)) / position.magnitude_squared())
+}
+
+pub fn velocity_to_obtain_eccentricity(position: DVec2, eccentricity: f64, standard_gravitational_parameter: f64, semi_major_axis: f64, direction: OrbitDirection) -> DVec2 {
+    let speed = speed_to_obtain_eccentricity(position, eccentricity, standard_gravitational_parameter, semi_major_axis);
+    let mut velocity_unit = vec2(-position.y, position.x).normalize();
+    if direction.is_clockwise() {
+        velocity_unit = -velocity_unit;
+    }
+    velocity_unit * speed
 }
 
 pub fn argument_of_periapsis(position: DVec2, velocity: DVec2, standard_gravitational_parameter: f64) -> f64 {

@@ -118,7 +118,7 @@ impl Model {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::{orbitable_component::OrbitableComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, storage::entity_builder::EntityBuilder, Model};
+    use crate::{components::{orbitable_component::OrbitableComponent, trajectory_component::{orbit::{conic::Conic, orbit_direction::OrbitDirection, Orbit}, segment::Segment, TrajectoryComponent}}, storage::entity_builder::EntityBuilder, Model};
 
     use super::find_same_parent_orbit_pairs;
 
@@ -214,13 +214,13 @@ mod test {
         let earth = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
         let mut trajectory = TrajectoryComponent::default();
-        let mut orbit = Orbit::new(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
+        let mut orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::Clockwise);
         orbit.end_at(1.0e10);
         trajectory.add_segment(Segment::Orbit(orbit));
         let vessel_a = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
 
         let mut trajectory = TrajectoryComponent::default();
-        let mut orbit = Orbit::new(earth, 3.0e2, 5.9722e24, vec2(-0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
+        let mut orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(-0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise);
         orbit.end_at(1.0e10);
         trajectory.add_segment(Segment::Orbit(orbit.clone()));
         let vessel_b = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
@@ -229,6 +229,12 @@ mod test {
         let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0).unwrap();
 
         println!("Actual: {} Expected: {}", actual, expected);
-        assert!((expected - actual).abs() < 1.0e-3);
+        assert!((expected - actual).abs() / expected < 1.0e-3);
+
+        let expected = orbit.get_period().unwrap() * 3.0 / 4.0;
+        let actual = model.find_next_closest_approach(vessel_a, vessel_b, orbit.get_period().unwrap() / 2.0).unwrap();
+
+        println!("Actual: {} Expected: {}", actual, expected);
+        assert!((expected - actual).abs() / expected < 1.0e-3);
     }
 }
