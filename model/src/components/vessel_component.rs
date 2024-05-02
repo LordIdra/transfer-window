@@ -66,7 +66,11 @@ impl VesselComponent {
         current_fuel
     }
 
-    pub fn get_fuel_capacity(&self) -> f64 {
+    pub fn get_remaining_fuel_kg(&self) -> f64 {
+        self.get_remaining_fuel_litres() * FUEL_DENSITY
+    }
+
+    pub fn get_max_fuel_litres(&self) -> f64 {
         let mut current_fuel = 0.0;
         for fuel_tank in self.slots.get_fuel_tanks() {
             current_fuel += fuel_tank.get_type().get_capacity_litres();
@@ -74,20 +78,19 @@ impl VesselComponent {
         current_fuel
     }
 
+    pub fn get_max_fuel_kg(&self) -> f64 {
+        self.get_max_fuel_litres() * FUEL_DENSITY
+    }
+
     pub fn get_dry_mass(&self) -> f64 {
         self.class.get_mass()
     }
 
-    pub fn get_fuel_mass(&self) -> f64 {
-        self.get_fuel_capacity() * FUEL_DENSITY
-    }
-
     pub fn get_mass(&self) -> f64 {
-        self.get_dry_mass() + self.get_remaining_fuel_litres() * FUEL_DENSITY
+        self.get_dry_mass() + self.get_remaining_fuel_kg() * FUEL_DENSITY
     }
 
     pub fn deplete_fuel(&mut self, fuel_to_deplete_kg: f64) {
-        dbg!(fuel_to_deplete_kg);
-        self.slots.deplete_fuel(fuel_to_deplete_kg)
+        self.slots.set_fuel_kg(fuel_to_deplete_kg)
     }
 }

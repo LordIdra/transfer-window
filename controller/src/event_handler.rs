@@ -147,7 +147,7 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
         None => {
             let vessel_component = model.get_vessel_component(entity);
             let dry_mass_kg = vessel_component.get_dry_mass();
-            let initial_fuel_mass_kg = vessel_component.get_fuel_mass();
+            let initial_fuel_mass_kg = vessel_component.get_max_fuel_kg();
             let engine = vessel_component.get_slots().get_engine().unwrap();
             let fuel_consumption_kg_per_second = engine.get_type().get_fuel_kg_per_second();
             let specific_impulse = engine.get_type().get_specific_impulse_space();

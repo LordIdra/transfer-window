@@ -48,14 +48,14 @@ impl Model {
 
     pub fn get_mass(&self, entity: Entity) -> f64 {
         if let Some(orbitable_component) = self.try_get_orbitable_component(entity) {
-            return orbitable_component.get_mass()
+            return orbitable_component.get_mass();
         }
 
         if let Some(vessel_component) = self.try_get_vessel_component(entity) {
             if let Segment::Burn(burn) = self.get_trajectory_component(entity).get_current_segment() {
                 return burn.get_current_point().get_mass();
             }
-            return vessel_component.get_mass()
+            return vessel_component.get_mass();
         }
 
         error!("Request to get mass of entity without orbitable or vessel components");
@@ -71,19 +71,18 @@ impl Model {
 
             // find last burn before time if it exists
             for segment in self.get_trajectory_component(entity).get_segments().iter().flatten().rev() {
-                if time > segment.get_end_time() {
+                if segment.get_start_time() > time {
                     continue;
                 }
 
                 if let Segment::Burn(burn) = segment {
                     if time > segment.get_start_time() && time < segment.get_end_time() {
                         // The requested time is within the burn
-                        let time_since_burn_started = time - burn.get_start_point() .get_time();
-                        return burn.get_rocket_equation_function().step_by_time(time_since_burn_started).unwrap().get_mass()
+                        return burn.get_point_at_time(time).get_mass();
                     }
                     
                     // Otherwise, the requested time is after the burn, so return mass at end of burn
-                    return burn.get_rocket_equation_function().end().get_mass()
+                    return burn.get_end_point().get_mass();
                 }
             }
             return vessel_component.get_mass()

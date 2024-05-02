@@ -60,7 +60,7 @@ impl FuelTank {
         self.remaining_litres * FUEL_DENSITY
     }
 
-    pub fn deplete(&mut self, to_deplete_kg: f64) {
-        self.remaining_litres -= to_deplete_kg / FUEL_DENSITY;
+    pub fn set_remaining(&mut self, to_deplete_kg: f64) {
+        self.remaining_litres = to_deplete_kg / FUEL_DENSITY;
     }
 }

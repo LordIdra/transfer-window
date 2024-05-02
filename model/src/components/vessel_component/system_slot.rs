@@ -86,14 +86,14 @@ impl Slots {
         fuel_tanks
     }
 
-    pub fn deplete_fuel(&mut self, fuel_to_deplete_kg: f64) {
+    pub fn set_fuel_kg(&mut self, new_fuel_kg: f64) {
         let fuel_tank_count = self.get_fuel_tanks().len();
-        let deplete_per_fuel_tank = fuel_to_deplete_kg / fuel_tank_count as f64;
+        let kg_per_fuel_tank = new_fuel_kg / fuel_tank_count as f64;
 
         for location in self.get_filled_slot_locations() {
             if let Slot::FuelTank(fuel_tank) = self.get_mut(location) {
                 if let Some(fuel_tank) = fuel_tank {
-                    fuel_tank.deplete(deplete_per_fuel_tank);
+                    fuel_tank.set_remaining(kg_per_fuel_tank);
                 }
             }
         }
