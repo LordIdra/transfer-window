@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::components::trajectory_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, specific_angular_momentum}};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Hyperbola {
     standard_gravitational_parameter: f64,
     semi_major_axis: f64,

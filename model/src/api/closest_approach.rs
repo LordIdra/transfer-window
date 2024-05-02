@@ -113,3 +113,95 @@ impl Model {
         None
     }
 }
+
+#[cfg(test)]
+mod test {
+    use nalgebra_glm::vec2;
+
+    use crate::{components::{orbitable_component::OrbitableComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, storage::entity_builder::EntityBuilder, Model};
+
+    use super::find_same_parent_orbit_pairs;
+
+    #[test]
+    fn test_find_same_parent_orbit_pairs() {
+        let mut model = Model::default();
+
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3);
+        let entity_builder = EntityBuilder::default();
+        let entity_a = model.allocate(entity_builder.with_orbitable_component(orbitable));
+
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3);
+        let entity_builder = EntityBuilder::default();
+        let entity_b = model.allocate(entity_builder.with_orbitable_component(orbitable));
+
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3);
+        let entity_builder = EntityBuilder::default();
+        let entity_c = model.allocate(entity_builder.with_orbitable_component(orbitable));
+
+        
+        let mut trajectory = TrajectoryComponent::default();
+    
+        let mut orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 0.0);
+        orbit.end_at(10.0);
+        let segment_d_1 = Segment::Orbit(orbit);
+        trajectory.add_segment(segment_d_1.clone());
+
+        let mut orbit = Orbit::new(entity_b, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 10.0);
+        orbit.end_at(50.0);
+        let segment_d_2 = Segment::Orbit(orbit);
+        trajectory.add_segment(segment_d_2.clone());
+
+        let mut orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 50.0);
+        orbit.end_at(100.0);
+        let segment_d_3 = Segment::Orbit(orbit);
+        trajectory.add_segment(segment_d_3.clone());
+
+        let entity_d = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
+
+
+        let mut trajectory = TrajectoryComponent::default();
+
+        let mut orbit = Orbit::new(entity_a, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 0.0);
+        orbit.end_at(5.0);
+        let segment_e_1 = Segment::Orbit(orbit);
+        trajectory.add_segment(segment_e_1.clone());
+
+        let mut orbit = Orbit::new(entity_b, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 5.0);
+        orbit.end_at(15.0);
+        let segment_e_2 = Segment::Orbit(orbit);
+        trajectory.add_segment(segment_e_2.clone());
+
+        let mut orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 15.0);
+        orbit.end_at(55.0);
+        let segment_e_3 = Segment::Orbit(orbit);
+        trajectory.add_segment(segment_e_3.clone());
+
+        let mut orbit = Orbit::new(entity_a, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 55.0);
+        orbit.end_at(70.0);
+        let segment_e_4 = Segment::Orbit(orbit);
+        trajectory.add_segment(segment_e_4.clone());
+
+        let mut orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 70.0);
+        orbit.end_at(100.0);
+        let segment_e_5 = Segment::Orbit(orbit);
+        trajectory.add_segment(segment_e_5.clone());
+
+        let entity_e = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
+
+
+        let expected = vec![
+            (segment_d_2, segment_e_2),
+            (segment_d_3.clone(), segment_e_3),
+            (segment_d_3, segment_e_5),
+        ];
+
+        let actual = find_same_parent_orbit_pairs(&model, entity_d, entity_e);
+
+        assert_eq!(actual.len(), expected.len());
+
+        for i in 0..actual.len() {
+            assert!(expected[i].0.get_parent() == actual[i].0.get_parent());
+            assert!(expected[i].1.get_parent() == actual[i].1.get_parent());
+        }
+    }
+}

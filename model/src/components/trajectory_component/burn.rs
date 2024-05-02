@@ -11,7 +11,7 @@ pub mod rocket_equation_function;
 const MIN_DURATION: f64 = 0.1;
 const BURN_TIME_STEP: f64 = 0.1;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Burn {
     entity: Entity,
     parent: Entity,

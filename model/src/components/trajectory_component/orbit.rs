@@ -12,7 +12,7 @@ mod orbit_direction;
 pub mod orbit_point;
 pub mod scary_math;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Orbit {
     parent: Entity,
     conic: Conic,

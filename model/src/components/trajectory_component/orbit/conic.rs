@@ -15,7 +15,7 @@ pub enum ConicType {
 
 /// Describes all the static parmeters of an orbit, but says nothing about the current model of the object in the orbit
 /// We use an enum instead of dynamic dispatch here because we cannot serialize trait objects
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Conic {
     Ellipse(Ellipse),
     Hyperbola(Hyperbola),

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{components::trajectory_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, period, specific_angular_momentum}}, util::normalize_angle};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Ellipse {
     semi_major_axis: f64,
     eccentricity: f64,
