@@ -3,7 +3,7 @@ use std::{collections::{HashMap, VecDeque}, fs};
 use nalgebra_glm::vec2;
 use serde::Deserialize;
 
-use crate::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}}, Model, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
+use crate::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -90,8 +90,7 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
     while !object_data.is_empty() {
         for (name, data) in object_data.clone() {
             let mut entity_builder = EntityBuilder::default()
-                .with_name_component(NameComponent::new(name.clone()))
-                .with_mass_component(MassComponent::new(data.mass));
+                .with_name_component(NameComponent::new(name.clone()));
 
             if data.velocity.is_none() && data.parent_name.is_none() {
                 let position = vec2(data.position[0], data.position[1]);
@@ -99,7 +98,7 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
 
             } else if data.velocity.is_some() && data.parent_name.is_some() {
                 if let Some(parent) = object_entities.get(data.parent_name.as_ref().unwrap()) {
-                    let parent_mass = model.get_mass_component(*parent).get_mass();
+                    let parent_mass = model.get_mass(*parent);
                     let position = vec2(data.position[0], data.position[1]);
                     let velocity = vec2(data.velocity.unwrap()[0], data.velocity.unwrap()[1]);
                     let mut trajectory_component = TrajectoryComponent::default();
@@ -114,7 +113,9 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
             }
 
             if data.orbitable {
-                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(0.0));
+                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(data.mass, 0.0));
+            } else {
+                entity_builder = entity_builder.with_vessel_component(VesselComponent::new(VesselClass::Light));
             }
 
             let entity = model.allocate(entity_builder);

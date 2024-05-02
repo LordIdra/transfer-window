@@ -18,7 +18,7 @@ impl EngineType {
         EngineType::HighThrust,
     ];
 
-    pub fn get_fuel_per_second(&self) -> f64 {
+    pub fn get_fuel_kg_per_second(&self) -> f64 {
         match self {
             EngineType::Efficient => 5.0,
             EngineType::HighThrust => 30.0,
@@ -33,7 +33,7 @@ impl EngineType {
     }
 
     pub fn get_specific_impulse_space(&self) -> f64 {
-        self.get_thrust_newtons() / (STANDARD_GRAVITY * self.get_fuel_per_second())
+        self.get_thrust_newtons() / (STANDARD_GRAVITY * self.get_fuel_kg_per_second())
     }
 }
 

@@ -29,11 +29,13 @@ fn draw_orbits(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui) {
 }
 
 fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Event>, time: f64, view: &mut Scene) {
-    let can_create_burn = if let Some(final_burn) = model.get_trajectory_component(entity).get_final_burn() {
-        time > final_burn.get_start_point().get_time()
+    let has_burn_before_requested_time = if let Some(final_burn) = model.get_trajectory_component(entity).get_final_burn() {
+        time < final_burn.get_start_point().get_time()
     } else {
-        true
+        false
     };
+    let vessel_component = model.get_vessel_component(entity);
+    let can_create_burn = vessel_component.get_slots().get_engine().is_some() && !has_burn_before_requested_time;
 
     let create_burn_button = Button::new("Create burn");
     if ui.add_enabled(can_create_burn, create_burn_button).clicked() {

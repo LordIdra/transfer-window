@@ -1,8 +1,7 @@
-use crate::components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, vessel_component::VesselComponent};
+use crate::components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, vessel_component::VesselComponent};
 
 #[derive(Debug, Default)]
 pub struct EntityBuilder {
-    pub mass_component: Option<MassComponent>,
     pub name_component: Option<NameComponent>,
     pub orbitable_component: Option<OrbitableComponent>,
     pub stationary_component: Option<StationaryComponent>,
@@ -13,11 +12,6 @@ pub struct EntityBuilder {
 /// Specifies how an entity should be built
 /// To build, pass into the model's allocate function
 impl EntityBuilder {
-    pub fn with_mass_component(mut self, component: MassComponent) -> Self {
-        self.mass_component = Some(component);
-        self
-    }
-
     pub fn with_name_component(mut self, component: NameComponent) -> Self {
         self.name_component = Some(component);
         self

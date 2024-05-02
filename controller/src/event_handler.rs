@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::Burn, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{system_slot::{Slot, SlotLocation, System}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model, SEGMENTS_TO_PREDICT};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -24,8 +24,7 @@ pub fn new_game(controller: &mut Controller) {
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html
     let sun = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Sun".to_string()))
-        .with_mass_component(MassComponent::new(1_988_500e24))
-        .with_orbitable_component(OrbitableComponent::new(695_700e3))
+        .with_orbitable_component(OrbitableComponent::new(1_988_500e24, 695_700e3))
         .with_stationary_component(StationaryComponent::new(vec2(0.0, 0.0))));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
@@ -35,8 +34,7 @@ pub fn new_game(controller: &mut Controller) {
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_mass_component(MassComponent::new(5.9722e24))
-        .with_orbitable_component(OrbitableComponent::new(0.5))
+        .with_orbitable_component(OrbitableComponent::new(5.9722e24, 0.5))
         .with_trajectory_component(trajectory_component));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
@@ -46,8 +44,7 @@ pub fn new_game(controller: &mut Controller) {
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
-        .with_mass_component(MassComponent::new(0.07346e24))
-        .with_orbitable_component(OrbitableComponent::new(1737.4e3))
+        .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3))
         .with_trajectory_component(trajectory_component));
 
     let mut trajectory_component = TrajectoryComponent::default();
@@ -56,7 +53,6 @@ pub fn new_game(controller: &mut Controller) {
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _spacecraft_1 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Light Spacecraft".to_string()))
-        .with_mass_component(MassComponent::new(3.0e2))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_trajectory_component(trajectory_component));
 
@@ -66,7 +62,6 @@ pub fn new_game(controller: &mut Controller) {
     trajectory_component.add_segment(Segment::Orbit(orbit));
     let _spacecraft_2 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Light Spacecraft".to_string()))
-        .with_mass_component(MassComponent::new(2.0e2))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_trajectory_component(trajectory_component));
 
@@ -146,11 +141,25 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let tangent = trajectory_component.get_end_segment().get_end_velocity().normalize();
     let start_position = trajectory_component.get_end_segment().get_end_position();
     let start_velocity = trajectory_component.get_end_segment().get_end_velocity();
-    let parent_mass = model.get_mass_component(parent).get_mass();
-    let mass = model.get_mass_component(entity).get_mass();
+    
+    let rocket_equation_function = match trajectory_component.get_final_burn() {
+        Some(burn) => burn.get_rocket_equation_function_at_end_of_burn(),
+        None => {
+            let vessel_component = model.get_vessel_component(entity);
+            let dry_mass_kg = vessel_component.get_dry_mass();
+            let initial_fuel_mass_kg = vessel_component.get_fuel_mass();
+            let engine = vessel_component.get_slots().get_engine().unwrap();
+            let fuel_consumption_kg_per_second = engine.get_type().get_fuel_kg_per_second();
+            let specific_impulse = engine.get_type().get_specific_impulse_space();
+            RocketEquationFunction::new(dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, 0.0)
+        }
+    };
 
-    let burn = Burn::new(entity, parent, parent_mass, tangent, vec2(0.0, 0.0), time, start_position, start_velocity);
-    let orbit = Orbit::new(parent, mass, parent_mass, burn.get_end_point().get_position(), burn.get_end_point().get_velocity(), burn.get_end_point().get_time());
+    let parent_mass = model.get_mass(parent);
+    let burn = Burn::new(entity, parent, parent_mass, tangent, vec2(0.0, 0.0), time, rocket_equation_function, start_position, start_velocity);
+
+    let mass_at_burn_end = burn.get_end_point().get_mass();
+    let orbit = Orbit::new(parent, mass_at_burn_end, parent_mass, burn.get_end_point().get_position(), burn.get_end_point().get_velocity(), burn.get_end_point().get_time());
     
     model.get_trajectory_component_mut(entity).add_segment(Segment::Burn(burn));
     model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
@@ -183,8 +192,8 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let parent = model.get_trajectory_component(entity).get_end_segment().get_parent();
     let position = model.get_trajectory_component_mut(entity).get_end_segment().get_end_position();
     let velocity = model.get_trajectory_component_mut(entity).get_end_segment().get_end_velocity();
-    let parent_mass = model.get_mass_component(parent).get_mass();
-    let mass = model.get_mass_component(entity).get_mass();
+    let parent_mass = model.get_mass(parent);
+    let mass = model.get_mass(entity);
 
     // Needs to be recalculated after we adjust the burn
     let end_time = model.get_trajectory_component_mut(entity).get_last_segment_at_time(time).get_end_time();

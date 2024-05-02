@@ -2,13 +2,21 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use self::system_slot::{Slot, SlotLocation, Slots, System};
+use self::system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System};
 
 pub mod system_slot;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum VesselClass {
     Light,
+}
+
+impl VesselClass {
+    pub fn get_mass(&self) -> f64 {
+        match self {
+            VesselClass::Light => 1.0e3,
+        }
+    }
 }
 
 /// Must have `MassComponent` and `TrajectoryComponent`
@@ -49,7 +57,7 @@ impl VesselComponent {
     pub fn get_remaining_fuel(&self) -> f64 {
         let mut current_fuel = 0.0;
         for fuel_tank in self.slots.get_fuel_tanks() {
-            current_fuel += fuel_tank.get_remaining();
+            current_fuel += fuel_tank.get_remaining_litres();
         }
         current_fuel
     }
@@ -60,5 +68,13 @@ impl VesselComponent {
             current_fuel += fuel_tank.get_type().get_capacity_litres();
         }
         current_fuel
+    }
+
+    pub fn get_dry_mass(&self) -> f64 {
+        self.class.get_mass()
+    }
+
+    pub fn get_fuel_mass(&self) -> f64 {
+        self.get_fuel_capacity() * FUEL_DENSITY
     }
 }

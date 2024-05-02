@@ -142,7 +142,8 @@ mod tests {
         let ellipse = Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let expected_time = 210.0 * 24.0 * 60.0 * 60.0;
         let duration = 365.20 * 24.0 * 60.0 * 60.0 + expected_time;
-        let mut tester = BruteForceTester::new(parent_mass, position, velocity, vec2(0.0, 0.0), 60.0);
+        let acceleration_from_time = |_: f64| vec2(0.0, 0.0);
+        let mut tester = BruteForceTester::new(parent_mass, position, velocity, acceleration_from_time, 60.0);
         tester.update(duration);
         let theta = f64::atan2(tester.get_position().y, tester.get_position().x);
         let time = ellipse.get_time_since_last_periapsis(theta);

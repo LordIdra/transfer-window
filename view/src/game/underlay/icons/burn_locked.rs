@@ -62,7 +62,7 @@ impl Icon for BurnLocked {
             u64::from(self.is_selected(view, model)),
             0,
             0,
-            (model.get_mass_component(self.entity).get_mass() / 1.0e22) as u64
+            (model.get_mass(self.entity) / 1.0e22) as u64
         ]
     }
 

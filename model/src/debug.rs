@@ -17,9 +17,6 @@ pub fn get_entity_by_name(model: &Model, name: &str) -> Entity {
 
 #[allow(unused)]
 pub fn log_components(model: &Model, entity: Entity) {
-    if let Some(component) = model.try_get_mass_component(entity) {
-        trace!("{component:?}");
-    }
     if let Some(component) = model.try_get_name_component(entity) {
         trace!("{component:?}");
     }

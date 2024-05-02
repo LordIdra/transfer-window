@@ -49,10 +49,6 @@ fn draw_burn(ui: &mut Ui, burn: &Burn) {
 }
 
 fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
-    if let Some(mass_component) = model.try_get_mass_component(entity) {
-        ui.label(format!("Mass: {:.3}", mass_component.get_mass()));
-    }
-
     let is_orbitable = model.try_get_orbitable_component(entity).is_some();
     ui.label(format!("Orbitable: {is_orbitable}"));
 
