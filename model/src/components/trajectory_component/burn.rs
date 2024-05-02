@@ -73,6 +73,7 @@ impl Burn {
         self.tangent
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn get_duration(&self) -> f64 {
         let final_rocket_equation_function = self.rocket_equation_function.step_by_dv(self.get_total_dv()).unwrap();
         f64::max(MIN_DURATION, final_rocket_equation_function.get_burn_time() - self.rocket_equation_function.get_burn_time())
@@ -83,6 +84,7 @@ impl Burn {
     }
 
     /// `time` is absolute
+    #[allow(clippy::missing_panics_doc)]
     pub fn get_point_at_time(&self, time: f64) -> BurnPoint {
         let time_since_start = self.get_time_since_start(time);
         let index = (time_since_start / BURN_TIME_STEP) as usize;
@@ -107,6 +109,7 @@ impl Burn {
         self.rocket_equation_function.clone()
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn get_rocket_equation_function_at_end_of_burn(&self) -> RocketEquationFunction {
         self.rocket_equation_function.step_by_time(self.get_duration()).unwrap()
     }

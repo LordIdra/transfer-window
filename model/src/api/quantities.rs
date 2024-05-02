@@ -4,6 +4,8 @@ use nalgebra_glm::{vec2, DVec2};
 use crate::{components::trajectory_component::segment::Segment, storage::entity_allocator::Entity, Model};
 
 impl Model {
+    /// # Panics
+    /// Panics if entity does not have a position
     pub fn get_position(&self, entity: Entity) -> Option<DVec2> {
         if let Some(stationary_component) = self.try_get_stationary_component(entity) {
             return Some(stationary_component.get_position())
@@ -16,7 +18,8 @@ impl Model {
         None
     }
 
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// Panics if entity does not have a position
     pub fn get_absolute_position(&self, entity: Entity) -> DVec2 {
         if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
             let current_segment = trajectory_component.get_current_segment();
@@ -31,7 +34,8 @@ impl Model {
         panic!("Error recoverable, but exiting anyway before something bad happens");
     }
 
-    #[allow(clippy::missing_panics_doc)]
+    /// # Panics
+    /// Panics if entity does not have a velocity
     pub fn get_absolute_velocity(&self, entity: Entity) -> DVec2 {
         if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
             let current_segment = trajectory_component.get_current_segment();
@@ -46,6 +50,8 @@ impl Model {
         panic!("Error recoverable, but exiting anyway before something bad happens");
     }
 
+    /// # Panics
+    /// Panics if entity does not have a mass
     pub fn get_mass(&self, entity: Entity) -> f64 {
         if let Some(orbitable_component) = self.try_get_orbitable_component(entity) {
             return orbitable_component.get_mass();
@@ -62,6 +68,8 @@ impl Model {
         panic!("Error recoverable, but exiting anyway before something bad happens");
     }
 
+    /// # Panics
+    /// Panics if entity does not have a mass
     pub fn get_mass_at_time(&self, entity: Entity, time: f64) -> f64 {
         if let Some(orbitable_component) = self.try_get_orbitable_component(entity) {
             return orbitable_component.get_mass()

@@ -142,17 +142,16 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let start_position = trajectory_component.get_end_segment().get_end_position();
     let start_velocity = trajectory_component.get_end_segment().get_end_velocity();
     
-    let rocket_equation_function = match trajectory_component.get_final_burn() {
-        Some(burn) => burn.get_rocket_equation_function_at_end_of_burn(),
-        None => {
-            let vessel_component = model.get_vessel_component(entity);
-            let dry_mass_kg = vessel_component.get_dry_mass();
-            let initial_fuel_mass_kg = vessel_component.get_remaining_fuel_kg();
-            let engine = vessel_component.get_slots().get_engine().unwrap();
-            let fuel_consumption_kg_per_second = engine.get_type().get_fuel_kg_per_second();
-            let specific_impulse = engine.get_type().get_specific_impulse_space();
-            RocketEquationFunction::new(dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, 0.0)
-        }
+    let rocket_equation_function = if let Some(burn) = trajectory_component.get_final_burn() {
+        burn.get_rocket_equation_function_at_end_of_burn()
+    } else {
+        let vessel_component = model.get_vessel_component(entity);
+        let dry_mass_kg = vessel_component.get_dry_mass();
+        let initial_fuel_mass_kg = vessel_component.get_remaining_fuel_kg();
+        let engine = vessel_component.get_slots().get_engine().unwrap();
+        let fuel_consumption_kg_per_second = engine.get_type().get_fuel_kg_per_second();
+        let specific_impulse = engine.get_type().get_specific_impulse_space();
+        RocketEquationFunction::new(dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, 0.0)
     };
 
     let parent_mass = model.get_mass(parent);

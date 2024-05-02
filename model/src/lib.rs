@@ -71,7 +71,7 @@ impl Model {
     pub fn update(&mut self, dt: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Model update");
-        fuel_depletion::update_fuel_depletion(self, dt);
+        fuel_depletion::update_fuel_depletion(self);
         warp_update_system::update(self, dt);
         time::update(self, dt);
         trajectory_update::update(self, dt);

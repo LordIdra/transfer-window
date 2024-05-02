@@ -107,6 +107,6 @@ impl VesselComponent {
     }
 
     pub fn deplete_fuel(&mut self, fuel_to_deplete_kg: f64) {
-        self.slots.set_fuel_kg(fuel_to_deplete_kg)
+        self.slots.set_fuel_kg(fuel_to_deplete_kg);
     }
 }

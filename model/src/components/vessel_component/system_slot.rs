@@ -71,16 +71,14 @@ impl Slots {
     }
 
     pub fn get_filled_slot_locations(&self) -> Vec<SlotLocation> {
-        self.slots.keys().cloned().into_iter().collect()
+        self.slots.keys().copied().collect()
     }
 
     pub fn get_fuel_tanks(&self) -> Vec<&FuelTank> {
         let mut fuel_tanks = vec![];
         for location in self.get_filled_slot_locations() {
-            if let Slot::FuelTank(fuel_tank) = self.get(location) {
-                if let Some(fuel_tank) = fuel_tank {
-                    fuel_tanks.push(fuel_tank);
-                }
+            if let Slot::FuelTank(Some(fuel_tank)) = self.get(location) {
+                fuel_tanks.push(fuel_tank);
             }
         }
         fuel_tanks
@@ -91,15 +89,15 @@ impl Slots {
         let kg_per_fuel_tank = new_fuel_kg / fuel_tank_count as f64;
 
         for location in self.get_filled_slot_locations() {
-            if let Slot::FuelTank(fuel_tank) = self.get_mut(location) {
-                if let Some(fuel_tank) = fuel_tank {
-                    fuel_tank.set_remaining(kg_per_fuel_tank);
-                }
+            if let Slot::FuelTank(Some(fuel_tank)) = self.get_mut(location) {
+                fuel_tank.set_remaining(kg_per_fuel_tank);
             }
         }
     }
 
     /// For now, we assume the ship only has one engine
+    /// # Panics
+    /// Panics if the ship does not have an engine slot
     pub fn get_engine(&self) -> Option<&Engine> {
         for location in self.get_filled_slot_locations() {
             if let Slot::Engine(engine) = self.get(location) {

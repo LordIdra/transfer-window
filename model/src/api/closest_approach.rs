@@ -118,7 +118,7 @@ impl Model {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::{orbitable_component::OrbitableComponent, trajectory_component::{orbit::{conic::Conic, orbit_direction::OrbitDirection, Orbit}, segment::Segment, TrajectoryComponent}}, storage::entity_builder::EntityBuilder, Model};
+    use crate::{components::{orbitable_component::OrbitableComponent, trajectory_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, TrajectoryComponent}}, storage::entity_builder::EntityBuilder, Model};
 
     use super::find_same_parent_orbit_pairs;
 

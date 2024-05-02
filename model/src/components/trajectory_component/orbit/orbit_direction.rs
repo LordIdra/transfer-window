@@ -20,11 +20,11 @@ impl OrbitDirection {
 }
 
 impl OrbitDirection {
-    pub fn is_anticlockwise(&self) -> bool {
+    pub fn is_anticlockwise(self) -> bool {
         matches!(self, Self::AntiClockwise)
     }
 
-    pub fn is_clockwise(&self) -> bool {
+    pub fn is_clockwise(self) -> bool {
         matches!(self, Self::Clockwise)
     }
 }
