@@ -1,7 +1,7 @@
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{storage::entity_allocator::Entity, Model};
+use crate::{components::trajectory_component::segment::Segment, storage::entity_allocator::Entity, Model};
 
 impl Model {
     pub fn get_position(&self, entity: Entity) -> Option<DVec2> {
@@ -43,6 +43,53 @@ impl Model {
         }
 
         error!("Request to get absolute position of entity without trajectory or stationary components");
+        panic!("Error recoverable, but exiting anyway before something bad happens");
+    }
+
+    pub fn get_mass(&self, entity: Entity) -> f64 {
+        if let Some(orbitable_component) = self.try_get_orbitable_component(entity) {
+            return orbitable_component.get_mass()
+        }
+
+        if let Some(vessel_component) = self.try_get_vessel_component(entity) {
+            if let Segment::Burn(burn) = self.get_trajectory_component(entity).get_current_segment() {
+                return burn.get_current_point().get_mass();
+            }
+            return vessel_component.get_dry_mass()
+        }
+
+        error!("Request to get mass of entity without orbitable or vessel components");
+        panic!("Error recoverable, but exiting anyway before something bad happens");
+    }
+
+    pub fn get_mass_at_time(&self, entity: Entity, time: f64) -> f64 {
+        if let Some(orbitable_component) = self.try_get_orbitable_component(entity) {
+            return orbitable_component.get_mass()
+        }
+
+        if let Some(vessel_component) = self.try_get_vessel_component(entity) {
+
+            // find last burn before time if it exists
+            for segment in self.get_trajectory_component(entity).get_segments().iter().flatten().rev() {
+                if time > segment.get_end_time() {
+                    continue;
+                }
+
+                if let Segment::Burn(burn) = segment {
+                    if time > segment.get_start_time() && time < segment.get_end_time() {
+                        // The requested time is within the burn
+                        let time_since_burn_started = time - burn.get_start_point() .get_time();
+                        return burn.get_rocket_equation_function().step_by_time(time_since_burn_started).unwrap().get_mass()
+                    }
+                    
+                    // Otherwise, the requested time is after the burn, so return mass at end of burn
+                    return burn.get_rocket_equation_function().end().get_mass()
+                }
+            }
+            return vessel_component.get_dry_mass()
+        }
+
+        error!("Request to get mass of entity without orbitable or vessel components");
         panic!("Error recoverable, but exiting anyway before something bad happens");
     }
 }

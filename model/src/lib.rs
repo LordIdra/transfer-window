@@ -4,7 +4,7 @@ use components::vessel_component::VesselComponent;
 use serde::{Deserialize, Serialize};
 use systems::{time::{self, TimeStep}, trajectory_update, warp_update_system::{self, TimeWarp}};
 
-use self::{components::{mass_component::MassComponent, name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
+use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
 pub const SEGMENTS_TO_PREDICT: usize = 4;
 
@@ -18,7 +18,6 @@ mod util;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Model {
     entity_allocator: EntityAllocator,
-    mass_components: ComponentStorage<MassComponent>,
     name_components: ComponentStorage<NameComponent>,
     orbitable_components: ComponentStorage<OrbitableComponent>,
     stationary_components: ComponentStorage<StationaryComponent>,
@@ -33,7 +32,6 @@ impl Default for Model {
     fn default() -> Self {
         Self {
             entity_allocator: EntityAllocator::default(),
-            mass_components: ComponentStorage::default(),
             name_components: ComponentStorage::default(),
             orbitable_components: ComponentStorage::default(),
             trajectory_components: ComponentStorage::default(),
@@ -82,7 +80,6 @@ impl Model {
         let mut entities = self.entity_allocator.get_entities().clone();
         while let Some(component_type) = with_component_types.pop() {
             let other_entities = match component_type {
-                ComponentType::MassComponent => self.mass_components.get_entities(),
                 ComponentType::NameComponent => self.name_components.get_entities(),
                 ComponentType::OrbitableComponent => self.orbitable_components.get_entities(),
                 ComponentType::StationaryComponent => self.stationary_components.get_entities(),
@@ -96,7 +93,6 @@ impl Model {
 
     pub fn allocate(&mut self, entity_builder: EntityBuilder) -> Entity {
         let EntityBuilder {
-            mass_component,
             name_component,
             orbitable_component,
             stationary_component,
@@ -104,7 +100,6 @@ impl Model {
             vessel_component,
         } = entity_builder;
         let entity = self.entity_allocator.allocate();
-        self.mass_components.set(entity, mass_component);
         self.name_components.set(entity, name_component);
         self.orbitable_components.set(entity, orbitable_component);
         self.stationary_components.set(entity, stationary_component);
@@ -115,7 +110,6 @@ impl Model {
 
     pub fn deallocate(&mut self, entity: Entity) {
         self.entity_allocator.deallocate(entity);
-        self.mass_components.remove_if_exists(entity);
         self.name_components.remove_if_exists(entity);
         self.orbitable_components.remove_if_exists(entity);
         self.stationary_components.remove_if_exists(entity);
@@ -125,102 +119,6 @@ impl Model {
 
     pub fn entity_exists(&self, entity: Entity) -> bool {
         self.entity_allocator.get_entities().contains(&entity)
-    }
-
-    pub fn get_mass_component_mut(&mut self, entity: Entity) -> &mut MassComponent {
-        self.mass_components.get_mut(entity)
-    }
-
-    pub fn get_mass_component(&self, entity: Entity) -> &MassComponent {
-        self.mass_components.get(entity)
-    }
-
-    pub fn try_get_mass_component_mut(&mut self, entity: Entity) -> Option<&mut MassComponent> {
-        self.mass_components.try_get_mut(entity)
-    }
-
-    pub fn try_get_mass_component(&self, entity: Entity) -> Option<&MassComponent> {
-        self.mass_components.try_get(entity)
-    }
-
-    pub fn get_name_component_mut(&mut self, entity: Entity) -> &mut NameComponent {
-        self.name_components.get_mut(entity)
-    }
-
-    pub fn get_name_component(&self, entity: Entity) -> &NameComponent {
-        self.name_components.get(entity)
-    }
-
-    pub fn try_get_name_component_mut(&mut self, entity: Entity) -> Option<&mut NameComponent> {
-        self.name_components.try_get_mut(entity)
-    }
-
-    pub fn try_get_name_component(&self, entity: Entity) -> Option<&NameComponent> {
-        self.name_components.try_get(entity)
-    }
-
-    pub fn get_stationary_component_mut(&mut self, entity: Entity) -> &mut StationaryComponent {
-        self.stationary_components.get_mut(entity)
-    }
-
-    pub fn get_stationary_component(&self, entity: Entity) -> &StationaryComponent {
-        self.stationary_components.get(entity)
-    }
-
-    pub fn try_get_stationary_component_mut(&mut self, entity: Entity) -> Option<&mut StationaryComponent> {
-        self.stationary_components.try_get_mut(entity)
-    }
-
-    pub fn try_get_stationary_component(&self, entity: Entity) -> Option<&StationaryComponent> {
-        self.stationary_components.try_get(entity)
-    }
-
-    pub fn get_orbitable_component_mut(&mut self, entity: Entity) -> &mut OrbitableComponent {
-        self.orbitable_components.get_mut(entity)
-    }
-
-    pub fn get_orbitable_component(&self, entity: Entity) -> &OrbitableComponent {
-        self.orbitable_components.get(entity)
-    }
-
-    pub fn try_get_orbitable_component_mut(&mut self, entity: Entity) -> Option<&mut OrbitableComponent> {
-        self.orbitable_components.try_get_mut(entity)
-    }
-
-    pub fn try_get_orbitable_component(&self, entity: Entity) -> Option<&OrbitableComponent> {
-        self.orbitable_components.try_get(entity)
-    }
-
-    pub fn get_trajectory_component_mut(&mut self, entity: Entity) -> &mut TrajectoryComponent {
-        self.trajectory_components.get_mut(entity)
-    }
-
-    pub fn get_trajectory_component(&self, entity: Entity) -> &TrajectoryComponent {
-        self.trajectory_components.get(entity)
-    }
-
-    pub fn try_get_trajectory_component_mut(&mut self, entity: Entity) -> Option<&mut TrajectoryComponent> {
-        self.trajectory_components.try_get_mut(entity)
-    }
-
-    pub fn try_get_trajectory_component(&self, entity: Entity) -> Option<&TrajectoryComponent> {
-        self.trajectory_components.try_get(entity)
-    }
-
-    pub fn get_vessel_component_mut(&mut self, entity: Entity) -> &mut VesselComponent {
-        self.vessel_components.get_mut(entity)
-    }
-
-    pub fn get_vessel_component(&self, entity: Entity) -> &VesselComponent {
-        self.vessel_components.get(entity)
-    }
-
-    pub fn try_get_vessel_component_mut(&mut self, entity: Entity) -> Option<&mut VesselComponent> {
-        self.vessel_components.try_get_mut(entity)
-    }
-
-    pub fn try_get_vessel_component(&self, entity: Entity) -> Option<&VesselComponent> {
-        self.vessel_components.try_get(entity)
     }
 }
 

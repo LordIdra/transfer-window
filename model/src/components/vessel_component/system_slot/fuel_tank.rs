@@ -27,12 +27,16 @@ impl FuelTankType {
             FuelTankType::Large => 20000.0,
         }
     }
+
+    pub fn get_capacity_kg(&self) -> f64 {
+        self.get_capacity_litres() * FUEL_DENSITY
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FuelTank {
     type_: FuelTankType,
-    remaining: f64,
+    remaining_litres: f64,
 }
 
 impl System for FuelTank {
@@ -45,10 +49,14 @@ impl System for FuelTank {
 
 impl FuelTank {
     pub fn new(type_: FuelTankType) -> Self {
-        FuelTank { type_, remaining: type_.get_capacity_litres() }
+        FuelTank { type_, remaining_litres: type_.get_capacity_litres() }
     }
 
-    pub fn get_remaining(&self) -> f64 {
-        self.remaining
+    pub fn get_remaining_litres(&self) -> f64 {
+        self.remaining_litres
+    }
+
+    pub fn get_remaining_kg(&self) -> f64 {
+        self.remaining_litres * FUEL_DENSITY
     }
 }

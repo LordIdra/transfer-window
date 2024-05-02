@@ -56,7 +56,7 @@ impl Icon for Orbitable {
             0,
             u64::from(self.is_selected(view, model)),
             2,
-            (model.get_mass_component(self.entity).get_mass() / 1.0e20) as u64
+            (model.get_mass(self.entity) / 1.0e20) as u64
         ]
     }
 

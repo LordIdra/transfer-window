@@ -57,7 +57,7 @@ fn show_tooltip_engine(ui: &mut Ui, engine: &Option<Engine>) {
 
 
     ui.label(name);
-    ui.label(RichText::new(format!("{} Fuel Consumption: {} L/s", ICON_OIL_BARREL, type_.get_fuel_per_second())));
+    ui.label(RichText::new(format!("{} Fuel Consumption: {} L/s", ICON_OIL_BARREL, type_.get_fuel_kg_per_second())));
     ui.label(RichText::new(format!("{} Thrust: {} kN", ICON_FAST_FORWARD, type_.get_thrust_newtons() / 1000.0)));
     ui.label(RichText::new(format!("{} Specific Impulse (vacuum): {} s", ICON_PIE_CHART_OUTLINE, type_.get_specific_impulse_space().round())));
 }

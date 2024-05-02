@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use log::error;
 use serde::{Deserialize, Serialize};
 
 use self::{engine::Engine, fuel_tank::FuelTank, weapon::Weapon};
@@ -77,5 +78,16 @@ impl Slots {
             }
         }
         fuel_tanks
+    }
+
+    /// For now, we assume the ship only has one engine
+    pub fn get_engine(&self) -> Option<&Engine> {
+        for location in self.get_filled_slot_locations() {
+            if let Slot::Engine(engine) = self.get(location) {
+                return engine.as_ref();
+            }
+        }
+        error!("A ship does not appear to have an engine slot");
+        panic!("Error recoverable but exiting before something bad happens")
     }
 }
