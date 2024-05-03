@@ -101,8 +101,8 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                     let parent_mass = model.get_mass(*parent);
                     let position = vec2(data.position[0], data.position[1]);
                     let velocity = vec2(data.velocity.unwrap()[0], data.velocity.unwrap()[1]);
-                    let mut trajectory_component = TrajectoryComponent::default();
-                    trajectory_component.add_segment(Segment::Orbit(Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0)));
+                    let trajectory_component = TrajectoryComponent::default()
+                        .with_segment(Segment::Orbit(Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0)));
                     entity_builder = entity_builder.with_trajectory_component(trajectory_component);
                 } else {
                     continue; // the object's parent is not added yet

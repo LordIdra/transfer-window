@@ -148,6 +148,11 @@ impl TrajectoryComponent {
         self.segments.push(Some(segment));
     }
 
+    pub fn with_segment(mut self, segment: Segment) -> Self {
+        self.segments.push(Some(segment));
+        self
+    }
+
     /// # Panics
     /// Panics if the segment at `time` is a burn
     pub fn remove_segments_after(&mut self, time: f64) {
@@ -211,9 +216,7 @@ mod test {
             let velocity = vec2(0.0, 1.0e5);
             let start_time = 0.0;
             let end_time = 99.9;
-            let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
-            orbit.end_at(end_time);
-            orbit
+            Orbit::new(parent, mass, parent_mass, position, velocity, start_time).with_end_at(end_time)
         };
 
         let orbit_2 = {
@@ -225,9 +228,7 @@ mod test {
             let velocity = vec2(0.0, -1.0e5); 
             let start_time = 99.9;
             let end_time = 200.0;
-            let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
-            orbit.end_at(end_time);
-            orbit
+            Orbit::new(parent, mass, parent_mass, position, velocity, start_time).with_end_at(end_time)
         };
 
         trajectory.add_segment(Segment::Orbit(orbit_1));

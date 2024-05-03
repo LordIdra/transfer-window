@@ -28,42 +28,30 @@ pub fn new_game(controller: &mut Controller) {
         .with_stationary_component(StationaryComponent::new(vec2(0.0, 0.0))));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
-    let mut trajectory_component = TrajectoryComponent::default();
-    let mut orbit = Orbit::new(sun, 5.9722e24, 1_988_500e24, vec2(147.095e9, 0.0), vec2(0.0, 30.29e3), 0.0);
-    orbit.end_at(1.0e10);
-    trajectory_component.add_segment(Segment::Orbit(orbit));
+    let orbit = Orbit::new(sun, 5.9722e24, 1_988_500e24, vec2(147.095e9, 0.0), vec2(0.0, 30.29e3), 0.0).with_end_at(1.0e10);
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(5.9722e24, 0.5))
-        .with_trajectory_component(trajectory_component));
+        .with_trajectory_component(TrajectoryComponent::default().with_segment(Segment::Orbit(orbit))));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
-    let mut trajectory_component = TrajectoryComponent::default();
-    let mut orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0);
-    orbit.end_at(1.0e10);
-    trajectory_component.add_segment(Segment::Orbit(orbit));
+    let orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0).with_end_at(1.0e10);
     let moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
         .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3))
-        .with_trajectory_component(trajectory_component));
+        .with_trajectory_component(TrajectoryComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    let mut trajectory_component = TrajectoryComponent::default();
-    let mut orbit = Orbit::new(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0);
-    orbit.end_at(1.0e10);
-    trajectory_component.add_segment(Segment::Orbit(orbit));
+    let orbit = Orbit::new(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0).with_end_at(1.0e10);
     let _spacecraft_1 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Light Spacecraft".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
-        .with_trajectory_component(trajectory_component));
+        .with_trajectory_component(TrajectoryComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    let mut trajectory_component = TrajectoryComponent::default();
-    let mut orbit = Orbit::new(moon, 2.0e2, 0.07346e24, vec2(0.3e8, 0.0), vec2(0.0, 4.0e2), 0.0);
-    orbit.end_at(1.0e10);
-    trajectory_component.add_segment(Segment::Orbit(orbit));
+    let orbit = Orbit::new(moon, 2.0e2, 0.07346e24, vec2(0.3e8, 0.0), vec2(0.0, 4.0e2), 0.0).with_end_at(1.0e10);
     let _spacecraft_2 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Light Spacecraft".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
-        .with_trajectory_component(trajectory_component));
+        .with_trajectory_component(TrajectoryComponent::default().with_segment(Segment::Orbit(orbit))));
 
     controller.model = Some(model);
     controller.view = View::GameScene(Scene::new(&controller.gl, Some(earth)));

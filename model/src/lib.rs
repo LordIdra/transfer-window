@@ -134,10 +134,9 @@ mod test {
     #[test]
     fn test_components() {
         let mut model = Model::default();
-        let builder1 = EntityBuilder::default().with_name_component(NameComponent::new("oh no".to_string()));
-        let builder2 = EntityBuilder::default();
-        let e1 = model.allocate(builder1);
-        let e2 = model.allocate(builder2);
+        let e1 = model.allocate(EntityBuilder::default()
+            .with_name_component(NameComponent::new("oh no".to_string())));
+        let e2 = model.allocate(EntityBuilder::default());
 
         let mut expected = HashSet::new();
         expected.insert(e1);

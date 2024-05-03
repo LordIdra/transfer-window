@@ -187,6 +187,11 @@ impl Orbit {
         self.end_point = OrbitPoint::new(&self.conic, position, time);
     }
 
+    pub fn with_end_at(mut self, time: f64) -> Self {
+        self.end_at(time);
+        self
+    }
+
     pub fn reset(&mut self) {
         self.current_point = self.start_point.clone();
     }
