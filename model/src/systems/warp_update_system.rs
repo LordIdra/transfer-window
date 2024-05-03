@@ -5,7 +5,10 @@ use crate::Model;
 
 use super::time::TimeStep;
 
+
 const STOP_BEFORE_TARGET_SECONDS: f64 = 5.0;
+const SLOW_DOWN_AFTER_PROPORTION: f64 = 0.95;
+const ADDITIONAL_MULTIPLER: f64 = 0.06;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TimeWarp {
@@ -19,7 +22,7 @@ impl TimeWarp {
     }
 
     fn get_max_warp_speed(&self) -> f64 {
-        1.0 * (self.end_time - self.start_time)
+        self.end_time - self.start_time
     }
 
     fn get_fraction_completed(&self, time: f64) -> f64 {
@@ -29,12 +32,13 @@ impl TimeWarp {
     }
     
     pub fn get_warp_speed(&self, time: f64) -> f64 {
-        if self.get_fraction_completed(time) < 0.95 {
-            return self.get_max_warp_speed()
+        if self.get_fraction_completed(time) < SLOW_DOWN_AFTER_PROPORTION {
+            self.get_max_warp_speed()
+        } else {
+            let fraction_of_last_fraction_completed = (self.get_fraction_completed(time) - SLOW_DOWN_AFTER_PROPORTION) / (1.0 - SLOW_DOWN_AFTER_PROPORTION);
+            let multiplier = (fraction_of_last_fraction_completed - 1.0).powi(2) + ADDITIONAL_MULTIPLER;
+            multiplier * self.get_max_warp_speed()
         }
-        let fraction_of_last_fraction_completed = (self.get_fraction_completed(time) - 0.95) * 20.0;
-        let multiplier = (fraction_of_last_fraction_completed - 1.0).powi(2) + 0.06;
-        multiplier * self.get_max_warp_speed()
     }
 }
 
