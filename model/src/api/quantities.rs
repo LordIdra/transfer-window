@@ -6,16 +6,17 @@ use crate::{components::trajectory_component::segment::Segment, storage::entity_
 impl Model {
     /// # Panics
     /// Panics if entity does not have a position
-    pub fn get_position(&self, entity: Entity) -> Option<DVec2> {
+    pub fn get_position(&self, entity: Entity) -> DVec2 {
         if let Some(stationary_component) = self.try_get_stationary_component(entity) {
-            return Some(stationary_component.get_position())
+            return stationary_component.get_position()
         }
 
         if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
-            return Some(trajectory_component.get_current_segment().get_current_position())
+            return trajectory_component.get_current_segment().get_current_position()
         }
 
-        None
+        error!("Request to get position of entity without trajectory or stationary components");
+        panic!("Error recoverable, but exiting anyway before something bad happens");
     }
 
     /// # Panics
@@ -31,6 +32,21 @@ impl Model {
         }
 
         error!("Request to get absolute position of entity without trajectory or stationary components");
+        panic!("Error recoverable, but exiting anyway before something bad happens");
+    }
+
+    /// # Panics
+    /// Panics if entity does not have a position
+    pub fn get_velocity(&self, entity: Entity) -> DVec2 {
+        if self.try_get_stationary_component(entity).is_some() {
+            return vec2(0.0, 0.0);
+        }
+
+        if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
+            return trajectory_component.get_current_segment().get_current_velocity()
+        }
+
+        error!("Request to get position of entity without trajectory or stationary components");
         panic!("Error recoverable, but exiting anyway before something bad happens");
     }
 

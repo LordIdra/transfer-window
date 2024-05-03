@@ -8,7 +8,7 @@ use crate::{storage::entity_allocator::Entity, util::normalize_angle};
 use self::{conic::{Conic, ConicType}, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{sphere_of_influence, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT}};
 
 pub mod conic;
-pub(crate) mod orbit_direction;
+pub mod orbit_direction;
 pub mod orbit_point;
 pub mod scary_math;
 
