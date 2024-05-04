@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{system_slot::{Slot, SlotLocation, System}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -122,35 +122,7 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let _span = tracy_client::span!("Create burn");
     let model = controller.get_model_mut();
     
-    let trajectory_component = model.get_trajectory_component_mut(entity);
-    trajectory_component.remove_segments_after(time);
-    
-    let parent = trajectory_component.get_end_segment().get_parent();
-    let tangent = trajectory_component.get_end_segment().get_end_velocity().normalize();
-    let start_position = trajectory_component.get_end_segment().get_end_position();
-    let start_velocity = trajectory_component.get_end_segment().get_end_velocity();
-    
-    let rocket_equation_function = if let Some(burn) = trajectory_component.get_final_burn() {
-        burn.get_rocket_equation_function_at_end_of_burn()
-    } else {
-        let vessel_component = model.get_vessel_component(entity);
-        let dry_mass_kg = vessel_component.get_dry_mass();
-        let initial_fuel_mass_kg = vessel_component.get_remaining_fuel_kg();
-        let engine = vessel_component.get_slots().get_engine().unwrap();
-        let fuel_consumption_kg_per_second = engine.get_type().get_fuel_kg_per_second();
-        let specific_impulse = engine.get_type().get_specific_impulse_space();
-        RocketEquationFunction::new(dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, 0.0)
-    };
-
-    let parent_mass = model.get_mass(parent);
-    let burn = Burn::new(entity, parent, parent_mass, tangent, vec2(0.0, 0.0), time, rocket_equation_function, start_position, start_velocity);
-
-    let mass_at_burn_end = burn.get_end_point().get_mass();
-    let orbit = Orbit::new(parent, mass_at_burn_end, parent_mass, burn.get_end_point().get_position(), burn.get_end_point().get_velocity(), burn.get_end_point().get_time());
-    
-    model.get_trajectory_component_mut(entity).add_segment(Segment::Burn(burn));
-    model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
-    model.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
+    model.create_burn(entity, time);
 }
 
 pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
@@ -158,13 +130,7 @@ pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let _span = tracy_client::span!("Delete burn");
     let model = controller.get_model_mut();
     
-    let trajectory_component = model.get_trajectory_component_mut(entity);
-    trajectory_component.remove_segments_after(time);
-
-    // This is needed to make sure we recompute the conic WITHOUT the burn
-    // Add 1 because the final orbit will have duration 0
-    let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - trajectory_component.get_remaining_orbits_after_final_burn();
-    model.predict(entity, 1.0e10, segments_to_predict);
+    model.delete_segments_after_time_and_recompute_trajectory(entity, time);
 }
 
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
@@ -172,23 +138,7 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let _span = tracy_client::span!("Adjust burn");
     let model = controller.get_model_mut();
     
-    let end_time = model.get_trajectory_component_mut(entity).get_last_segment_at_time(time).get_end_time();
-    model.get_trajectory_component_mut(entity).remove_segments_after(end_time);
-    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_burn_mut().adjust(amount);
-
-    let parent = model.get_trajectory_component(entity).get_end_segment().get_parent();
-    let position = model.get_trajectory_component_mut(entity).get_end_segment().get_end_position();
-    let velocity = model.get_trajectory_component_mut(entity).get_end_segment().get_end_velocity();
-    let parent_mass = model.get_mass(parent);
-    let mass = model.get_mass(entity);
-
-    // Needs to be recalculated after we adjust the burn
-    let end_time = model.get_trajectory_component_mut(entity).get_last_segment_at_time(time).get_end_time();
-
-    let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
-
-    model.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
-    model.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
+    model.adjust_burn(entity, time, amount);
 }
 
 pub fn destroy(controller: &mut Controller, entity: Entity) {
