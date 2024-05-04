@@ -8,11 +8,26 @@ impl Model {
     /// Panics if entity does not have a position
     pub fn get_position(&self, entity: Entity) -> DVec2 {
         if let Some(stationary_component) = self.try_get_stationary_component(entity) {
-            return stationary_component.get_position()
+            return stationary_component.get_position();
         }
 
         if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
-            return trajectory_component.get_current_segment().get_current_position()
+            return trajectory_component.get_current_segment().get_current_position();
+        }
+
+        error!("Request to get position of entity without trajectory or stationary components");
+        panic!("Error recoverable, but exiting anyway before something bad happens");
+    }
+
+    /// # Panics
+    /// Panics if entity does not have a position
+    pub fn get_position_at_time(&self, entity: Entity, time: f64) -> DVec2 {
+        if let Some(stationary_component) = self.try_get_stationary_component(entity) {
+            return stationary_component.get_position();
+        }
+
+        if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
+            return trajectory_component.get_first_segment_at_time(time).get_position_at_time(time);
         }
 
         error!("Request to get position of entity without trajectory or stationary components");
@@ -43,7 +58,22 @@ impl Model {
         }
 
         if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
-            return trajectory_component.get_current_segment().get_current_velocity()
+            return trajectory_component.get_current_segment().get_current_velocity();
+        }
+
+        error!("Request to get position of entity without trajectory or stationary components");
+        panic!("Error recoverable, but exiting anyway before something bad happens");
+    }
+
+    /// # Panics
+    /// Panics if entity does not have a position
+    pub fn get_velocity_at_time(&self, entity: Entity, time: f64) -> DVec2 {
+        if self.try_get_stationary_component(entity).is_some() {
+            return vec2(0.0, 0.0);
+        }
+
+        if let Some(trajectory_component) = self.try_get_trajectory_component(entity) {
+            return trajectory_component.get_first_segment_at_time(time).get_velocity_at_time(time);
         }
 
         error!("Request to get position of entity without trajectory or stationary components");
@@ -109,7 +139,7 @@ impl Model {
                     return burn.get_end_point().get_mass();
                 }
             }
-            return vessel_component.get_mass()
+            return vessel_component.get_mass();
         }
 
         error!("Request to get mass of entity without orbitable or vessel components");

@@ -68,4 +68,9 @@ impl Model {
         self.get_trajectory_component_mut(entity).add_segment(Segment::Orbit(orbit));
         self.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
     }
+
+    pub fn can_create_burn(&mut self, entity: Entity) -> bool {
+        let slots = self.get_vessel_component(entity).get_slots();
+        slots.get_engine().is_some() && !slots.get_fuel_tanks().is_empty()
+    }
 }
