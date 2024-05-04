@@ -14,7 +14,7 @@ pub fn compute_initial_windows(model: &Model, entity: Entity, siblings: Vec<Enti
     let _span = tracy_client::span!("Get initial windows");
     let orbit = model
         .path_component(entity)
-        .end_segment()
+        .last_segment()
         .as_orbit()
         .expect("Entity does not have an orbit at requested start time");
     let mut windows = vec![];

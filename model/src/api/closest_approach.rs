@@ -28,7 +28,7 @@ impl Model {
         }
 
         if let Some(path_component) = self.try_path_component(entity) {
-            return path_component.segments().iter().flatten().filter_map(|x| x.as_orbit()).collect()
+            return path_component.future_orbits()
         }
 
         error!("Attempt to get orbits of an entity than cannot have orbits");
@@ -40,20 +40,21 @@ impl Model {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Find same parent orbits");
         let mut same_parent_orbit_pairs = vec![];
-        let segments_a: Vec<&Orbit> = self.orbits(entity_a);
-        let segments_b: Vec<&Orbit> = self.orbits(entity_b);
+        let orbits_a: Vec<&Orbit> = self.orbits(entity_a);
+        let orbits_b: Vec<&Orbit> = self.orbits(entity_b);
         let mut index_a = 0;
         let mut index_b = 0;
-
-        while index_a < segments_a.len() && index_b < segments_b.len() {
-            let segment_a = segments_a[index_a];
-            let segment_b = segments_b[index_b];
-
-            if segment_a.parent() == segment_b.parent() {
-                same_parent_orbit_pairs.push((segment_a, segment_b));
+        
+        while index_a < orbits_a.len() && index_b < orbits_b.len() {
+            let orbit_a = orbits_a[index_a];
+            let orbit_b = orbits_b[index_b];
+            
+            dbg!(orbit_a.end_point().time(), orbit_b.end_point().time());
+            if orbit_a.parent() == orbit_b.parent() {
+                same_parent_orbit_pairs.push((orbit_a, orbit_b));
             }
 
-            if segment_a.end_point().time() < segment_b.end_point().time() {
+            if orbit_a.end_point().time() < orbit_b.end_point().time() {
                 index_a += 1;
             } else {
                 index_b += 1;

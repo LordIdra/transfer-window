@@ -17,7 +17,7 @@ impl Burn {
     pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::VesselComponent]) {
-            for segment in model.path_component(entity).segments().iter().flatten().rev() {
+            for segment in model.path_component(entity).future_segments().iter().flatten().rev() {
                 if let Segment::Burn(burn) = segment {
                     let time = burn.start_point().time();
                     if time > model.time() {
@@ -64,7 +64,7 @@ impl Icon for Burn {
     }
 
     fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
-        let burn = model.path_component(self.entity).last_segment_at_time(self.time).as_burn();
+        let burn = model.path_component(self.entity).future_segment_starting_at_time(self.time).as_burn();
         model.absolute_position(burn.parent()) + burn.start_point().get_position()
     }
 

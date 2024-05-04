@@ -12,7 +12,7 @@ fn update_path_component(model: &mut Model, entity: Entity, time: f64, simulatio
 
         // Add one because one of the orbits will be duration zero right at the end
         // due to how trajectory prediction works
-        let segments_to_predict = SEGMENTS_TO_PREDICT as i32 + 1 - model.path_component(entity).remaining_orbits_after_final_burn() as i32;
+        let segments_to_predict = SEGMENTS_TO_PREDICT as i32 + 1 - model.path_component(entity).future_orbits_after_final_burn().len() as i32;
         if segments_to_predict > 0 {
             model.predict(entity, 1.0e10, segments_to_predict as usize);
         }

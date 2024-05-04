@@ -37,7 +37,7 @@ fn test_prediction() {
 
     model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
 
-    let segments = model.path_component(vessel).segments();
+    let segments = model.path_component(vessel).future_segments();
 
     // + 1 to account for the last segment which will have a time of 0
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
@@ -45,11 +45,11 @@ fn test_prediction() {
     let encounter_times = vec![1452880.5996859074, 1453237.8732705116, 1756031.4693295956, 1759789.8763918877];
 
     for i in 0..segments.len()-1 {
-        assert_eq!(segments[i].as_ref().unwrap().end_time(), segments[i+1].as_ref().unwrap().start_time());
+        assert_eq!(segments[i].end_time(), segments[i+1].start_time());
     }
 
     for i in 0..encounter_times.len() {
-        let actual = segments[i].as_ref().unwrap().end_time();
+        let actual = segments[i].end_time();
         println!("Expected={} Actual={}", encounter_times[i], actual);
         assert!((actual - encounter_times[i]).abs() / encounter_times[i] < 1.0e-3);
     }
@@ -92,11 +92,11 @@ fn test_prediction_with_burn() {
 
     model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
 
-    assert_eq!(model.path_component(vessel).segments().len(), 1);
+    assert_eq!(model.path_component(vessel).future_segments().len(), 1);
 
     let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 10000.0, 0.0);
     let burn = Burn::new(vessel, earth, earth_mass, vessel_start_velocity.normalize(), vec2(1.0e3, 0.0), 0.0, rocket_equation_function, vessel_start_position, vessel_start_velocity);
-    model.path_component_mut(vessel).end_segment_mut().as_orbit_mut().unwrap().end_at(0.0);
+    model.path_component_mut(vessel).last_segment_mut().as_orbit_mut().unwrap().end_at(0.0);
     model.path_component_mut(vessel).add_segment(Segment::Burn(burn.clone()));
 
     let end_point = burn.end_point();
@@ -110,19 +110,19 @@ fn test_prediction_with_burn() {
     model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
     model.update(end_point.time() + 1.0e-3);
 
-    let segments = model.path_component(vessel).segments();
+    let segments = model.path_component(vessel).future_segments();
 
-    // 3 = 1 for the final segment after prediction + the initial orbit segment + the initial burn segment + orbit right after burn
-    assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 3);
+    // 1 = 1 for the final segment after prediction + the initial orbit segment + the initial burn segment + orbit right after burn - 2 that have been popped because of update
+    assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
 
     let encounter_times = vec![1451640.0092875957, 1453650.030605793, 1756813.440374136, 1760025.6886267662];
 
     for i in 3..segments.len()-1 {
-        assert_eq!(segments[i].as_ref().unwrap().end_time(), segments[i+1].as_ref().unwrap().start_time());
+        assert_eq!(segments[i].end_time(), segments[i+1].start_time());
     }
 
     for i in 0..encounter_times.len() {
-        let actual = segments[i+2].as_ref().unwrap().end_time();
+        let actual = segments[i].end_time();
         println!("Expected={} Actual={}", encounter_times[i], actual);
         assert!((actual - encounter_times[i]).abs() / encounter_times[i] < 1.0e-3);
     }

@@ -15,7 +15,7 @@ const MIN_TIME_BEFORE_ENCOUNTER: f64 = 1.0;
 /// It's expected that candidates only contains entities with an orbitable component,
 /// and that entity has a path component
 fn compute_siblings(model: &Model, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
-    let end_segment = model.path_component(entity).end_segment();
+    let end_segment = model.path_component(entity).last_segment();
     let parent = end_segment.parent();
     let mut siblings = vec![];
     for other_entity in candidates {

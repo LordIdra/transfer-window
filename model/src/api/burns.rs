@@ -23,7 +23,7 @@ impl Model {
 
         // Recompute new trajectory
         // Add 1 because the final orbit will have duration 0
-        let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - path_component.remaining_orbits_after_final_burn();
+        let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - path_component.future_orbits_after_final_burn().len();
         self.predict(entity, 1.0e10, segments_to_predict);
     }
 
@@ -31,10 +31,10 @@ impl Model {
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);
 
-        let parent = path_component.end_segment().parent();
-        let tangent = path_component.end_segment().end_velocity().normalize();
-        let start_position = path_component.end_segment().end_position();
-        let start_velocity = path_component.end_segment().end_velocity();
+        let parent = path_component.last_segment().parent();
+        let tangent = path_component.last_segment().end_velocity().normalize();
+        let start_position = path_component.last_segment().end_position();
+        let start_velocity = path_component.last_segment().end_velocity();
         let rocket_equation_function = self.rocket_equation_function_at_end_of_trajectory(entity);
         let parent_mass = self.mass(parent);
         let burn = Burn::new(entity, parent, parent_mass, tangent, vec2(0.0, 0.0), time, rocket_equation_function, start_position, start_velocity);
@@ -49,14 +49,14 @@ impl Model {
 
     pub fn adjust_burn(&mut self, entity: Entity, time: f64, amount: DVec2) {
         let path_component = self.path_component_mut(entity);
-        let end_time = path_component.last_segment_at_time(time).end_time();
+        let end_time = path_component.future_segment_starting_at_time(time).end_time();
         path_component.remove_segments_after(end_time);
-        path_component.end_segment_mut()
+        path_component.last_segment_mut()
             .as_burn_mut()
             .expect(&format!("Burn not found at time {}", time))
             .adjust(amount);
 
-        let end_segment = path_component.end_segment();
+        let end_segment = path_component.last_segment();
         let parent = end_segment.parent();
         let position = end_segment.end_position();
         let velocity = end_segment.end_velocity();
@@ -64,7 +64,7 @@ impl Model {
         let mass = self.mass(entity);
 
         // Needs to be recalculated after we adjust the burn
-        let end_time = self.path_component_mut(entity).last_segment_at_time(time).end_time();
+        let end_time = self.path_component_mut(entity).future_segment_starting_at_time(time).end_time();
 
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
 

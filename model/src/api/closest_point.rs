@@ -3,7 +3,7 @@ use std::mem::swap;
 use nalgebra_glm::DVec2;
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::{path_component::{orbit::Orbit, segment::Segment}, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
+use crate::{components::{path_component::orbit::Orbit, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
 
 /// Returns the closest point to `point` on the given orbit if it is less than `radius` away from the orbit
 /// Returns none if the closest distance to `point` is further than the radius
@@ -51,11 +51,7 @@ impl Model {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
         for entity in self.entities(vec![ComponentType::PathComponent]) {
-            for segment in self.path_component(entity).segments().iter().flatten() {
-                let Segment::Orbit(orbit) = segment else { 
-                    continue 
-                };
-
+            for orbit in self.path_component(entity).future_orbits() {
                 let parent_position = self.absolute_position(orbit.parent());
                 let point = point - parent_position;
                 let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {

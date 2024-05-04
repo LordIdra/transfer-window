@@ -98,7 +98,7 @@ pub fn solve_for_exit(model: &Model, entity: Entity, start_time: f64, end_time: 
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Solve for exit");
     let orbit = model.path_component(entity)
-        .end_segment()
+        .last_segment()
         .as_orbit()
         .expect("Entity does not have an orbit as end segment"); 
     let Some(parent_orbit) = model.orbitable_component(orbit.parent()).orbit() else {

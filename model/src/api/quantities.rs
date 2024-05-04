@@ -27,7 +27,7 @@ impl Model {
         }
 
         if let Some(path_component) = self.try_path_component(entity) {
-            return path_component.first_segment_at_time(time).position_at_time(time);
+            return path_component.future_segment_ending_at_time(time).position_at_time(time);
         }
 
         error!("Request to get position of entity without path or orbitable components");
@@ -82,7 +82,7 @@ impl Model {
         }
 
         if let Some(path_component) = self.try_path_component(entity) {
-            let segment_at_time = path_component.first_segment_at_time(time);
+            let segment_at_time = path_component.future_segment_ending_at_time(time);
             return segment_at_time.velocity_at_time(time);
         }
 
@@ -137,20 +137,14 @@ impl Model {
         if let Some(vessel_component) = self.try_vessel_component(entity) {
 
             // find last burn before time if it exists
-            for segment in self.path_component(entity).segments().iter().flatten().rev() {
-                if segment.start_time() > time {
-                    continue;
+            for burn in self.path_component(entity).future_burns() {
+                if time > burn.start_point().time() && time < burn.end_point().time() {
+                    // The requested time is within the burn
+                    return burn.point_at_time(time).mass();
                 }
-
-                if let Segment::Burn(burn) = segment {
-                    if time > segment.start_time() && time < segment.end_time() {
-                        // The requested time is within the burn
-                        return burn.point_at_time(time).mass();
-                    }
-                    
-                    // Otherwise, the requested time is after the burn, so return mass at end of burn
-                    return burn.end_point().mass();
-                }
+                
+                // Otherwise, the requested time is after the burn, so return mass at end of burn
+                return burn.end_point().mass();
             }
             return vessel_component.mass();
         }

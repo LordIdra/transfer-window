@@ -13,7 +13,7 @@ fn draw_selected_circle(view: &mut Scene, model: &Model, entity: Entity, time: f
     let select_radius = SELECT_RADIUS / view.camera.zoom();
     let mut vertices = vec![];
     let path_component = model.path_component(entity);
-    let segment = path_component.last_segment_at_time(time);
+    let segment = path_component.future_segment_starting_at_time(time);
     let point = model.absolute_position(segment.parent()) + segment.position_at_time(time);
     add_textured_square(&mut vertices, point, select_radius, alpha);
     view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);

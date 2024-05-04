@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use log::{error, trace};
 use serde::{Deserialize, Serialize};
 
@@ -12,10 +14,8 @@ pub mod segment;
 /// Must have `MassComponent`, cannot have `StationaryComponent`
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PathComponent {
-    current_index: usize,
-    previous_orbits: usize,
-    previous_burns: usize,
-    segments: Vec<Option<Segment>>,
+    past_segments: Vec<Segment>,
+    future_segments: VecDeque<Segment>,
 }
 
 impl PathComponent {
@@ -27,50 +27,51 @@ impl PathComponent {
         Self::default().with_segment(Segment::Orbit(orbit))
     }
 
-    pub fn segments(&self) -> &Vec<Option<Segment>> {
-        &self.segments
+    pub fn past_segments(&self) -> &Vec<Segment> {
+        &self.past_segments
     }
 
-    pub fn previous_orbits(&self) -> usize {
-        self.previous_orbits
+    pub fn past_orbits(&self) -> Vec<&Orbit> {
+        self.past_segments.iter()
+            .filter_map(|segment| segment.as_orbit())
+            .collect()
     }
 
-    pub fn previous_burns(&self) -> usize {
-        self.previous_burns
+    pub fn past_burns(&self) -> Vec<&Burn> {
+        self.past_segments.iter()
+            .filter_map(|segment| segment.as_burn())
+            .collect()
     }
 
-    pub fn remaining_orbits(&self) -> usize {
-        self.segments.iter()
-            .flatten()
-            .filter(|segment| matches!(segment, Segment::Orbit(_)))
-            .count()
+    pub fn future_segments(&self) -> &VecDeque<Segment> {
+        &self.future_segments
     }
 
-    pub fn remaining_burns(&self) -> usize {
-        self.segments.iter()
-            .flatten()
-            .filter(|segment| matches!(segment, Segment::Burn(_)))
-            .count()
+    pub fn future_orbits(&self) -> Vec<&Orbit> {
+        self.future_segments.iter()
+            .filter_map(|segment| segment.as_orbit())
+            .collect()
     }
 
-    pub fn remaining_orbits_after_final_burn(&self) -> usize {
-        let mut remaining_orbits = 0;
-        for segment in self.segments.iter().rev().flatten() {
+    pub fn future_burns(&self) -> Vec<&Burn> {
+        self.future_segments.iter()
+            .filter_map(|segment| segment.as_burn())
+            .collect()
+    }
+
+    pub fn future_orbits_after_final_burn(&self) -> Vec<&Orbit> {
+        let mut orbits = vec![];
+        for segment in self.future_segments.iter().rev() {
             match segment {
                 Segment::Burn(_) => break,
-                Segment::Orbit(_) => remaining_orbits += 1,
+                Segment::Orbit(orbit) => orbits.push(orbit),
             }
         }
-        remaining_orbits
+        orbits
     }
 
     pub fn final_burn(&self) -> Option<&Burn> {
-        for segment in self.segments.iter().rev().flatten() {
-            if let Segment::Burn(burn) = segment {
-                return Some(burn)
-            }
-        }
-        None
+        self.future_burns().last().map(|burn| *burn)
     }
 
     /// Returns the first segment it finds matching the time
@@ -78,8 +79,8 @@ impl PathComponent {
     /// returns the first one
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn first_segment_at_time(&self, time: f64) -> &Segment {
-        for segment in self.segments.iter().flatten() {
+    pub fn future_segment_ending_at_time(&self, time: f64) -> &Segment {
+        for segment in &self.future_segments {
             if segment.start_time() <= time && segment.end_time() >= time {
                 return segment
             }
@@ -92,8 +93,8 @@ impl PathComponent {
     /// returns the last one
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn last_segment_at_time(&self, time: f64) -> &Segment {
-        for segment in self.segments.iter().flatten() {
+    pub fn future_segment_starting_at_time(&self, time: f64) -> &Segment {
+        for segment in &self.future_segments {
             if segment.start_time() <= time && segment.end_time() > time {
                 return segment
             }
@@ -103,8 +104,8 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn last_segment_at_time_mut(&mut self, time: f64) -> &mut Segment {
-        for segment in self.segments.iter_mut().flatten() {
+    pub fn future_segment_ending_at_time_mut(&mut self, time: f64) -> &mut Segment {
+        for segment in &mut self.future_segments {
             if segment.start_time() <= time && segment.end_time() > time {
                 return segment
             }
@@ -115,49 +116,43 @@ impl PathComponent {
     /// # Panics
     /// Panics if the trajectory has no current segment
     pub fn current_segment(&self) -> &Segment {
-        self.segments
-            .get(self.current_index)
-            .expect("Current segment does not exist")
+        self.future_segments
+            .front()
             .as_ref()
             .unwrap() // current segment value should never be None
     }
 
     /// # Panics
     /// Panics if the trajectory has no end segment
-    pub fn end_segment(&self) -> &Segment {
-        self.segments
-            .last()
-            .expect("End segment does not exist")
+    pub fn last_segment(&self) -> &Segment {
+        self.future_segments
+            .back()
             .as_ref()
             .unwrap() // end segment value should never be None
     }
 
     /// # Panics
     /// Panics if the trajectory has no start segment
-    pub fn end_segment_mut(&mut self) -> &mut Segment {
-        self.segments
-            .last_mut()
-            .expect("End segment does not exist")
-            .as_mut()
-            .unwrap() // end segment value should never be None
+    pub fn last_segment_mut(&mut self) -> &mut Segment {
+        self.future_segments
+            .back_mut()
+            .unwrap()
     }
 
     /// # Panics
     /// Panics if the trajectory has no current segment
     pub fn current_segment_mut(&mut self) -> &mut Segment {
-        self.segments
-            .get_mut(self.current_index)
-            .expect("Current segment does not exist")
-            .as_mut()
-            .unwrap() // current segment value should never be None
+        self.future_segments
+            .front_mut()
+            .unwrap()
     }
 
     pub fn add_segment(&mut self, segment: Segment) {
-        self.segments.push(Some(segment));
+        self.future_segments.push_back(segment);
     }
 
     pub fn with_segment(mut self, segment: Segment) -> Self {
-        self.segments.push(Some(segment));
+        self.future_segments.push_back(segment);
         self
     }
 
@@ -165,11 +160,11 @@ impl PathComponent {
     /// Panics if the segment at `time` is a burn
     pub fn remove_segments_after(&mut self, time: f64) {
         loop {
-            match self.segments.last_mut().unwrap().as_mut().unwrap() {
+            match self.future_segments.back_mut().as_mut().unwrap() {
                 Segment::Burn(burn) => {
                     // The >= is important, because we might try and remove segments after exactly the start time of a burn (ie when deleting a burn)
                     if burn.start_point().time() >= time {
-                        self.segments.pop();
+                        self.future_segments.pop_back();
                     } else if burn.is_time_within_burn(time) {
                         error!("Attempt to split a burn");
                         panic!("Error recoverable, but exiting anyway before something bad happens");
@@ -179,7 +174,7 @@ impl PathComponent {
                 },
                 Segment::Orbit(orbit) => {
                     if orbit.start_point().time() >= time {
-                        self.segments.pop();
+                        self.future_segments.pop_back();
                     } else if orbit.is_time_within_orbit(time) {
                         orbit.end_at(time);
                     } else {
@@ -191,14 +186,9 @@ impl PathComponent {
     }
 
     pub fn on_segment_finished(&mut self, time: f64) {
-        match self.current_segment() {
-            Segment::Orbit(_) => self.previous_orbits += 1,
-            Segment::Burn(_) => self.previous_burns += 1,
-        }
         trace!("Segment finished at time={time}");
         let overshot_time = self.current_segment().overshot_time(time);
-        self.segments[self.current_index] = None;
-        self.current_index += 1;
+        self.past_segments.push(self.future_segments.pop_front().unwrap());
         self.current_segment_mut().next(overshot_time);
     }
 }
@@ -242,11 +232,11 @@ mod test {
         path_component.add_segment(Segment::Orbit(orbit_1));
         path_component.add_segment(Segment::Orbit(orbit_2));
 
-        assert!(path_component.current_index == 0);
-        assert!(path_component.first_segment_at_time(105.0).start_time() == 99.9);
+        assert!(path_component.past_segments().is_empty());
+        assert!(path_component.future_segment_ending_at_time(105.0).start_time() == 99.9);
 
-        let end_position_1 = path_component.first_segment_at_time(43.65).end_position();
-        let end_position_2 = path_component.first_segment_at_time(172.01).end_position();
+        let end_position_1 = path_component.future_segment_ending_at_time(43.65).end_position();
+        let end_position_2 = path_component.future_segment_ending_at_time(172.01).end_position();
         let m1 = end_position_1.magnitude();
         let m2 = end_position_2.magnitude();
         let difference = (m1 - m2) / m1;
@@ -262,6 +252,6 @@ mod test {
         }
 
         assert!((path_component.current_segment().as_orbit().unwrap().current_point().time() - 100.0).abs() < 1.0e-6);
-        assert!(path_component.current_index == 1);
+        assert!(path_component.past_segments().len() == 1);
     }
 }
