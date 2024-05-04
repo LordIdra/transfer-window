@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::components::trajectory_component::orbit::scary_math::STANDARD_GRAVITY;
+use crate::components::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
 /// Helper struct for computing vessel mass after N seconds of
 /// firing its engine using the rocket equation

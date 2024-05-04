@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 use eframe::emath::normalized_angle;
 use nalgebra_glm::DVec2;
-use transfer_window_model::components::trajectory_component::orbit::Orbit;
+use transfer_window_model::components::path_component::orbit::Orbit;
 
 const INITIAL_POINT_COUNT: usize = 50;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-4;
@@ -52,14 +52,14 @@ pub fn tessellate(interpolate: impl Fn(DVec2, DVec2) -> DVec2, mut points: Vec<D
 fn find_initial_points_orbit(orbit: &Orbit, absolute_parent_position: DVec2) -> Vec<DVec2> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Find initial orbit points");
-    let start_angle = normalized_angle(orbit.get_current_point().get_theta() as f32);
-    let angle_to_rotate_through = orbit.get_remaining_angle();
+    let start_angle = normalized_angle(orbit.current_point().theta() as f32);
+    let angle_to_rotate_through = orbit.remaining_angle();
 
     // First and last points are be equal to make sure we draw lines through the whole segment
     let mut initial_points = vec![];
     for i in 0..=INITIAL_POINT_COUNT {
         let theta = start_angle as f64 + (i as f64 / INITIAL_POINT_COUNT as f64) * angle_to_rotate_through;
-        initial_points.push(absolute_parent_position + orbit.get_position_from_theta(theta));
+        initial_points.push(absolute_parent_position + orbit.position_from_theta(theta));
     }
 
     initial_points
@@ -85,7 +85,7 @@ pub fn compute_points(orbit: &Orbit, absolute_parent_position: DVec2, camera_cen
     let interpolate = |point1: DVec2, point2: DVec2| {
         let theta_1 = f64::atan2(point1.y, point1.x);
         let theta_2 = f64::atan2(point2.y, point2.x);
-        orbit.get_position_from_theta(interpolate_angles(theta_1, theta_2))
+        orbit.position_from_theta(interpolate_angles(theta_1, theta_2))
     };
     tessellate(interpolate, points, absolute_parent_position, camera_centre, zoom)
 }

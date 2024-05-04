@@ -1,6 +1,6 @@
 use std::{f64::consts::PI, mem::swap};
 
-use crate::{components::trajectory_component::orbit::Orbit, util::normalize_angle};
+use crate::{components::path_component::orbit::Orbit, util::normalize_angle};
 
 use transfer_window_common::numerical_methods::itp::itp;
 
@@ -38,10 +38,10 @@ pub fn angle_window_to_time_window(orbit: &Orbit, mut window: (f64, f64)) -> (f6
         swap(&mut window.0, &mut window.1);
     }
     let mut window = (
-        orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.0), 
-        orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(window.1));
+        orbit.first_periapsis_time() + orbit.time_since_first_periapsis(window.0), 
+        orbit.first_periapsis_time() + orbit.time_since_first_periapsis(window.1));
     if window.1 < window.0 {
-        window.1 += orbit.get_period().unwrap();
+        window.1 += orbit.period().unwrap();
     }
     window
 }

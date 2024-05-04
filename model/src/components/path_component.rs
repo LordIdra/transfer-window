@@ -1,7 +1,7 @@
 use log::{error, trace};
 use serde::{Deserialize, Serialize};
 
-use self::{burn::Burn, segment::Segment};
+use self::{burn::Burn, orbit::Orbit, segment::Segment};
 
 #[cfg(test)]
 mod brute_force_tester;
@@ -11,14 +11,22 @@ pub mod segment;
 
 /// Must have `MassComponent`, cannot have `StationaryComponent`
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct TrajectoryComponent {
+pub struct PathComponent {
     current_index: usize,
     previous_orbits: usize,
     previous_burns: usize,
     segments: Vec<Option<Segment>>,
 }
 
-impl TrajectoryComponent {
+impl PathComponent {
+    pub fn new_with_segment(segment: Segment) -> Self {
+        Self::default().with_segment(segment)
+    }
+
+    pub fn new_with_orbit(orbit: Orbit) -> Self {
+        Self::default().with_segment(Segment::Orbit(orbit))
+    }
+
     pub fn get_segments(&self) -> &Vec<Option<Segment>> {
         &self.segments
     }
@@ -72,7 +80,7 @@ impl TrajectoryComponent {
     /// Panics if the trajectory has no segment at the given time
     pub fn get_first_segment_at_time(&self, time: f64) -> &Segment {
         for segment in self.segments.iter().flatten() {
-            if segment.get_start_time() <= time && segment.get_end_time() >= time {
+            if segment.start_time() <= time && segment.end_time() >= time {
                 return segment
             }
         }
@@ -86,7 +94,7 @@ impl TrajectoryComponent {
     /// Panics if the trajectory has no segment at the given time
     pub fn get_last_segment_at_time(&self, time: f64) -> &Segment {
         for segment in self.segments.iter().flatten() {
-            if segment.get_start_time() <= time && segment.get_end_time() > time {
+            if segment.start_time() <= time && segment.end_time() > time {
                 return segment
             }
         }
@@ -97,7 +105,7 @@ impl TrajectoryComponent {
     /// Panics if the trajectory has no segment at the given time
     pub fn get_last_segment_at_time_mut(&mut self, time: f64) -> &mut Segment {
         for segment in self.segments.iter_mut().flatten() {
-            if segment.get_start_time() <= time && segment.get_end_time() > time {
+            if segment.start_time() <= time && segment.end_time() > time {
                 return segment
             }
         }
@@ -160,7 +168,7 @@ impl TrajectoryComponent {
             match self.segments.last_mut().unwrap().as_mut().unwrap() {
                 Segment::Burn(burn) => {
                     // The >= is important, because we might try and remove segments after exactly the start time of a burn (ie when deleting a burn)
-                    if burn.get_start_point().get_time() >= time {
+                    if burn.start_point().get_time() >= time {
                         self.segments.pop();
                     } else if burn.is_time_within_burn(time) {
                         error!("Attempt to split a burn");
@@ -170,7 +178,7 @@ impl TrajectoryComponent {
                     }
                 },
                 Segment::Orbit(orbit) => {
-                    if orbit.get_start_point().get_time() >= time {
+                    if orbit.start_point().time() >= time {
                         self.segments.pop();
                     } else if orbit.is_time_within_orbit(time) {
                         orbit.end_at(time);
@@ -188,7 +196,7 @@ impl TrajectoryComponent {
             Segment::Burn(_) => self.previous_burns += 1,
         }
         trace!("Segment finished at time={time}");
-        let overshot_time = self.get_current_segment().get_overshot_time(time);
+        let overshot_time = self.get_current_segment().overshot_time(time);
         self.segments[self.current_index] = None;
         self.current_index += 1;
         self.get_current_segment_mut().next(overshot_time);
@@ -199,14 +207,14 @@ impl TrajectoryComponent {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{storage::entity_allocator::Entity, components::trajectory_component::TrajectoryComponent};
+    use crate::{storage::entity_allocator::Entity, components::path_component::PathComponent};
 
     use super::{segment::Segment, orbit::Orbit};
 
 
     #[test]
     pub fn test() {
-        let mut trajectory = TrajectoryComponent::default();
+        let mut trajectory = PathComponent::default();
 
         let orbit_1 = {
             let parent = Entity::mock();
@@ -235,10 +243,10 @@ mod test {
         trajectory.add_segment(Segment::Orbit(orbit_2));
 
         assert!(trajectory.current_index == 0);
-        assert!(trajectory.get_first_segment_at_time(105.0).get_start_time() == 99.9);
+        assert!(trajectory.get_first_segment_at_time(105.0).start_time() == 99.9);
 
-        let end_position_1 = trajectory.get_first_segment_at_time(43.65).get_end_position();
-        let end_position_2 = trajectory.get_first_segment_at_time(172.01).get_end_position();
+        let end_position_1 = trajectory.get_first_segment_at_time(43.65).end_position();
+        let end_position_2 = trajectory.get_first_segment_at_time(172.01).end_position();
         let m1 = end_position_1.magnitude();
         let m2 = end_position_2.magnitude();
         let difference = (m1 - m2) / m1;
@@ -253,7 +261,7 @@ mod test {
             }
         }
 
-        assert!((trajectory.get_current_segment().as_orbit().get_current_point().get_time() - 100.0).abs() < 1.0e-6);
+        assert!((trajectory.get_current_segment().as_orbit().unwrap().current_point().time() - 100.0).abs() < 1.0e-6);
         assert!(trajectory.current_index == 1);
     }
 }

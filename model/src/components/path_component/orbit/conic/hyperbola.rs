@@ -4,7 +4,7 @@ use nalgebra_glm::{vec2, DVec2};
 use rust_kepler_solver::hyperbola::HyperbolaSolver;
 use serde::{Deserialize, Serialize};
 
-use crate::components::trajectory_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, specific_angular_momentum}};
+use crate::components::path_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, asymptote_theta, specific_angular_momentum}};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Hyperbola {
@@ -100,7 +100,7 @@ impl Hyperbola {
     }
 
     pub fn is_time_between_points(start: &OrbitPoint, end: &OrbitPoint, time: f64) -> bool {
-        time > start.get_time() && time < end.get_time()
+        time > start.time() && time < end.time()
     }
 }
 
@@ -108,7 +108,7 @@ impl Hyperbola {
 mod tests {
     use std::f64::consts::PI;
 
-    use crate::components::trajectory_component::orbit::scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT};
+    use crate::components::path_component::orbit::scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT};
 
     use super::*;
 

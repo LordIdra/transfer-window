@@ -1,5 +1,5 @@
 use eframe::egui::{ScrollArea, Ui};
-use transfer_window_model::{components::trajectory_component::{burn::{burn_point::BurnPoint, Burn}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::path_component::{burn::{burn_point::BurnPoint, Burn}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model};
 
 use crate::game::util::format_time;
 
@@ -10,18 +10,18 @@ fn draw_burn_point(ui: &mut Ui, burn_point: &BurnPoint) {
 }
 
 fn draw_orbit_point(ui: &mut Ui, orbit_point: &OrbitPoint) {
-    ui.label(format!("Position: {:.3?}", orbit_point.get_position()));
-    ui.label(format!("Velocity: {:.3?}", orbit_point.get_velocity()));
-    ui.label(format!("Time: {:.3?}", orbit_point.get_time()));
-    ui.label(format!("Time since periapsis: {:.3?}", orbit_point.get_time_since_periapsis()));
-    ui.label(format!("Theta: {:.3?}", orbit_point.get_theta()));
+    ui.label(format!("Position: {:.3?}", orbit_point.position()));
+    ui.label(format!("Velocity: {:.3?}", orbit_point.velocity()));
+    ui.label(format!("Time: {:.3?}", orbit_point.time()));
+    ui.label(format!("Time since periapsis: {:.3?}", orbit_point.time_since_periapsis()));
+    ui.label(format!("Theta: {:.3?}", orbit_point.theta()));
 }
 
 fn draw_orbit(ui: &mut Ui, orbit: &Orbit) {
-    ui.label(format!("Duration: {}", format_time(orbit.get_end_point().get_time() - orbit.get_start_point().get_time())));
-    ui.label(format!("Remaining orbits: {}", orbit.get_remaining_orbits()));
-    ui.label(format!("Direction: {:?}", orbit.get_direction()));
-    match orbit.get_period() {
+    ui.label(format!("Duration: {}", format_time(orbit.end_point().time() - orbit.start_point().time())));
+    ui.label(format!("Remaining orbits: {}", orbit.remaining_orbits()));
+    ui.label(format!("Direction: {:?}", orbit.direction()));
+    match orbit.period() {
         Some(period) => {
             ui.label("Type: ellipse".to_string());
             ui.label(format!("Period: {}", format_time(period)));
@@ -30,22 +30,22 @@ fn draw_orbit(ui: &mut Ui, orbit: &Orbit) {
             ui.label("Type: hyperbola".to_string());
         }
     }
-    ui.label(format!("Semi-major axis: {:.5e}", orbit.get_semi_major_axis()));
-    ui.label(format!("Semi-minor axis: {:.5e}", orbit.get_semi_minor_axis()));
-    ui.label(format!("Eccentricity: {:.5}", orbit.get_eccentricity()));
-    ui.label(format!("Argument of periapsis: {:.5e}", orbit.get_argument_of_periapsis()));
-    ui.label(format!("Remaining angle: {:.5e}", orbit.get_remaining_angle()));
-    ui.collapsing("Start", |ui| draw_orbit_point(ui, orbit.get_start_point()));
-    ui.collapsing("Current", |ui| draw_orbit_point(ui, orbit.get_current_point()));
-    ui.collapsing("End", |ui| draw_orbit_point(ui, orbit.get_end_point()));
+    ui.label(format!("Semi-major axis: {:.5e}", orbit.semi_major_axis()));
+    ui.label(format!("Semi-minor axis: {:.5e}", orbit.semi_minor_axis()));
+    ui.label(format!("Eccentricity: {:.5}", orbit.eccentricity()));
+    ui.label(format!("Argument of periapsis: {:.5e}", orbit.argument_of_periapsis()));
+    ui.label(format!("Remaining angle: {:.5e}", orbit.remaining_angle()));
+    ui.collapsing("Start", |ui| draw_orbit_point(ui, orbit.start_point()));
+    ui.collapsing("Current", |ui| draw_orbit_point(ui, orbit.current_point()));
+    ui.collapsing("End", |ui| draw_orbit_point(ui, orbit.end_point()));
 }
 
 fn draw_burn(ui: &mut Ui, burn: &Burn) {
-    ui.label(format!("DV: {:.3?}", burn.get_total_dv()));
-    ui.label(format!("Duration: {}", format_time(burn.get_duration())));
-    ui.collapsing("Start", |ui| draw_burn_point(ui, burn.get_start_point()));
-    ui.collapsing("Current", |ui| draw_burn_point(ui, burn.get_current_point()));
-    ui.collapsing("End", |ui| draw_burn_point(ui, burn.get_end_point()));
+    ui.label(format!("DV: {:.3?}", burn.total_dv()));
+    ui.label(format!("Duration: {}", format_time(burn.duration())));
+    ui.collapsing("Start", |ui| draw_burn_point(ui, burn.start_point()));
+    ui.collapsing("Current", |ui| draw_burn_point(ui, burn.current_point()));
+    ui.collapsing("End", |ui| draw_burn_point(ui, burn.end_point()));
 }
 
 fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
@@ -56,7 +56,7 @@ fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
         ui.label(format!("Position: {:.3?}", stationary_component.get_position()));
     }
 
-    if let Some(trajectory_component) = model.try_get_trajectory_component(entity) {
+    if let Some(trajectory_component) = model.try_get_path_component(entity) {
         ui.collapsing("Trajectory", |ui| {
             for segment in trajectory_component.get_segments().iter().flatten() {
                 match segment {

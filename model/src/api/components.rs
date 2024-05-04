@@ -1,7 +1,7 @@
 use crate::components::vessel_component::VesselComponent;
 use crate::Model;
 
-use crate::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent}, storage::entity_allocator::Entity};
+use crate::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent}, storage::entity_allocator::Entity};
 
 impl Model {
     pub fn get_name_component_mut(&mut self, entity: Entity) -> &mut NameComponent {
@@ -20,22 +20,6 @@ impl Model {
         self.name_components.try_get(entity)
     }
 
-    pub fn get_stationary_component_mut(&mut self, entity: Entity) -> &mut StationaryComponent {
-        self.stationary_components.get_mut(entity)
-    }
-
-    pub fn get_stationary_component(&self, entity: Entity) -> &StationaryComponent {
-        self.stationary_components.get(entity)
-    }
-
-    pub fn try_get_stationary_component_mut(&mut self, entity: Entity) -> Option<&mut StationaryComponent> {
-        self.stationary_components.try_get_mut(entity)
-    }
-
-    pub fn try_get_stationary_component(&self, entity: Entity) -> Option<&StationaryComponent> {
-        self.stationary_components.try_get(entity)
-    }
-
     pub fn get_orbitable_component_mut(&mut self, entity: Entity) -> &mut OrbitableComponent {
         self.orbitable_components.get_mut(entity)
     }
@@ -52,20 +36,20 @@ impl Model {
         self.orbitable_components.try_get(entity)
     }
 
-    pub fn get_trajectory_component_mut(&mut self, entity: Entity) -> &mut TrajectoryComponent {
-        self.trajectory_components.get_mut(entity)
+    pub fn get_path_component_mut(&mut self, entity: Entity) -> &mut PathComponent {
+        self.path_components.get_mut(entity)
     }
 
-    pub fn get_trajectory_component(&self, entity: Entity) -> &TrajectoryComponent {
-        self.trajectory_components.get(entity)
+    pub fn get_path_component(&self, entity: Entity) -> &PathComponent {
+        self.path_components.get(entity)
     }
 
-    pub fn try_get_trajectory_component_mut(&mut self, entity: Entity) -> Option<&mut TrajectoryComponent> {
-        self.trajectory_components.try_get_mut(entity)
+    pub fn try_get_path_component_mut(&mut self, entity: Entity) -> Option<&mut PathComponent> {
+        self.path_components.try_get_mut(entity)
     }
 
-    pub fn try_get_trajectory_component(&self, entity: Entity) -> Option<&TrajectoryComponent> {
-        self.trajectory_components.try_get(entity)
+    pub fn try_get_path_component(&self, entity: Entity) -> Option<&PathComponent> {
+        self.path_components.try_get(entity)
     }
 
     pub fn get_vessel_component_mut(&mut self, entity: Entity) -> &mut VesselComponent {

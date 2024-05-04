@@ -34,23 +34,23 @@ impl OrbitPoint {
         Self { theta, time, time_since_periapsis, position, velocity }
     }
 
-    pub fn get_theta(&self) -> f64 {
+    pub fn theta(&self) -> f64 {
         self.theta
     }
 
-    pub fn get_position(&self) -> DVec2 {
+    pub fn position(&self) -> DVec2 {
         self.position
     }
 
-    pub fn get_velocity(&self) -> DVec2 {
+    pub fn velocity(&self) -> DVec2 {
         self.velocity
     }
 
-    pub fn get_time(&self) -> f64 {
+    pub fn time(&self) -> f64 {
         self.time
     }
 
-    pub fn get_time_since_periapsis(&self) -> f64 {
+    pub fn time_since_periapsis(&self) -> f64 {
         self.time_since_periapsis
     }
 

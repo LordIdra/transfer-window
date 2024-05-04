@@ -95,8 +95,8 @@ pub fn format_time(time: f64) -> String {
 }
 
 pub fn get_burn_arrow_position(view: &Scene, model: &Model, entity: Entity, time: f64, direction: &BurnAdjustDirection) -> DVec2 {
-    let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
-    let burn_position = model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position();
-    let burn_to_arrow_unit = burn.get_rotation_matrix() * direction.get_vector();
+    let burn = model.get_path_component(entity).get_last_segment_at_time(time).as_burn();
+    let burn_position = model.get_absolute_position(burn.parent()) + burn.start_point().get_position();
+    let burn_to_arrow_unit = burn.rotation_matrix() * direction.get_vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.get_zoom()
 }

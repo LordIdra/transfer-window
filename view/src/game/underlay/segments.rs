@@ -1,6 +1,6 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{trajectory_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{path_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
 
 use crate::game::{util::add_triangle, Scene};
 
@@ -78,18 +78,18 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.get_zoom();
-    let trajectory_component = model.get_trajectory_component(entity);
+    let trajectory_component = model.get_path_component(entity);
 
     let mut segment_points_data = vec![];
     let mut orbit_index = 0;
     for segment in trajectory_component.get_segments().iter().flatten() {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Draw segment");
-        let absolute_parent_position = model.get_absolute_position(segment.get_parent());
+        let absolute_parent_position = model.get_absolute_position(segment.parent());
         match segment {
             Segment::Orbit(orbit) => {
                 // When predicting trajectories, the last orbit will have duration zero, so skip it
-                if orbit.get_duration().abs() == 0.0 {
+                if orbit.duration().abs() == 0.0 {
                     continue;
                 }
                 let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
@@ -118,7 +118,7 @@ pub fn draw(view: &mut Scene, model: &Model) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments");
     let camera_centre = view.camera.get_translation(model);
-    for entity in model.get_entities(vec![ComponentType::TrajectoryComponent]) {
+    for entity in model.get_entities(vec![ComponentType::PathComponent]) {
         draw_entity_segments(view, model, entity, camera_centre);
     }
 }

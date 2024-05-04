@@ -4,7 +4,7 @@ use nalgebra_glm::{vec2, DVec2};
 use rust_kepler_solver::ellipse::EllipseSolver;
 use serde::{Deserialize, Serialize};
 
-use crate::{components::trajectory_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, period, specific_angular_momentum}}, util::normalize_angle};
+use crate::{components::path_component::orbit::{orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{argument_of_periapsis, period, specific_angular_momentum}}, util::normalize_angle};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Ellipse {
@@ -105,13 +105,13 @@ impl Ellipse {
     }
 
     pub fn is_time_between_points(start: &OrbitPoint, end: &OrbitPoint, time: f64) -> bool {
-        time > start.get_time() && time < end.get_time()
+        time > start.time() && time < end.time()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::components::trajectory_component::{brute_force_tester::BruteForceTester, orbit::{conic::Conic, scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT}}};
+    use crate::components::path_component::{brute_force_tester::BruteForceTester, orbit::{conic::Conic, scary_math::{eccentricity, semi_major_axis, GRAVITATIONAL_CONSTANT}}};
 
     use super::*;
     

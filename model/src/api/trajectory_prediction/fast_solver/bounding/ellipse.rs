@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use transfer_window_common::numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point};
 
-use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, util::normalize_angle};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, util::normalize_angle};
 
 use super::{sdf::make_sdf, util::find_other_stationary_point, window::Window};
 
@@ -62,7 +62,7 @@ impl<'a> BounderData<'a> {
         // We split the orbit up into many segments
         // It's incredibly unlikely that a segment will contain multiple minimums, 
         // and all we need is a segment that contains 0-1 minimums for the solver
-        self.make_segmented_window(true, self.start_time, self.start_time + self.orbit.get_period().unwrap(), 16)
+        self.make_segmented_window(true, self.start_time, self.start_time + self.orbit.period().unwrap(), 16)
     }
 
     fn no_encounters() -> Vec<Window<'a>> {
@@ -143,11 +143,11 @@ impl<'a> BounderData<'a> {
 pub fn get_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64) -> Vec<Window<'a>> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Ellipse bounding");
-    let argument_of_apoapsis = orbit.get_argument_of_periapsis() + PI;
+    let argument_of_apoapsis = orbit.argument_of_periapsis() + PI;
     let sdf = make_sdf(orbit, sibling_orbit);
     let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis);
     let (min, max) = (sdf(min_theta), sdf(max_theta));
-    let soi = sibling_orbit.get_sphere_of_influence();
+    let soi = sibling_orbit.sphere_of_influence();
     let data = BounderData {
         orbit,
         sibling_orbit,

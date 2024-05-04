@@ -70,8 +70,8 @@ impl Icon for ClosestApproach {
 
     fn get_position(&self, view: &Scene, model: &Model) -> DVec2 {
         let offset = vec2(0.0, self.get_radius(view, model) / view.camera.get_zoom());
-        let segment = model.get_trajectory_component(self.entity).get_first_segment_at_time(self.time);
-        model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(self.time) + offset
+        let segment = model.get_path_component(self.entity).get_first_segment_at_time(self.time);
+        model.get_absolute_position(segment.parent()) + segment.position_at_time(self.time) + offset
     }
 
     fn get_facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {

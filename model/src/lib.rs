@@ -4,7 +4,7 @@ use components::vessel_component::VesselComponent;
 use serde::{Deserialize, Serialize};
 use systems::{fuel_depletion, time::{self, TimeStep}, trajectory_update, warp_update_system::{self, TimeWarp}};
 
-use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::TrajectoryComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
+use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
 pub const SEGMENTS_TO_PREDICT: usize = 4;
 
@@ -20,8 +20,7 @@ pub struct Model {
     entity_allocator: EntityAllocator,
     name_components: ComponentStorage<NameComponent>,
     orbitable_components: ComponentStorage<OrbitableComponent>,
-    stationary_components: ComponentStorage<StationaryComponent>,
-    trajectory_components: ComponentStorage<TrajectoryComponent>,
+    path_components: ComponentStorage<PathComponent>,
     vessel_components: ComponentStorage<VesselComponent>,
     time: f64,
     time_step: TimeStep,
@@ -34,8 +33,7 @@ impl Default for Model {
             entity_allocator: EntityAllocator::default(),
             name_components: ComponentStorage::default(),
             orbitable_components: ComponentStorage::default(),
-            trajectory_components: ComponentStorage::default(),
-            stationary_components: ComponentStorage::default(),
+            path_components: ComponentStorage::default(),
             vessel_components: ComponentStorage::default(),
             time: 0.0,
             time_step: TimeStep::Level{ level: 1, paused: false },
@@ -83,8 +81,7 @@ impl Model {
             let other_entities = match component_type {
                 ComponentType::NameComponent => self.name_components.get_entities(),
                 ComponentType::OrbitableComponent => self.orbitable_components.get_entities(),
-                ComponentType::StationaryComponent => self.stationary_components.get_entities(),
-                ComponentType::TrajectoryComponent => self.trajectory_components.get_entities(),
+                ComponentType::PathComponent => self.path_components.get_entities(),
                 ComponentType::VesselComponent => self.vessel_components.get_entities(),
             };
             entities.retain(|entity| other_entities.contains(entity));
@@ -96,15 +93,13 @@ impl Model {
         let EntityBuilder {
             name_component,
             orbitable_component,
-            stationary_component,
-            trajectory_component,
+            path_component: trajectory_component,
             vessel_component,
         } = entity_builder;
         let entity = self.entity_allocator.allocate();
         self.name_components.set(entity, name_component);
         self.orbitable_components.set(entity, orbitable_component);
-        self.stationary_components.set(entity, stationary_component);
-        self.trajectory_components.set(entity, trajectory_component);
+        self.path_components.set(entity, trajectory_component);
         self.vessel_components.set(entity, vessel_component);
         entity
     }
@@ -113,8 +108,7 @@ impl Model {
         self.entity_allocator.deallocate(entity);
         self.name_components.remove_if_exists(entity);
         self.orbitable_components.remove_if_exists(entity);
-        self.stationary_components.remove_if_exists(entity);
-        self.trajectory_components.remove_if_exists(entity);
+        self.path_components.remove_if_exists(entity);
         self.vessel_components.remove_if_exists(entity);
     }
 

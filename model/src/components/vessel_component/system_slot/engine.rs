@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::components::trajectory_component::orbit::scary_math::STANDARD_GRAVITY;
+use crate::components::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
 use super::{System, SystemType};
 

@@ -1,4 +1,4 @@
-use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
 
 use super::{sdf::make_sdf, window::Window};
 
@@ -72,9 +72,9 @@ impl<'a> BounderData<'a> {
 
 pub fn get_hyperbola_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity) -> Vec<Window<'a>> {
     let sdf = make_sdf(orbit, sibling_orbit);
-    let soi = sibling_orbit.get_sphere_of_influence();
-    let min_asymptote_theta = orbit.get_min_asymptote_theta().unwrap() + 0.001;
-    let max_asymptote_theta = orbit.get_max_asymptote_theta().unwrap() - 0.001;
+    let soi = sibling_orbit.sphere_of_influence();
+    let min_asymptote_theta = orbit.min_asymptote_theta().unwrap() + 0.001;
+    let max_asymptote_theta = orbit.max_asymptote_theta().unwrap() - 0.001;
     let max_theta = find_max(&sdf, min_asymptote_theta, max_asymptote_theta);
     let max = sdf(max_theta);
     let data = BounderData {

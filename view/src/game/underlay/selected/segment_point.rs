@@ -12,9 +12,9 @@ const SELECTED_ALPHA: f32 = 1.0;
 fn draw_selected_circle(view: &mut Scene, model: &Model, entity: Entity, time: f64, alpha: f32) {
     let select_radius = SELECT_RADIUS / view.camera.get_zoom();
     let mut vertices = vec![];
-    let trajectory_component = model.get_trajectory_component(entity);
+    let trajectory_component = model.get_path_component(entity);
     let segment = trajectory_component.get_last_segment_at_time(time);
-    let point = model.get_absolute_position(segment.get_parent()) + segment.get_position_at_time(time);
+    let point = model.get_absolute_position(segment.parent()) + segment.position_at_time(time);
     add_textured_square(&mut vertices, point, select_radius, alpha);
     view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);
 }

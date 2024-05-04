@@ -4,7 +4,7 @@ use crate::storage::entity_allocator::Entity;
 
 use self::system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System};
 
-use super::trajectory_component::orbit::scary_math::STANDARD_GRAVITY;
+use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
 pub mod system_slot;
 

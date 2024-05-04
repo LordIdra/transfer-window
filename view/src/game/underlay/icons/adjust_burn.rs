@@ -1,7 +1,7 @@
 use eframe::egui::{PointerState, Rect};
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::trajectory_component::burn::Burn, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::path_component::burn::Burn, storage::entity_allocator::Entity, Model};
 
 use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, util::get_burn_arrow_position, Scene};
 
@@ -25,8 +25,8 @@ pub struct AdjustBurn {
 
 impl AdjustBurn {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
-        let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
-        let burn_to_arrow_unit = burn.get_rotation_matrix() * direction.get_vector();
+        let burn = model.get_path_component(entity).get_last_segment_at_time(time).as_burn();
+        let burn_to_arrow_unit = burn.rotation_matrix() * direction.get_vector();
         let mut position = get_burn_arrow_position(view, model, entity, time, &direction);
 
         // Additional offset if arrow is being dragged
@@ -47,9 +47,9 @@ impl AdjustBurn {
         let mut icons = vec![];
         if let Selected::Burn { entity, time, state } = view.selected.clone() {
             if state.is_adjusting() || state.is_dragging() {
-                let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
-                let time = burn.get_start_point().get_time();
-                burn.get_tangent_direction();
+                let burn = model.get_path_component(entity).get_last_segment_at_time(time).as_burn();
+                let time = burn.start_point().get_time();
+                burn.tangent_direction();
                 let icon = Self::new(view, model, entity, time, BurnAdjustDirection::Prograde, pointer, screen_rect);
                 icons.push(Box::new(icon) as Box<dyn Icon>);
                 let icon = Self::new(view, model, entity, time, BurnAdjustDirection::Retrograde, pointer, screen_rect);
@@ -64,7 +64,7 @@ impl AdjustBurn {
     }
 
     fn get_burn<'a>(&self, model: &'a Model) -> &'a Burn {
-        model.get_trajectory_component(self.entity).get_last_segment_at_time(self.time).as_burn()
+        model.get_path_component(self.entity).get_last_segment_at_time(self.time).as_burn()
     }
 }
 
@@ -105,7 +105,7 @@ impl Icon for AdjustBurn {
 
     fn get_facing(&self, _view: &Scene, model: &Model) -> Option<DVec2> {
         let burn = self.get_burn(model);
-        Some(burn.get_rotation_matrix() * self.direction.get_vector())
+        Some(burn.rotation_matrix() * self.direction.get_vector())
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {

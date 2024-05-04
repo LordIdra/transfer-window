@@ -3,7 +3,7 @@ use std::{collections::{HashMap, VecDeque}, fs};
 use nalgebra_glm::vec2;
 use serde::Deserialize;
 
-use crate::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_component::StationaryComponent, trajectory_component::{orbit::Orbit, segment::Segment, TrajectoryComponent}, vessel_component::{VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -92,30 +92,32 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
             let mut entity_builder = EntityBuilder::default()
                 .with_name_component(NameComponent::new(name.clone()));
 
-            if data.velocity.is_none() && data.parent_name.is_none() {
-                let position = vec2(data.position[0], data.position[1]);
-                entity_builder = entity_builder.with_stationary_component(StationaryComponent::new(position));
+            let position = vec2(data.position[0], data.position[1]);
+            if data.parent_name.is_some() {
+                let Some(parent) = object_entities.get(data.parent_name.as_ref().unwrap()) else {
+                    // parent not added yet
+                    continue;
+                };
 
-            } else if data.velocity.is_some() && data.parent_name.is_some() {
-                if let Some(parent) = object_entities.get(data.parent_name.as_ref().unwrap()) {
-                    let parent_mass = model.get_mass(*parent);
-                    let position = vec2(data.position[0], data.position[1]);
-                    let velocity = vec2(data.velocity.unwrap()[0], data.velocity.unwrap()[1]);
-                    let trajectory_component = TrajectoryComponent::default()
-                        .with_segment(Segment::Orbit(Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0)));
-                    entity_builder = entity_builder.with_trajectory_component(trajectory_component);
+                let Some(velocity) = data.velocity else {
+                    panic!("An object has parent but not velocity");
+                };
+
+                let parent_mass = model.get_mass(*parent);
+                let velocity = vec2(velocity[0], velocity[1]);
+                let orbit = Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0);
+
+                if data.orbitable {
+                    let orbitable_component = OrbitableComponent::new(data.mass, 0.0, OrbitableComponentPhysics::Stationary(position));
+                    entity_builder = entity_builder.with_orbitable_component(orbitable_component);
                 } else {
-                    continue; // the object's parent is not added yet
+                    let path_component = PathComponent::default()
+                        .with_segment(Segment::Orbit(orbit));
+                    entity_builder = entity_builder.with_path_component(path_component);
+                    entity_builder = entity_builder.with_vessel_component(VesselComponent::new(VesselClass::Light));
                 }
-
             } else {
-                panic!("Object {name} has only one of velocity and parent_name");
-            }
-
-            if data.orbitable {
-                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(data.mass, 0.0));
-            } else {
-                entity_builder = entity_builder.with_vessel_component(VesselComponent::new(VesselClass::Light));
+                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(data.mass, 0.0, OrbitableComponentPhysics::Stationary(position)));
             }
 
             let entity = model.allocate(entity_builder);
@@ -130,6 +132,7 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
             object_data.remove(&name);
         }
     }
+
     let non_orbitable_entity = non_orbitable_entity.expect("Case does not contain a non-orbitable entity");
 
     (model, encounters, non_orbitable_entity, metadata.end_time, metadata.time_step)

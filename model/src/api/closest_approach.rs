@@ -1,64 +1,68 @@
+use log::error;
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::trajectory_component::segment::Segment, storage::entity_allocator::Entity, Model};
-
-/// Returns an ordered vector of pairs of orbits that have the same parent
-fn find_same_parent_orbit_pairs(model: &Model, entity_a: Entity, entity_b: Entity) -> Vec<(&Segment, &Segment)> {
-    #[cfg(feature = "profiling")]
-    let _span = tracy_client::span!("Find same parent orbits");
-    let mut same_parent_orbit_pairs = vec![];
-    let segments_a: Vec<&Segment> = model.get_trajectory_component(entity_a).get_segments().iter().flatten().collect();
-    let segments_b: Vec<&Segment> = model.get_trajectory_component(entity_b).get_segments().iter().flatten().collect();
-    let mut index_a = 0;
-    let mut index_b = 0;
-
-    while index_a < segments_a.len() && index_b < segments_b.len() {
-        let segment_a = segments_a[index_a];
-        let segment_b = segments_b[index_b];
-
-        if !segment_a.is_orbit() {
-            index_a += 1;
-            continue;
-        }
-
-        if !segment_b.is_orbit() {
-            index_a += 1;
-            continue;
-        }
-
-        if segment_a.get_parent() == segment_b.get_parent() {
-            same_parent_orbit_pairs.push((segment_a, segment_b));
-        }
-
-        if segment_a.get_end_time() < segment_b.get_end_time() {
-            index_a += 1;
-        } else {
-            index_b += 1;
-        }
-    }
-
-    same_parent_orbit_pairs
-}
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
 
 /// Step time needs to be large enough to be performant but small 
 /// enough to catch all approaches. We choose this by choosing the 
 /// minimum of the durations, and if applicable, periods, then dividing 
 /// by a constant
-fn get_time_step(segment_a: &Segment, segment_b: &Segment, start_time: f64, end_time: f64) -> f64 {
+fn get_time_step(orbit_a: &Orbit, orbit_b: &Orbit, start_time: f64, end_time: f64) -> f64 {
     let mut step_time = end_time - start_time;
-    if let Segment::Orbit(orbit) = segment_a {
-        if let Some(period) = orbit.get_period() {
-            step_time = f64::min(step_time, period);
-        }
+    if let Some(period) = orbit_a.period() {
+        step_time = f64::min(step_time, period);
     }
-    if let Segment::Orbit(orbit) = segment_b {
-        if let Some(period) = orbit.get_period() {
-            step_time = f64::min(step_time, period);
-        }
+    if let Some(period) = orbit_b.period() {
+        step_time = f64::min(step_time, period);
     }
     step_time / 16.0
 }
+
 impl Model {
+    fn get_orbits(&self, entity: Entity) -> Vec<&Orbit> {
+        if let Some(orbitable_component) = self.try_get_orbitable_component(entity) {
+            return match orbitable_component.get_orbit() {
+                Some(orbit) => vec![orbit],
+                None => vec![],
+            }
+        }
+
+        if let Some(path_component) = self.try_get_path_component(entity) {
+            return path_component.get_segments().iter().flatten().filter_map(|x| x.as_orbit()).collect()
+        }
+
+        error!("Attempt to get orbits of an entity than cannot have orbits");
+        vec![]
+    }
+
+    /// Returns an ordered vector of pairs of orbits that have the same parent
+    fn find_same_parent_orbit_pairs(&self, entity_a: Entity, entity_b: Entity) -> Vec<(&Orbit, &Orbit)> {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Find same parent orbits");
+        let mut same_parent_orbit_pairs = vec![];
+        let segments_a: Vec<&Orbit> = self.get_orbits(entity_a);
+        let segments_b: Vec<&Orbit> = self.get_orbits(entity_b);
+        let mut index_a = 0;
+        let mut index_b = 0;
+
+        while index_a < segments_a.len() && index_b < segments_b.len() {
+            let segment_a = segments_a[index_a];
+            let segment_b = segments_b[index_b];
+
+            if segment_a.parent() == segment_b.parent() {
+                same_parent_orbit_pairs.push((segment_a, segment_b));
+            }
+
+            if segment_a.end_point().time() < segment_b.end_point().time() {
+                index_a += 1;
+            } else {
+                index_b += 1;
+            }
+        }
+
+        same_parent_orbit_pairs
+    }
+
     /// Returns the time at which the next closest approach will occur.
     /// This ignore burns. Why? Picture two spacecraft getting closer
     /// to each other. One of them starts burning to accelerate and
@@ -69,15 +73,15 @@ impl Model {
     pub fn find_next_closest_approach(&self, entity_a: Entity, entity_b: Entity, start_time: f64) -> Option<f64> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Find next closest approach");
-        let same_parent_orbit_pairs = find_same_parent_orbit_pairs(self, entity_a, entity_b);
+        let same_parent_orbit_pairs = self.find_same_parent_orbit_pairs(entity_a, entity_b);
 
         for pair in same_parent_orbit_pairs {
-            let segment_a = pair.0;
-            let segment_b = pair.1;
-            let start_time = f64::max(f64::max(segment_b.get_start_time(), segment_a.get_start_time()), start_time);
-            let end_time = f64::min(segment_a.get_end_time(), segment_b.get_end_time());
-            let time_step = get_time_step(segment_a, segment_b, start_time, end_time);
-            let distance = |time: f64| (segment_a.get_position_at_time(time) - segment_b.get_position_at_time(time)).magnitude();
+            let orbit_a = pair.0;
+            let orbit_b = pair.1;
+            let start_time = f64::max(f64::max(orbit_b.start_point().time(), orbit_a.start_point().time()), start_time);
+            let end_time = f64::min(orbit_a.end_point().time(), orbit_b.end_point().time());
+            let time_step = get_time_step(orbit_a, orbit_b, start_time, end_time);
+            let distance = |time: f64| (orbit_a.point_at_time(time).position() - orbit_b.point_at_time(time).position()).magnitude();
             let distance_prime = |time: f64| (distance(time + 2.0) - distance(time)) / 2.0;
 
             if start_time > end_time {
@@ -118,28 +122,26 @@ impl Model {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::{orbitable_component::OrbitableComponent, trajectory_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, TrajectoryComponent}}, storage::entity_builder::EntityBuilder, Model};
-
-    use super::find_same_parent_orbit_pairs;
+    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::entity_builder::EntityBuilder, Model};
 
     #[test]
     fn test_find_same_parent_orbit_pairs() {
         let mut model = Model::default();
 
-        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3);
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)));
         let entity_builder = EntityBuilder::default();
         let entity_a = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
-        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3);
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableComponentPhysics::Stationary(vec2(1000.0, 0.0)));
         let entity_builder = EntityBuilder::default();
         let entity_b = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
-        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3);
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableComponentPhysics::Stationary(vec2(0.0, 1000.0)));
         let entity_builder = EntityBuilder::default();
         let entity_c = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
         
-        let mut trajectory = TrajectoryComponent::default();
+        let mut trajectory = PathComponent::default();
     
         let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 0.0).with_end_at(10.0);
         let segment_d_1 = Segment::Orbit(orbit);
@@ -153,10 +155,10 @@ mod test {
         let segment_d_3 = Segment::Orbit(orbit);
         trajectory.add_segment(segment_d_3.clone());
 
-        let entity_d = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
+        let entity_d = model.allocate(EntityBuilder::default().with_path_component(trajectory));
 
 
-        let mut trajectory = TrajectoryComponent::default();
+        let mut trajectory = PathComponent::default();
 
         let orbit = Orbit::new(entity_a, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 0.0).with_end_at(5.0);
         let segment_e_1 = Segment::Orbit(orbit);
@@ -178,7 +180,7 @@ mod test {
         let segment_e_5 = Segment::Orbit(orbit);
         trajectory.add_segment(segment_e_5.clone());
 
-        let entity_e = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
+        let entity_e = model.allocate(EntityBuilder::default().with_path_component(trajectory));
 
 
         let expected = vec![
@@ -187,13 +189,13 @@ mod test {
             (segment_d_3, segment_e_5),
         ];
 
-        let actual = find_same_parent_orbit_pairs(&model, entity_d, entity_e);
+        let actual = model.find_same_parent_orbit_pairs(entity_d, entity_e);
 
         assert_eq!(actual.len(), expected.len());
 
         for i in 0..actual.len() {
-            assert!(expected[i].0.get_parent() == actual[i].0.get_parent());
-            assert!(expected[i].1.get_parent() == actual[i].1.get_parent());
+            assert!(expected[i].0.parent() == actual[i].0.parent());
+            assert!(expected[i].1.parent() == actual[i].1.parent());
         }
     }
 
@@ -201,28 +203,28 @@ mod test {
     fn test_find_next_closest_approach() {
         let mut model = Model::default();
 
-        let orbitable = OrbitableComponent::new(5.9722e24, 6.371e3);
+        let orbitable = OrbitableComponent::new(5.9722e24, 6.371e3, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)));
         let entity_builder = EntityBuilder::default();
         let earth = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
-        let mut trajectory = TrajectoryComponent::default();
+        let mut trajectory = PathComponent::default();
         let orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::Clockwise).with_end_at(1.0e10);
         trajectory.add_segment(Segment::Orbit(orbit));
-        let vessel_a = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
+        let vessel_a = model.allocate(EntityBuilder::default().with_path_component(trajectory));
 
-        let mut trajectory = TrajectoryComponent::default();
+        let mut trajectory = PathComponent::default();
         let orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(-0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
         trajectory.add_segment(Segment::Orbit(orbit.clone()));
-        let vessel_b = model.allocate(EntityBuilder::default().with_trajectory_component(trajectory));
+        let vessel_b = model.allocate(EntityBuilder::default().with_path_component(trajectory));
 
-        let expected = orbit.get_period().unwrap() / 4.0;
+        let expected = orbit.period().unwrap() / 4.0;
         let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0).unwrap();
 
         println!("Actual: {} Expected: {}", actual, expected);
         assert!((expected - actual).abs() / expected < 1.0e-3);
 
-        let expected = orbit.get_period().unwrap() * 3.0 / 4.0;
-        let actual = model.find_next_closest_approach(vessel_a, vessel_b, orbit.get_period().unwrap() / 2.0).unwrap();
+        let expected = orbit.period().unwrap() * 3.0 / 4.0;
+        let actual = model.find_next_closest_approach(vessel_a, vessel_b, orbit.period().unwrap() / 2.0).unwrap();
 
         println!("Actual: {} Expected: {}", actual, expected);
         assert!((expected - actual).abs() / expected < 1.0e-3);

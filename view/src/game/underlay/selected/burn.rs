@@ -68,8 +68,8 @@ pub fn update_drag(view: &mut Scene, model: &Model, context: &Context, events: &
     // Do drag adjustment
     if let Selected::Burn { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
         if let Some(mouse_position) = pointer.latest_pos() {
-            let burn = model.get_trajectory_component(entity).get_last_segment_at_time(time).as_burn();
-            let burn_to_arrow_unit = burn.get_rotation_matrix() * direction.get_vector();
+            let burn = model.get_path_component(entity).get_last_segment_at_time(time).as_burn();
+            let burn_to_arrow_unit = burn.rotation_matrix() * direction.get_vector();
             let arrow_position = get_burn_arrow_position(view, model, entity, time, &direction);
             let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, context.screen_rect()) - arrow_position;
             let amount = burn_adjustment_amount(arrow_to_mouse.dot(&burn_to_arrow_unit)) * direction.get_vector() * view.camera.get_zoom().powi(2);

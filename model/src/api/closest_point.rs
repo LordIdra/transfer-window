@@ -3,7 +3,7 @@ use std::mem::swap;
 use nalgebra_glm::DVec2;
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::{trajectory_component::{orbit::Orbit, segment::Segment}, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
+use crate::{components::{path_component::{orbit::Orbit, segment::Segment}, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
 
 /// Returns the closest point to `point` on the given orbit if it is less than `radius` away from the orbit
 /// Returns none if the closest distance to `point` is further than the radius
@@ -17,14 +17,14 @@ fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f64) -
         return None;
     }
 
-    let distance = |time: f64| (orbit.get_position_from_theta(orbit.get_theta_from_time(time)) - point).magnitude();
+    let distance = |time: f64| (orbit.position_from_theta(orbit.theta_from_time(time)) - point).magnitude();
     let distance_prime = |time: f64| (distance(time + 1.0e-2) - distance(time)) / 1.0e-2;
     
-    let min_theta = orbit.get_min_asymptote_theta().unwrap() + 1.0e-2;
-    let max_theta = orbit.get_max_asymptote_theta().unwrap() - 1.0e-2;
+    let min_theta = orbit.min_asymptote_theta().unwrap() + 1.0e-2;
+    let max_theta = orbit.max_asymptote_theta().unwrap() - 1.0e-2;
 
-    let mut min_time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(min_theta);
-    let mut max_time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(max_theta);
+    let mut min_time = orbit.first_periapsis_time() + orbit.time_since_first_periapsis(min_theta);
+    let mut max_time = orbit.first_periapsis_time() + orbit.time_since_first_periapsis(max_theta);
 
     let (min, max) = (distance_prime(min_time), distance_prime(max_time));
     if min.is_sign_positive() && max.is_sign_positive() || min.is_sign_negative() && max.is_sign_negative() {
@@ -36,7 +36,7 @@ fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f64) -
     }
 
     let time = itp(&distance_prime, min_time, max_time);
-    let position = orbit.get_position_from_theta(orbit.get_theta_from_time(time));
+    let position = orbit.position_from_theta(orbit.theta_from_time(time));
     if (position - point).magnitude() < max_distance {
         return Some(position);
     }
@@ -50,13 +50,13 @@ impl Model {
     pub fn get_closest_point_on_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
-        for entity in self.get_entities(vec![ComponentType::TrajectoryComponent]) {
-            for segment in self.get_trajectory_component(entity).get_segments().iter().flatten() {
+        for entity in self.get_entities(vec![ComponentType::PathComponent]) {
+            for segment in self.get_path_component(entity).get_segments().iter().flatten() {
                 let Segment::Orbit(orbit) = segment else { 
                     continue 
                 };
 
-                let parent_position = self.get_absolute_position(orbit.get_parent());
+                let parent_position = self.get_absolute_position(orbit.parent());
                 let point = point - parent_position;
                 let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {
                     continue;
@@ -64,22 +64,22 @@ impl Model {
 
                 let distance = (closest_position - point).magnitude();
                 let theta = f64::atan2(closest_position.y, closest_position.x);
-                let time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
+                let time = orbit.first_periapsis_time() + orbit.time_since_first_periapsis(theta);
                 if distance > closest_distance {
                     continue
                 }
 
                 closest_distance = distance;
-                if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
+                if time > orbit.current_point().time() && time < orbit.end_point().time() {
                     closest_point = Some((entity, time));
                     closest_distance = distance;
                     continue;
                 }
 
-                if let Some(period) = orbit.get_period() {
+                if let Some(period) = orbit.period() {
                     // If the orbit has a period, we might have calculated an invalid time that's one period behind a valid time
                     let time = time + period;
-                    if time > orbit.get_current_point().get_time() && time < orbit.get_end_point().get_time() {
+                    if time > orbit.current_point().time() && time < orbit.end_point().time() {
                         closest_point = Some((entity, time));
                         closest_distance = distance;
                     }
@@ -97,7 +97,7 @@ mod test {
 
     use nalgebra_glm::vec2;
 
-    use crate::{api::closest_point::find_closest_point_on_orbit, components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity};
+    use crate::{api::closest_point::find_closest_point_on_orbit, components::path_component::orbit::Orbit, storage::entity_allocator::Entity};
 
     #[test]
     fn test_find_closest_point_on_orbit_ellipse() {

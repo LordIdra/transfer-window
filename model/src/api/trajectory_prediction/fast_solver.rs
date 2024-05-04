@@ -1,4 +1,4 @@
-use crate::{components::trajectory_component::{orbit::Orbit, segment::Segment}, Model, storage::entity_allocator::Entity};
+use crate::{components::path_component::{orbit::Orbit, segment::Segment}, Model, storage::entity_allocator::Entity};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -6,24 +6,42 @@ mod bounding;
 pub mod solver;
 
 fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
-    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(time);
-    let old_parent = model.get_trajectory_component(entity).get_end_segment().get_parent();
+    model.get_path_component_mut(entity)
+        .get_end_segment_mut()
+        .as_orbit_mut()
+        .expect("Attempt to do an exit encounter on a burn")
+        .end_at(time);
+
+    let old_parent = model.get_path_component(entity).get_end_segment().parent();
     let mass = model.get_mass_at_time(entity, time);
     let new_parent_mass = model.get_mass_at_time(new_parent, time);
-    let position = model.get_trajectory_component(entity).get_end_segment().get_end_position() + model.get_trajectory_component(old_parent).get_first_segment_at_time(time).get_position_at_time(time);
-    let velocity = model.get_trajectory_component(entity).get_end_segment().get_end_velocity() + model.get_trajectory_component(old_parent).get_first_segment_at_time(time).get_velocity_at_time(time);
-    let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
-    model.get_trajectory_component_mut(entity).add_segment(segment);
+
+    let entity_segment = model.get_path_component(entity).get_end_segment();
+    let old_parent_segment = &model.get_path_component(old_parent).get_first_segment_at_time(time);
+    let position = entity_segment.end_position() + old_parent_segment.position_at_time(time);
+    let velocity = entity_segment.end_velocity() + old_parent_segment.velocity_at_time(time);
+
+    let orbit = Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time);
+    model.get_path_component_mut(entity).add_segment(Segment::Orbit(orbit));
 }
 
 fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
-    model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(time);
+    model.get_path_component_mut(entity)
+        .get_end_segment_mut()
+        .as_orbit_mut()
+        .expect("Attempt to do an exit encounter on a burn")
+        .end_at(time);
+
     let new_parent_mass = model.get_mass_at_time(new_parent, time);
     let mass = model.get_mass_at_time(entity, time);
-    let position = model.get_trajectory_component(entity).get_end_segment().get_end_position() - model.get_trajectory_component(new_parent).get_first_segment_at_time(time).get_position_at_time(time);
-    let velocity = model.get_trajectory_component(entity).get_end_segment().get_end_velocity() - model.get_trajectory_component(new_parent).get_first_segment_at_time(time).get_velocity_at_time(time);
+
+    let entity_segment = model.get_path_component(entity).get_end_segment();
+    let new_parent_segment = &model.get_path_component(new_parent).get_first_segment_at_time(time);
+    let position = entity_segment.end_position() - new_parent_segment.position_at_time(time);
+    let velocity = entity_segment.end_velocity() - new_parent_segment.velocity_at_time(time);
+
     let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
-    model.get_trajectory_component_mut(entity).add_segment(segment);
+    model.get_path_component_mut(entity).add_segment(segment);
 }
 
 /// This detachment of encounter solving and application 
@@ -46,7 +64,7 @@ mod test {
         let mut start_time = 0.0;
         loop {
             let mut soonest_encounter: Option<Encounter> = None;
-            for entity in model.get_entities(vec![ComponentType::TrajectoryComponent]) {
+            for entity in model.get_entities(vec![ComponentType::PathComponent]) {
                 let encounter = find_next_encounter(&model, entity, start_time, end_time);
                 if let Some(encounter) = encounter {
                     if let Some(soonest_encounter) = &mut soonest_encounter {
@@ -75,8 +93,12 @@ mod test {
             let case_encounter = encounters.pop_front().unwrap();
             encounter.set_time(case_encounter.get_time());
 
-            for entity in model.get_entities(vec![ComponentType::TrajectoryComponent]) {
-                model.get_trajectory_component_mut(entity).get_end_segment_mut().as_orbit_mut().end_at(encounter.get_time());
+            for entity in model.get_entities(vec![ComponentType::PathComponent]) {
+                model.get_path_component_mut(entity)
+                    .get_end_segment_mut()
+                    .as_orbit_mut()
+                    .expect("Attempt to set end time of a segment that is not an orbit")
+                    .end_at(encounter.get_time());
             }
 
             start_time = encounter.get_time();

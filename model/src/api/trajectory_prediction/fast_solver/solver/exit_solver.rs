@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::trajectory_component::orbit::Orbit, Model, storage::entity_allocator::Entity, api::trajectory_prediction::encounter::{Encounter, EncounterType}};
+use crate::{components::path_component::orbit::Orbit, Model, storage::entity_allocator::Entity, api::trajectory_prediction::encounter::{Encounter, EncounterType}};
 
 use super::MIN_TIME_BEFORE_ENCOUNTER;
 
@@ -15,8 +15,8 @@ use super::MIN_TIME_BEFORE_ENCOUNTER;
 /// - Finally, check that the time is not after end time - if it is, no encounter is possible
 fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Option<f64> {
     // SDF negative outside of SOI
-    let sdf = |theta: f64| soi - orbit.get_position_from_theta(theta).magnitude(); 
-    let periapsis = orbit.get_argument_of_periapsis();
+    let sdf = |theta: f64| soi - orbit.position_from_theta(theta).magnitude(); 
+    let periapsis = orbit.argument_of_periapsis();
     let apoapsis = periapsis + PI;
 
     if sdf(apoapsis).is_sign_positive() {
@@ -43,9 +43,9 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         itp(&sdf, from, to)
     };
 
-    let mut time = orbit.get_first_periapsis_time() + orbit.get_time_since_first_periapsis(theta);
+    let mut time = orbit.first_periapsis_time() + orbit.time_since_first_periapsis(theta);
     while time < start_time {
-        time += orbit.get_period().unwrap();
+        time += orbit.period().unwrap();
     }
     if time > end_time {
         return None;
@@ -64,8 +64,8 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 /// - Repeat until t > `end_time`
 fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Option<f64> {
     let f = |time: f64| {
-        let theta = orbit.get_theta_from_time(time);
-        let distance = orbit.get_position_from_theta(theta).magnitude();
+        let theta = orbit.theta_from_time(time);
+        let distance = orbit.position_from_theta(theta).magnitude();
         soi - distance
     };
 
@@ -97,17 +97,22 @@ fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 pub fn solve_for_exit(model: &Model, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Solve for exit");
-    let orbit = model.get_trajectory_component(entity).get_end_segment().as_orbit(); 
-    let Some(parent_trajectory_component) = model.try_get_trajectory_component(orbit.get_parent()) else {
+    let orbit = model.get_path_component(entity)
+        .get_end_segment()
+        .as_orbit()
+        .expect("Entity does not have an orbit as end segment"); 
+    let Some(parent_trajectory_component) = model.try_get_path_component(orbit.parent()) else {
         // Parent cannot be exited as it is a root entity
         return None;
     };
-    let parent_orbit = parent_trajectory_component.get_first_segment_at_time(start_time).as_orbit();
+    let parent_orbit = parent_trajectory_component.get_first_segment_at_time(start_time)
+        .as_orbit()
+        .expect("Parent does not have an orbit at requested start time");
 
     let encounter_time = if orbit.is_ellipse() {
-        find_elliptical_exit_time(orbit, parent_orbit.get_sphere_of_influence(), start_time, end_time)
+        find_elliptical_exit_time(orbit, parent_orbit.sphere_of_influence(), start_time, end_time)
     } else {
-        find_hyperbolic_exit_time(orbit, parent_orbit.get_sphere_of_influence(), start_time, end_time)
+        find_hyperbolic_exit_time(orbit, parent_orbit.sphere_of_influence(), start_time, end_time)
     }?;
     
     if encounter_time < start_time + MIN_TIME_BEFORE_ENCOUNTER {
@@ -117,5 +122,5 @@ pub fn solve_for_exit(model: &Model, entity: Entity, start_time: f64, end_time: 
         return None;
     }
 
-    Some(Encounter::new(EncounterType::Exit, entity, parent_orbit.get_parent(), encounter_time))
+    Some(Encounter::new(EncounterType::Exit, entity, parent_orbit.parent(), encounter_time))
 }

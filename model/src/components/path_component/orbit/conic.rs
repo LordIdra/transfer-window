@@ -157,7 +157,7 @@ impl Conic {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::components::trajectory_component::orbit::orbit_direction::OrbitDirection;
+    use crate::components::path_component::orbit::orbit_direction::OrbitDirection;
 
     use super::Conic;
 

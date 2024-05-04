@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity};
 
 /// A one-time window where the bounds can be checked once then discarded
 #[derive(Debug)]
@@ -43,7 +43,7 @@ impl<'a> Window<'a> {
 
     // Increments bounds by period
     pub fn next(&self) -> Self {
-        let bound = (self.bound.0 + self.orbit.get_period().unwrap(), self.bound.1 + self.orbit.get_period().unwrap());
+        let bound = (self.bound.0 + self.orbit.period().unwrap(), self.bound.1 + self.orbit.period().unwrap());
         Self::new(self.orbit, self.other_orbit, self.other_entity, self.periodic, bound)
     }
 

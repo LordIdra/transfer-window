@@ -12,11 +12,18 @@ mod window;
 pub fn get_initial_windows(model: &Model, entity: Entity, siblings: Vec<Entity>, start_time: f64, end_time: f64) -> Vec<Window> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Get initial windows");
-    let orbit = model.get_trajectory_component(entity).get_end_segment().as_orbit();
+    let orbit = model
+        .get_path_component(entity)
+        .get_end_segment()
+        .as_orbit()
+        .expect("Entity does not have an orbit at requested start time");
     let mut windows = vec![];
 
     for sibling in siblings {
-        let sibling_orbit = model.get_trajectory_component(sibling).get_first_segment_at_time(start_time).as_orbit();
+        let sibling_orbit = model.get_path_component(sibling)
+            .get_first_segment_at_time(start_time)
+            .as_orbit()
+            .expect("Sibling does not have an orbit at requested start time");
         assert!(sibling_orbit.is_ellipse(), "Orbitable is on hyperbolic trajectory");
         if orbit.is_ellipse() {
             for window in get_ellipse_bound(orbit, sibling_orbit, sibling, start_time) {

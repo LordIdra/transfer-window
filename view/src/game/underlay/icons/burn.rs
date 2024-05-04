@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{trajectory_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{path_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model};
 
 use crate::game::{underlay::selected::{burn::BurnState, Selected}, Scene};
 
@@ -17,9 +17,9 @@ impl Burn {
     pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.get_entities(vec![ComponentType::VesselComponent]) {
-            for segment in model.get_trajectory_component(entity).get_segments().iter().flatten().rev() {
+            for segment in model.get_path_component(entity).get_segments().iter().flatten().rev() {
                 if let Segment::Burn(burn) = segment {
-                    let time = burn.get_start_point().get_time();
+                    let time = burn.start_point().get_time();
                     if time > model.get_time() {
                         let icon = Self { entity, time };
                         icons.push(Box::new(icon) as Box<dyn Icon>);
@@ -64,8 +64,8 @@ impl Icon for Burn {
     }
 
     fn get_position(&self, _view: &Scene, model: &Model) -> DVec2 {
-        let burn = model.get_trajectory_component(self.entity).get_last_segment_at_time(self.time).as_burn();
-        model.get_absolute_position(burn.get_parent()) + burn.get_start_point().get_position()
+        let burn = model.get_path_component(self.entity).get_last_segment_at_time(self.time).as_burn();
+        model.get_absolute_position(burn.parent()) + burn.start_point().get_position()
     }
 
     fn get_facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {

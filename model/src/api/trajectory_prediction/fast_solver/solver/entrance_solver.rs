@@ -1,4 +1,4 @@
-use crate::components::trajectory_component::orbit::Orbit;
+use crate::components::path_component::orbit::Orbit;
 
 use transfer_window_common::numerical_methods::itp::itp;
 
@@ -17,18 +17,18 @@ use transfer_window_common::numerical_methods::itp::itp;
 pub fn solve_for_entrance(orbit: &Orbit, sibling_orbit: &Orbit, start_time: f64, end_time: f64) -> Option<f64> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Solve for entrance");
-    let distance = |time: f64| (orbit.get_position_from_theta(orbit.get_theta_from_time(time)) - sibling_orbit.get_position_from_theta(sibling_orbit.get_theta_from_time(time))).magnitude();
+    let distance = |time: f64| (orbit.position_from_theta(orbit.theta_from_time(time)) - sibling_orbit.position_from_theta(sibling_orbit.theta_from_time(time))).magnitude();
     let distance_prime = |time: f64| (distance(time + 0.001) - distance(time)) / 0.001;
     let distance_prime_start = distance_prime(start_time);
     let distance_prime_end = distance_prime(end_time);
     if distance_prime_start.is_sign_negative() && distance_prime_end.is_sign_positive() {
         let min_distance_time = itp(&distance_prime, start_time, end_time);
         let min_distance = distance(min_distance_time);
-        let soi = sibling_orbit.get_sphere_of_influence();
+        let soi = sibling_orbit.sphere_of_influence();
         if min_distance < soi {
             let f = |time: f64| distance(time) - soi;
             let mut adjusted_start_time = start_time;
-            if let Some(period) = orbit.get_period() {
+            if let Some(period) = orbit.period() {
                 while f(adjusted_start_time).is_sign_negative() {
                     adjusted_start_time -= period / 32.0;
                 }

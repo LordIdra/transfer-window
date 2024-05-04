@@ -23,10 +23,7 @@ pub fn log_components(model: &Model, entity: Entity) {
     if let Some(component) = model.try_get_orbitable_component(entity) {
         trace!("{component:?}");
     }
-    if let Some(component) = model.try_get_stationary_component(entity) {
-        trace!("{component:?}");
-    }
-    if let Some(component) = model.try_get_trajectory_component(entity) {
+    if let Some(component) = model.try_get_path_component(entity) {
         trace!("{component:?}");
     }
     if let Some(component) = model.try_get_vessel_component(entity) {

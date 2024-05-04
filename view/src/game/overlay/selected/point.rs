@@ -1,12 +1,12 @@
 use eframe::{egui::{Align2, Button, Context, Ui, Window}, epaint};
-use transfer_window_model::{components::trajectory_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::{underlay::selected::{burn::BurnState, Selected}, util::format_time, Scene}};
 
 fn draw_next(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui, view: &mut Scene, entity: Entity) {
     let time = time - period;
     let button = Button::new("Previous orbit");
-    let enabled = time > orbit.get_current_point().get_time();
+    let enabled = time > orbit.current_point().time();
     if ui.add_enabled(enabled, button).clicked() {
         view.selected = Selected::Point { entity, time };
     }
@@ -15,22 +15,22 @@ fn draw_next(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui, view: &mut Scen
 fn draw_previous(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui, view: &mut Scene, entity: Entity) {
     let time = time + period;
     let button = Button::new("Next orbit");
-    let enabled = time < orbit.get_end_point().get_time();
+    let enabled = time < orbit.end_point().time();
     if ui.add_enabled(enabled, button).clicked() {
         view.selected = Selected::Point { entity, time };
     }
 }
 
 fn draw_orbits(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui) {
-    let orbits = ((time - orbit.get_current_point().get_time()) / period) as usize;
+    let orbits = ((time - orbit.current_point().time()) / period) as usize;
     if orbits != 0 {
         ui.label("Orbits: ".to_string() + orbits.to_string().as_str());
     }
 }
 
 fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Event>, time: f64, view: &mut Scene) {
-    let has_burn_before_requested_time = if let Some(final_burn) = model.get_trajectory_component(entity).get_final_burn() {
-        time < final_burn.get_start_point().get_time()
+    let has_burn_before_requested_time = if let Some(final_burn) = model.get_path_component(entity).get_final_burn() {
+        time < final_burn.start_point().get_time()
     } else {
         false
     };
@@ -43,8 +43,8 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
         view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
     }
 
-    let orbit = model.get_trajectory_component(entity).get_first_segment_at_time(time).as_orbit();
-    if let Some(period) = orbit.get_period() {
+    let orbit = model.get_path_component(entity).get_first_segment_at_time(time).as_orbit();
+    if let Some(period) = orbit.period() {
         draw_next(time, period, orbit, ui, view, entity);
         draw_previous(time, period, orbit, ui, view, entity);
         draw_orbits(time, period, orbit, ui);
