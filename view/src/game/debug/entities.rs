@@ -4,9 +4,9 @@ use transfer_window_model::{components::path_component::{burn::{burn_point::Burn
 use crate::game::util::format_time;
 
 fn draw_burn_point(ui: &mut Ui, burn_point: &BurnPoint) {
-    ui.label(format!("Position: {:.3?}", burn_point.get_position()));
-    ui.label(format!("Velocity: {:.3?}", burn_point.get_velocity()));
-    ui.label(format!("Time: {:.3?}", burn_point.get_time()));
+    ui.label(format!("Position: {:.3?}", burn_point.position()));
+    ui.label(format!("Velocity: {:.3?}", burn_point.velocity()));
+    ui.label(format!("Time: {:.3?}", burn_point.time()));
 }
 
 fn draw_orbit_point(ui: &mut Ui, orbit_point: &OrbitPoint) {
@@ -49,16 +49,16 @@ fn draw_burn(ui: &mut Ui, burn: &Burn) {
 }
 
 fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
-    let is_orbitable = model.try_get_orbitable_component(entity).is_some();
+    let is_orbitable = model.try_orbitable_component(entity).is_some();
     ui.label(format!("Orbitable: {is_orbitable}"));
 
     if let Some(stationary_component) = model.try_get_stationary_component(entity) {
         ui.label(format!("Position: {:.3?}", stationary_component.get_position()));
     }
 
-    if let Some(trajectory_component) = model.try_get_path_component(entity) {
+    if let Some(trajectory_component) = model.try_path_component(entity) {
         ui.collapsing("Trajectory", |ui| {
-            for segment in trajectory_component.get_segments().iter().flatten() {
+            for segment in trajectory_component.segments().iter().flatten() {
                 match segment {
                     Segment::Orbit(orbit) => draw_orbit(ui, orbit),
                     Segment::Burn(burn) => draw_burn(ui, burn),
@@ -69,14 +69,14 @@ fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
 }
 
 pub fn draw(model: &Model, ui: &mut Ui) {
-    let entities: Vec<Entity> = model.get_entities(vec![]).into_iter().collect();
+    let entities: Vec<Entity> = model.entities(vec![]).into_iter().collect();
     ScrollArea::vertical()
         .auto_shrink([false, false])
         .show_rows(ui, 10.0, entities.len(), |ui, row_range| {
             for i in row_range {
                 let entity = entities[i];
-                let name = match model.try_get_name_component(entity) {
-                    Some(name_component) => name_component.get_name(),
+                let name = match model.try_name_component(entity) {
+                    Some(name_component) => name_component.name(),
                     None => "<unnamed>".to_string(),
                 };
                 ui.collapsing(name, |ui| draw_entity(model, ui, entity));

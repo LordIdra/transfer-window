@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::path_component::burn::Burn, storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, util::get_burn_arrow_position, Scene};
+use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, util::compute_burn_arrow_position, Scene};
 
 use super::Icon;
 
@@ -25,9 +25,9 @@ pub struct AdjustBurn {
 
 impl AdjustBurn {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
-        let burn = model.get_path_component(entity).get_last_segment_at_time(time).as_burn();
-        let burn_to_arrow_unit = burn.rotation_matrix() * direction.get_vector();
-        let mut position = get_burn_arrow_position(view, model, entity, time, &direction);
+        let burn = model.path_component(entity).last_segment_at_time(time).as_burn();
+        let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
+        let mut position = compute_burn_arrow_position(view, model, entity, time, &direction);
 
         // Additional offset if arrow is being dragged
         if let Some(mouse_position) = pointer.latest_pos() {
@@ -47,7 +47,7 @@ impl AdjustBurn {
         let mut icons = vec![];
         if let Selected::Burn { entity, time, state } = view.selected.clone() {
             if state.is_adjusting() || state.is_dragging() {
-                let burn = model.get_path_component(entity).get_last_segment_at_time(time).as_burn();
+                let burn = model.path_component(entity).last_segment_at_time(time).as_burn();
                 let time = burn.start_point().get_time();
                 burn.tangent_direction();
                 let icon = Self::new(view, model, entity, time, BurnAdjustDirection::Prograde, pointer, screen_rect);
@@ -63,17 +63,17 @@ impl AdjustBurn {
         icons
     }
 
-    fn get_burn<'a>(&self, model: &'a Model) -> &'a Burn {
-        model.get_path_component(self.entity).get_last_segment_at_time(self.time).as_burn()
+    fn burn<'a>(&self, model: &'a Model) -> &'a Burn {
+        model.path_component(self.entity).last_segment_at_time(self.time).as_burn()
     }
 }
 
 impl Icon for AdjustBurn {
-    fn get_texture(&self, _view: &Scene, _model: &Model) -> String {
+    fn texture(&self, _view: &Scene, _model: &Model) -> String {
         "adjust-burn-arrow".to_string()
     }
 
-    fn get_alpha(&self, view: &Scene, _model: &Model, _is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+    fn alpha(&self, view: &Scene, _model: &Model, _is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
             return 0.0;
         }
@@ -91,21 +91,21 @@ impl Icon for AdjustBurn {
         }
     }
 
-    fn get_radius(&self, _view: &Scene, _model: &Model) -> f64 {
+    fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
         10.0
     }
 
-    fn get_priorities(&self, _view: &Scene, _model: &Model) -> [u64; 4] {
+    fn priorities(&self, _view: &Scene, _model: &Model) -> [u64; 4] {
         [2, 0, 0, 0]
     }
 
-    fn get_position(&self, _view: &Scene, _model: &Model, ) -> DVec2 {
+    fn position(&self, _view: &Scene, _model: &Model, ) -> DVec2 {
         self.position
     }
 
-    fn get_facing(&self, _view: &Scene, model: &Model) -> Option<DVec2> {
-        let burn = self.get_burn(model);
-        Some(burn.rotation_matrix() * self.direction.get_vector())
+    fn facing(&self, _view: &Scene, model: &Model) -> Option<DVec2> {
+        let burn = self.burn(model);
+        Some(burn.rotation_matrix() * self.direction.vector())
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {

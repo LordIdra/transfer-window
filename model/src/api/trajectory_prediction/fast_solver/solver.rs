@@ -4,7 +4,7 @@ use crate::{components::ComponentType, api::trajectory_prediction::encounter::{E
 
 use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
 
-use super::bounding::get_initial_windows;
+use super::bounding::compute_initial_windows;
 
 mod entrance_solver;
 mod exit_solver;
@@ -12,21 +12,21 @@ mod exit_solver;
 const MIN_TIME_BEFORE_ENCOUNTER: f64 = 1.0;
 
 /// Returns all entities with the same FINAL parent from `can_enter`
-/// It's expected that candidates only contains entities with a trajectory component
-fn get_final_siblings(model: &Model, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
-    let end_segment = model.get_path_component(entity).get_end_segment();
-    let time = end_segment.end_time();
+/// It's expected that candidates only contains entities with an orbitable component,
+/// and that entity has a path component
+fn compute_siblings(model: &Model, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
+    let end_segment = model.path_component(entity).end_segment();
     let parent = end_segment.parent();
     let mut siblings = vec![];
     for other_entity in candidates {
         if entity == *other_entity {
             continue;
         }
-        let other_end_segment = model.get_path_component(*other_entity).get_first_segment_at_time(time);
-        if parent != other_end_segment.parent() {
-            continue;
+        if let Some(other_orbit) = model.orbitable_component(*other_entity).orbit() {
+            if parent == other_orbit.parent() {
+                siblings.push(*other_entity);
+            }
         }
-        siblings.push(*other_entity);
     }
     siblings
 }
@@ -41,14 +41,14 @@ pub fn find_next_encounter(model: &Model, entity: Entity, start_time: f64, end_t
     let _span = tracy_client::span!("Find next encounter");
 
     // Find entrance windows
-    let can_enter = &model.get_entities(vec![ComponentType::PathComponent, ComponentType::OrbitableComponent]);
-    let siblings = get_final_siblings(model, can_enter, entity);
-    let mut windows = get_initial_windows(model, entity, siblings, start_time, end_time);
+    let can_enter = &model.entities(vec![ComponentType::OrbitableComponent]);
+    let siblings = compute_siblings(model, can_enter, entity);
+    let mut windows = compute_initial_windows(model, entity, siblings, start_time, end_time);
 
     // If an exit encounter is found, set that as the soonest known encounter
     let mut soonest_encounter = solve_for_exit(model, entity, start_time, end_time);
     let mut end_time = match &soonest_encounter {
-        Some(encounter) => encounter.get_time(),
+        Some(encounter) => encounter.time(),
         None => end_time,
     };
 
@@ -58,7 +58,7 @@ pub fn find_next_encounter(model: &Model, entity: Entity, start_time: f64, end_t
     // Once an encounter is found, we'll have to evaluate all the remaining windows that are not entirely after the time of the discovered encounter
     // Because an encounter with another object could possibly happen sooner than the encounter we just found
     loop {
-        windows.retain(|window| window.get_soonest_time() < end_time);
+        windows.retain(|window| window.soonest_time() < end_time);
         #[allow(clippy::redundant_closure_for_method_calls)] // We would have to make Window public to fix this
         windows.sort_by(|a, b| a.cmp(b));
 
@@ -68,13 +68,13 @@ pub fn find_next_encounter(model: &Model, entity: Entity, start_time: f64, end_t
 
         // Popped window has the soonest start time
         let window = windows.pop().unwrap();
-        let from = f64::max(window.get_soonest_time(), start_time);
-        let to = f64::min(window.get_latest_time(), end_time);
-        if let Some(encounter_time) = solve_for_entrance(window.get_orbit(), window.get_other_orbit(), from, to) {
+        let from = f64::max(window.soonest_time(), start_time);
+        let to = f64::min(window.latest_time(), end_time);
+        if let Some(encounter_time) = solve_for_entrance(window.orbit(), window.other_orbit(), from, to) {
             // Add a minimum time as another encounter could be calculated as being eg 0.01 seconds later
             // if eg an entity exits an SOI and then an 'entrance' is calculated to be very shortly after
             if encounter_time > start_time + MIN_TIME_BEFORE_ENCOUNTER {
-                soonest_encounter = Some(Encounter::new(EncounterType::Entrance, entity, window.get_other_entity(), encounter_time));
+                soonest_encounter = Some(Encounter::new(EncounterType::Entrance, entity, window.other_entity(), encounter_time));
                 end_time = encounter_time;
             }
         }

@@ -41,7 +41,7 @@ impl Controller {
         Box::new(Self { gl, model, view, last_frame })
     }
 
-    pub fn get_model(&self) -> &Model {
+    pub fn model(&self) -> &Model {
         if let Some(model) = self.model.as_ref() {
             return model;
         }
@@ -49,7 +49,7 @@ impl Controller {
         panic!("Unrecoverable error");
     }
 
-    fn get_model_mut(&mut self) -> &mut Model {
+    fn model_mut(&mut self) -> &mut Model {
         if let Some(model) = self.model.as_mut() {
             return model;
         }

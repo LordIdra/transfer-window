@@ -7,7 +7,7 @@ use crate::{components::path_component::orbit::Orbit, storage::entity_allocator:
 /// enough to catch all approaches. We choose this by choosing the 
 /// minimum of the durations, and if applicable, periods, then dividing 
 /// by a constant
-fn get_time_step(orbit_a: &Orbit, orbit_b: &Orbit, start_time: f64, end_time: f64) -> f64 {
+fn compute_time_step(orbit_a: &Orbit, orbit_b: &Orbit, start_time: f64, end_time: f64) -> f64 {
     let mut step_time = end_time - start_time;
     if let Some(period) = orbit_a.period() {
         step_time = f64::min(step_time, period);
@@ -19,16 +19,16 @@ fn get_time_step(orbit_a: &Orbit, orbit_b: &Orbit, start_time: f64, end_time: f6
 }
 
 impl Model {
-    fn get_orbits(&self, entity: Entity) -> Vec<&Orbit> {
-        if let Some(orbitable_component) = self.try_get_orbitable_component(entity) {
-            return match orbitable_component.get_orbit() {
+    fn orbits(&self, entity: Entity) -> Vec<&Orbit> {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return match orbitable_component.orbit() {
                 Some(orbit) => vec![orbit],
                 None => vec![],
             }
         }
 
-        if let Some(path_component) = self.try_get_path_component(entity) {
-            return path_component.get_segments().iter().flatten().filter_map(|x| x.as_orbit()).collect()
+        if let Some(path_component) = self.try_path_component(entity) {
+            return path_component.segments().iter().flatten().filter_map(|x| x.as_orbit()).collect()
         }
 
         error!("Attempt to get orbits of an entity than cannot have orbits");
@@ -40,8 +40,8 @@ impl Model {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Find same parent orbits");
         let mut same_parent_orbit_pairs = vec![];
-        let segments_a: Vec<&Orbit> = self.get_orbits(entity_a);
-        let segments_b: Vec<&Orbit> = self.get_orbits(entity_b);
+        let segments_a: Vec<&Orbit> = self.orbits(entity_a);
+        let segments_b: Vec<&Orbit> = self.orbits(entity_b);
         let mut index_a = 0;
         let mut index_b = 0;
 
@@ -80,7 +80,7 @@ impl Model {
             let orbit_b = pair.1;
             let start_time = f64::max(f64::max(orbit_b.start_point().time(), orbit_a.start_point().time()), start_time);
             let end_time = f64::min(orbit_a.end_point().time(), orbit_b.end_point().time());
-            let time_step = get_time_step(orbit_a, orbit_b, start_time, end_time);
+            let time_step = compute_time_step(orbit_a, orbit_b, start_time, end_time);
             let distance = |time: f64| (orbit_a.point_at_time(time).position() - orbit_b.point_at_time(time).position()).magnitude();
             let distance_prime = |time: f64| (distance(time + 2.0) - distance(time)) / 2.0;
 

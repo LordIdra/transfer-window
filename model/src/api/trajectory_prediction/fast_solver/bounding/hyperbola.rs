@@ -70,7 +70,7 @@ impl<'a> BounderData<'a> {
     }
 }
 
-pub fn get_hyperbola_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity) -> Vec<Window<'a>> {
+pub fn compute_hyperbola_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity) -> Vec<Window<'a>> {
     let sdf = make_sdf(orbit, sibling_orbit);
     let soi = sibling_orbit.sphere_of_influence();
     let min_asymptote_theta = orbit.min_asymptote_theta().unwrap() + 0.001;

@@ -9,9 +9,9 @@ mod orbit;
 
 const RADIUS: f64 = 0.8;
 
-fn get_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
-    let is_vessel = model.try_get_vessel_component(entity).is_some();
-    let is_selected = if let Some(selected) = view.selected.get_selected_entity() {
+fn compute_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
+    let is_vessel = model.try_vessel_component(entity).is_some();
+    let is_selected = if let Some(selected) = view.selected.selected_entity() {
         selected == entity
     } else {
         false
@@ -37,7 +37,7 @@ fn get_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) ->
     colors[index]
 }
 
-fn get_burn_color() -> Rgba {
+fn compute_burn_color() -> Rgba {
     Rgba::from_srgba_premultiplied(255, 255, 255, 255)
 }
 
@@ -77,15 +77,15 @@ fn draw_from_points(view: &mut Scene, points: &[DVec2], zoom: f64, color: Rgba) 
 fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_centre: DVec2) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments for one entity");
-    let zoom = view.camera.get_zoom();
-    let trajectory_component = model.get_path_component(entity);
+    let zoom = view.camera.zoom();
+    let trajectory_component = model.path_component(entity);
 
     let mut segment_points_data = vec![];
     let mut orbit_index = 0;
-    for segment in trajectory_component.get_segments().iter().flatten() {
+    for segment in trajectory_component.segments().iter().flatten() {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Draw segment");
-        let absolute_parent_position = model.get_absolute_position(segment.parent());
+        let absolute_parent_position = model.absolute_position(segment.parent());
         match segment {
             Segment::Orbit(orbit) => {
                 // When predicting trajectories, the last orbit will have duration zero, so skip it
@@ -93,13 +93,13 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
                     continue;
                 }
                 let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
-                let color = get_orbit_color(view, model, entity, orbit_index);
+                let color = compute_orbit_color(view, model, entity, orbit_index);
                 segment_points_data.push((points, color));
                 orbit_index += 1;
             },
             Segment::Burn(burn) => {
                 let points = burn::compute_points(burn, absolute_parent_position, camera_centre, zoom);
-                let color = get_burn_color();
+                let color = compute_burn_color();
                 segment_points_data.push((points, color));
                 orbit_index = 0;
             }
@@ -117,8 +117,8 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
 pub fn draw(view: &mut Scene, model: &Model) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments");
-    let camera_centre = view.camera.get_translation(model);
-    for entity in model.get_entities(vec![ComponentType::PathComponent]) {
+    let camera_centre = view.camera.translation(model);
+    for entity in model.entities(vec![ComponentType::PathComponent]) {
         draw_entity_segments(view, model, entity, camera_centre);
     }
 }

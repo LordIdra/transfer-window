@@ -13,11 +13,11 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
         .resizable(false)
         .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
-            let vessel_component = model.get_vessel_component(entity);
-            if !vessel_component.get_slots().get_fuel_tanks().is_empty() {
+            let vessel_component = model.vessel_component(entity);
+            if !vessel_component.slots().fuel_tanks().is_empty() {
                 ui.with_layout(Layout::left_to_right(Align::TOP),|ui| {
-                    let remaining_fuel = vessel_component.get_remaining_fuel_litres();
-                    let max_fuel = vessel_component.get_max_fuel_litres();
+                    let remaining_fuel = vessel_component.remaining_fuel_litres();
+                    let max_fuel = vessel_component.max_fuel_litres();
 
                     ui.label("Fuel");
 
@@ -39,10 +39,10 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                     ui.label(format!("{} / {}", remaining_fuel.round(), max_fuel));
                 });
 
-                if vessel_component.get_slots().get_engine().is_some() {
+                if vessel_component.slots().engine().is_some() {
                     ui.with_layout(Layout::left_to_right(Align::TOP),|ui| {
-                        let remaining_dv = vessel_component.get_remaining_dv().unwrap();
-                        let max_dv = vessel_component.get_max_dv().unwrap();
+                        let remaining_dv = vessel_component.remaining_dv().unwrap();
+                        let max_dv = vessel_component.max_dv().unwrap();
 
                         ui.label("Delta-V");
 

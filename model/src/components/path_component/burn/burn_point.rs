@@ -27,19 +27,19 @@ impl BurnPoint {
         Self { parent_mass, mass: new_mass, time, position, velocity }
     }
 
-    pub fn get_mass(&self) -> f64 {
+    pub fn mass(&self) -> f64 {
         self.mass
     }
 
-    pub fn get_time(&self) -> f64 {
+    pub fn time(&self) -> f64 {
         self.time
     }
 
-    pub fn get_position(&self) -> DVec2 {
+    pub fn position(&self) -> DVec2 {
         self.position
     }
 
-    pub fn get_velocity(&self) -> DVec2 {
+    pub fn velocity(&self) -> DVec2 {
         self.velocity
     }
 }

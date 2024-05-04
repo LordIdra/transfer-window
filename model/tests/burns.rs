@@ -11,7 +11,7 @@ fn test_burn_without_engine_or_fuel_tank() {
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
     let class = VesselClass::Light;
-    let orbit = Orbit::new(earth, class.get_mass(), earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
+    let orbit = Orbit::new(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
         .with_vessel_component(VesselComponent::new(class))
@@ -19,13 +19,13 @@ fn test_burn_without_engine_or_fuel_tank() {
 
     assert!(!model.can_create_burn(vessel));
 
-    let vessel_component = model.get_vessel_component_mut(vessel).get_slots_mut();
+    let vessel_component = model.vessel_component_mut(vessel).slots_mut();
     let engine = Slot::Engine(Some(Engine::new(EngineType::Efficient)));
     *vessel_component.get_mut(SlotLocation::Back) = engine;
 
     assert!(!model.can_create_burn(vessel));
 
-    let vessel_component = model.get_vessel_component_mut(vessel).get_slots_mut();
+    let vessel_component = model.vessel_component_mut(vessel).slots_mut();
     let fuel_tank = Slot::FuelTank(Some(FuelTank::new(FuelTankType::Medium)));
     *vessel_component.get_mut(SlotLocation::Middle) = fuel_tank;
 
@@ -46,12 +46,12 @@ fn test_create_burn_with_zero_dv() {
         .with_name_component(NameComponent::new("Vessel".to_string()))
         .with_vessel_component(VesselComponent::new(class))
         .with_path_component(PathComponent::default()));
-    let orbit = Orbit::circle(earth, class.get_mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
-    model.get_path_component_mut(vessel).add_segment(Segment::Orbit(orbit));
+    let orbit = Orbit::circle(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    model.path_component_mut(vessel).add_segment(Segment::Orbit(orbit));
 
     model.update(0.01);
 
-    let vessel_component = model.get_vessel_component_mut(vessel).get_slots_mut();
+    let vessel_component = model.vessel_component_mut(vessel).slots_mut();
     let engine = Slot::Engine(Some(Engine::new(EngineType::Efficient)));
     *vessel_component.get_mut(SlotLocation::Back) = engine;
     let fuel_tank = Slot::FuelTank(Some(FuelTank::new(FuelTankType::Medium)));
@@ -59,15 +59,15 @@ fn test_create_burn_with_zero_dv() {
     assert!(model.can_create_burn(vessel));
 
     let time = 101.0;
-    let mass_before = model.get_mass_at_time(vessel, time);
-    let position_before = model.get_position_at_time(vessel, time);
-    let velocity_before = model.get_velocity_at_time(vessel, time);
+    let mass_before = model.mass_at_time(vessel, time);
+    let position_before = model.position_at_time(vessel, time);
+    let velocity_before = model.velocity_at_time(vessel, time);
     model.create_burn(vessel, 100.0);
-    let mass_after = model.get_mass_at_time(vessel, time);
-    let position_after = model.get_position_at_time(vessel, time);
-    let velocity_after = model.get_velocity_at_time(vessel, time);
+    let mass_after = model.mass_at_time(vessel, time);
+    let position_after = model.position_at_time(vessel, time);
+    let velocity_after = model.velocity_at_time(vessel, time);
 
-    assert_eq!(model.get_path_component(vessel).get_final_burn().unwrap().total_dv(), 0.0);
+    assert_eq!(model.path_component(vessel).final_burn().unwrap().total_dv(), 0.0);
 
     println!("mass after = {} mass before = {}", mass_after, mass_before);
     println!("position after = {:?} position before = {:?}", position_after, position_before);
@@ -89,7 +89,7 @@ fn test_create_and_adjust_burn() {
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
     let class = VesselClass::Light;
-    let orbit = Orbit::circle(earth, class.get_mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let orbit = Orbit::circle(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
         .with_vessel_component(VesselComponent::new(class))
@@ -97,7 +97,7 @@ fn test_create_and_adjust_burn() {
 
     model.update(0.01);
 
-    let vessel_component = model.get_vessel_component_mut(vessel).get_slots_mut();
+    let vessel_component = model.vessel_component_mut(vessel).slots_mut();
     let engine = Slot::Engine(Some(Engine::new(EngineType::HighThrust)));
     *vessel_component.get_mut(SlotLocation::Back) = engine;
     let fuel_tank = Slot::FuelTank(Some(FuelTank::new(FuelTankType::Medium)));
@@ -106,10 +106,10 @@ fn test_create_and_adjust_burn() {
 
     model.create_burn(vessel, 100.0);
     model.adjust_burn(vessel, 100.0, vec2(150.0, 0.0));
-    let start_time = model.get_path_component(vessel).get_final_burn().unwrap().start_point().get_time();
-    let end_time = model.get_path_component(vessel).get_final_burn().unwrap().end_point().get_time();
-    let velocity_before = model.get_velocity_at_time(vessel, start_time - 1.0);
-    let velocity_after = model.get_velocity_at_time(vessel, end_time + 1.0);
+    let start_time = model.path_component(vessel).final_burn().unwrap().start_point().time();
+    let end_time = model.path_component(vessel).final_burn().unwrap().end_point().time();
+    let velocity_before = model.velocity_at_time(vessel, start_time - 1.0);
+    let velocity_after = model.velocity_at_time(vessel, end_time + 1.0);
 
     assert!(((velocity_before.magnitude() - velocity_after.magnitude()).abs() - 150.0) < 1.0e-3);
 }

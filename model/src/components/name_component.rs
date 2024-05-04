@@ -10,7 +10,7 @@ impl NameComponent {
         Self { name }
     }
 
-    pub fn get_name(&self) -> String {
+    pub fn name(&self) -> String {
         self.name.clone()
     }
 }

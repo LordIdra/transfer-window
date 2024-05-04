@@ -35,7 +35,7 @@ impl Orbit {
     pub fn circle(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, time: f64, direction: OrbitDirection) -> Self {
         let conic = Conic::circle(parent_mass, position, direction);
         let standard_gravitational_parameter = parent_mass * GRAVITATIONAL_CONSTANT;
-        let velocity = velocity_to_obtain_eccentricity(position, conic.get_eccentricity(), standard_gravitational_parameter, conic.get_semi_major_axis(), direction);
+        let velocity = velocity_to_obtain_eccentricity(position, conic.eccentricity(), standard_gravitational_parameter, conic.semi_major_axis(), direction);
         let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
@@ -68,7 +68,7 @@ impl Orbit {
 
         let mut end_theta = normalize_angle(self.end_point.theta());
         let current_theta = normalize_angle(self.current_point.theta());
-        if let OrbitDirection::AntiClockwise = self.conic.get_direction() {
+        if let OrbitDirection::AntiClockwise = self.conic.direction() {
             if end_theta < current_theta {
                 end_theta += 2.0 * PI;
             }
@@ -79,11 +79,11 @@ impl Orbit {
     }
 
     pub fn remaining_orbits(&self) -> i32 {
-        self.conic.get_orbits(self.end_point.time() - self.current_point.time())
+        self.conic.orbits(self.end_point.time() - self.current_point.time())
     }
 
     pub fn completed_orbits(&self) -> i32 {
-        self.conic.get_orbits(self.current_point.time() - self.start_point.time())
+        self.conic.orbits(self.current_point.time() - self.start_point.time())
     }
 
     pub fn conic(&self) -> &Conic {
@@ -95,19 +95,19 @@ impl Orbit {
     }
 
     pub fn semi_major_axis(&self) -> f64 {
-        self.conic.get_semi_major_axis()
+        self.conic.semi_major_axis()
     }
 
     pub fn semi_minor_axis(&self) -> f64 {
-        self.conic.get_semi_minor_axis()
+        self.conic.semi_minor_axis()
     }
 
     pub fn eccentricity(&self) -> f64 {
-        self.conic.get_eccentricity()
+        self.conic.eccentricity()
     }
 
     pub fn argument_of_periapsis(&self) -> f64 {
-        self.conic.get_argument_of_periapsis()
+        self.conic.argument_of_periapsis()
     }
 
     pub fn duration(&self) -> f64 {
@@ -115,19 +115,19 @@ impl Orbit {
     }
 
     pub fn min_asymptote_theta(&self) -> Option<f64> {
-        self.conic.get_min_asymptote_theta()
+        self.conic.min_asymptote_theta()
     }
 
     pub fn max_asymptote_theta(&self) -> Option<f64> {
-        self.conic.get_max_asymptote_theta()
+        self.conic.max_asymptote_theta()
     }
 
     pub fn direction(&self) -> OrbitDirection {
-        self.conic.get_direction()
+        self.conic.direction()
     }
 
     pub fn period(&self) -> Option<f64> {
-        self.conic.get_period()
+        self.conic.period()
     }
 
     pub fn is_clockwise(&self) -> bool {
@@ -159,7 +159,7 @@ impl Orbit {
     }
 
     pub fn time_since_last_periapsis(&self, theta: f64) -> f64 {
-        self.conic.get_time_since_last_periapsis(theta)
+        self.conic.time_since_last_periapsis(theta)
     }
 
     pub fn first_periapsis_time(&self) -> f64 {
@@ -168,15 +168,15 @@ impl Orbit {
 
     pub fn theta_from_time(&self, time: f64) -> f64 {
         let time_since_periapsis = time - self.first_periapsis_time();
-        self.conic.get_theta_from_time_since_periapsis(time_since_periapsis)
+        self.conic.theta_from_time_since_periapsis(time_since_periapsis)
     }
 
     pub fn position_from_theta(&self, theta: f64) -> DVec2 {
-        self.conic.get_position(theta)
+        self.conic.position(theta)
     }
 
     pub fn velocity_from_theta(&self, theta: f64) -> DVec2 {
-        self.conic.get_velocity(self.position_from_theta(theta), theta)
+        self.conic.velocity(self.position_from_theta(theta), theta)
     }
 
     pub fn sphere_of_influence(&self) -> f64 {
@@ -185,7 +185,7 @@ impl Orbit {
 
     pub fn end_at(&mut self, time: f64) {
         let theta = self.theta_from_time(time);
-        let position = self.conic.get_position(theta);
+        let position = self.conic.position(theta);
         self.end_point = OrbitPoint::new(&self.conic, position, time);
     }
 

@@ -23,7 +23,7 @@ pub struct Weapon {
 impl System for Weapon {
     type Type = WeaponType;
     
-    fn get_type(&self) -> &Self::Type {
+    fn type_(&self) -> &Self::Type {
         &self.type_
     }
 }

@@ -36,8 +36,8 @@ pub fn tessellate(burn: &Burn, mut points: Vec<(f64, DVec2)>, absolute_parent_po
         if area / min_distance > TESSELLATION_THRESHOLD {
             let new_time_1 = (point1.0 + point2.0) / 2.0;
             let new_time_2 = (point2.0 + point3.0) / 2.0;
-            let new_position_1 = burn.point_at_time(new_time_1).get_position();
-            let new_position_2 = burn.point_at_time(new_time_2).get_position();
+            let new_position_1 = burn.point_at_time(new_time_1).position();
+            let new_position_2 = burn.point_at_time(new_time_2).position();
 
             points.insert(i + 1, (new_time_1, absolute_parent_position + new_position_1));
             points.insert(i + 3, (new_time_2, absolute_parent_position + new_position_2));
@@ -52,14 +52,14 @@ pub fn tessellate(burn: &Burn, mut points: Vec<(f64, DVec2)>, absolute_parent_po
 fn find_initial_points_orbit(burn: &Burn, absolute_parent_position: DVec2) -> Vec<(f64, DVec2)> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Find initial burn points");
-    let start_time = burn.current_point().get_time();
+    let start_time = burn.current_point().time();
     let time_to_step_through = burn.remaining_time();
 
     // First and last points are be equal to make sure we draw lines through the whole segment
     let mut initial_points = vec![];
     for i in 0..=INITIAL_POINT_COUNT {
         let time = start_time + (i as f64 / INITIAL_POINT_COUNT as f64) * time_to_step_through;
-        initial_points.push((time, absolute_parent_position + burn.point_at_time(time).get_position()));
+        initial_points.push((time, absolute_parent_position + burn.point_at_time(time).position()));
     }
 
     initial_points

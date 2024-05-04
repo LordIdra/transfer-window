@@ -34,7 +34,7 @@ impl RocketEquationFunction {
             return Some(self.clone());
         }
         let new_burn_time = self.burn_time + time_to_step;
-        if new_burn_time >= 0.0 && new_burn_time <= self.end().get_burn_time() {
+        if new_burn_time >= 0.0 && new_burn_time <= self.end().burn_time() {
             Some(Self::new(self.dry_mass_kg, self.initial_fuel_mass_kg, self.fuel_consumption_kg_per_second, self.specific_impulse, new_burn_time))
         } else {
             None
@@ -45,38 +45,38 @@ impl RocketEquationFunction {
         if dv == 0.0 {
             return Some(self.clone());
         }
-        let extra_burn_time = (self.get_mass() / self.fuel_consumption_kg_per_second) * (1.0 - f64::exp(-dv / (self.specific_impulse * STANDARD_GRAVITY)));
+        let extra_burn_time = (self.mass() / self.fuel_consumption_kg_per_second) * (1.0 - f64::exp(-dv / (self.specific_impulse * STANDARD_GRAVITY)));
         let new_burn_time = self.burn_time + extra_burn_time;
-        if new_burn_time >= 0.0 && new_burn_time <= self.end().get_burn_time() {
+        if new_burn_time >= 0.0 && new_burn_time <= self.end().burn_time() {
             Some(Self::new(self.dry_mass_kg, self.initial_fuel_mass_kg, self.fuel_consumption_kg_per_second, self.specific_impulse, new_burn_time))
         } else {
             None
         }
     }
 
-    pub fn get_burn_time(&self) -> f64 {
+    pub fn burn_time(&self) -> f64 {
         self.burn_time
     }
 
-    pub fn get_used_dv(&self) -> f64 {
+    pub fn used_dv(&self) -> f64 {
         let start_mass = self.dry_mass_kg + self.initial_fuel_mass_kg;
-        let end_mass = self.get_mass();
+        let end_mass = self.mass();
         STANDARD_GRAVITY * self.specific_impulse * f64::ln(start_mass / end_mass)
     }
 
-    pub fn get_mass(&self) -> f64 {
+    pub fn mass(&self) -> f64 {
         let start_mass = self.dry_mass_kg + self.initial_fuel_mass_kg;
         let burnt_mass = self.fuel_consumption_kg_per_second * self.burn_time;
         start_mass - burnt_mass
     }
 
-    pub fn get_fuel_kg_burnt(&self) -> f64 {
+    pub fn fuel_kg_burnt(&self) -> f64 {
         self.fuel_consumption_kg_per_second * self.burn_time
     }
 
-    pub fn get_acceleration(&self) -> f64 {
+    pub fn acceleration(&self) -> f64 {
         let force = STANDARD_GRAVITY * self.specific_impulse * self.fuel_consumption_kg_per_second;
-        force / self.get_mass()
+        force / self.mass()
     }
 }
 
@@ -87,19 +87,19 @@ mod test {
     #[test]
     fn test_basic() {
         let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 1.0, 0.0);
-        assert_eq!(rocket_equation_function.end().get_burn_time(), 100.0);
-        assert_eq!(rocket_equation_function.end().start().get_mass(), 200.0);
+        assert_eq!(rocket_equation_function.end().burn_time(), 100.0);
+        assert_eq!(rocket_equation_function.end().start().mass(), 200.0);
     }
 
     #[test]
     fn test_step() {
         let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 1.0, 0.0);
-        let step_end_mass = rocket_equation_function.step_by_time(99.9999).unwrap().get_mass();
-        let actual_end_mass = rocket_equation_function.end().get_mass();
+        let step_end_mass = rocket_equation_function.step_by_time(99.9999).unwrap().mass();
+        let actual_end_mass = rocket_equation_function.end().mass();
         assert!((step_end_mass - actual_end_mass).abs() < 1.0e-3);
 
-        let step_end_time = rocket_equation_function.step_by_dv(rocket_equation_function.end().get_used_dv()).unwrap().get_burn_time();
-        let actual_end_time = rocket_equation_function.end().get_burn_time();
+        let step_end_time = rocket_equation_function.step_by_dv(rocket_equation_function.end().used_dv()).unwrap().burn_time();
+        let actual_end_time = rocket_equation_function.end().burn_time();
         assert!((step_end_time - actual_end_time).abs() < 1.0e-3)
     }
 }

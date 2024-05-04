@@ -13,7 +13,7 @@ pub mod weapon;
 
 pub trait System {
     type Type: SystemType;
-    fn get_type(&self) -> &Self::Type;
+    fn type_(&self) -> &Self::Type;
 }
 
 pub trait SystemType {}
@@ -70,13 +70,13 @@ impl Slots {
         self.slots.get_mut(&location).expect("Location does not contain slot")
     }
 
-    pub fn get_filled_slot_locations(&self) -> Vec<SlotLocation> {
+    pub fn filled_slot_locations(&self) -> Vec<SlotLocation> {
         self.slots.keys().copied().collect()
     }
 
-    pub fn get_fuel_tanks(&self) -> Vec<&FuelTank> {
+    pub fn fuel_tanks(&self) -> Vec<&FuelTank> {
         let mut fuel_tanks = vec![];
-        for location in self.get_filled_slot_locations() {
+        for location in self.filled_slot_locations() {
             if let Slot::FuelTank(Some(fuel_tank)) = self.get(location) {
                 fuel_tanks.push(fuel_tank);
             }
@@ -85,10 +85,10 @@ impl Slots {
     }
 
     pub fn set_fuel_kg(&mut self, new_fuel_kg: f64) {
-        let fuel_tank_count = self.get_fuel_tanks().len();
+        let fuel_tank_count = self.fuel_tanks().len();
         let kg_per_fuel_tank = new_fuel_kg / fuel_tank_count as f64;
 
-        for location in self.get_filled_slot_locations() {
+        for location in self.filled_slot_locations() {
             if let Slot::FuelTank(Some(fuel_tank)) = self.get_mut(location) {
                 fuel_tank.set_remaining(kg_per_fuel_tank);
             }
@@ -98,8 +98,8 @@ impl Slots {
     /// For now, we assume the ship only has one engine
     /// # Panics
     /// Panics if the ship does not have an engine slot
-    pub fn get_engine(&self) -> Option<&Engine> {
-        for location in self.get_filled_slot_locations() {
+    pub fn engine(&self) -> Option<&Engine> {
+        for location in self.filled_slot_locations() {
             if let Slot::Engine(engine) = self.get(location) {
                 return engine.as_ref();
             }

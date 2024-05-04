@@ -7,8 +7,8 @@ const ZOOM_SENSITIVITY: f64 = 0.003;
 
 fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui::Vec2, screen_size: Rect) {
     let screen_size = vec2(screen_size.width() as f64, screen_size.height() as f64);
-    let new_zoom = view.camera.get_zoom() * (1.0 + ZOOM_SENSITIVITY * scroll_delta.y as f64);
-    let delta_zoom = (view.camera.get_zoom() - new_zoom) / new_zoom;
+    let new_zoom = view.camera.zoom() * (1.0 + ZOOM_SENSITIVITY * scroll_delta.y as f64);
+    let delta_zoom = (view.camera.zoom() - new_zoom) / new_zoom;
     let mouse_position = vec2(
         -(latest_mouse_position.x as f64 - (screen_size.x / 2.0)), 
             latest_mouse_position.y as f64 - (screen_size.y / 2.0));

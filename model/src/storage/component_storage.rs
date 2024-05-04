@@ -32,12 +32,12 @@ impl<T> ComponentStorage<T> {
         if value.is_some() {
             self.entities.insert(entity);
         }
-        let index = entity.get_index();
-        let generation = entity.get_generation();
+        let index = entity.index();
+        let generation = entity.generation();
         let entry = value.map(|value| StorageEntry { value, generation });
         if let Some(current_entry) = self.entries.get_mut(index) {
             *current_entry = entry;
-        } else if entity.get_index() == self.entries.len() {
+        } else if entity.index() == self.entries.len() {
             self.entries.push(entry);
         } else {
             // This should never happen
@@ -48,10 +48,10 @@ impl<T> ComponentStorage<T> {
 
     #[allow(clippy::missing_panics_doc)]
     pub fn remove_if_exists(&mut self, entity: Entity) {
-        let entry = self.entries.get_mut(entity.get_index());
+        let entry = self.entries.get_mut(entity.index());
         if let Some(entry) = entry {
             if let Some(entry) = entry {
-                if entry.generation != entity.get_generation() {
+                if entry.generation != entity.generation() {
                     error!("Attempt to remove a component with an entity that has a different generation");
                     panic!("Error recoverable, but exiting anyway before something bad happens");
                 }
@@ -82,9 +82,9 @@ impl<T> ComponentStorage<T> {
     }
 
     pub fn try_get_mut(&mut self, entity: Entity) -> Option<&mut T> {
-        let entry = self.entries[entity.get_index()].as_mut();
+        let entry = self.entries[entity.index()].as_mut();
         if let Some(entry) = entry {
-            if entry.generation == entity.get_generation() {
+            if entry.generation == entity.generation() {
                 return Some(&mut entry.value);
             }
         }
@@ -92,16 +92,16 @@ impl<T> ComponentStorage<T> {
     }
 
     pub fn try_get(&self, entity: Entity) -> Option<&T> {
-        let entry = &self.entries[entity.get_index()];
+        let entry = &self.entries[entity.index()];
         if let Some(entry) = entry {
-            if entry.generation == entity.get_generation() {
+            if entry.generation == entity.generation() {
                 return Some(&entry.value);
             }
         }
         None
     }
 
-    pub fn get_entities(&self) -> &HashSet<Entity> {
+    pub fn entities(&self) -> &HashSet<Entity> {
         &self.entities
     }
 }
@@ -167,6 +167,6 @@ mod test {
         let mut expected = HashSet::new();
         expected.insert(e1);
         expected.insert(e3);
-        assert!(*storage.get_entities() == expected);
+        assert!(*storage.entities() == expected);
     }
 }

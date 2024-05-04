@@ -47,16 +47,16 @@ impl Model {
     /// Returns the entity and time of the closest point on ANY segment anywhere provided the closest
     /// distance from the point to a segment is less than `max_distance`
     /// Short circuits; if there are multiple points, the first one found is returned
-    pub fn get_closest_point_on_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
+    pub fn closest_point_on_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
-        for entity in self.get_entities(vec![ComponentType::PathComponent]) {
-            for segment in self.get_path_component(entity).get_segments().iter().flatten() {
+        for entity in self.entities(vec![ComponentType::PathComponent]) {
+            for segment in self.path_component(entity).segments().iter().flatten() {
                 let Segment::Orbit(orbit) = segment else { 
                     continue 
                 };
 
-                let parent_position = self.get_absolute_position(orbit.parent());
+                let parent_position = self.absolute_position(orbit.parent());
                 let point = point - parent_position;
                 let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {
                     continue;

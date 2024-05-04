@@ -21,19 +21,19 @@ impl Encounter {
         Self { encounter_type, entity, new_parent, time }
     }
 
-    pub fn get_type(&self) -> EncounterType {
+    pub fn type_(&self) -> EncounterType {
         self.encounter_type.clone()
     }
 
-    pub fn get_entity(&self) -> Entity {
+    pub fn entity(&self) -> Entity {
         self.entity
     }
 
-    pub fn get_new_parent(&self) -> Entity {
+    pub fn new_parent(&self) -> Entity {
         self.new_parent
     }
 
-    pub fn get_time(&self) -> f64 {
+    pub fn time(&self) -> f64 {
         self.time
     }
 

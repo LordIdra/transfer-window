@@ -140,7 +140,7 @@ impl<'a> BounderData<'a> {
     }
 }
 
-pub fn get_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64) -> Vec<Window<'a>> {
+pub fn compute_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64) -> Vec<Window<'a>> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Ellipse bounding");
     let argument_of_apoapsis = orbit.argument_of_periapsis() + PI;

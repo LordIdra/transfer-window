@@ -14,7 +14,7 @@ pub enum VesselClass {
 }
 
 impl VesselClass {
-    pub fn get_mass(&self) -> f64 {
+    pub fn mass(&self) -> f64 {
         match self {
             VesselClass::Light => 1.0e3,
         }
@@ -40,7 +40,7 @@ impl VesselComponent {
         self.target = target;
     }
     
-    pub fn get_target(&self) -> Option<Entity> {
+    pub fn target(&self) -> Option<Entity> {
         self.target
     }
 
@@ -48,11 +48,11 @@ impl VesselComponent {
         self.class
     }
 
-    pub fn get_slots(&self) -> &Slots {
+    pub fn slots(&self) -> &Slots {
         &self.slots
     }
 
-    pub fn get_slots_mut(&mut self) -> &mut Slots {
+    pub fn slots_mut(&mut self) -> &mut Slots {
         &mut self.slots
     }
 
@@ -60,49 +60,49 @@ impl VesselComponent {
         self.slots.set(location, slot);
     }
 
-    pub fn get_remaining_fuel_litres(&self) -> f64 {
+    pub fn remaining_fuel_litres(&self) -> f64 {
         let mut current_fuel = 0.0;
-        for fuel_tank in self.slots.get_fuel_tanks() {
-            current_fuel += fuel_tank.get_remaining_litres();
+        for fuel_tank in self.slots.fuel_tanks() {
+            current_fuel += fuel_tank.remaining_litres();
         }
         current_fuel
     }
 
-    pub fn get_remaining_fuel_kg(&self) -> f64 {
-        self.get_remaining_fuel_litres() * FUEL_DENSITY
+    pub fn remaining_fuel_kg(&self) -> f64 {
+        self.remaining_fuel_litres() * FUEL_DENSITY
     }
 
-    pub fn get_max_fuel_litres(&self) -> f64 {
+    pub fn max_fuel_litres(&self) -> f64 {
         let mut current_fuel = 0.0;
-        for fuel_tank in self.slots.get_fuel_tanks() {
-            current_fuel += fuel_tank.get_type().get_capacity_litres();
+        for fuel_tank in self.slots.fuel_tanks() {
+            current_fuel += fuel_tank.type_().capacity_litres();
         }
         current_fuel
     }
 
-    pub fn get_max_fuel_kg(&self) -> f64 {
-        self.get_max_fuel_litres() * FUEL_DENSITY
+    pub fn max_fuel_kg(&self) -> f64 {
+        self.max_fuel_litres() * FUEL_DENSITY
     }
 
-    pub fn get_dry_mass(&self) -> f64 {
-        self.class.get_mass()
+    pub fn dry_mass(&self) -> f64 {
+        self.class.mass()
     }
 
-    pub fn get_mass(&self) -> f64 {
-        self.get_dry_mass() + self.get_remaining_fuel_kg() * FUEL_DENSITY
+    pub fn mass(&self) -> f64 {
+        self.dry_mass() + self.remaining_fuel_kg() * FUEL_DENSITY
     }
 
-    pub fn get_max_dv(&self) -> Option<f64> {
-        let initial_mass = self.get_dry_mass() + self.get_max_fuel_kg();
-        let final_mass = self.get_dry_mass();
-        let isp = self.get_slots().get_engine()?.get_type().get_specific_impulse_space();
+    pub fn max_dv(&self) -> Option<f64> {
+        let initial_mass = self.dry_mass() + self.max_fuel_kg();
+        let final_mass = self.dry_mass();
+        let isp = self.slots().engine()?.type_().specific_impulse_space();
         Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
     }
 
-    pub fn get_remaining_dv(&self) -> Option<f64> {
-        let initial_mass = self.get_mass();
-        let final_mass = self.get_dry_mass();
-        let isp = self.get_slots().get_engine()?.get_type().get_specific_impulse_space();
+    pub fn remaining_dv(&self) -> Option<f64> {
+        let initial_mass = self.mass();
+        let final_mass = self.dry_mass();
+        let isp = self.slots().engine()?.type_().specific_impulse_space();
         Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
     }
 

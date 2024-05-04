@@ -27,33 +27,33 @@ impl PathComponent {
         Self::default().with_segment(Segment::Orbit(orbit))
     }
 
-    pub fn get_segments(&self) -> &Vec<Option<Segment>> {
+    pub fn segments(&self) -> &Vec<Option<Segment>> {
         &self.segments
     }
 
-    pub fn get_previous_orbits(&self) -> usize {
+    pub fn previous_orbits(&self) -> usize {
         self.previous_orbits
     }
 
-    pub fn get_previous_burns(&self) -> usize {
+    pub fn previous_burns(&self) -> usize {
         self.previous_burns
     }
 
-    pub fn get_remaining_orbits(&self) -> usize {
+    pub fn remaining_orbits(&self) -> usize {
         self.segments.iter()
             .flatten()
             .filter(|segment| matches!(segment, Segment::Orbit(_)))
             .count()
     }
 
-    pub fn get_remaining_burns(&self) -> usize {
+    pub fn remaining_burns(&self) -> usize {
         self.segments.iter()
             .flatten()
             .filter(|segment| matches!(segment, Segment::Burn(_)))
             .count()
     }
 
-    pub fn get_remaining_orbits_after_final_burn(&self) -> usize {
+    pub fn remaining_orbits_after_final_burn(&self) -> usize {
         let mut remaining_orbits = 0;
         for segment in self.segments.iter().rev().flatten() {
             match segment {
@@ -64,7 +64,7 @@ impl PathComponent {
         remaining_orbits
     }
 
-    pub fn get_final_burn(&self) -> Option<&Burn> {
+    pub fn final_burn(&self) -> Option<&Burn> {
         for segment in self.segments.iter().rev().flatten() {
             if let Segment::Burn(burn) = segment {
                 return Some(burn)
@@ -78,7 +78,7 @@ impl PathComponent {
     /// returns the first one
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn get_first_segment_at_time(&self, time: f64) -> &Segment {
+    pub fn first_segment_at_time(&self, time: f64) -> &Segment {
         for segment in self.segments.iter().flatten() {
             if segment.start_time() <= time && segment.end_time() >= time {
                 return segment
@@ -92,7 +92,7 @@ impl PathComponent {
     /// returns the last one
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn get_last_segment_at_time(&self, time: f64) -> &Segment {
+    pub fn last_segment_at_time(&self, time: f64) -> &Segment {
         for segment in self.segments.iter().flatten() {
             if segment.start_time() <= time && segment.end_time() > time {
                 return segment
@@ -103,7 +103,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn get_last_segment_at_time_mut(&mut self, time: f64) -> &mut Segment {
+    pub fn last_segment_at_time_mut(&mut self, time: f64) -> &mut Segment {
         for segment in self.segments.iter_mut().flatten() {
             if segment.start_time() <= time && segment.end_time() > time {
                 return segment
@@ -114,7 +114,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no current segment
-    pub fn get_current_segment(&self) -> &Segment {
+    pub fn current_segment(&self) -> &Segment {
         self.segments
             .get(self.current_index)
             .expect("Current segment does not exist")
@@ -124,7 +124,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no end segment
-    pub fn get_end_segment(&self) -> &Segment {
+    pub fn end_segment(&self) -> &Segment {
         self.segments
             .last()
             .expect("End segment does not exist")
@@ -134,7 +134,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no start segment
-    pub fn get_end_segment_mut(&mut self) -> &mut Segment {
+    pub fn end_segment_mut(&mut self) -> &mut Segment {
         self.segments
             .last_mut()
             .expect("End segment does not exist")
@@ -144,7 +144,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no current segment
-    pub fn get_current_segment_mut(&mut self) -> &mut Segment {
+    pub fn current_segment_mut(&mut self) -> &mut Segment {
         self.segments
             .get_mut(self.current_index)
             .expect("Current segment does not exist")
@@ -168,7 +168,7 @@ impl PathComponent {
             match self.segments.last_mut().unwrap().as_mut().unwrap() {
                 Segment::Burn(burn) => {
                     // The >= is important, because we might try and remove segments after exactly the start time of a burn (ie when deleting a burn)
-                    if burn.start_point().get_time() >= time {
+                    if burn.start_point().time() >= time {
                         self.segments.pop();
                     } else if burn.is_time_within_burn(time) {
                         error!("Attempt to split a burn");
@@ -191,15 +191,15 @@ impl PathComponent {
     }
 
     pub fn on_segment_finished(&mut self, time: f64) {
-        match self.get_current_segment() {
+        match self.current_segment() {
             Segment::Orbit(_) => self.previous_orbits += 1,
             Segment::Burn(_) => self.previous_burns += 1,
         }
         trace!("Segment finished at time={time}");
-        let overshot_time = self.get_current_segment().overshot_time(time);
+        let overshot_time = self.current_segment().overshot_time(time);
         self.segments[self.current_index] = None;
         self.current_index += 1;
-        self.get_current_segment_mut().next(overshot_time);
+        self.current_segment_mut().next(overshot_time);
     }
 }
 
@@ -243,10 +243,10 @@ mod test {
         trajectory.add_segment(Segment::Orbit(orbit_2));
 
         assert!(trajectory.current_index == 0);
-        assert!(trajectory.get_first_segment_at_time(105.0).start_time() == 99.9);
+        assert!(trajectory.first_segment_at_time(105.0).start_time() == 99.9);
 
-        let end_position_1 = trajectory.get_first_segment_at_time(43.65).end_position();
-        let end_position_2 = trajectory.get_first_segment_at_time(172.01).end_position();
+        let end_position_1 = trajectory.first_segment_at_time(43.65).end_position();
+        let end_position_2 = trajectory.first_segment_at_time(172.01).end_position();
         let m1 = end_position_1.magnitude();
         let m2 = end_position_2.magnitude();
         let difference = (m1 - m2) / m1;
@@ -255,13 +255,13 @@ mod test {
         let mut time = 0.0;
         for _ in 0..100 {
             time += 1.0;
-            trajectory.get_current_segment_mut().next(1.0);
-            while trajectory.get_current_segment().is_finished() {
+            trajectory.current_segment_mut().next(1.0);
+            while trajectory.current_segment().is_finished() {
                 trajectory.on_segment_finished(time);
             }
         }
 
-        assert!((trajectory.get_current_segment().as_orbit().unwrap().current_point().time() - 100.0).abs() < 1.0e-6);
+        assert!((trajectory.current_segment().as_orbit().unwrap().current_point().time() - 100.0).abs() < 1.0e-6);
         assert!(trajectory.current_index == 1);
     }
 }

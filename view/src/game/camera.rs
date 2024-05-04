@@ -43,23 +43,23 @@ impl Camera {
         self.focus = focus;
     }
 
-    pub fn get_focus(&self) -> Option<Entity> {
+    pub fn focus(&self) -> Option<Entity> {
         self.focus
     }
 
-    pub fn get_zoom(&self) -> f64 {
+    pub fn zoom(&self) -> f64 {
         self.zoom
     }
 
-    pub fn get_translation(&self, model: &Model) -> DVec2 {
+    pub fn translation(&self, model: &Model) -> DVec2 {
         let focus_position = match self.focus {
-            Some(focus) => model.get_absolute_position(focus),
+            Some(focus) => model.absolute_position(focus),
             None => self.focus_position,
         };
         focus_position + self.panning
     }
 
-    pub fn get_zoom_matrix(&self, screen_size: Rect) -> Mat3 {
+    pub fn zoom_matrix(&self, screen_size: Rect) -> Mat3 {
         let mut mat = DMat3::identity();
         // Scale to width and height so we don't end up stretching shapes
         mat = scale2d(&mat, &DVec2::new(2.0 / screen_size.width() as f64, 2.0 / screen_size.height() as f64));
@@ -71,8 +71,8 @@ impl Camera {
         )
     }
 
-    pub fn get_translation_matrices(&self, model: &Model) -> (Mat3, Mat3) {
-        let translation = self.get_translation(model);
+    pub fn translation_matrices(&self, model: &Model) -> (Mat3, Mat3) {
+        let translation = self.translation(model);
         let translation_pair_x = f64_to_f32_pair(translation.x);
         let translation_pair_y = f64_to_f32_pair(translation.y);
         let mat1 = translate2d(&Mat3::identity(), &Vec2::new(-translation_pair_x.0, -translation_pair_y.0));
@@ -83,12 +83,12 @@ impl Camera {
     pub fn window_space_to_world_space(&self, model: &Model, window_coords: Pos2, screen_size: Rect) -> DVec2 {
         let offset_x = f64::from(window_coords.x - (screen_size.width() / 2.0)) / self.zoom;
         let offset_y = f64::from((screen_size.height() / 2.0) - window_coords.y) / self.zoom;
-        self.get_translation(model) + DVec2::new(offset_x, offset_y)
+        self.translation(model) + DVec2::new(offset_x, offset_y)
     }
 
     #[allow(unused)]
     pub fn world_space_to_window_space(&self, model: &Model, world_coords: DVec2, screen_size: Rect) -> Pos2 {
-        let offset = world_coords - self.get_translation(model);
+        let offset = world_coords - self.translation(model);
         let window_coords_x =  (offset.x * self.zoom) as f32 + 0.5 * screen_size.width();
         let window_coords_y = -(offset.y * self.zoom) as f32 - 0.5 * screen_size.height();
         Pos2::new(window_coords_x, window_coords_y)

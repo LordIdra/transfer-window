@@ -33,15 +33,15 @@ impl BruteForceTester {
         self.step(end_time - self.time);
     }
 
-    pub fn get_position(&self) -> DVec2 {
+    pub fn position(&self) -> DVec2 {
         self.position
     }
 
-    pub fn get_velocity(&self) -> DVec2 {
+    pub fn velocity(&self) -> DVec2 {
         self.velocity
     }
 
-    pub fn get_time(&self) -> f64 {
+    pub fn time(&self) -> f64 {
         self.time
     }
 }
@@ -64,17 +64,17 @@ mod test {
         let expected_time = 0.5 * period;
         let expected_position = vec2(-4.155e8, 0.0);
         let expected_velocity = vec2(0.0, -0.945e3);
-        assert!((tester.get_time() - expected_time).abs() < 2.0);
-        assert!((tester.get_position() - expected_position).magnitude() < 1.0e5);
-        assert!((tester.get_velocity() - expected_velocity).magnitude() < 1.0);
+        assert!((tester.time() - expected_time).abs() < 2.0);
+        assert!((tester.position() - expected_position).magnitude() < 1.0e5);
+        assert!((tester.velocity() - expected_velocity).magnitude() < 1.0);
 
         tester.update(0.5 * period);
         let expected_time = period;
         let expected_position = start_position;
         let expected_velocity = start_velocity;
-        assert!((tester.get_time() - expected_time).abs() < 2.0);
-        assert!((tester.get_position() - expected_position).magnitude() < 1.0e5);
-        assert!((tester.get_velocity() - expected_velocity).magnitude() < 1.0);
+        assert!((tester.time() - expected_time).abs() < 2.0);
+        assert!((tester.position() - expected_position).magnitude() < 1.0e5);
+        assert!((tester.velocity() - expected_velocity).magnitude() < 1.0);
     }
 
     #[test]
@@ -91,8 +91,8 @@ mod test {
         let expected_time = duration;
         let expected_position = vec2(0.5 * constant_acceleration.magnitude() * duration.powi(2), 0.0);
         let expected_velocity = vec2(constant_acceleration.magnitude() * duration, 0.0);
-        assert!((tester.get_time() - expected_time).abs() < 1.0e-1);
-        assert!((tester.get_position() - expected_position).magnitude() < 2.0);
-        assert!((tester.get_velocity() - expected_velocity).magnitude() < 1.0e-2);
+        assert!((tester.time() - expected_time).abs() < 1.0e-1);
+        assert!((tester.position() - expected_position).magnitude() < 2.0);
+        assert!((tester.velocity() - expected_velocity).magnitude() < 1.0e-2);
     }
 }

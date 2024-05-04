@@ -20,7 +20,7 @@ pub enum Selected {
 }
 
 impl Selected {
-    pub fn get_selected_entity(&self) -> Option<Entity> {
+    pub fn selected_entity(&self) -> Option<Entity> {
         match self {
             Selected::None => None,
             Selected::Orbitable(entity) 

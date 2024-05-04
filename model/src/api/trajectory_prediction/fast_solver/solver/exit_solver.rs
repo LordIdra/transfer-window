@@ -97,17 +97,14 @@ fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 pub fn solve_for_exit(model: &Model, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Solve for exit");
-    let orbit = model.get_path_component(entity)
-        .get_end_segment()
+    let orbit = model.path_component(entity)
+        .end_segment()
         .as_orbit()
         .expect("Entity does not have an orbit as end segment"); 
-    let Some(parent_trajectory_component) = model.try_get_path_component(orbit.parent()) else {
+    let Some(parent_orbit) = model.orbitable_component(orbit.parent()).orbit() else {
         // Parent cannot be exited as it is a root entity
         return None;
     };
-    let parent_orbit = parent_trajectory_component.get_first_segment_at_time(start_time)
-        .as_orbit()
-        .expect("Parent does not have an orbit at requested start time");
 
     let encounter_time = if orbit.is_ellipse() {
         find_elliptical_exit_time(orbit, parent_orbit.sphere_of_influence(), start_time, end_time)

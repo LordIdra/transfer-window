@@ -37,7 +37,7 @@ fn test_prediction() {
 
     model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
 
-    let segments = model.get_path_component(vessel).get_segments();
+    let segments = model.path_component(vessel).segments();
 
     // + 1 to account for the last segment which will have a time of 0
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
@@ -92,25 +92,25 @@ fn test_prediction_with_burn() {
 
     model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
 
-    assert_eq!(model.get_path_component(vessel).get_segments().len(), 1);
+    assert_eq!(model.path_component(vessel).segments().len(), 1);
 
     let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 10000.0, 0.0);
     let burn = Burn::new(vessel, earth, earth_mass, vessel_start_velocity.normalize(), vec2(1.0e3, 0.0), 0.0, rocket_equation_function, vessel_start_position, vessel_start_velocity);
-    model.get_path_component_mut(vessel).get_end_segment_mut().as_orbit_mut().unwrap().end_at(0.0);
-    model.get_path_component_mut(vessel).add_segment(Segment::Burn(burn.clone()));
+    model.path_component_mut(vessel).end_segment_mut().as_orbit_mut().unwrap().end_at(0.0);
+    model.path_component_mut(vessel).add_segment(Segment::Burn(burn.clone()));
 
     let end_point = burn.end_point();
-    let orbit = Orbit::new(earth, vessel_mass, earth_mass, end_point.get_position(), end_point.get_velocity(), end_point.get_time());
-    model.get_path_component_mut(vessel).add_segment(Segment::Orbit(orbit));
+    let orbit = Orbit::new(earth, vessel_mass, earth_mass, end_point.position(), end_point.velocity(), end_point.time());
+    model.path_component_mut(vessel).add_segment(Segment::Orbit(orbit));
 
-    println!("At end of burn, vessel position={:?} velocity={:?} time={} mass={}", end_point.get_position(), end_point.get_velocity(), end_point.get_time(), end_point.get_mass());
-    println!("At end of burn, moon position={:?} velocity={:?}", model.get_position(moon), model.get_velocity(moon));
-    println!("At end of burn, earth position={:?} velocity={:?}", model.get_position(earth), model.get_velocity(earth));
+    println!("At end of burn, vessel position={:?} velocity={:?} time={} mass={}", end_point.position(), end_point.velocity(), end_point.time(), end_point.mass());
+    println!("At end of burn, moon position={:?} velocity={:?}", model.position(moon), model.velocity(moon));
+    println!("At end of burn, earth position={:?} velocity={:?}", model.position(earth), model.velocity(earth));
     
     model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
-    model.update(end_point.get_time() + 1.0e-3);
+    model.update(end_point.time() + 1.0e-3);
 
-    let segments = model.get_path_component(vessel).get_segments();
+    let segments = model.path_component(vessel).segments();
 
     // 3 = 1 for the final segment after prediction + the initial orbit segment + the initial burn segment + orbit right after burn
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 3);

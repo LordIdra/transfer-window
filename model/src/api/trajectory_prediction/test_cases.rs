@@ -22,29 +22,29 @@ pub struct CaseEncounter {
 }
 
 impl CaseEncounter {
-    pub fn get_type(&self) -> EncounterType {
+    pub fn type_(&self) -> EncounterType {
         self.encounter_type.clone()
     }
 
-    pub fn get_object(&self) -> String {
+    pub fn object(&self) -> String {
         self.object.clone()
     }
 
-    pub fn get_new_parent(&self) -> String {
+    pub fn new_parent(&self) -> String {
         self.new_parent.clone()
     }
 
-    pub fn get_time(&self) -> f64 {
+    pub fn time(&self) -> f64 {
         self.time
     }
 
     pub fn compare(&self, model: &Model, encounter: &Encounter) -> bool {
-        let object_name = model.get_name_component(encounter.get_entity()).get_name();
-        let new_parent_name = model.get_name_component(encounter.get_new_parent()).get_name();
-        let difference = (encounter.get_time() - self.get_time()).abs() / encounter.get_time();
-        encounter.get_type() == self.get_type()
-            && object_name == self.get_object()
-            && new_parent_name == self.get_new_parent() 
+        let object_name = model.name_component(encounter.entity()).name();
+        let new_parent_name = model.name_component(encounter.new_parent()).name();
+        let difference = (encounter.time() - self.time()).abs() / encounter.time();
+        encounter.type_() == self.type_()
+            && object_name == self.object()
+            && new_parent_name == self.new_parent() 
             && difference < 0.005
     }
 }
@@ -103,12 +103,12 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                     panic!("An object has parent but not velocity");
                 };
 
-                let parent_mass = model.get_mass(*parent);
+                let parent_mass = model.mass(*parent);
                 let velocity = vec2(velocity[0], velocity[1]);
                 let orbit = Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0);
 
                 if data.orbitable {
-                    let orbitable_component = OrbitableComponent::new(data.mass, 0.0, OrbitableComponentPhysics::Stationary(position));
+                    let orbitable_component = OrbitableComponent::new(data.mass, 0.0, OrbitableComponentPhysics::Orbit(orbit));
                     entity_builder = entity_builder.with_orbitable_component(orbitable_component);
                 } else {
                     let path_component = PathComponent::default()

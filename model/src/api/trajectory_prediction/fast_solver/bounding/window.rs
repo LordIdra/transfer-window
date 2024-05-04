@@ -17,23 +17,23 @@ impl<'a> Window<'a> {
         Self { orbit, other_orbit, other_entity, periodic, bound }
     }
 
-    pub fn get_orbit(&self) -> &'a Orbit {
+    pub fn orbit(&self) -> &'a Orbit {
         self.orbit
     }
 
-    pub fn get_other_orbit(&self) -> &'a Orbit {
+    pub fn other_orbit(&self) -> &'a Orbit {
         self.other_orbit
     }
 
-    pub fn get_other_entity(&self) -> Entity {
+    pub fn other_entity(&self) -> Entity {
         self.other_entity
     }
 
-    pub fn get_soonest_time(&self) -> f64 {
+    pub fn soonest_time(&self) -> f64 {
         f64::min(self.bound.0, self.bound.1)
     }
 
-    pub fn get_latest_time(&self) -> f64 {
+    pub fn latest_time(&self) -> f64 {
         f64::max(self.bound.0, self.bound.1)
     }
 
@@ -48,7 +48,7 @@ impl<'a> Window<'a> {
     }
 
     pub fn cmp(&self, other: &Self) -> Ordering {
-        if self.get_soonest_time() > other.get_soonest_time() {
+        if self.soonest_time() > other.soonest_time() {
             Ordering::Less
         } else {
             Ordering::Greater

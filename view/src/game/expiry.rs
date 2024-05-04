@@ -6,14 +6,14 @@ use super::{underlay::selected::Selected, Scene};
 
 pub fn update(view: &mut Scene, model: &Model) {
     // Unfocus camera if focus no longer exists
-    if let Some(entity) = view.camera.get_focus() {
+    if let Some(entity) = view.camera.focus() {
         if !model.entity_exists(entity) {
             view.camera.set_focus(None);
         }
     }
     
     // Delete selected if its entity no longer exists
-    if let Some(entity) = view.selected.get_selected_entity() {
+    if let Some(entity) = view.selected.selected_entity() {
         if !model.entity_exists(entity) {
             view.selected = Selected::None;
         }
@@ -21,7 +21,7 @@ pub fn update(view: &mut Scene, model: &Model) {
 
     // Remove selected point if expired
     if let Selected::Point { entity: _, time } = view.selected.clone() {
-        if time < model.get_time() {
+        if time < model.time() {
             trace!("Selected segment point expired at time={time}");
             view.selected = Selected::None;
         }
@@ -29,7 +29,7 @@ pub fn update(view: &mut Scene, model: &Model) {
 
     // Remove selected burn if expired
     if let Selected::Burn { entity: _, time, state: _ } = view.selected.clone() {
-        if time < model.get_time() {
+        if time < model.time() {
             trace!("Selected burn expired at time={time}");
             view.selected = Selected::None;
         }

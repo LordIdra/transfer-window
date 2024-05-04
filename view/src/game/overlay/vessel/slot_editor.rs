@@ -3,7 +3,7 @@ use transfer_window_model::{components::vessel_component::{system_slot::{engine:
 
 use crate::{events::Event, game::Scene, icons::{ICON_FAST_FORWARD, ICON_OIL_BARREL, ICON_PIE_CHART_OUTLINE}};
 
-use super::util::{get_slot_locations, get_slot_size, TexturedSlot};
+use super::util::{compute_slot_locations, compute_slot_size, TexturedSlot};
 
 /// With respect to the size of the slot
 const SLOT_SELECTOR_HEIGHT_PROPORTION: f32 = 0.5;
@@ -19,7 +19,7 @@ fn show_tooltip_weapon(ui: &mut Ui, weapon: &Option<Weapon>) {
         return;
     };
 
-    let name = match weapon.get_type() {
+    let name = match weapon.type_() {
         WeaponType::Torpedo => "Torpedo",
     };
 
@@ -32,7 +32,7 @@ fn show_tooltip_fuel_tank(ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
         return;
     };
 
-    let type_ = fuel_tank.get_type();
+    let type_ = fuel_tank.type_();
     let name = match type_ {
         FuelTankType::Small => "Small Fuel Tank",
         FuelTankType::Medium => "Medium Fuel Tank",
@@ -40,7 +40,7 @@ fn show_tooltip_fuel_tank(ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
     };
 
     ui.label(name);
-    ui.label(RichText::new(format!("{} Capacity: {} L", ICON_OIL_BARREL, type_.get_capacity_litres())));
+    ui.label(RichText::new(format!("{} Capacity: {} L", ICON_OIL_BARREL, type_.capacity_litres())));
 }
 
 fn show_tooltip_engine(ui: &mut Ui, engine: &Option<Engine>) {
@@ -49,7 +49,7 @@ fn show_tooltip_engine(ui: &mut Ui, engine: &Option<Engine>) {
         return;
     };
 
-    let type_ = engine.get_type();
+    let type_ = engine.type_();
     let name = match type_ {
         EngineType::Efficient => "Efficient Engine",
         EngineType::HighThrust => "High Thrust Engine",
@@ -57,9 +57,9 @@ fn show_tooltip_engine(ui: &mut Ui, engine: &Option<Engine>) {
 
 
     ui.label(name);
-    ui.label(RichText::new(format!("{} Fuel Consumption: {} L/s", ICON_OIL_BARREL, type_.get_fuel_kg_per_second())));
-    ui.label(RichText::new(format!("{} Thrust: {} kN", ICON_FAST_FORWARD, type_.get_thrust_newtons() / 1000.0)));
-    ui.label(RichText::new(format!("{} Specific Impulse (vacuum): {} s", ICON_PIE_CHART_OUTLINE, type_.get_specific_impulse_space().round())));
+    ui.label(RichText::new(format!("{} Fuel Consumption: {} L/s", ICON_OIL_BARREL, type_.fuel_kg_per_second())));
+    ui.label(RichText::new(format!("{} Thrust: {} kN", ICON_FAST_FORWARD, type_.thrust_newtons() / 1000.0)));
+    ui.label(RichText::new(format!("{} Specific Impulse (vacuum): {} s", ICON_PIE_CHART_OUTLINE, type_.specific_impulse_space().round())));
 }
 
 fn show_tooltip(ui: &mut Ui, slot: &Slot) {
@@ -87,7 +87,7 @@ impl SlotSelector {
         let slot_selector_center = first_slot_selector_position + epaint::vec2(translation_x, 0.0);
         let slot_selector_rect = Rect::from_center_size(slot_selector_center, slot_selector_size);
         ui.allocate_ui_at_rect(slot_selector_rect, |ui| {
-            let image_button = ImageButton::new(view.resources.get_texture_image(self.texture.as_str()));
+            let image_button = ImageButton::new(view.resources.texture_image(self.texture.as_str()));
             let response = ui.add(image_button);
             let clicked = response.clicked();
             response.on_hover_ui(|ui| { 
@@ -113,7 +113,7 @@ impl SlotEditor {
             Slot::Weapon(_) => {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::Weapon(None)));
                 for type_ in WeaponType::TYPES {
-                    let texture = type_.get_texture().to_string();
+                    let texture = type_.texture().to_string();
                     let slot = Slot::Weapon(Some(Weapon::new(type_)));
                     selectors.push(SlotSelector::new(texture, slot));
                 }
@@ -122,7 +122,7 @@ impl SlotEditor {
             Slot::FuelTank(_) => {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::FuelTank(None)));
                 for type_ in FuelTankType::TYPES {
-                    let texture = type_.get_texture().to_string();
+                    let texture = type_.texture().to_string();
                     let slot = Slot::FuelTank(Some(FuelTank::new(type_)));
                     selectors.push(SlotSelector::new(texture, slot));
                 }
@@ -131,7 +131,7 @@ impl SlotEditor {
             Slot::Engine(_) => {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::Engine(None)));
                 for type_ in EngineType::TYPES {
-                    let texture = type_.get_texture().to_string();
+                    let texture = type_.texture().to_string();
                     let slot = Slot::Engine(Some(Engine::new(type_)));
                     selectors.push(SlotSelector::new(texture, slot));
                 }
@@ -142,12 +142,12 @@ impl SlotEditor {
     }
 
     pub fn draw(&self, view: &Scene, ui: &mut Ui, slot_center: Pos2, scalar: f32, events: &mut Vec<Event>) {
-        let slot_translation = scalar * get_slot_locations(self.vessel_class)
+        let slot_translation = scalar * compute_slot_locations(self.vessel_class)
             .get(&self.location)
             .expect("Slot editor location does not exist");
         let first_slot_selector_position = slot_center + epaint::vec2(
             slot_translation - SLOT_SELECTOR_SPACING * (self.selectors.len() - 1) as f32 / 2.0, 
-            -SLOT_SELECTOR_HEIGHT_OFFSET - SLOT_SELECTOR_HEIGHT_PROPORTION * get_slot_size(self.vessel_class) * scalar);
+            -SLOT_SELECTOR_HEIGHT_OFFSET - SLOT_SELECTOR_HEIGHT_PROPORTION * compute_slot_size(self.vessel_class) * scalar);
 
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: Color32::from_rgba_unmultiplied(40, 40, 40, 220),

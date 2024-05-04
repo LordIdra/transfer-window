@@ -18,7 +18,7 @@ pub enum TimeStep {
 }
 
 impl TimeStep {
-    pub fn get_time_step(&self) -> f64 {
+    pub fn time_step(&self) -> f64 {
         if self.is_paused() {
             return 0.0;
         }
@@ -76,5 +76,5 @@ impl TimeStep {
 }
 
 pub fn update(model: &mut Model, dt: f64) {
-    model.time += dt * model.time_step.get_time_step();
+    model.time += dt * model.time_step.time_step();
 }

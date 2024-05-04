@@ -9,7 +9,7 @@ pub struct VertexAttribute {
 }
 
 impl VertexAttribute {
-    pub fn get_size(&self) -> i32 {
+    pub fn size(&self) -> i32 {
         self.count * std::mem::size_of::<f32>() as i32
     }
 }
@@ -27,7 +27,7 @@ impl VertexArrayObject {
         let vertex_array: VertexArray;
         let vertex_buffer: Buffer;
         let vertices_per_triangle = vertex_attributes.iter().map(|attribute| attribute.count).sum();
-        let stride = vertex_attributes.iter().map(VertexAttribute::get_size).sum();
+        let stride = vertex_attributes.iter().map(VertexAttribute::size).sum();
 
         unsafe { 
             vertex_array = gl.create_vertex_array().expect("Cannot create vertex array");
@@ -42,7 +42,7 @@ impl VertexArrayObject {
                 gl.vertex_attrib_pointer_f32(attribute.index, attribute.count, FLOAT, false, stride, offset);
                 gl.enable_vertex_attrib_array(attribute.index);
             };
-            offset += attribute.get_size();
+            offset += attribute.size();
         }
 
         VertexArrayObject { gl, vertices: 0, vertices_per_triangle, vertex_array, vertex_buffer }

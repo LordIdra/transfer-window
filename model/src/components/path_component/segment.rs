@@ -15,70 +15,70 @@ impl Segment {
     pub fn start_time(&self) -> f64 {
         match self {
             Segment::Orbit(orbit) => orbit.start_point().time(),
-            Segment::Burn(burn) => burn.start_point().get_time(),
+            Segment::Burn(burn) => burn.start_point().time(),
         }
     }
 
     pub fn start_position(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.start_point().position(),
-            Segment::Burn(burn) => burn.start_point().get_position(),
+            Segment::Burn(burn) => burn.start_point().position(),
         }
     }
 
     pub fn start_velocity(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.start_point().velocity(),
-            Segment::Burn(burn) => burn.start_point().get_velocity(),
+            Segment::Burn(burn) => burn.start_point().velocity(),
         }
     }
 
     pub fn current_position(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.current_point().position(),
-            Segment::Burn(burn) => burn.current_point().get_position(),
+            Segment::Burn(burn) => burn.current_point().position(),
         }
     }
 
     pub fn current_velocity(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.current_point().velocity(),
-            Segment::Burn(burn) => burn.current_point().get_velocity(),
+            Segment::Burn(burn) => burn.current_point().velocity(),
         }
     }
 
     pub fn end_time(&self) -> f64 {
         match self {
             Segment::Orbit(orbit) => orbit.end_point().time(),
-            Segment::Burn(burn) => burn.end_point().get_time(),
+            Segment::Burn(burn) => burn.end_point().time(),
         }
     }
 
     pub fn end_position(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.end_point().position(),
-            Segment::Burn(burn) => burn.end_point().get_position(),
+            Segment::Burn(burn) => burn.end_point().position(),
         }
     }
 
     pub fn end_velocity(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.end_point().velocity(),
-            Segment::Burn(burn) => burn.end_point().get_velocity(),
+            Segment::Burn(burn) => burn.end_point().velocity(),
         }
     }
 
     pub fn position_at_time(&self, time: f64) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.position_from_theta(orbit.theta_from_time(time)),
-            Segment::Burn(burn) => burn.point_at_time(time).get_position(),
+            Segment::Burn(burn) => burn.point_at_time(time).position(),
         }
     }
 
     pub fn velocity_at_time(&self, time: f64) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.velocity_from_theta(orbit.theta_from_time(time)),
-            Segment::Burn(burn) => burn.point_at_time(time).get_velocity(),
+            Segment::Burn(burn) => burn.point_at_time(time).velocity(),
         }
     }
 

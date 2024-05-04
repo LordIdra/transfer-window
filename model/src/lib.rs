@@ -75,14 +75,14 @@ impl Model {
         trajectory_update::update(self, dt);
     }
 
-    pub fn get_entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
-        let mut entities = self.entity_allocator.get_entities().clone();
+    pub fn entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
+        let mut entities = self.entity_allocator.entities().clone();
         while let Some(component_type) = with_component_types.pop() {
             let other_entities = match component_type {
-                ComponentType::NameComponent => self.name_components.get_entities(),
-                ComponentType::OrbitableComponent => self.orbitable_components.get_entities(),
-                ComponentType::PathComponent => self.path_components.get_entities(),
-                ComponentType::VesselComponent => self.vessel_components.get_entities(),
+                ComponentType::NameComponent => self.name_components.entities(),
+                ComponentType::OrbitableComponent => self.orbitable_components.entities(),
+                ComponentType::PathComponent => self.path_components.entities(),
+                ComponentType::VesselComponent => self.vessel_components.entities(),
             };
             entities.retain(|entity| other_entities.contains(entity));
         }
@@ -113,7 +113,7 @@ impl Model {
     }
 
     pub fn entity_exists(&self, entity: Entity) -> bool {
-        self.entity_allocator.get_entities().contains(&entity)
+        self.entity_allocator.entities().contains(&entity)
     }
 }
 
@@ -135,10 +135,10 @@ mod test {
         let mut expected = HashSet::new();
         expected.insert(e1);
         expected.insert(e2);
-        assert!(model.get_entities(vec![]) == expected);
+        assert!(model.entities(vec![]) == expected);
 
         let mut expected = HashSet::new();
         expected.insert(e1);
-        assert!(model.get_entities(vec![ComponentType::NameComponent]) == expected);
+        assert!(model.entities(vec![ComponentType::NameComponent]) == expected);
     }
 }

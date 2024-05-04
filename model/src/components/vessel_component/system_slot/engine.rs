@@ -18,22 +18,22 @@ impl EngineType {
         EngineType::HighThrust,
     ];
 
-    pub fn get_fuel_kg_per_second(&self) -> f64 {
+    pub fn fuel_kg_per_second(&self) -> f64 {
         match self {
             EngineType::Efficient => 5.0,
             EngineType::HighThrust => 30.0,
         }
     }
 
-    pub fn get_thrust_newtons(&self) -> f64 {
+    pub fn thrust_newtons(&self) -> f64 {
         match self {
             EngineType::Efficient => 15000.0,
             EngineType::HighThrust => 75000.0,
         }
     }
 
-    pub fn get_specific_impulse_space(&self) -> f64 {
-        self.get_thrust_newtons() / (STANDARD_GRAVITY * self.get_fuel_kg_per_second())
+    pub fn specific_impulse_space(&self) -> f64 {
+        self.thrust_newtons() / (STANDARD_GRAVITY * self.fuel_kg_per_second())
     }
 }
 
@@ -45,7 +45,7 @@ pub struct Engine {
 impl System for Engine {
     type Type = EngineType;
     
-    fn get_type(&self) -> &Self::Type {
+    fn type_(&self) -> &Self::Type {
         &self.type_
     }
 }

@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::{vec2, DVec2};
 use transfer_window_model::Model;
 
-use crate::{events::Event, game::{underlay::selected::Selected, util::get_burn_arrow_position, Scene}};
+use crate::{events::Event, game::{underlay::selected::Selected, util::compute_burn_arrow_position, Scene}};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum BurnAdjustDirection {
@@ -14,7 +14,7 @@ pub enum BurnAdjustDirection {
 }
 
 impl BurnAdjustDirection {
-    pub fn get_vector(&self) -> DVec2 {
+    pub fn vector(&self) -> DVec2 {
         match self {
             BurnAdjustDirection::Prograde => vec2(1.0, 0.0),
             BurnAdjustDirection::Retrograde => vec2(-1.0, 0.0),
@@ -68,11 +68,11 @@ pub fn update_drag(view: &mut Scene, model: &Model, context: &Context, events: &
     // Do drag adjustment
     if let Selected::Burn { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
         if let Some(mouse_position) = pointer.latest_pos() {
-            let burn = model.get_path_component(entity).get_last_segment_at_time(time).as_burn();
-            let burn_to_arrow_unit = burn.rotation_matrix() * direction.get_vector();
-            let arrow_position = get_burn_arrow_position(view, model, entity, time, &direction);
+            let burn = model.path_component(entity).last_segment_at_time(time).as_burn();
+            let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
+            let arrow_position = compute_burn_arrow_position(view, model, entity, time, &direction);
             let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, context.screen_rect()) - arrow_position;
-            let amount = burn_adjustment_amount(arrow_to_mouse.dot(&burn_to_arrow_unit)) * direction.get_vector() * view.camera.get_zoom().powi(2);
+            let amount = burn_adjustment_amount(arrow_to_mouse.dot(&burn_to_arrow_unit)) * direction.vector() * view.camera.zoom().powi(2);
             events.push(Event::AdjustBurn { entity, time, amount });
         }
     }

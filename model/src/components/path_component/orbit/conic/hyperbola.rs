@@ -30,7 +30,7 @@ impl Hyperbola {
 }
 
 impl Hyperbola {
-    pub fn get_theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
+    pub fn theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
         let x = self.standard_gravitational_parameter.powi(2) / self.specific_angular_momentum.powi(3);
         let mean_anomaly = x * time_since_periapsis * (self.eccentricity.powi(2) - 1.0).powf(3.0 / 2.0);
         let eccentric_anomaly = self.solver.solve(mean_anomaly);
@@ -45,7 +45,7 @@ impl Hyperbola {
     }
 
     /// Time can be negative if we have not reached the periapsis at the given theta
-    pub fn get_time_since_last_periapsis(&self, theta: f64) -> f64 {
+    pub fn time_since_last_periapsis(&self, theta: f64) -> f64 {
         let true_anomaly = theta - self.argument_of_periapsis;
         let eccentric_anomaly = 2.0 * f64::atanh(f64::sqrt((self.eccentricity - 1.0) / (self.eccentricity + 1.0)) * f64::tan(true_anomaly / 2.0));
         let mean_anomaly = self.eccentricity * f64::sinh(eccentric_anomaly) - eccentric_anomaly;
@@ -53,13 +53,13 @@ impl Hyperbola {
         mean_anomaly * x / (self.eccentricity.powi(2) - 1.0).powf(3.0 / 2.0)
     }
 
-    pub fn get_position(&self, theta: f64) -> DVec2 {
+    pub fn position(&self, theta: f64) -> DVec2 {
         let true_anomaly = theta - self.argument_of_periapsis;
         let radius = (self.semi_major_axis * (1.0 - self.eccentricity.powi(2))) / (1.0 + self.eccentricity * true_anomaly.cos());
         vec2(radius * theta.cos(), radius * theta.sin())
     }
     
-    pub fn get_velocity(&self, position: DVec2, theta: f64) -> DVec2 {
+    pub fn velocity(&self, position: DVec2, theta: f64) -> DVec2 {
         let true_anomaly = theta - self.argument_of_periapsis;
         let radius = position.magnitude();
         let radius_derivative_with_respect_to_true_anomaly = self.semi_major_axis * self.eccentricity * (1.0 - self.eccentricity.powi(2)) * true_anomaly.sin()
@@ -71,31 +71,31 @@ impl Hyperbola {
         position_derivative_with_respect_to_true_anomaly * angular_speed
     }
 
-    pub fn get_direction(&self) -> OrbitDirection {
+    pub fn direction(&self) -> OrbitDirection {
         self.direction
     }
 
-    pub fn get_semi_major_axis(&self) -> f64 {
+    pub fn semi_major_axis(&self) -> f64 {
         self.semi_major_axis
     }
 
-    pub fn get_semi_minor_axis(&self) -> f64 {
+    pub fn semi_minor_axis(&self) -> f64 {
         self.semi_major_axis * f64::sqrt(self.eccentricity.powi(2) - 1.0)
     }
 
-    pub fn get_argument_of_periapsis(&self) -> f64 {
+    pub fn argument_of_periapsis(&self) -> f64 {
         self.argument_of_periapsis
     }
 
-    pub fn get_min_asymptote_theta(&self) -> f64 {
+    pub fn min_asymptote_theta(&self) -> f64 {
         self.min_asymptote_theta
     }
 
-    pub fn get_max_asymptote_theta(&self) -> f64 {
+    pub fn max_asymptote_theta(&self) -> f64 {
         self.max_asymptote_theta
     }
 
-    pub fn get_eccentricity(&self) -> f64 {
+    pub fn eccentricity(&self) -> f64 {
         self.eccentricity
     }
 
@@ -122,7 +122,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(100.0);
-        let time = hyperbola.get_time_since_last_periapsis(theta);
+        let time = hyperbola.time_since_last_periapsis(theta);
         let expected_time = 1.15 * 60.0 * 60.0;
         assert!((time - expected_time).abs() < 3.0);
     }
@@ -137,7 +137,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(-100.0);
-        let time = hyperbola.get_time_since_last_periapsis(theta);
+        let time = hyperbola.time_since_last_periapsis(theta);
         let expected_time = -1.15 * 60.0 * 60.0;
         assert!((time - expected_time).abs() < 3.0);
     }
@@ -152,7 +152,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let expected_theta = 0.0;
-        let theta = hyperbola.get_theta_from_time_since_periapsis(0.0);
+        let theta = hyperbola.theta_from_time_since_periapsis(0.0);
         assert!((theta - expected_theta).abs() < 0.01);
     }
 
@@ -166,7 +166,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let time = 4.15 * 60.0 * 60.0;
-        let theta = hyperbola.get_theta_from_time_since_periapsis(time);
+        let theta = hyperbola.theta_from_time_since_periapsis(time);
         let expected_theta = f64::to_radians(107.78);
         assert!((theta - expected_theta).abs() < 0.01);
     }
@@ -181,7 +181,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let time = -4.15 * 60.0 * 60.0;
-        let theta = hyperbola.get_theta_from_time_since_periapsis(time);
+        let theta = hyperbola.theta_from_time_since_periapsis(time);
         let expected_theta = f64::to_radians(-107.78) + 2.0*PI;
         assert!((theta - expected_theta).abs() < 0.01);
     }
@@ -196,8 +196,8 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let expected_theta = f64::atan2(position.y, position.x) + 2.0*PI;
-        let time_since_periapsis = hyperbola.get_time_since_last_periapsis(expected_theta);
-        let theta = hyperbola.get_theta_from_time_since_periapsis(time_since_periapsis);
+        let time_since_periapsis = hyperbola.time_since_last_periapsis(expected_theta);
+        let theta = hyperbola.theta_from_time_since_periapsis(time_since_periapsis);
         assert!((theta - expected_theta).abs() < 0.01);
     }
 
@@ -211,7 +211,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(107.78);
-        let radius = hyperbola.get_position(theta).magnitude();
+        let radius = hyperbola.position(theta).magnitude();
         let expected_radius = 1.632_298_46e08;
         assert!((radius - expected_radius).abs() < 1.0);
     }
@@ -225,7 +225,7 @@ mod tests {
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
-        let new_position = hyperbola.get_position(0.0);
+        let new_position = hyperbola.position(0.0);
         let position_difference = new_position - position;
         assert!(position_difference.x.abs() < 0.1);
         assert!(position_difference.y.abs() < 0.1);
@@ -240,7 +240,7 @@ mod tests {
         let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
-        let new_position = hyperbola.get_position(PI / 4.0);
+        let new_position = hyperbola.position(PI / 4.0);
         let position_difference = new_position - position;
         assert!(position_difference.x.abs() < 0.1);
         assert!(position_difference.y.abs() < 0.1);
@@ -256,7 +256,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::atan2(position.y, position.x);
-        let new_position = hyperbola.get_position(theta);
+        let new_position = hyperbola.position(theta);
         let position_difference = new_position - position;
         assert!(position_difference.x.abs() < 0.1);
         assert!(position_difference.y.abs() < 0.1);
@@ -272,7 +272,7 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = 0.0;
-        let new_velocity = hyperbola.get_velocity(hyperbola.get_position(theta), theta);
+        let new_velocity = hyperbola.velocity(hyperbola.position(theta), theta);
         let velocity_difference = new_velocity - velocity;
         assert!(velocity_difference.x.abs() < 0.1);
         assert!(velocity_difference.y.abs() < 0.1);
@@ -289,7 +289,7 @@ mod tests {
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(107.78);
         let expected_speed = 1.051_245_7e4;
-        let speed = hyperbola.get_velocity(hyperbola.get_position(theta), theta).magnitude();
+        let speed = hyperbola.velocity(hyperbola.position(theta), theta).magnitude();
         assert!((speed - expected_speed).abs() < 0.1);
     }
 
@@ -304,7 +304,7 @@ mod tests {
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::to_radians(-107.78 + 90.0);
         let expected_speed = 1.05126e4;
-        let speed = hyperbola.get_velocity(hyperbola.get_position(theta), theta).magnitude();
+        let speed = hyperbola.velocity(hyperbola.position(theta), theta).magnitude();
         assert!((speed - expected_speed).abs() < 0.5);
     }
 
@@ -318,8 +318,8 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = PI / 4.0;
-        let new_position = hyperbola.get_position(theta);
-        let new_velocity = hyperbola.get_velocity(new_position, theta);
+        let new_position = hyperbola.position(theta);
+        let new_velocity = hyperbola.velocity(new_position, theta);
         let velocity_difference = new_velocity - velocity;
         assert!(velocity_difference.x.abs() < 0.1);
         assert!(velocity_difference.y.abs() < 0.1);
@@ -335,8 +335,8 @@ mod tests {
         let direction = OrbitDirection::new(position, velocity);
         let hyperbola = Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction);
         let theta = f64::atan2(position.y, position.x);
-        let new_position = hyperbola.get_position(theta);
-        let new_velocity = hyperbola.get_velocity(new_position, theta);
+        let new_position = hyperbola.position(theta);
+        let new_velocity = hyperbola.velocity(new_position, theta);
         let velocity_difference = new_velocity - velocity;
         assert!(velocity_difference.x.abs() < 0.1);
         assert!(velocity_difference.y.abs() < 0.1);

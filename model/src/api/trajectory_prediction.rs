@@ -17,12 +17,12 @@ impl Model {
     /// Trajectory prediction is extremely complex, good luck if
     /// you need to modify this...
     pub fn predict(&mut self, entity: Entity, end_time: f64, segment_count: usize) {
-        let mut start_time = self.get_path_component(entity).get_end_segment().end_time();
+        let mut start_time = self.path_component(entity).end_segment().end_time();
         let mut segments = 0;
         while let Some(encounter) = find_next_encounter(self, entity, start_time, end_time) {
             trace!("Found encounter {encounter:?}");
             apply_encounter(self, &encounter);
-            start_time = encounter.get_time();
+            start_time = encounter.time();
             segments += 1;
             if segments >= segment_count {
                 break;
@@ -30,8 +30,8 @@ impl Model {
         }
         
         if segments < segment_count {
-            self.get_path_component_mut(entity)
-                .get_end_segment_mut()
+            self.path_component_mut(entity)
+                .end_segment_mut()
                 .as_orbit_mut()
                 .expect("Attempt to start prediction when the last segment is a burn!")
                 .end_at(end_time);

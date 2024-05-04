@@ -29,13 +29,13 @@ fn draw_orbits(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui) {
 }
 
 fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Event>, time: f64, view: &mut Scene) {
-    let has_burn_before_requested_time = if let Some(final_burn) = model.get_path_component(entity).get_final_burn() {
-        time < final_burn.start_point().get_time()
+    let has_burn_before_requested_time = if let Some(final_burn) = model.path_component(entity).final_burn() {
+        time < final_burn.start_point().time()
     } else {
         false
     };
-    let vessel_component = model.get_vessel_component(entity);
-    let can_create_burn = vessel_component.get_slots().get_engine().is_some() && !has_burn_before_requested_time;
+    let vessel_component = model.vessel_component(entity);
+    let can_create_burn = vessel_component.slots().engine().is_some() && !has_burn_before_requested_time;
 
     let create_burn_button = Button::new("Create burn");
     if ui.add_enabled(can_create_burn, create_burn_button).clicked() {
@@ -43,7 +43,7 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
         view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
     }
 
-    let orbit = model.get_path_component(entity).get_first_segment_at_time(time).as_orbit();
+    let orbit = model.path_component(entity).first_segment_at_time(time).as_orbit();
     if let Some(period) = orbit.period() {
         draw_next(time, period, orbit, ui, view, entity);
         draw_previous(time, period, orbit, ui, view, entity);
@@ -61,14 +61,14 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
         .resizable(false)
         .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
-            ui.label(model.get_name_component(entity).get_name());
-            ui.label("T-".to_string() + format_time(time - model.get_time()).as_str());
+            ui.label(model.name_component(entity).name());
+            ui.label("T-".to_string() + format_time(time - model.time()).as_str());
 
             if ui.button("Warp here").clicked() {
                 events.push(Event::StartWarp { end_time: time });
             }
 
-            if model.try_get_vessel_component(entity).is_some() {
+            if model.try_vessel_component(entity).is_some() {
                 draw_vessel(model, entity, ui, events, time, view);
             }
         });

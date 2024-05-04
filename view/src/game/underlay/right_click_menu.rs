@@ -5,7 +5,7 @@ use transfer_window_model::{storage::entity_allocator::Entity, Model};
 use crate::{events::Event, game::Scene};
 
 fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, entity: Entity) {
-    let world_position = model.get_absolute_position(entity) + vec2(50.0, 0.0);
+    let world_position = model.absolute_position(entity) + vec2(50.0, 0.0);
     let window_position = view.camera.world_space_to_window_space(model, world_position, context.screen_rect());
     Window::new("Right click menu")
         .title_bar(false)
@@ -16,8 +16,8 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
                 view.camera.reset_panning();
                 view.camera.set_focus(Some(entity));
             }
-            if let Some(selected) = view.selected.get_selected_entity() {
-                if model.try_get_vessel_component(selected).is_some() {
+            if let Some(selected) = view.selected.selected_entity() {
+                if model.try_vessel_component(selected).is_some() {
                     let can_target = selected != entity;
                     let target_button = Button::new("Set target");
                     if ui.add_enabled(can_target, target_button).clicked() {

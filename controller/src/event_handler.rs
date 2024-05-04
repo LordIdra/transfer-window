@@ -61,7 +61,7 @@ pub fn save_game(controller: &Controller, name: &str) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Save game");
 
-    let model = controller.get_model();
+    let model = controller.model();
 
     let serialized = model.serialize();
     let Ok(serialized) = serialized else {
@@ -96,31 +96,31 @@ pub fn load_game(controller: &mut Controller, name: &str) {
 pub fn toggle_paused(controller: &mut Controller) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Toggle paused");
-    controller.get_model_mut().toggle_paused();
+    controller.model_mut().toggle_paused();
 }
 
 pub fn increase_time_step_level(controller: &mut Controller) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Increase time step level");
-    controller.get_model_mut().increase_time_step_level();
+    controller.model_mut().increase_time_step_level();
 }
 
 pub fn decrease_time_step_level(controller: &mut Controller) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Decrease time step level");
-    controller.get_model_mut().decrease_time_step_level();
+    controller.model_mut().decrease_time_step_level();
 }
 
 pub fn start_warp(controller: &mut Controller, end_time: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Start warp");
-    controller.get_model_mut().start_warp(end_time);
+    controller.model_mut().start_warp(end_time);
 }
 
 pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Create burn");
-    let model = controller.get_model_mut();
+    let model = controller.model_mut();
     
     model.create_burn(entity, time);
 }
@@ -128,7 +128,7 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
 pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Delete burn");
-    let model = controller.get_model_mut();
+    let model = controller.model_mut();
     
     model.delete_segments_after_time_and_recompute_trajectory(entity, time);
 }
@@ -136,7 +136,7 @@ pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Adjust burn");
-    let model = controller.get_model_mut();
+    let model = controller.model_mut();
     
     model.adjust_burn(entity, time, amount);
 }
@@ -144,7 +144,7 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
 pub fn destroy(controller: &mut Controller, entity: Entity) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Set target");
-    let model = controller.get_model_mut();
+    let model = controller.model_mut();
 
     model.deallocate(entity);
 }
@@ -152,15 +152,15 @@ pub fn destroy(controller: &mut Controller, entity: Entity) {
 pub fn set_target(controller: &mut Controller, entity: Entity, target: Option<Entity>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Set target");
-    let model = controller.get_model_mut();
+    let model = controller.model_mut();
 
-    model.get_vessel_component_mut(entity).set_target(target);
+    model.vessel_component_mut(entity).set_target(target);
 }
 
 pub fn set_slot(controller: &mut Controller, entity: Entity, location: SlotLocation, slot: Slot) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Set slot");
-    let model = controller.get_model_mut();
+    let model = controller.model_mut();
 
-    model.get_vessel_component_mut(entity).set_slot(location, slot);
+    model.vessel_component_mut(entity).set_slot(location, slot);
 }

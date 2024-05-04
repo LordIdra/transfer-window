@@ -21,8 +21,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     let texture_renderers = view.texture_renderers.clone();
 
     // Matrices need model to calculate, which is not send/sync, so we have to calculate matrices *before* constructing a callback
-    let zoom_matrix = view.camera.get_zoom_matrix(rect);
-    let translation_matrices = view.camera.get_translation_matrices(model);
+    let zoom_matrix = view.camera.zoom_matrix(rect);
+    let translation_matrices = view.camera.translation_matrices(model);
 
     let callback = Arc::new(CallbackFn::new(move |_info, _painter| {
         object_renderer.lock().unwrap().render(zoom_matrix, translation_matrices);

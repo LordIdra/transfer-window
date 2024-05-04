@@ -37,24 +37,24 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             let vessel_editor = view.vessel_editor.as_ref().unwrap();
             let mut should_close = false;
             ui.with_layout(Layout::right_to_left(Align::Min), |ui| {
-                let button = ImageButton::new(view.resources.get_texture_image("close"));
+                let button = ImageButton::new(view.resources.texture_image("close"));
                 if ui.add_sized(epaint::vec2(20.0, 20.0), button).clicked() {
                     should_close = true;
                 }
                 ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
-                    ui.label(model.get_name_component(vessel_editor.entity).get_name().to_uppercase());
+                    ui.label(model.name_component(vessel_editor.entity).name().to_uppercase());
                 });
             });
-            let vessel_component = model.get_vessel_component(vessel_editor.entity);
+            let vessel_component = model.vessel_component(vessel_editor.entity);
             let vessel_class = vessel_component.class();
-            let rect = draw_vessel_editor(view, context, ui, vessel_class, vessel_component.get_slots());
+            let rect = draw_vessel_editor(view, context, ui, vessel_class, vessel_component.slots());
             let center = rect.center();
             let scalar = rect.size().x;
 
             // Vessel editor is queried again to satisfy borrow checker (draw_editor needs mutable access)
             let vessel_editor = view.vessel_editor.as_ref().unwrap();
             if let Some(location) = vessel_editor.slot_editor {
-                let slot = vessel_component.get_slots().get(location);
+                let slot = vessel_component.slots().get(location);
                 SlotEditor::new(vessel_editor.entity, vessel_class, location, slot).draw(view, ui, center, scalar, events);
             }
 

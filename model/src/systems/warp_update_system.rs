@@ -21,23 +21,23 @@ impl TimeWarp {
         Self { start_time, end_time: end_time - STOP_BEFORE_TARGET_SECONDS }
     }
 
-    fn get_max_warp_speed(&self) -> f64 {
+    fn compute_max_warp_speed(&self) -> f64 {
         self.end_time - self.start_time
     }
 
-    fn get_fraction_completed(&self, time: f64) -> f64 {
+    fn compute_fraction_completed(&self, time: f64) -> f64 {
         let current_duration = time - self.start_time;
         let total_duration = self.end_time - self.start_time;
         current_duration / total_duration
     }
     
-    pub fn get_warp_speed(&self, time: f64) -> f64 {
-        if self.get_fraction_completed(time) < SLOW_DOWN_AFTER_PROPORTION {
-            self.get_max_warp_speed()
+    pub fn compute_warp_speed(&self, time: f64) -> f64 {
+        if self.compute_fraction_completed(time) < SLOW_DOWN_AFTER_PROPORTION {
+            self.compute_max_warp_speed()
         } else {
-            let fraction_of_last_fraction_completed = (self.get_fraction_completed(time) - SLOW_DOWN_AFTER_PROPORTION) / (1.0 - SLOW_DOWN_AFTER_PROPORTION);
+            let fraction_of_last_fraction_completed = (self.compute_fraction_completed(time) - SLOW_DOWN_AFTER_PROPORTION) / (1.0 - SLOW_DOWN_AFTER_PROPORTION);
             let multiplier = (fraction_of_last_fraction_completed - 1.0).powi(2) + ADDITIONAL_MULTIPLER;
-            multiplier * self.get_max_warp_speed()
+            multiplier * self.compute_max_warp_speed()
         }
     }
 }
@@ -57,7 +57,7 @@ pub fn update(model: &mut Model, dt: f64) {
     }
 
     if let Some(warp) = &model.warp {
-        let mut speed = warp.get_warp_speed(model.time);
+        let mut speed = warp.compute_warp_speed(model.time);
         let final_time = model.time + speed * dt;
         if final_time > warp.end_time {
             // Oh no, we're about to overshoot

@@ -59,13 +59,13 @@ impl ShaderProgram {
         unsafe { self.gl.use_program(Some(self.program)) };
     }
 
-    fn get_location(&self, name: &str) -> NativeUniformLocation {
+    fn location(&self, name: &str) -> NativeUniformLocation {
         unsafe { self.gl.get_uniform_location(self.program, name).unwrap_or_else(|| panic!("Failed to find uniform location '{name}'")) }
     }
 
     pub fn uniform_mat3(&self, name: &str, v: &[f32]) {
         self.use_program();
-        unsafe { self.gl.uniform_matrix_3_f32_slice(Some(&Self::get_location(self, name)), false, v); }
+        unsafe { self.gl.uniform_matrix_3_f32_slice(Some(&Self::location(self, name)), false, v); }
     }
 }
 

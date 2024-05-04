@@ -11,8 +11,8 @@ fn test_stationary_position() {
     let planet = model.allocate(EntityBuilder::default()
         .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, OrbitableComponentPhysics::Stationary(earth_position))));
 
-    assert!(model.get_position(planet) == earth_position);
-    assert!(model.get_absolute_position(planet) == earth_position);
+    assert!(model.position(planet) == earth_position);
+    assert!(model.absolute_position(planet) == earth_position);
 }
 
 #[test]
@@ -23,8 +23,8 @@ fn test_stationary_velocity() {
     let planet = model.allocate(EntityBuilder::default()
         .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, OrbitableComponentPhysics::Stationary(earth_position))));
 
-    assert!(model.get_velocity(planet) == vec2(0.0, 0.0));
-    assert!(model.get_absolute_velocity(planet) == vec2(0.0, 0.0));
+    assert!(model.velocity(planet) == vec2(0.0, 0.0));
+    assert!(model.absolute_velocity(planet) == vec2(0.0, 0.0));
 }
 
 #[test]
@@ -41,15 +41,15 @@ fn test_trajectory_position() {
     let vessel = model.allocate(EntityBuilder::default()
         .with_path_component(trajectory_component));
 
-    assert!(model.get_position(vessel) == vessel_position);
-    assert!(model.get_absolute_position(vessel) == vessel_position);
+    assert!(model.position(vessel) == vessel_position);
+    assert!(model.absolute_position(vessel) == vessel_position);
 
     model.update(orbit.period().unwrap() / 4.0);
     
     let expected = vec2(-vessel_position.y, vessel_position.x);
     
-    assert!((model.get_position(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
-    assert!((model.get_absolute_position(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
+    assert!((model.position(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
+    assert!((model.absolute_position(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
 }
 
 #[test]
@@ -67,16 +67,16 @@ fn test_trajectory_velocity() {
         .with_path_component(trajectory_component));
 
     let expected = orbit.velocity_from_theta(0.0);
-    assert!((model.get_velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
-    assert!((model.get_absolute_velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
+    assert!((model.velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
+    assert!((model.absolute_velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
 
     model.update(orbit.period().unwrap() / 4.0);
     
     let expected_theta = PI / 2.0;
     let expected = orbit.velocity_from_theta(expected_theta);
     
-    assert!((model.get_velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
-    assert!((model.get_absolute_velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
+    assert!((model.velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
+    assert!((model.absolute_velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
 }
 
 #[test]
@@ -87,5 +87,5 @@ fn test_simple_mass() {
     let planet = model.allocate(EntityBuilder::default()
         .with_orbitable_component(OrbitableComponent::new(mass, 1.0e4, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    assert_eq!(model.get_mass(planet), mass);
+    assert_eq!(model.mass(planet), mass);
 }

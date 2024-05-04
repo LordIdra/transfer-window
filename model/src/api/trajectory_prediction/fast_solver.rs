@@ -6,51 +6,51 @@ mod bounding;
 pub mod solver;
 
 fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
-    model.get_path_component_mut(entity)
-        .get_end_segment_mut()
+    model.path_component_mut(entity)
+        .end_segment_mut()
         .as_orbit_mut()
         .expect("Attempt to do an exit encounter on a burn")
         .end_at(time);
 
-    let old_parent = model.get_path_component(entity).get_end_segment().parent();
-    let mass = model.get_mass_at_time(entity, time);
-    let new_parent_mass = model.get_mass_at_time(new_parent, time);
+    let old_parent = model.path_component(entity).end_segment().parent();
+    let mass = model.mass_at_time(entity, time);
+    let new_parent_mass = model.mass_at_time(new_parent, time);
 
-    let entity_segment = model.get_path_component(entity).get_end_segment();
-    let old_parent_segment = &model.get_path_component(old_parent).get_first_segment_at_time(time);
-    let position = entity_segment.end_position() + old_parent_segment.position_at_time(time);
-    let velocity = entity_segment.end_velocity() + old_parent_segment.velocity_at_time(time);
+    let entity_segment = model.path_component(entity).end_segment();
+    let old_parent_point = &model.orbitable_component(old_parent).orbit().unwrap().point_at_time(time);
+    let position = entity_segment.end_position() + old_parent_point.position();
+    let velocity = entity_segment.end_velocity() + old_parent_point.velocity();
 
     let orbit = Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time);
-    model.get_path_component_mut(entity).add_segment(Segment::Orbit(orbit));
+    model.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
 }
 
 fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
-    model.get_path_component_mut(entity)
-        .get_end_segment_mut()
+    model.path_component_mut(entity)
+        .end_segment_mut()
         .as_orbit_mut()
         .expect("Attempt to do an exit encounter on a burn")
         .end_at(time);
 
-    let new_parent_mass = model.get_mass_at_time(new_parent, time);
-    let mass = model.get_mass_at_time(entity, time);
+    let new_parent_mass = model.mass_at_time(new_parent, time);
+    let mass = model.mass_at_time(entity, time);
 
-    let entity_segment = model.get_path_component(entity).get_end_segment();
-    let new_parent_segment = &model.get_path_component(new_parent).get_first_segment_at_time(time);
-    let position = entity_segment.end_position() - new_parent_segment.position_at_time(time);
-    let velocity = entity_segment.end_velocity() - new_parent_segment.velocity_at_time(time);
+    let entity_segment = model.path_component(entity).end_segment();
+    let new_parent_point = &model.orbitable_component(new_parent).orbit().unwrap().point_at_time(time);
+    let position = entity_segment.end_position() - new_parent_point.position();
+    let velocity = entity_segment.end_velocity() - new_parent_point.velocity();
 
     let segment = Segment::Orbit(Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time));
-    model.get_path_component_mut(entity).add_segment(segment);
+    model.path_component_mut(entity).add_segment(segment);
 }
 
 /// This detachment of encounter solving and application 
 /// allows the solver to be much more easily tested, as well 
 /// as leading to cleaner overall design
 pub fn apply_encounter(model: &mut Model, encounter: &Encounter) {
-    match encounter.get_type() {
-        EncounterType::Entrance => do_entrance(model, encounter.get_entity(), encounter.get_new_parent(), encounter.get_time()),
-        EncounterType::Exit => do_exit(model, encounter.get_entity(), encounter.get_new_parent(), encounter.get_time()),
+    match encounter.type_() {
+        EncounterType::Entrance => do_entrance(model, encounter.entity(), encounter.new_parent(), encounter.time()),
+        EncounterType::Exit => do_exit(model, encounter.entity(), encounter.new_parent(), encounter.time()),
     }
 }
 
@@ -64,11 +64,11 @@ mod test {
         let mut start_time = 0.0;
         loop {
             let mut soonest_encounter: Option<Encounter> = None;
-            for entity in model.get_entities(vec![ComponentType::PathComponent]) {
+            for entity in model.entities(vec![ComponentType::PathComponent]) {
                 let encounter = find_next_encounter(&model, entity, start_time, end_time);
                 if let Some(encounter) = encounter {
                     if let Some(soonest_encounter) = &mut soonest_encounter {
-                        if encounter.get_time() < soonest_encounter.get_time() {
+                        if encounter.time() < soonest_encounter.time() {
                             *soonest_encounter = encounter;
                         }
                     } else {
@@ -91,17 +91,17 @@ mod test {
             // We unfortunately have to use the case encounter's time, not the calculated time
             // Small errors in the cases or differences in implementations can cause the simulations to massively diverge in more complex tests
             let case_encounter = encounters.pop_front().unwrap();
-            encounter.set_time(case_encounter.get_time());
+            encounter.set_time(case_encounter.time());
 
-            for entity in model.get_entities(vec![ComponentType::PathComponent]) {
-                model.get_path_component_mut(entity)
-                    .get_end_segment_mut()
+            for entity in model.entities(vec![ComponentType::PathComponent]) {
+                model.path_component_mut(entity)
+                    .end_segment_mut()
                     .as_orbit_mut()
                     .expect("Attempt to set end time of a segment that is not an orbit")
-                    .end_at(encounter.get_time());
+                    .end_at(encounter.time());
             }
 
-            start_time = encounter.get_time();
+            start_time = encounter.time();
             apply_encounter(&mut model, &encounter);
         }
 

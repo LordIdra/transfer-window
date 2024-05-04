@@ -42,7 +42,7 @@ pub fn update(view: &Scene, context: &Context) {
         .default_width(120.0)
         .anchor(Align2::RIGHT_BOTTOM, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
-            let (width, scale) = calculate_scale(view.camera.get_zoom() as f32);
+            let (width, scale) = calculate_scale(view.camera.zoom() as f32);
 
             ui.with_layout(Layout::default().with_cross_align(Align::Center), |ui| {
                 ui.label(scale);

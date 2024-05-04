@@ -8,7 +8,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
         return
     };
 
-    let Segment::Burn(burn) = model.get_path_component(entity).get_last_segment_at_time(time) else {
+    let Segment::Burn(burn) = model.path_component(entity).last_segment_at_time(time) else {
         return;
     };
     
@@ -18,15 +18,15 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
         .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
             let dv = (burn.total_dv() * 10.0).round() / 10.0;
-            ui.label(model.get_name_component(entity).get_name());
-            ui.label("T-".to_string() + format_time(time - model.get_time()).as_str());
+            ui.label(model.name_component(entity).name());
+            ui.label("T-".to_string() + format_time(time - model.time()).as_str());
             ui.label(dv.to_string() + " ΔV");
 
             if ui.button("Warp to burn").clicked() {
                 events.push(Event::StartWarp { end_time: time });
             }
 
-            let can_delete = model.get_path_component(entity).get_final_burn().unwrap().start_point().get_time() == time;
+            let can_delete = model.path_component(entity).final_burn().unwrap().start_point().time() == time;
             let delete_button = Button::new("Delete burn");
             if ui.add_enabled(can_delete, delete_button).clicked() {
                 events.push(Event::DeleteBurn { entity, time });

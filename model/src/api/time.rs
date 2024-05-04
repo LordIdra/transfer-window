@@ -17,11 +17,11 @@ impl Model {
         self.warp = Some(TimeWarp::new(self.time, end_time));
     }
 
-    pub fn get_time_step(&self) -> &TimeStep {
+    pub fn time_step(&self) -> &TimeStep {
         &self.time_step
     }
 
-    pub fn get_time(&self) -> f64 {
+    pub fn time(&self) -> f64 {
         self.time
     }
 }

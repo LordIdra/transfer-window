@@ -54,100 +54,100 @@ impl Conic {
         Self::new(parent_mass, position, velocity)
     }
 
-    pub fn get_theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
+    pub fn theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_theta_from_time_since_periapsis(time_since_periapsis),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_theta_from_time_since_periapsis(time_since_periapsis),
+            Conic::Ellipse(ellipse) => ellipse.theta_from_time_since_periapsis(time_since_periapsis),
+            Conic::Hyperbola(hyperbola) => hyperbola.theta_from_time_since_periapsis(time_since_periapsis),
         }
     }
 
-    pub fn get_time_since_last_periapsis(&self, theta: f64) -> f64 {
+    pub fn time_since_last_periapsis(&self, theta: f64) -> f64 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_time_since_last_periapsis(theta),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_time_since_last_periapsis(theta),
+            Conic::Ellipse(ellipse) => ellipse.time_since_last_periapsis(theta),
+            Conic::Hyperbola(hyperbola) => hyperbola.time_since_last_periapsis(theta),
         }
     }
 
-    pub fn get_position(&self, theta: f64) -> DVec2 {
+    pub fn position(&self, theta: f64) -> DVec2 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_position(theta),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_position(theta),
+            Conic::Ellipse(ellipse) => ellipse.position(theta),
+            Conic::Hyperbola(hyperbola) => hyperbola.position(theta),
         }
     }
 
-    pub fn get_velocity(&self, position: DVec2, theta: f64) -> DVec2 {
+    pub fn velocity(&self, position: DVec2, theta: f64) -> DVec2 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_velocity(position, theta),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_velocity(position, theta),
+            Conic::Ellipse(ellipse) => ellipse.velocity(position, theta),
+            Conic::Hyperbola(hyperbola) => hyperbola.velocity(position, theta),
         }
     }
 
-    pub fn get_type(&self) -> ConicType {
+    pub fn type_(&self) -> ConicType {
         match self {
             Conic::Ellipse(_) => ConicType::Ellipse,
             Conic::Hyperbola(_) => ConicType::Hyperbola,
         }
     }
 
-    pub fn get_direction(&self) -> OrbitDirection {
+    pub fn direction(&self) -> OrbitDirection {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_direction(),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_direction(),
+            Conic::Ellipse(ellipse) => ellipse.direction(),
+            Conic::Hyperbola(hyperbola) => hyperbola.direction(),
         }
     }
 
-    pub fn get_semi_major_axis(&self) -> f64 {
+    pub fn semi_major_axis(&self) -> f64 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_semi_major_axis(),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_semi_major_axis(),
+            Conic::Ellipse(ellipse) => ellipse.semi_major_axis(),
+            Conic::Hyperbola(hyperbola) => hyperbola.semi_major_axis(),
         }
     }
 
-    pub fn get_semi_minor_axis(&self) -> f64 {
+    pub fn semi_minor_axis(&self) -> f64 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_semi_minor_axis(),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_semi_minor_axis(),
+            Conic::Ellipse(ellipse) => ellipse.semi_minor_axis(),
+            Conic::Hyperbola(hyperbola) => hyperbola.semi_minor_axis(),
         }
     }
 
-    pub fn get_argument_of_periapsis(&self) -> f64 {
+    pub fn argument_of_periapsis(&self) -> f64 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_argument_of_periapsis(),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_argument_of_periapsis(),
+            Conic::Ellipse(ellipse) => ellipse.argument_of_periapsis(),
+            Conic::Hyperbola(hyperbola) => hyperbola.argument_of_periapsis(),
         }
     }
 
-    pub fn get_min_asymptote_theta(&self) -> Option<f64> {
+    pub fn min_asymptote_theta(&self) -> Option<f64> {
         match self {
             Conic::Ellipse(_) => None,
-            Conic::Hyperbola(hyperbola) => Some(hyperbola.get_min_asymptote_theta()),
+            Conic::Hyperbola(hyperbola) => Some(hyperbola.min_asymptote_theta()),
         }
     }
 
-    pub fn get_max_asymptote_theta(&self) -> Option<f64> {
+    pub fn max_asymptote_theta(&self) -> Option<f64> {
         match self {
             Conic::Ellipse(_) => None,
-            Conic::Hyperbola(hyperbola) => Some(hyperbola.get_max_asymptote_theta()),
+            Conic::Hyperbola(hyperbola) => Some(hyperbola.max_asymptote_theta()),
         }
     }
 
-    pub fn get_eccentricity(&self) -> f64 {
+    pub fn eccentricity(&self) -> f64 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_eccentricity(),
-            Conic::Hyperbola(hyperbola) => hyperbola.get_eccentricity(),
+            Conic::Ellipse(ellipse) => ellipse.eccentricity(),
+            Conic::Hyperbola(hyperbola) => hyperbola.eccentricity(),
         }
     }
 
-    pub fn get_period(&self) -> Option<f64> {
+    pub fn period(&self) -> Option<f64> {
         match self {
-            Conic::Ellipse(ellipse) => Some(ellipse.get_period()),
+            Conic::Ellipse(ellipse) => Some(ellipse.period()),
             Conic::Hyperbola(_) => None,
         }
     }
 
-    pub fn get_orbits(&self, time: f64) -> i32 {
+    pub fn orbits(&self, time: f64) -> i32 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.get_orbits(time),
+            Conic::Ellipse(ellipse) => ellipse.orbits(time),
             Conic::Hyperbola(_) => 0
         }
     }
@@ -164,13 +164,13 @@ mod test {
     #[test]
     fn test_circle() {
         let conic = Conic::circle(1.0e23, vec2(1.0e9, -1.0e8), OrbitDirection::AntiClockwise);
-        println!("e={} direction={:?}", conic.get_eccentricity(), conic.get_direction());
-        assert!(conic.get_eccentricity().abs() < 1.0e-2);
-        assert!(conic.get_direction().is_anticlockwise());
+        println!("e={} direction={:?}", conic.eccentricity(), conic.direction());
+        assert!(conic.eccentricity().abs() < 1.0e-2);
+        assert!(conic.direction().is_anticlockwise());
 
         let conic = Conic::circle(1.0e17, vec2(-1.0e3, 0.0), OrbitDirection::Clockwise);
-        println!("e={} direction={:?}", conic.get_eccentricity(), conic.get_direction());
-        assert!(conic.get_eccentricity().abs() < 1.0e-2);
-        assert!(conic.get_direction().is_clockwise());
+        println!("e={} direction={:?}", conic.eccentricity(), conic.direction());
+        assert!(conic.eccentricity().abs() < 1.0e-2);
+        assert!(conic.direction().is_clockwise());
     }
 }

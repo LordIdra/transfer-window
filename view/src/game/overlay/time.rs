@@ -10,9 +10,9 @@ pub fn update(model: &Model, context: &Context) {
         .resizable(false)
         .anchor(Align2::CENTER_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
-            ui.label("Time: ".to_string() + format_time(model.get_time()).as_str());
-            ui.label("Time step: ".to_string() + format_time(model.get_time_step().get_time_step()).as_str());
-            if model.get_time_step().is_paused() {
+            ui.label("Time: ".to_string() + format_time(model.time()).as_str());
+            ui.label("Time step: ".to_string() + format_time(model.time_step().time_step()).as_str());
+            if model.time_step().is_paused() {
                 ui.label("PAUSED");
             }
         });

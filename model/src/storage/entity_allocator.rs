@@ -13,11 +13,11 @@ impl Entity {
         Self { index: 0, generation: 0 }
     }
 
-    pub fn get_index(&self) -> usize {
+    pub fn index(&self) -> usize {
         self.index
     }
 
-    pub fn get_generation(&self) -> usize {
+    pub fn generation(&self) -> usize {
         self.generation
     }
 }
@@ -63,7 +63,7 @@ impl EntityAllocator {
         self.free.push(entity.index);
     }
 
-    pub fn get_entities(&self) -> &HashSet<Entity> {
+    pub fn entities(&self) -> &HashSet<Entity> {
         &self.entities
     }
 }
