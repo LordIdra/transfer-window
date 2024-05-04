@@ -21,7 +21,7 @@ impl VesselClass {
     }
 }
 
-/// Must have `MassComponent` and `TrajectoryComponent`
+/// Must have `MassComponent` and `PathComponent`
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VesselComponent {
     class: VesselClass,

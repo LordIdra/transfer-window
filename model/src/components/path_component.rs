@@ -214,7 +214,7 @@ mod test {
 
     #[test]
     pub fn test() {
-        let mut trajectory = PathComponent::default();
+        let mut path_component = PathComponent::default();
 
         let orbit_1 = {
             let parent = Entity::mock();
@@ -239,14 +239,14 @@ mod test {
             Orbit::new(parent, mass, parent_mass, position, velocity, start_time).with_end_at(end_time)
         };
 
-        trajectory.add_segment(Segment::Orbit(orbit_1));
-        trajectory.add_segment(Segment::Orbit(orbit_2));
+        path_component.add_segment(Segment::Orbit(orbit_1));
+        path_component.add_segment(Segment::Orbit(orbit_2));
 
-        assert!(trajectory.current_index == 0);
-        assert!(trajectory.first_segment_at_time(105.0).start_time() == 99.9);
+        assert!(path_component.current_index == 0);
+        assert!(path_component.first_segment_at_time(105.0).start_time() == 99.9);
 
-        let end_position_1 = trajectory.first_segment_at_time(43.65).end_position();
-        let end_position_2 = trajectory.first_segment_at_time(172.01).end_position();
+        let end_position_1 = path_component.first_segment_at_time(43.65).end_position();
+        let end_position_2 = path_component.first_segment_at_time(172.01).end_position();
         let m1 = end_position_1.magnitude();
         let m2 = end_position_2.magnitude();
         let difference = (m1 - m2) / m1;
@@ -255,13 +255,13 @@ mod test {
         let mut time = 0.0;
         for _ in 0..100 {
             time += 1.0;
-            trajectory.current_segment_mut().next(1.0);
-            while trajectory.current_segment().is_finished() {
-                trajectory.on_segment_finished(time);
+            path_component.current_segment_mut().next(1.0);
+            while path_component.current_segment().is_finished() {
+                path_component.on_segment_finished(time);
             }
         }
 
-        assert!((trajectory.current_segment().as_orbit().unwrap().current_point().time() - 100.0).abs() < 1.0e-6);
-        assert!(trajectory.current_index == 1);
+        assert!((path_component.current_segment().as_orbit().unwrap().current_point().time() - 100.0).abs() < 1.0e-6);
+        assert!(path_component.current_index == 1);
     }
 }

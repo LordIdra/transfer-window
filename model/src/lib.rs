@@ -93,13 +93,13 @@ impl Model {
         let EntityBuilder {
             name_component,
             orbitable_component,
-            path_component: trajectory_component,
+            path_component,
             vessel_component,
         } = entity_builder;
         let entity = self.entity_allocator.allocate();
         self.name_components.set(entity, name_component);
         self.orbitable_components.set(entity, orbitable_component);
-        self.path_components.set(entity, trajectory_component);
+        self.path_components.set(entity, path_component);
         self.vessel_components.set(entity, vessel_component);
         entity
     }

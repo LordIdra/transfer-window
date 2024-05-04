@@ -56,9 +56,9 @@ fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
         ui.label(format!("Position: {:.3?}", stationary_component.get_position()));
     }
 
-    if let Some(trajectory_component) = model.try_path_component(entity) {
-        ui.collapsing("Trajectory", |ui| {
-            for segment in trajectory_component.segments().iter().flatten() {
+    if let Some(path_component) = model.try_path_component(entity) {
+        ui.collapsing("Path", |ui| {
+            for segment in path_component.segments().iter().flatten() {
                 match segment {
                     Segment::Orbit(orbit) => draw_orbit(ui, orbit),
                     Segment::Burn(burn) => draw_burn(ui, burn),

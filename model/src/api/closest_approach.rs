@@ -141,46 +141,46 @@ mod test {
         let entity_c = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
         
-        let mut trajectory = PathComponent::default();
+        let mut path_component = PathComponent::default();
     
         let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 0.0).with_end_at(10.0);
         let segment_d_1 = Segment::Orbit(orbit);
-        trajectory.add_segment(segment_d_1.clone());
+        path_component.add_segment(segment_d_1.clone());
 
         let orbit = Orbit::new(entity_b, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 10.0).with_end_at(50.0);
         let segment_d_2 = Segment::Orbit(orbit);
-        trajectory.add_segment(segment_d_2.clone());
+        path_component.add_segment(segment_d_2.clone());
 
         let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 50.0).with_end_at(100.0);
         let segment_d_3 = Segment::Orbit(orbit);
-        trajectory.add_segment(segment_d_3.clone());
+        path_component.add_segment(segment_d_3.clone());
 
-        let entity_d = model.allocate(EntityBuilder::default().with_path_component(trajectory));
+        let entity_d = model.allocate(EntityBuilder::default().with_path_component(path_component));
 
 
-        let mut trajectory = PathComponent::default();
+        let mut path_component = PathComponent::default();
 
         let orbit = Orbit::new(entity_a, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 0.0).with_end_at(5.0);
         let segment_e_1 = Segment::Orbit(orbit);
-        trajectory.add_segment(segment_e_1.clone());
+        path_component.add_segment(segment_e_1.clone());
 
         let orbit = Orbit::new(entity_b, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 5.0).with_end_at(15.0);
         let segment_e_2 = Segment::Orbit(orbit);
-        trajectory.add_segment(segment_e_2.clone());
+        path_component.add_segment(segment_e_2.clone());
 
         let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 15.0).with_end_at(55.0);
         let segment_e_3 = Segment::Orbit(orbit);
-        trajectory.add_segment(segment_e_3.clone());
+        path_component.add_segment(segment_e_3.clone());
 
         let orbit = Orbit::new(entity_a, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 55.0).with_end_at(70.0);
         let segment_e_4 = Segment::Orbit(orbit);
-        trajectory.add_segment(segment_e_4.clone());
+        path_component.add_segment(segment_e_4.clone());
 
         let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 70.0).with_end_at(100.0);
         let segment_e_5 = Segment::Orbit(orbit);
-        trajectory.add_segment(segment_e_5.clone());
+        path_component.add_segment(segment_e_5.clone());
 
-        let entity_e = model.allocate(EntityBuilder::default().with_path_component(trajectory));
+        let entity_e = model.allocate(EntityBuilder::default().with_path_component(path_component));
 
 
         let expected = vec![
@@ -207,15 +207,15 @@ mod test {
         let entity_builder = EntityBuilder::default();
         let earth = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
-        let mut trajectory = PathComponent::default();
+        let mut path_component = PathComponent::default();
         let orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::Clockwise).with_end_at(1.0e10);
-        trajectory.add_segment(Segment::Orbit(orbit));
-        let vessel_a = model.allocate(EntityBuilder::default().with_path_component(trajectory));
+        path_component.add_segment(Segment::Orbit(orbit));
+        let vessel_a = model.allocate(EntityBuilder::default().with_path_component(path_component));
 
-        let mut trajectory = PathComponent::default();
+        let mut path_component = PathComponent::default();
         let orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(-0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
-        trajectory.add_segment(Segment::Orbit(orbit.clone()));
-        let vessel_b = model.allocate(EntityBuilder::default().with_path_component(trajectory));
+        path_component.add_segment(Segment::Orbit(orbit.clone()));
+        let vessel_b = model.allocate(EntityBuilder::default().with_path_component(path_component));
 
         let expected = orbit.period().unwrap() / 4.0;
         let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0).unwrap();

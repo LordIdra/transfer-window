@@ -78,11 +78,11 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.zoom();
-    let trajectory_component = model.path_component(entity);
+    let path_component = model.path_component(entity);
 
     let mut segment_points_data = vec![];
     let mut orbit_index = 0;
-    for segment in trajectory_component.segments().iter().flatten() {
+    for segment in path_component.segments().iter().flatten() {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Draw segment");
         let absolute_parent_position = model.absolute_position(segment.parent());

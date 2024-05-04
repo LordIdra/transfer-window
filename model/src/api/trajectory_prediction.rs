@@ -12,8 +12,8 @@ mod test_cases;
 impl Model {
     /// Adds segments for all encounters after `entity`'s final
     /// segment but before `end_time`. Obviously, `entity` is
-    /// expected to have a trajectory component. Additionally,
-    /// the final segment of entity's trajectory MUST be an Orbit.
+    /// expected to have a path component. Additionally,
+    /// the final segment of entity's path MUST be an Orbit.
     /// Trajectory prediction is extremely complex, good luck if
     /// you need to modify this...
     pub fn predict(&mut self, entity: Entity, end_time: f64, segment_count: usize) {

@@ -39,7 +39,7 @@ impl OrbitableComponentPhysics {
     }
 }
 
-/// Must have `MassComponent` and either `StationaryComponent` or `TrajectoryComponent`
+/// Must have `MassComponent`
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OrbitableComponent {
     mass: f64,

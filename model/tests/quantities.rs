@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, PathComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_stationary_position() {
@@ -36,10 +36,9 @@ fn test_trajectory_position() {
 
     let vessel_position = vec2(1.0e4, 0.0);
     let orbit = Orbit::circle(planet, 1.0e3, 1.0e16, vessel_position, 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
-    let trajectory_component = PathComponent::default()
-        .with_segment(Segment::Orbit(orbit.clone()));
+    let path_component = PathComponent::new_with_orbit(orbit.clone());
     let vessel = model.allocate(EntityBuilder::default()
-        .with_path_component(trajectory_component));
+        .with_path_component(path_component));
 
     assert!(model.position(vessel) == vessel_position);
     assert!(model.absolute_position(vessel) == vessel_position);
@@ -61,10 +60,9 @@ fn test_trajectory_velocity() {
 
     let vessel_position = vec2(1.0e4, 0.0);
     let orbit = Orbit::circle(planet, 1.0e3, 1.0e16, vessel_position, 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
-    let trajectory_component = PathComponent::default()
-        .with_segment(Segment::Orbit(orbit.clone()));
+    let path_component = PathComponent::new_with_orbit(orbit.clone());
     let vessel = model.allocate(EntityBuilder::default()
-        .with_path_component(trajectory_component));
+        .with_path_component(path_component));
 
     let expected = orbit.velocity_from_theta(0.0);
     assert!((model.velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
