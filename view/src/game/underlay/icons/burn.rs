@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
 use crate::game::{underlay::selected::{burn::BurnState, Selected}, Scene};
 
@@ -17,14 +17,14 @@ impl Burn {
     pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::VesselComponent]) {
-            for segment in model.path_component(entity).future_segments().iter().flatten().rev() {
-                if let Segment::Burn(burn) = segment {
-                    let time = burn.start_point().time();
-                    if time > model.time() {
-                        let icon = Self { entity, time };
-                        icons.push(Box::new(icon) as Box<dyn Icon>);
-                        break
-                    }
+            // Find the last burn that's not in progress
+            // Previous burns will have a locked icon so we don't want to render those
+            for burn in model.path_component(entity).future_burns().iter().rev() {
+                let time = burn.start_point().time();
+                if time > model.time() {
+                    let icon = Self { entity, time };
+                    icons.push(Box::new(icon) as Box<dyn Icon>);
+                    break
                 }
             }
         }
@@ -64,8 +64,8 @@ impl Icon for Burn {
     }
 
     fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
-        let burn = model.path_component(self.entity).future_segment_starting_at_time(self.time).as_burn();
-        model.absolute_position(burn.parent()) + burn.start_point().get_position()
+        let burn = model.burn_at_time(self.entity, self.time);
+        model.absolute_position(burn.parent()) + burn.start_point().position()
     }
 
     fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {

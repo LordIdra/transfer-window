@@ -70,8 +70,38 @@ impl Model {
         self.recompute_trajectory(entity);
     }
 
-    pub fn can_create_burn(&mut self, entity: Entity) -> bool {
+    pub fn can_create_burn(&self, entity: Entity) -> bool {
         let slots = self.vessel_component(entity).slots();
         slots.engine().is_some() && !slots.fuel_tanks().is_empty()
+    }
+
+    /// # Panics
+    /// Panics if the entity does not have an orbit at the given time
+    pub fn orbit_at_time(&self, entity: Entity, time: f64) -> &Orbit {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            if let Some(orbit) = orbitable_component.orbit() {
+                return orbit;
+            }
+        }
+
+        if let Some(path_component) = self.try_path_component(entity) {
+            if let Segment::Orbit(orbit) = path_component.future_segment_starting_at_time(time) {
+                return orbit;
+            }
+        }
+
+        panic!("There is no orbit at the requested time")
+    }
+
+    /// # Panics
+    /// Panics if the entity does not have a burn at the given time
+    pub fn burn_at_time(&self, entity: Entity, time: f64) -> &Burn {
+        if let Some(path_component) = self.try_path_component(entity) {
+            if let Segment::Burn(burn) = path_component.future_segment_starting_at_time(time) {
+                return burn;
+            }
+        }
+
+        panic!("There is no burn at the requested time")
     }
 }

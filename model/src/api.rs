@@ -1,4 +1,4 @@
-pub mod burns;
+pub mod segments;
 pub mod closest_approach;
 pub mod closest_point;
 pub mod components;

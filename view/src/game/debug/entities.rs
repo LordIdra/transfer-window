@@ -1,5 +1,5 @@
 use eframe::egui::{ScrollArea, Ui};
-use transfer_window_model::{components::path_component::{burn::{burn_point::BurnPoint, Burn}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{orbitable_component::OrbitableComponentPhysics, path_component::{burn::{burn_point::BurnPoint, Burn}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment}}, storage::entity_allocator::Entity, Model};
 
 use crate::game::util::format_time;
 
@@ -49,16 +49,21 @@ fn draw_burn(ui: &mut Ui, burn: &Burn) {
 }
 
 fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
-    let is_orbitable = model.try_orbitable_component(entity).is_some();
-    ui.label(format!("Orbitable: {is_orbitable}"));
-
-    if let Some(stationary_component) = model.try_get_stationary_component(entity) {
-        ui.label(format!("Position: {:.3?}", stationary_component.get_position()));
+    if let Some(orbitable) = model.try_orbitable_component(entity) {
+        ui.label(format!("Is orbitable"));
+        match orbitable.physics() {
+            OrbitableComponentPhysics::Stationary(position) => {
+                ui.label(format!("Position: {:.3?}", position));
+            }
+            OrbitableComponentPhysics::Orbit(orbit) => {
+                draw_orbit(ui, orbit);
+            },
+        }
     }
 
     if let Some(path_component) = model.try_path_component(entity) {
         ui.collapsing("Path", |ui| {
-            for segment in path_component.future_segments().iter().flatten() {
+            for segment in path_component.future_segments() {
                 match segment {
                     Segment::Orbit(orbit) => draw_orbit(ui, orbit),
                     Segment::Burn(burn) => draw_burn(ui, burn),

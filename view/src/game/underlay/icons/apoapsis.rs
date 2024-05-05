@@ -1,6 +1,6 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{path_component::{orbit::Orbit, segment::Segment}, ComponentType}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{path_component::orbit::Orbit, ComponentType}, storage::entity_allocator::Entity, Model};
 
 use crate::game::Scene;
 
@@ -32,12 +32,10 @@ impl Apoapsis {
     pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::PathComponent]) {
-            for segment in model.path_component(entity).future_segments().iter().flatten() {
-                if let Segment::Orbit(orbit) = segment {
-                    if let Some(time) = compute_time_of_next_apoapsis(model, orbit) {
-                        let icon = Self { entity, time };
-                        icons.push(Box::new(icon) as Box<dyn Icon>);
-                    }
+            for orbit in model.path_component(entity).future_orbits() {
+                if let Some(time) = compute_time_of_next_apoapsis(model, orbit) {
+                    let icon = Self { entity, time };
+                    icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
             }
         }
@@ -72,7 +70,7 @@ impl Icon for Apoapsis {
     }
 
     fn position(&self, view: &Scene, model: &Model) -> DVec2 {
-        let orbit = model.path_component(self.entity).future_segment_starting_at_time(self.time).as_orbit();
+        let orbit = model.orbit_at_time(self.entity, self.time);
         let offset = vec2(0.0, self.radius(view, model) / view.camera.zoom());
         model.absolute_position(orbit.parent()) + orbit.position_from_theta(orbit.theta_from_time(self.time)) + offset
     }

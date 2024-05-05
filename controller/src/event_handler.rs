@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, stationary_path_component::StationaryComponent, path_component::{orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -24,22 +24,19 @@ pub fn new_game(controller: &mut Controller) {
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html
     let sun = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Sun".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(1_988_500e24, 695_700e3))
-        .with_stationary_component(StationaryComponent::new(vec2(0.0, 0.0))));
+        .with_orbitable_component(OrbitableComponent::new(1_988_500e24, 695_700e3, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
     let orbit = Orbit::new(sun, 5.9722e24, 1_988_500e24, vec2(147.095e9, 0.0), vec2(0.0, 30.29e3), 0.0).with_end_at(1.0e10);
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(5.9722e24, 0.5))
-        .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
+        .with_orbitable_component(OrbitableComponent::new(5.9722e24, 0.5, OrbitableComponentPhysics::Orbit(orbit))));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
     let orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0).with_end_at(1.0e10);
     let moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3))
-        .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
+        .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3, OrbitableComponentPhysics::Orbit(orbit))));
 
     let orbit = Orbit::new(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), vec2(0.0, 2.0e3), 0.0).with_end_at(1.0e10);
     let _spacecraft_1 = model.allocate(EntityBuilder::default()

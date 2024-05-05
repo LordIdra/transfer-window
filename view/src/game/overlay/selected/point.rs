@@ -43,7 +43,10 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
         view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
     }
 
-    let orbit = model.path_component(entity).future_segment_ending_at_time(time).as_orbit();
+    let orbit = model.path_component(entity)
+        .future_segment_ending_at_time(time)
+        .as_orbit()
+        .expect("Segment at requested time is not orbit");
     if let Some(period) = orbit.period() {
         draw_next(time, period, orbit, ui, view, entity);
         draw_previous(time, period, orbit, ui, view, entity);
