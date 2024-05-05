@@ -1,7 +1,6 @@
 use std::f64::consts::PI;
 
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_common::numerical_methods::laguerre::laguerre_to_find_stationary_point_option_mut;
 
 use crate::{components::{name_component::NameComponent, path_component::{orbit::Orbit, PathComponent}, vessel_component::{system_slot::SlotLocation, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
@@ -46,37 +45,34 @@ impl Model {
             .collect();
         results.sort_by(|a, b| a.2.total_cmp(&b.2));
         let angle = results.first()?.0;
-        
-        // Stage 2: Laguerre
-        let mut to_minimise = |angle: f64| closest_approach_from_angle(angle).map(|x| x.2);
-        let result = laguerre_to_find_stationary_point_option_mut(&mut to_minimise, angle, 1.0e-4, 1.0e-3, 100)?;
-        Some(compute_dv(result))
 
-        // Stage 2: Find the derivative of distance and keep going in that direction until the sign flips
-        // const DERIVATIVE_DELTA: f64 = 0.01;
-        // let mut derivative = |angle: f64| {
-        //     let a = closest_approach_from_angle(angle + DERIVATIVE_DELTA)?.2;
-        //     let b = closest_approach_from_angle(angle)?.2;
-        //     Some((a - b) / DERIVATIVE_DELTA)
-        // };
-        // let derivative_direction = derivative(angle)?.signum();
-        // let mut increment = 0.01 * derivative_direction;
-        // let mut angle = angle;
-        // const MULTIPLIER: f64 = 1.8;
-        // const MAX_INCREMENT: f64 = 15.0;
-        // loop {
-        //     if increment >= MAX_INCREMENT {
-        //         return None;
-        //     }
-        //     increment *= MULTIPLIER;
-        //     angle += increment;
-        //     if derivative(angle)?.signum() != derivative_direction {
-        //         // Direction has flipped; we have our bounds
-        //         let from = angle - increment;
-        //         let to = angle;
+        // Stage 2: Find the derivative of distance and keep going in that direction until the sign flips to find bounds
+        const DERIVATIVE_DELTA: f64 = 0.01;
+        let mut derivative = |angle: f64| {
+            let a = closest_approach_from_angle(angle + DERIVATIVE_DELTA)?.2;
+            let b = closest_approach_from_angle(angle)?.2;
+            Some((a - b) / DERIVATIVE_DELTA)
+        };
+        return Some(compute_dv(angle));
+        let derivative_direction = derivative(angle)?.signum();
+        let mut increment = 0.01 * derivative_direction;
+        let mut angle = angle;
+        const MULTIPLIER: f64 = 1.8;
+        const MAX_INCREMENT: f64 = 15.0;
+        loop {
+            if increment >= MAX_INCREMENT {
+                return None;
+            }
+            increment *= MULTIPLIER;
+            angle += increment;
+            if derivative(angle)?.signum() != derivative_direction {
+                // Direction has flipped; we have our bounds
+                let from = angle - increment;
+                let to = angle;
+                return Some(compute_dv(to));
                 
-        //     }
-        // }
+            }
+        }
     }
 
     pub fn spawn_torpedo(&mut self, fire_from: Entity, slot_location: SlotLocation, target: Entity) {
