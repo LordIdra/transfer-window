@@ -35,7 +35,7 @@ fn test_prediction() {
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
-    model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
+    model.recompute_trajectory(vessel);
 
     let segments = model.path_component(vessel).future_segments();
 
@@ -90,7 +90,7 @@ fn test_prediction_with_burn() {
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
-    model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
+        model.recompute_trajectory(vessel);
 
     assert_eq!(model.path_component(vessel).future_segments().len(), 1);
 
@@ -107,12 +107,13 @@ fn test_prediction_with_burn() {
     println!("At end of burn, moon position={:?} velocity={:?}", model.position(moon), model.velocity(moon));
     println!("At end of burn, earth position={:?} velocity={:?}", model.position(earth), model.velocity(earth));
     
-    model.predict(vessel, 1.0e10, SEGMENTS_TO_PREDICT);
+    model.recompute_trajectory(vessel);
     model.update(end_point.time() + 1.0e-3);
 
     let segments = model.path_component(vessel).future_segments();
 
-    // 1 = 1 for the final segment after prediction + the initial orbit segment + the initial burn segment + orbit right after burn - 2 that have been popped because of update
+    dbg!(segments);
+
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
 
     let encounter_times = vec![1451640.0092875957, 1453650.030605793, 1756813.440374136, 1760025.6886267662];

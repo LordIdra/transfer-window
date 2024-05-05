@@ -1,7 +1,7 @@
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::{orbitable_component::OrbitableComponentPhysics, path_component::segment::Segment}, storage::entity_allocator::Entity, Model};
+use crate::{components::orbitable_component::OrbitableComponentPhysics, storage::entity_allocator::Entity, Model};
 
 impl Model {
     /// # Panics
@@ -116,11 +116,8 @@ impl Model {
             return orbitable_component.mass();
         }
 
-        if let Some(vessel_component) = self.try_vessel_component(entity) {
-            if let Segment::Burn(burn) = self.path_component(entity).current_segment() {
-                return burn.current_point().mass();
-            }
-            return vessel_component.mass();
+        if let Some(path_component) = self.try_path_component(entity) {
+            return path_component.current_mass();
         }
 
         error!("Request to get mass of entity without orbitable or vessel components");
@@ -131,22 +128,11 @@ impl Model {
     /// Panics if entity does not have a mass
     pub fn mass_at_time(&self, entity: Entity, time: f64) -> f64 {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return orbitable_component.mass()
+            return orbitable_component.mass();
         }
 
-        if let Some(vessel_component) = self.try_vessel_component(entity) {
-
-            // find last burn before time if it exists
-            for burn in self.path_component(entity).future_burns() {
-                if time > burn.start_point().time() && time < burn.end_point().time() {
-                    // The requested time is within the burn
-                    return burn.point_at_time(time).mass();
-                }
-                
-                // Otherwise, the requested time is after the burn, so return mass at end of burn
-                return burn.end_point().mass();
-            }
-            return vessel_component.mass();
+        if let Some(path_component) = self.try_path_component(entity) {
+            return path_component.mass_at_time(time);
         }
 
         error!("Request to get mass of entity without orbitable or vessel components");

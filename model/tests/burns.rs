@@ -56,6 +56,7 @@ fn test_create_burn_with_zero_dv() {
     *vessel_component.get_mut(SlotLocation::Back) = engine;
     let fuel_tank = Slot::FuelTank(Some(FuelTank::new(FuelTankType::Medium)));
     *vessel_component.get_mut(SlotLocation::Middle) = fuel_tank;
+    model.recompute_entire_trajectory(vessel);
     assert!(model.can_create_burn(vessel));
 
     let time = 101.0;
@@ -74,9 +75,8 @@ fn test_create_burn_with_zero_dv() {
     println!("velocity after = {:?} velocity before = {:?}", velocity_after, velocity_before);
 
     assert!((mass_after - mass_before).abs() < 1.0e-5);
-    // TODO re-introduce these assertions once segments are reworked
-    // assert!((position_after - position_before).magnitude() < 1.0e-1);
-    // assert!((velocity_after - velocity_before).magnitude() < 1.0e-3);
+    assert!((position_after - position_before).magnitude() < 1.0e-1);
+    assert!((velocity_after - velocity_before).magnitude() < 1.0e-3);
 }
 
 #[test]

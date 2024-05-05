@@ -1,6 +1,6 @@
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::{path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment}, vessel_component::system_slot::System}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use crate::{components::{path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment}, vessel_component::system_slot::System}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
@@ -20,11 +20,7 @@ impl Model {
     pub fn delete_segments_after_time_and_recompute_trajectory(&mut self, entity: Entity, time: f64) {
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);
-
-        // Recompute new trajectory
-        // Add 1 because the final orbit will have duration 0
-        let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - path_component.future_orbits_after_final_burn().len();
-        self.predict(entity, 1.0e10, segments_to_predict);
+        self.recompute_trajectory(entity);
     }
 
     pub fn create_burn(&mut self, entity: Entity, time: f64) {
@@ -44,16 +40,18 @@ impl Model {
 
         self.path_component_mut(entity).add_segment(Segment::Burn(burn));
         self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
-        self.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
+        self.recompute_trajectory(entity);
     }
 
+    /// # Panics
+    /// Panics if there is no burn at the specified time
     pub fn adjust_burn(&mut self, entity: Entity, time: f64, amount: DVec2) {
         let path_component = self.path_component_mut(entity);
         let end_time = path_component.future_segment_starting_at_time(time).end_time();
         path_component.remove_segments_after(end_time);
         path_component.last_segment_mut()
             .as_burn_mut()
-            .expect(&format!("Burn not found at time {}", time))
+            .unwrap_or_else(|| panic!("Burn not found at time {time}"))
             .adjust(amount);
 
         let end_segment = path_component.last_segment();
@@ -69,7 +67,7 @@ impl Model {
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
 
         self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
-        self.predict(entity, 1.0e10, SEGMENTS_TO_PREDICT);
+        self.recompute_trajectory(entity);
     }
 
     pub fn can_create_burn(&mut self, entity: Entity) -> bool {

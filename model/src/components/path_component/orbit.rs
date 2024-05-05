@@ -15,6 +15,7 @@ pub mod scary_math;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Orbit {
     parent: Entity,
+    mass: f64,
     conic: Conic,
     sphere_of_influence: f64,
     start_point: OrbitPoint,
@@ -29,7 +30,7 @@ impl Orbit {
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, conic, sphere_of_influence, start_point, end_point, current_point }
+        Self { parent, mass, conic, sphere_of_influence, start_point, end_point, current_point }
     }
 
     pub fn circle(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, time: f64, direction: OrbitDirection) -> Self {
@@ -40,7 +41,11 @@ impl Orbit {
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, conic, sphere_of_influence, start_point, end_point, current_point }
+        Self { parent, mass, conic, sphere_of_influence, start_point, end_point, current_point }
+    }
+
+    pub fn mass(&self) -> f64 {
+        self.mass
     }
 
     pub fn start_point(&self) -> &OrbitPoint {

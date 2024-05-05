@@ -49,7 +49,6 @@ impl Model {
             let orbit_a = orbits_a[index_a];
             let orbit_b = orbits_b[index_b];
             
-            dbg!(orbit_a.end_point().time(), orbit_b.end_point().time());
             if orbit_a.parent() == orbit_b.parent() {
                 same_parent_orbit_pairs.push((orbit_a, orbit_b));
             }

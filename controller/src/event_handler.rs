@@ -163,4 +163,5 @@ pub fn set_slot(controller: &mut Controller, entity: Entity, location: SlotLocat
     let model = controller.model_mut();
 
     model.vessel_component_mut(entity).set_slot(location, slot);
+    model.recompute_entire_trajectory(entity);
 }

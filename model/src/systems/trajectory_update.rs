@@ -1,4 +1,4 @@
-use crate::{components::ComponentType, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use crate::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
 fn update_path_component(model: &mut Model, entity: Entity, time: f64, simulation_dt: f64) {
     model.path_component_mut(entity).current_segment_mut().next(simulation_dt);
@@ -12,11 +12,8 @@ fn update_path_component(model: &mut Model, entity: Entity, time: f64, simulatio
 
         // Add one because one of the orbits will be duration zero right at the end
         // due to how trajectory prediction works
-        let segments_to_predict = SEGMENTS_TO_PREDICT as i32 + 1 - model.path_component(entity).future_orbits_after_final_burn().len() as i32;
-        if segments_to_predict > 0 {
-            model.predict(entity, 1.0e10, segments_to_predict as usize);
-        }
     }
+    model.recompute_trajectory(entity);
 }
 
 fn update_orbitable_component(model: &mut Model, entity: Entity, simulation_dt: f64) {

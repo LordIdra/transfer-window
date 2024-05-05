@@ -71,7 +71,7 @@ impl PathComponent {
     }
 
     pub fn final_burn(&self) -> Option<&Burn> {
-        self.future_burns().last().map(|burn| *burn)
+        self.future_burns().last().copied()
     }
 
     /// Returns the first segment it finds matching the time
@@ -147,6 +147,20 @@ impl PathComponent {
             .unwrap()
     }
 
+    pub fn current_mass(&self) -> f64 {
+        match self.current_segment() {
+            Segment::Orbit(orbit) => orbit.mass(),
+            Segment::Burn(burn) => burn.current_point().mass(),
+        }
+    }
+
+    pub fn mass_at_time(&self, time: f64) -> f64 {
+        match self.future_segment_ending_at_time(time) {
+            Segment::Orbit(orbit) => orbit.mass(),
+            Segment::Burn(burn) => burn.current_point().mass(),
+        }
+    }
+
     pub fn add_segment(&mut self, segment: Segment) {
         self.future_segments.push_back(segment);
     }
@@ -185,11 +199,17 @@ impl PathComponent {
         }
     }
 
+    /// # Panics
+    /// Panics if there are no more future segments after the finished segment
     pub fn on_segment_finished(&mut self, time: f64) {
         trace!("Segment finished at time={time}");
         let overshot_time = self.current_segment().overshot_time(time);
-        self.past_segments.push(self.future_segments.pop_front().unwrap());
+        self.past_segments.push(self.future_segments.pop_front().expect("No more future segments"));
         self.current_segment_mut().next(overshot_time);
+    }
+
+    pub fn clear_future_segments(&mut self) {
+        self.future_segments.clear();
     }
 }
 
