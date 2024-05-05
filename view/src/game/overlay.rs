@@ -12,6 +12,7 @@ mod scale;
 mod selected;
 mod time;
 pub mod vessel;
+pub mod widgets;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     #[cfg(feature = "profiling")]

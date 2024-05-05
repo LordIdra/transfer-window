@@ -1,6 +1,8 @@
-use eframe::{egui::{Align, Align2, Color32, Context, Layout, Pos2, Rect, Sense, Stroke, Window}, emath::RectTransform, epaint};
+use eframe::{egui::{Align, Align2, Color32, Context, Layout, Window}, epaint};
 
 use crate::game::Scene;
+
+use super::widgets::draw_scale_bar;
 
 fn calculate_scale(pixels_per_metre: f32) -> (f32, String) {
     let mut width = pixels_per_metre;
@@ -43,31 +45,9 @@ pub fn update(view: &Scene, context: &Context) {
         .anchor(Align2::RIGHT_BOTTOM, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
             let (width, scale) = calculate_scale(view.camera.zoom() as f32);
-
             ui.with_layout(Layout::default().with_cross_align(Align::Center), |ui| {
                 ui.label(scale);
             });
-            
-            let (response, painter) = ui.allocate_painter(epaint::vec2(120.0, 20.0), Sense::hover());
-
-            let to_screen = RectTransform::from_to(
-                Rect::from_min_size(Pos2::ZERO, response.rect.size()),
-                response.rect,
-            );
-
-            // Horizontal
-            let from = to_screen.transform_pos(Pos2::new(60.0 - width / 2.0, 10.0));
-            let to = to_screen.transform_pos(Pos2::new(60.0 + width / 2.0, 10.0));
-            painter.line_segment([from, to], Stroke::new(2.0, Color32::WHITE));
-
-            // Left vertical
-            let from = to_screen.transform_pos(Pos2::new(60.0 - width / 2.0, 5.0));
-            let to = to_screen.transform_pos(Pos2::new(60.0 - width / 2.0, 15.0));
-            painter.line_segment([from, to], Stroke::new(2.0, Color32::WHITE));
-
-            // Right vertical
-            let from = to_screen.transform_pos(Pos2::new(60.0 + width / 2.0, 5.0));
-            let to = to_screen.transform_pos(Pos2::new(60.0 + width / 2.0, 15.0));
-            painter.line_segment([from, to], Stroke::new(2.0, Color32::WHITE));
+            draw_scale_bar(ui, 120.0, 20.0, 2.0, Color32::WHITE, width);
         });
 }
