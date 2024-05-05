@@ -37,12 +37,16 @@ trait Icon: Debug {
     fn on_mouse_over(&self, view: &mut Scene, model: &Model, pointer: &PointerState);
 
     fn is_hovered(&self, view: &Scene, model: &Model, mouse_position_window: Pos2, screen_size: Rect) -> bool {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Is icon hovered");
         let mouse_position_world = view.camera.window_space_to_world_space(model, mouse_position_window, screen_size);
         let radius = self.radius(view, model) / view.camera.zoom();
         (self.position(view, model) - mouse_position_world).magnitude() < radius
     }
 
     fn overlaps(&self, view: &Scene, model: &Model, other_icon: &dyn Icon) -> bool {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Icon overlaps");
         let min_distance_between_icons = (self.radius(view, model) + other_icon.radius(view, model)) / view.camera.zoom();
         (self.position(view, model) - other_icon.position(view, model)).magnitude() < min_distance_between_icons
     }
@@ -65,6 +69,9 @@ trait Icon: Debug {
 }
 
 fn compute_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, screen_rect: Rect) -> Vec<Box<dyn Icon>> {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Compute initial icons");
+
     let mut icons: Vec<Box<dyn Icon>> = vec![];
     icons.append(&mut AdjustBurn::generate(view, model, pointer, screen_rect));
     icons.append(&mut Apoapsis::generate(model));
@@ -83,6 +90,9 @@ fn compute_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, sc
 /// Returns (`not_overlapped`, `overlapped`)
 #[allow(clippy::type_complexity)]
 fn split_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon>>) -> (Vec<Box<dyn Icon>>, Vec<Box<dyn Icon>>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Split overlapping icons");
+
     let mut not_overlapped = vec![];
     let mut overlapped = vec![];
     for icon in icons {
@@ -97,6 +107,9 @@ fn split_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon>
 }
 
 fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, screen_size: Rect, icon: &dyn Icon, is_overlapped: bool) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Draw icon");
+
     let radius = icon.radius(view, model) / view.camera.zoom();
     let is_selected = icon.is_selected(view, model);
     let is_hovered = if let Some(mouse_position_window) = mouse_position_window{
@@ -125,6 +138,9 @@ fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, s
 
 // 'rust is simple' said no one ever
 fn compute_mouse_over_icon<'a>(view: &Scene, model: &Model, mouse_position: Pos2, screen_size: Rect, icons: &'a Vec<Box<dyn Icon>>) -> Option<&'a dyn Icon> {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Compute mouse over icon");
+
     let focus = view.camera.window_space_to_world_space(model, mouse_position, screen_size);
     for icon in icons {
         let radius = icon.radius(view, model) / view.camera.zoom();

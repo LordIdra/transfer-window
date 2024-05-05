@@ -1,9 +1,13 @@
-use eframe::egui::{self, Context, Pos2, Rect};
+use eframe::egui::{self, Context, Pos2, Rect, Vec2};
 use nalgebra_glm::vec2;
 
 use super::Scene;
 
 const ZOOM_SENSITIVITY: f64 = 0.003;
+
+fn update_pan(view: &mut Scene, mouse_delta: Vec2) {
+    view.camera.pan(vec2(-mouse_delta.x as f64, mouse_delta.y as f64));
+}
 
 fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui::Vec2, screen_size: Rect) {
     let screen_size = vec2(screen_size.width() as f64, screen_size.height() as f64);
@@ -16,15 +20,13 @@ fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui
     view.camera.set_zoom(new_zoom);
 }
 
-
-
 pub fn update(view: &mut Scene, context: &Context) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update mouse");
+    
     context.input(|input| {
         if input.pointer.secondary_down() {
-            let mouse_delta = input.pointer.delta();
-            view.camera.pan(vec2(-mouse_delta.x as f64, mouse_delta.y as f64));
+            update_pan(view, input.pointer.delta())
         };
 
         if let Some(latest_mouse_position) = input.pointer.latest_pos() {

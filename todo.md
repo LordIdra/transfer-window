@@ -65,7 +65,7 @@
 - [1|x] Allow editing current systems
 - [1|x] System tooltips
 - [1|x] Close button for vessel editor
-- [1| ] Show remaining DV + fuel bar in vessel top left GUI
+- [1|x] Show remaining DV + fuel bar in vessel top left GUI
 - [1| ] Disallow changing modules to change burns
 - [1| ] Vessel mass should account for remaining fuel
 - [1| ] Cannot create new burns if no engines or out of fuel
@@ -96,3 +96,4 @@
 - [1| ] PDC automatic targeting system
 - [1| ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 - [1| ] PDC shells not affected by gravity?
+- [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)

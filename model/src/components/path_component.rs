@@ -74,6 +74,10 @@ impl PathComponent {
         self.future_burns().last().copied()
     }
 
+    pub fn final_orbit(&self) -> Option<&Orbit> {
+        self.future_orbits().last().copied()
+    }
+
     /// Returns the first segment it finds matching the time
     /// If the time is exactly on the border between two segments,
     /// returns the first one

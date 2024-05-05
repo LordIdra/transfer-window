@@ -25,6 +25,16 @@ impl Model {
         
         let mut start_time = self.path_component(entity).last_segment().end_time();
         let mut segments = 0;
+
+        // Special case: A spacecraft that is for example in LEO will never have any
+        // encounters, but without this, the predictor would keep on going every single frame
+        // and rediscovering the exact same orbits
+        if let Some(final_orbit) = self.path_component(entity).final_orbit() {
+            if final_orbit.end_point().time() == end_time {
+                return;
+            }
+        }
+
         while let Some(encounter) = find_next_encounter(self, entity, start_time, end_time) {
             trace!("Found encounter {encounter:?}");
             apply_encounter(self, &encounter);

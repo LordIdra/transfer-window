@@ -64,4 +64,12 @@ impl Scene {
 
         events
     }
+
+    pub fn is_selected(&self, entity: Entity) -> bool {
+        if let Some(selected) = self.selected.selected_entity() {
+            selected == entity
+        } else {
+            false
+        }
+    }
 }

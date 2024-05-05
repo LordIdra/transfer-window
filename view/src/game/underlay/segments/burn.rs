@@ -1,9 +1,14 @@
+use eframe::egui::Rgba;
 use nalgebra_glm::DVec2;
 use transfer_window_model::components::path_component::burn::Burn;
 
 const INITIAL_POINT_COUNT: usize = 50;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-3;
 const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
+
+pub fn compute_burn_color() -> Rgba {
+    Rgba::from_srgba_premultiplied(255, 255, 255, 255)
+}
 
 /// Uses triangle heuristic as described in <https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation>
 pub fn tessellate(burn: &Burn, mut points: Vec<(f64, DVec2)>, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<(f64, DVec2)> {

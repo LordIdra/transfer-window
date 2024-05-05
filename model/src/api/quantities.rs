@@ -37,6 +37,8 @@ impl Model {
     /// # Panics
     /// Panics if entity does not have a position
     pub fn absolute_position(&self, entity: Entity) -> DVec2 {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Absolute position");
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return match orbitable_component.physics() {
                 OrbitableComponentPhysics::Stationary(position) => *position,
@@ -93,6 +95,8 @@ impl Model {
     /// # Panics
     /// Panics if entity does not have a velocity
     pub fn absolute_velocity(&self, entity: Entity) -> DVec2 {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Absolute velocity");
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return match orbitable_component.physics() {
                 OrbitableComponentPhysics::Stationary(_) => vec2(0.0, 0.0),

@@ -86,6 +86,8 @@ impl Model {
     /// # Panics
     /// Panics if the entity does not have an orbit at the given time
     pub fn orbit_at_time(&self, entity: Entity, time: f64) -> &Orbit {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Orbit at time");
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             if let Some(orbit) = orbitable_component.orbit() {
                 return orbit;

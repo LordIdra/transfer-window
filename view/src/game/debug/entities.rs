@@ -1,5 +1,5 @@
 use eframe::egui::{ScrollArea, Ui};
-use transfer_window_model::{components::{orbitable_component::OrbitableComponentPhysics, path_component::{burn::{burn_point::BurnPoint, Burn}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment}}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::{burn_point::BurnPoint, Burn}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment, PathComponent}}, storage::entity_allocator::Entity, Model};
 
 use crate::game::util::format_time;
 
@@ -48,29 +48,42 @@ fn draw_burn(ui: &mut Ui, burn: &Burn) {
     ui.collapsing("End", |ui| draw_burn_point(ui, burn.end_point()));
 }
 
-fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
-    if let Some(orbitable) = model.try_orbitable_component(entity) {
-        ui.label(format!("Is orbitable"));
-        match orbitable.physics() {
-            OrbitableComponentPhysics::Stationary(position) => {
-                ui.label(format!("Position: {:.3?}", position));
-            }
-            OrbitableComponentPhysics::Orbit(orbit) => {
-                draw_orbit(ui, orbit);
-            },
+fn draw_orbitable(ui: &mut Ui, orbitable_component: &OrbitableComponent) {
+    match orbitable_component.physics() {
+        OrbitableComponentPhysics::Stationary(position) => { ui.label(format!("Position: {:.3?}", position)); }
+        OrbitableComponentPhysics::Orbit(orbit) => { draw_orbit(ui, orbit); }
+    }
+}
+
+fn draw_path(ui: &mut Ui, path_component: &PathComponent) {
+    for segment in path_component.future_segments() {
+        match segment {
+            Segment::Orbit(orbit) => draw_orbit(ui, orbit),
+            Segment::Burn(burn) => draw_burn(ui, burn),
         }
+    } 
+}
+
+fn draw_entity(model: &Model, ui: &mut Ui, entity: Entity) {
+    if let Some(orbitable_component) = model.try_orbitable_component(entity) {
+        ui.collapsing("Orbitable", |ui| {
+            draw_orbitable(ui, orbitable_component);
+        });
     }
 
     if let Some(path_component) = model.try_path_component(entity) {
         ui.collapsing("Path", |ui| {
-            for segment in path_component.future_segments() {
-                match segment {
-                    Segment::Orbit(orbit) => draw_orbit(ui, orbit),
-                    Segment::Burn(burn) => draw_burn(ui, burn),
-                }
-            } 
+            draw_path(ui, path_component);
         });
     }
+}
+
+fn draw_row(model: &Model, ui: &mut Ui, entity: Entity) {
+    let name = match model.try_name_component(entity) {
+        Some(name_component) => name_component.name(),
+        None => "<unnamed>".to_string(),
+    };
+    ui.collapsing(name, |ui| draw_entity(model, ui, entity));
 }
 
 pub fn draw(model: &Model, ui: &mut Ui) {
@@ -79,12 +92,7 @@ pub fn draw(model: &Model, ui: &mut Ui) {
         .auto_shrink([false, false])
         .show_rows(ui, 10.0, entities.len(), |ui, row_range| {
             for i in row_range {
-                let entity = entities[i];
-                let name = match model.try_name_component(entity) {
-                    Some(name_component) => name_component.name(),
-                    None => "<unnamed>".to_string(),
-                };
-                ui.collapsing(name, |ui| draw_entity(model, ui, entity));
+                draw_row(model, ui, entities[i]);
             }
     });
 }

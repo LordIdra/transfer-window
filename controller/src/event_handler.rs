@@ -119,7 +119,6 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let _span = tracy_client::span!("Create burn");
     let model = controller.model_mut();
     
-    dbg!(time);
     model.create_burn(entity, time);
 }
 

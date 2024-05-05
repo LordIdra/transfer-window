@@ -61,6 +61,8 @@ impl Icon for Orbitable {
     }
 
     fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("orbitable position");
         model.absolute_position(self.entity)
     }
 

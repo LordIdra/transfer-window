@@ -1,45 +1,15 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{path_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{orbitable_component::OrbitableComponentPhysics, path_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model};
 
 use crate::game::{util::add_triangle, Scene};
+
+use self::{burn::compute_burn_color, orbit::{compute_orbitable_orbit_color, compute_path_orbit_color}};
 
 mod burn;
 mod orbit;
 
 const RADIUS: f64 = 0.8;
-
-fn compute_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
-    let is_vessel = model.try_vessel_component(entity).is_some();
-    let is_selected = if let Some(selected) = view.selected.selected_entity() {
-        selected == entity
-    } else {
-        false
-    };
-
-    let colors: [Rgba; SEGMENTS_TO_PREDICT] = if is_vessel {
-        if is_selected {
-            [
-                Rgba::from_srgba_unmultiplied(0, 255, 255, 255),
-                Rgba::from_srgba_unmultiplied(0, 255, 255, 170),
-                Rgba::from_srgba_unmultiplied(0, 255, 255, 130),
-                Rgba::from_srgba_unmultiplied(0, 255, 255, 100),
-            ]
-        } else {
-            [Rgba::from_srgba_unmultiplied(0, 255, 255, 60); SEGMENTS_TO_PREDICT]
-        }
-    } else if is_selected {
-        [Rgba::from_srgba_unmultiplied(255, 255, 255, 160); SEGMENTS_TO_PREDICT]
-    } else {
-        [Rgba::from_srgba_unmultiplied(255, 255, 255, 50); SEGMENTS_TO_PREDICT]
-    };
-
-    colors[index]
-}
-
-fn compute_burn_color() -> Rgba {
-    Rgba::from_srgba_premultiplied(255, 255, 255, 255)
-}
 
 /// Draws a line between two points so that all the lines on a segment are connected together
 /// This should be called multiple times with different i's to create a blur effect, where i represents how far away from the 'real' line this line is
@@ -74,7 +44,7 @@ fn draw_from_points(view: &mut Scene, points: &[DVec2], zoom: f64, color: Rgba) 
     view.segment_renderer.lock().unwrap().add_vertices(&mut vertices);
 }
 
-fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_centre: DVec2) {
+fn draw_path_segments(view: &mut Scene, model: &Model, entity: Entity, camera_centre: DVec2) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.zoom();
@@ -93,10 +63,11 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
                     continue;
                 }
                 let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
-                let color = compute_orbit_color(view, model, entity, orbit_index);
+                let color = compute_path_orbit_color(view, entity, orbit_index);
                 segment_points_data.push((points, color));
                 orbit_index += 1;
             },
+
             Segment::Burn(burn) => {
                 let points = burn::compute_points(burn, absolute_parent_position, camera_centre, zoom);
                 let color = compute_burn_color();
@@ -114,11 +85,25 @@ fn draw_entity_segments(view: &mut Scene, model: &Model, entity: Entity, camera_
     }
 }
 
+fn draw_orbitable_segment(view: &mut Scene, model: &Model, entity: Entity, camera_centre: DVec2) {
+    let orbitable_component = model.orbitable_component(entity);
+    if let OrbitableComponentPhysics::Orbit(orbit) = orbitable_component.physics() {
+        let absolute_parent_position = model.absolute_position(orbit.parent());
+        let zoom = view.camera.zoom();
+        let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
+        let color = compute_orbitable_orbit_color(view, entity);
+        draw_from_points(view, &points, zoom, color);
+    }
+}
+
 pub fn draw(view: &mut Scene, model: &Model) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments");
     let camera_centre = view.camera.translation(model);
     for entity in model.entities(vec![ComponentType::PathComponent]) {
-        draw_entity_segments(view, model, entity, camera_centre);
+        draw_path_segments(view, model, entity, camera_centre);
+    }
+    for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
+        draw_orbitable_segment(view, model, entity, camera_centre);
     }
 }

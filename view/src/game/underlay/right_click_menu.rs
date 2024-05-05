@@ -1,8 +1,26 @@
-use eframe::egui::{Align2, Button, Context, Window};
+use eframe::egui::{Align2, Button, Context, Ui, Window};
 use nalgebra_glm::vec2;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::Scene};
+
+fn draw_focus(view: &mut Scene, ui: &mut Ui, entity: Entity) {
+    if ui.button("Focus").clicked() {
+        view.camera.reset_panning();
+        view.camera.set_focus(Some(entity));
+    }
+}
+
+fn draw_set_target(ui: &mut Ui, entity: Entity, selected: Entity, events: &mut Vec<Event>) {
+    let can_target = selected != entity;
+    let target_button = Button::new("Set target");
+    if ui.add_enabled(can_target, target_button).clicked() {
+        events.push(Event::SetTarget { 
+            entity: selected, 
+            target: Some(entity) 
+        });
+    }
+}
 
 fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, entity: Entity) {
     let world_position = model.absolute_position(entity) + vec2(50.0, 0.0);
@@ -12,20 +30,10 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
         .resizable(false)
         .anchor(Align2::LEFT_BOTTOM, window_position.to_vec2())
         .show(context, |ui| {
-            if ui.button("Focus").clicked() {
-                view.camera.reset_panning();
-                view.camera.set_focus(Some(entity));
-            }
+            draw_focus(view, ui, entity);
             if let Some(selected) = view.selected.selected_entity() {
                 if model.try_vessel_component(selected).is_some() {
-                    let can_target = selected != entity;
-                    let target_button = Button::new("Set target");
-                    if ui.add_enabled(can_target, target_button).clicked() {
-                        events.push(Event::SetTarget { 
-                            entity: selected, 
-                            target: Some(entity) 
-                        });
-                    }
+                    draw_set_target(ui, entity, selected, events);
                 }
             }
         });

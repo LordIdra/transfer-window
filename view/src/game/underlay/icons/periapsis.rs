@@ -82,6 +82,8 @@ impl Icon for Periapsis {
     }
 
     fn position(&self, view: &Scene, model: &Model) -> DVec2 {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Periapsis position");
         let orbit = model.orbit_at_time(self.entity, self.time);
         let offset = vec2(0.0, self.radius(view, model) / view.camera.zoom());
         model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position() + offset

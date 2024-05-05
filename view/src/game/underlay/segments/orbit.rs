@@ -1,11 +1,36 @@
 use std::f64::consts::PI;
-use eframe::emath::normalized_angle;
+use eframe::{egui::Rgba, emath::normalized_angle};
 use nalgebra_glm::DVec2;
-use transfer_window_model::components::path_component::orbit::Orbit;
+use transfer_window_model::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, SEGMENTS_TO_PREDICT};
+
+use crate::game::Scene;
 
 const INITIAL_POINT_COUNT: usize = 50;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-4;
 const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
+
+pub fn compute_path_orbit_color(view: &Scene, entity: Entity, index: usize) -> Rgba {
+    let colors = if view.is_selected(entity) {
+        [
+            Rgba::from_srgba_unmultiplied(0, 255, 255, 255),
+            Rgba::from_srgba_unmultiplied(0, 255, 255, 170),
+            Rgba::from_srgba_unmultiplied(0, 255, 255, 130),
+            Rgba::from_srgba_unmultiplied(0, 255, 255, 100),
+        ]
+    } else {
+        [Rgba::from_srgba_unmultiplied(0, 255, 255, 60); SEGMENTS_TO_PREDICT]
+    };
+
+    colors[index]
+}
+
+pub fn compute_orbitable_orbit_color(view: &Scene, entity: Entity) -> Rgba {
+    if view.is_selected(entity) {
+        Rgba::from_srgba_unmultiplied(255, 255, 255, 160)
+    } else {
+        Rgba::from_srgba_unmultiplied(255, 255, 255, 50)
+    }
+}
 
 /// Uses triangle heuristic as described in <https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation>
 pub fn tessellate(interpolate: impl Fn(DVec2, DVec2) -> DVec2, mut points: Vec<DVec2>, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<DVec2> {

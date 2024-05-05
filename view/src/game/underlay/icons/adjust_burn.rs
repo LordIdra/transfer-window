@@ -100,6 +100,8 @@ impl Icon for AdjustBurn {
     }
 
     fn position(&self, _view: &Scene, _model: &Model, ) -> DVec2 {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Adjust burn position");
         self.position
     }
 
