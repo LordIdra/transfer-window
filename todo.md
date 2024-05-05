@@ -66,11 +66,10 @@
 - [1|x] System tooltips
 - [1|x] Close button for vessel editor
 - [1|x] Show remaining DV + fuel bar in vessel top left GUI
-- [1| ] Disallow changing modules to change burns
-- [1| ] Vessel mass should account for remaining fuel
-- [1| ] Cannot create new burns if no engines or out of fuel
-- [1| ] Reduce DV/fuel while burning
-- [1| ] Burns cannot use more DV than ship has including previous burns
+- [1|x] Disallow changing modules to change burns
+- [1|x] Vessel mass should account for remaining fuel
+- [1|x] Cannot create new burns if no engines or out of fuel
+- [1|x] Reduce DV/fuel while burning
 - [1| ] Add torpedo system
 - [1| ] Show active weapons at bottom of screen (simple for now)
 - [1| ] Allow a weapon to be locked onto a target
@@ -81,8 +80,12 @@
 - [1| ] Torpedo burns directly towards target until fuel expended
 - [1| ] Yeet torpedo target when torpedo gets close enough
 - [1| ] Torpedo guidance system
+- [1| ] Burns cannot use more DV than ship has including previous burns
+- [1| ] Show DV budget while adjusting burn
+- [1| ] Replace most buttons with icons and add tooltips
+- [1| ] General UI improvements (cross that bridge later)
 
-# Stuff to do later because more stuff needs to be in place first
+# Stuff to do later because other stuff needs to be in place first
 - [1| ] Games have names
 - [1| ] Choose game to load
 - [1| ] Dim P/A icons when moused over and don't count as hovered????
