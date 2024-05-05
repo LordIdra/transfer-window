@@ -11,6 +11,7 @@ pub fn show_tooltip(ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
 
     let type_ = fuel_tank.type_();
     let name = match type_ {
+        FuelTankType::Torpedo => unreachable!(),
         FuelTankType::Small => "Small Fuel Tank",
         FuelTankType::Medium => "Medium Fuel Tank",
         FuelTankType::Large => "Large Fuel Tank",

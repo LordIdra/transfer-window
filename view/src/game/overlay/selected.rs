@@ -10,5 +10,5 @@ mod vessel;
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     point::update(view, model, context, events);
     burn::update(view, model, context, events);
-    vessel::update(view, model, context, events);
+    vessel::update(view, model, context);
 }

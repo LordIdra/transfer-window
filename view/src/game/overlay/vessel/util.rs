@@ -5,11 +5,13 @@ use transfer_window_model::components::vessel_component::{system_slot::{engine::
 pub fn compute_slot_size(vessel_class: VesselClass) -> f32 {
     match vessel_class {
         VesselClass::Light => 0.113,
+        VesselClass::Torpedo => unreachable!(),
     }
 }
 
 pub fn compute_slot_locations(vessel_class: VesselClass) -> BTreeMap<SlotLocation, f32> {
     match vessel_class {
+        VesselClass::Torpedo => unreachable!(),
         VesselClass::Light => vec![
             (SlotLocation::Front, -0.142),
             (SlotLocation::Middle, 0.177),
@@ -25,6 +27,7 @@ pub trait TexturedSlot {
 impl TexturedSlot for EngineType {
     fn texture(&self) -> &str {
         match self {
+            EngineType::Torpedo => unreachable!(),
             EngineType::Efficient => "engine-efficient",
             EngineType::HighThrust => "engine-high-thrust",
         }
@@ -34,6 +37,7 @@ impl TexturedSlot for EngineType {
 impl TexturedSlot for FuelTankType {
     fn texture(&self) -> &str {
         match self {
+            FuelTankType::Torpedo => unreachable!(),
             FuelTankType::Small => "tank-small",
             FuelTankType::Medium => "tank-medium",
             FuelTankType::Large => "tank-large",

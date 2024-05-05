@@ -6,6 +6,7 @@ pub const FUEL_DENSITY: f64 = 1.0; // both RP-1 and LOX are very roughly 1.0kg/L
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum FuelTankType {
+    Torpedo,
     Small,
     Medium,
     Large
@@ -22,6 +23,7 @@ impl FuelTankType {
 
     pub fn capacity_litres(&self) -> f64 {
         match self {
+            FuelTankType::Torpedo => 5000.0,
             FuelTankType::Small => 10000.0,
             FuelTankType::Medium => 15000.0,
             FuelTankType::Large => 20000.0,

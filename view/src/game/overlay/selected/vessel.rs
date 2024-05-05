@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Color32, Context, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::VesselComponent, Model};
 
-use crate::{events::Event, game::{overlay::{vessel::VesselEditor, widgets::draw_filled_bar}, underlay::selected::Selected, Scene}};
+use crate::game::{overlay::{vessel::VesselEditor, widgets::draw_filled_bar}, underlay::selected::Selected, Scene};
 
 fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent) {
     let remaining_fuel = vessel_component.remaining_fuel_litres();
@@ -27,7 +27,7 @@ fn draw_dv(ui: &mut Ui, vessel_component: &VesselComponent) {
     ui.end_row();
 }
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     let Selected::Vessel(entity) = view.selected.clone() else { 
         return
     };
@@ -44,12 +44,12 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                     draw_dv(ui, vessel_component);
                 });
             }
+
+            if !vessel_component.can_edit() {
+                if ui.button("Edit").clicked() {
+                    view.vessel_editor = Some(VesselEditor::new(entity));
+                }
+            }
             
-            if ui.button("Edit").clicked() {
-                view.vessel_editor = Some(VesselEditor::new(entity));
-            }
-            if ui.button("Yeet").clicked() {
-                events.push(Event::Destroy { entity });
-            }
         });
 }

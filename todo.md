@@ -70,7 +70,7 @@
 - [1|x] Vessel mass should account for remaining fuel
 - [1|x] Cannot create new burns if no engines or out of fuel
 - [1|x] Reduce DV/fuel while burning
-- [1| ] Add torpedo system
+- [1|x] Add torpedo system
 - [1| ] Show active weapons at bottom of screen (simple for now)
 - [1| ] Allow a weapon to be locked onto a target
 - [1| ] Cannot fire until firing solution computed

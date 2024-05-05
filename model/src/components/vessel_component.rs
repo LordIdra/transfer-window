@@ -10,14 +10,20 @@ pub mod system_slot;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum VesselClass {
+    Torpedo,
     Light,
 }
 
 impl VesselClass {
     pub fn mass(&self) -> f64 {
         match self {
-            VesselClass::Light => 1.0e3,
+            VesselClass::Torpedo => 1.0e3,
+            VesselClass::Light => 1.0e4,
         }
+    }
+
+    pub fn is_torpedo(self) -> bool {
+        matches!(self, Self::Torpedo)
     }
 }
 
@@ -104,5 +110,13 @@ impl VesselComponent {
         let final_mass = self.dry_mass();
         let isp = self.slots().engine()?.type_().specific_impulse_space();
         Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
+    }
+
+    pub fn can_change_target(&self) -> bool {
+        !self.class.is_torpedo()
+    }
+
+    pub fn can_edit(&self) -> bool {
+        !self.class.is_torpedo()
     }
 }

@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use log::error;
 use serde::{Deserialize, Serialize};
 
-use self::{engine::Engine, fuel_tank::FuelTank, weapon::Weapon};
+use self::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::Weapon};
 
 use super::VesselClass;
 
@@ -20,6 +20,8 @@ pub trait SystemType {}
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SlotLocation {
+    TorpedoEngine,
+    TorpedoFuelTank,
     Front,
     Middle,
     Back,
@@ -45,6 +47,11 @@ pub struct Slots {
 impl Slots {
     pub fn new(class: VesselClass) -> Self {
         let slots = match class {
+            VesselClass::Torpedo => [
+                (SlotLocation::TorpedoFuelTank, Slot::FuelTank(Some(FuelTank::new(FuelTankType::Torpedo)))),
+                (SlotLocation::TorpedoEngine, Slot::Engine(Some(Engine::new(EngineType::Torpedo)))),
+            ].into_iter().collect(),
+
             VesselClass::Light => [
                 (SlotLocation::Front, Slot::Weapon(None)),
                 (SlotLocation::Middle, Slot::FuelTank(None)),
