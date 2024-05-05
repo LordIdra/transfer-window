@@ -72,8 +72,8 @@ impl Icon for ClosestApproach {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Closest approach position");
         let offset = vec2(0.0, self.radius(view, model) / view.camera.zoom());
-        let segment = model.path_component(self.entity).future_segment_at_time(self.time);
-        model.absolute_position(segment.parent()) + segment.position_at_time(self.time) + offset
+        let orbit = model.orbit_at_time(self.entity, self.time);
+        model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position() + offset
     }
 
     fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {

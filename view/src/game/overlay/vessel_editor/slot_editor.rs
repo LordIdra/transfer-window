@@ -1,9 +1,9 @@
 use eframe::{egui::{ImageButton, Pos2, Rect, Ui}, epaint};
-use transfer_window_model::{components::vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::{Weapon, WeaponType}, Slot, SlotLocation}, VesselClass}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, Slot, SlotLocation}, VesselClass}, storage::entity_allocator::Entity};
 
-use crate::{events::Event, game::Scene, styles};
+use crate::{events::Event, game::{overlay::slot_textures::TexturedSlot, Scene}, styles};
 
-use super::{tooltips::show_tooltip, util::{compute_slot_locations, compute_slot_size, TexturedSlot}};
+use super::{tooltips::show_tooltip, util::{compute_slot_locations, compute_slot_size}};
 
 /// With respect to the size of the slot
 const SLOT_SELECTOR_HEIGHT_PROPORTION: f32 = 0.5;
@@ -59,7 +59,7 @@ impl SlotEditor {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::Weapon(None)));
                 for type_ in WeaponType::TYPES {
                     let texture = type_.texture().to_string();
-                    let slot = Slot::Weapon(Some(Weapon::new(type_)));
+                    let slot = Slot::new_weapon(type_);
                     selectors.push(SlotSelector::new(texture, slot));
                 }
             }
@@ -68,7 +68,7 @@ impl SlotEditor {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::FuelTank(None)));
                 for type_ in FuelTankType::TYPES {
                     let texture = type_.texture().to_string();
-                    let slot = Slot::FuelTank(Some(FuelTank::new(type_)));
+                    let slot = Slot::new_fuel_tank(type_);
                     selectors.push(SlotSelector::new(texture, slot));
                 }
             }
@@ -77,7 +77,7 @@ impl SlotEditor {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::Engine(None)));
                 for type_ in EngineType::TYPES {
                     let texture = type_.texture().to_string();
-                    let slot = Slot::Engine(Some(Engine::new(type_)));
+                    let slot = Slot::new_engine(type_);
                     selectors.push(SlotSelector::new(texture, slot));
                 }
             }
@@ -98,7 +98,7 @@ impl SlotEditor {
 
         for (i, selector) in self.selectors.iter().enumerate() {
             if selector.draw(view, ui, i, first_slot_selector_position) {
-                events.push(Event::SetSlot { entity: self.entity, location: self.location, slot: selector.slot.clone() });
+                events.push(Event::SetSlot { entity: self.entity, slot_location: self.location, slot: selector.slot.clone() });
             }
         }
     }

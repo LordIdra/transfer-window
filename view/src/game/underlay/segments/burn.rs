@@ -54,13 +54,12 @@ pub fn tessellate(burn: &Burn, mut points: Vec<(f64, DVec2)>, absolute_parent_po
     points
 }
 
-fn find_initial_points_orbit(burn: &Burn, absolute_parent_position: DVec2) -> Vec<(f64, DVec2)> {
+fn find_initial_points_burn(burn: &Burn, absolute_parent_position: DVec2) -> Vec<(f64, DVec2)> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Find initial burn points");
     let start_time = burn.current_point().time();
     let time_to_step_through = burn.remaining_time();
 
-    // First and last points are be equal to make sure we draw lines through the whole segment
     let mut initial_points = vec![];
     for i in 0..=INITIAL_POINT_COUNT {
         let time = start_time + (i as f64 / INITIAL_POINT_COUNT as f64) * time_to_step_through;
@@ -73,7 +72,7 @@ fn find_initial_points_orbit(burn: &Burn, absolute_parent_position: DVec2) -> Ve
 pub fn compute_points(burn: &Burn, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<DVec2> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute burn points");
-    let points = find_initial_points_orbit(burn, absolute_parent_position);
+    let points = find_initial_points_burn(burn, absolute_parent_position);
     let points = tessellate(burn, points, absolute_parent_position, camera_centre, zoom);
     let mut new_points = vec![];
     for (_, position) in points {

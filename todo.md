@@ -71,13 +71,12 @@
 - [1|x] Cannot create new burns if no engines or out of fuel
 - [1|x] Reduce DV/fuel while burning
 - [1|x] Add torpedo system
-- [1| ] Show active weapons at bottom of screen (simple for now)
-- [1| ] Allow a weapon to be locked onto a target
+- [1|x] Show active weapons at bottom of screen (simple for now)
+- [1|x] Click button to confirm fire
+- [1| ] Allow deselecting burn
 - [1| ] Cannot fire until firing solution computed
-- [1| ] Once a weapon is locked, click button to confirm fire
-- [1| ] Add torpedo component
-- [1| ] Spawn new torpedo at ship location
-- [1| ] Torpedo burns directly towards target until fuel expended
+- [1|x] Spawn new torpedo at ship location
+- [1| ] Torpedo burns until fuel expended
 - [1| ] Yeet torpedo target when torpedo gets close enough
 - [1| ] Torpedo guidance system
 - [1| ] Burns cannot use more DV than ship has including previous burns
@@ -100,3 +99,4 @@
 - [1| ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 - [1| ] PDC shells not affected by gravity?
 - [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
+- [1| ] Collisions with planets (nearly forgot about that lmao)

@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use log::error;
 use serde::{Deserialize, Serialize};
 
-use self::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::Weapon};
+use self::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::{Weapon, WeaponType}};
 
 use super::VesselClass;
 
@@ -34,6 +34,32 @@ pub enum Slot {
     Engine(Option<Engine>),
 }
 
+impl Slot {
+    pub fn is_weapon(&self) -> bool {
+        matches!(self, Slot::Weapon(_))
+    }
+
+    pub fn is_fuel_tank(&self) -> bool {
+        matches!(self, Slot::FuelTank(_))
+    }
+
+    pub fn is_engine(&self) -> bool {
+        matches!(self, Slot::Engine(_))
+    }
+
+    pub fn new_weapon(type_: WeaponType) -> Self {
+        Self::Weapon(Some(Weapon::new(type_)))
+    }
+
+    pub fn new_fuel_tank(type_: FuelTankType) -> Self {
+        Self::FuelTank(Some(FuelTank::new(type_)))
+    }
+
+    pub fn new_engine(type_: EngineType) -> Self {
+        Self::Engine(Some(Engine::new(type_)))
+    }
+}
+
 /// Maintains a mapping of locations to slots. The purpose of this 
 /// is to provide a wrapper that does not allow new slots to be 
 /// inserted at locations where the class should not have slots. In
@@ -48,8 +74,8 @@ impl Slots {
     pub fn new(class: VesselClass) -> Self {
         let slots = match class {
             VesselClass::Torpedo => [
-                (SlotLocation::TorpedoFuelTank, Slot::FuelTank(Some(FuelTank::new(FuelTankType::Torpedo)))),
-                (SlotLocation::TorpedoEngine, Slot::Engine(Some(Engine::new(EngineType::Torpedo)))),
+                (SlotLocation::TorpedoFuelTank, Slot::new_fuel_tank(FuelTankType::Torpedo)),
+                (SlotLocation::TorpedoEngine, Slot::new_engine(EngineType::Torpedo)),
             ].into_iter().collect(),
 
             VesselClass::Light => [
@@ -113,5 +139,15 @@ impl Slots {
         }
         error!("A ship does not appear to have an engine slot");
         panic!("Error recoverable but exiting before something bad happens")
+    }
+
+    pub fn weapon_slots(&self) -> Vec<(SlotLocation, Option<&Weapon>)> {
+        let mut weapons = vec![];
+        for location in self.filled_slot_locations() {
+            if let Slot::Weapon(weapon) = self.get(location) {
+                weapons.push((location, weapon.as_ref()));
+            }
+        }
+        weapons
     }
 }

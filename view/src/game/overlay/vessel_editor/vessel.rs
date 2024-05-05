@@ -1,9 +1,9 @@
 use eframe::egui::{self, Color32, Context, Image, ImageButton, Pos2, Rect, Response, Ui};
 use transfer_window_model::components::vessel_component::{system_slot::{Slot, SlotLocation, Slots}, VesselClass};
 
-use crate::{game::Scene, styles};
+use crate::{game::{overlay::slot_textures::TexturedSlot, Scene}, styles};
 
-use super::util::{compute_slot_locations, compute_slot_size, TexturedSlot};
+use super::util::{compute_slot_locations, compute_slot_size};
 
 const UNDERLAY_SIZE_PROPORTION: f32 = 0.9;
 const WEAPON_SLOT_COLOR: Color32 = Color32::from_rgb(212, 11, 24);

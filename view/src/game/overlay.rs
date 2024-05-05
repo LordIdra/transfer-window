@@ -10,8 +10,9 @@ use super::Scene;
 mod fps;
 mod scale;
 mod selected;
+mod slot_textures;
 mod time;
-pub mod vessel;
+pub mod vessel_editor;
 pub mod widgets;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
@@ -27,7 +28,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
 
     styles::VesselEditor::apply(context);
 
-    vessel::update(view, model, context, events);
+    vessel_editor::update(view, model, context, events);
 
     context.set_style(Style::default());
 }

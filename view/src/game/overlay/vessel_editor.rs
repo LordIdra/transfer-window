@@ -3,12 +3,13 @@ use transfer_window_model::{components::vessel_component::system_slot::SlotLocat
 
 use crate::{events::Event, game::Scene};
 
-use self::{slot_editor::SlotEditor, vessel_editor::draw_vessel_editor};
+use self::{slot_editor::SlotEditor, vessel::draw_vessel_editor};
 
 mod slot_editor;
 mod tooltips;
 mod util;
-mod vessel_editor;
+mod vessel;
+
 
 #[derive(Debug, Clone)]
 pub struct VesselEditor {

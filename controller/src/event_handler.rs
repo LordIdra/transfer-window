@@ -162,3 +162,12 @@ pub fn set_slot(controller: &mut Controller, entity: Entity, location: SlotLocat
     model.set_slot(entity, location, slot);
     model.recompute_entire_trajectory(entity);
 }
+
+pub fn fire_torpedo(controller: &mut Controller, entity: Entity, location: SlotLocation, target: Entity) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Fire torpedo");
+
+    let model = controller.model_mut();
+
+    model.spawn_torpedo(entity, location, target);
+}
