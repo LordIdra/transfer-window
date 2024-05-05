@@ -1,5 +1,7 @@
 use crate::numerical_methods::util::{differentiate_2, differentiate_3};
 
+use super::util::differentiate_3_option_mut;
+
 fn delta(f: f64, f_prime: f64, f_prime_prime: f64) -> f64 {
     if f == 0.0 {
         // Yes, this is actually a scenario we have to worry about...
@@ -40,6 +42,26 @@ pub fn laguerre_to_find_stationary_point(function: &impl Fn(f64) -> f64, startin
     let mut i = 0;
     loop {
         let (_, f_prime, f_prime_prime, f_prime_prime_prime) = differentiate_3(function, x, derivative_delta);
+        let delta = delta(f_prime, f_prime_prime, f_prime_prime_prime);
+        x += delta;
+        i += 1;
+        if i > max_iterations {
+            return None;
+        }
+        if delta.abs() < max_delta {
+            break;
+        }
+    }
+    Some(x)
+}
+
+pub fn laguerre_to_find_stationary_point_option_mut(function: &mut impl FnMut(f64) -> Option<f64>, starting_x: f64, derivative_delta: f64, max_delta: f64, max_iterations: usize) -> Option<f64> {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Laguerre to find stationary point");
+    let mut x = starting_x;
+    let mut i = 0;
+    loop {
+        let (_, f_prime, f_prime_prime, f_prime_prime_prime) = differentiate_3_option_mut(function, x, derivative_delta)?;
         let delta = delta(f_prime, f_prime_prime, f_prime_prime_prime);
         x += delta;
         i += 1;

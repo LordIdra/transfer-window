@@ -23,7 +23,7 @@ impl FuelTankType {
 
     pub fn capacity_litres(&self) -> f64 {
         match self {
-            FuelTankType::Torpedo => 5000.0,
+            FuelTankType::Torpedo => 2000.0,
             FuelTankType::Small => 10000.0,
             FuelTankType::Medium => 15000.0,
             FuelTankType::Large => 20000.0,

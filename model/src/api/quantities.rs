@@ -142,4 +142,8 @@ impl Model {
         error!("Request to get mass of entity without orbitable or vessel components");
         panic!("Error recoverable, but exiting anyway before something bad happens");
     }
+
+    pub fn distance(&self, entity_a: Entity, entity_b: Entity) -> f64 {
+        (self.absolute_position(entity_a) - self.absolute_position(entity_b)).magnitude()
+    }
 }
