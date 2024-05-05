@@ -112,8 +112,6 @@ fn test_prediction_with_burn() {
 
     let segments = model.path_component(vessel).future_segments();
 
-    dbg!(segments);
-
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
 
     let encounter_times = vec![1451640.0092875957, 1453650.030605793, 1756813.440374136, 1760025.6886267662];

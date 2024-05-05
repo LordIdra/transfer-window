@@ -47,22 +47,30 @@ impl Model {
     /// Panics if there is no burn at the specified time
     pub fn adjust_burn(&mut self, entity: Entity, time: f64, amount: DVec2) {
         let path_component = self.path_component_mut(entity);
-        let end_time = path_component.future_segment_starting_at_time(time).end_time();
-        path_component.remove_segments_after(end_time);
-        path_component.last_segment_mut()
-            .as_burn_mut()
+        // The reason we do start time instead of end time is because a burn could have a duration of 0
+        // This would mean we have eg (orbit 0.0 <-> 100) then (burn 100 <-> 100) then (orbit 100 <-> 160)
+        // In this case we'd have to be careful to remove only the orbit starting at 100, which is difficult
+        let mut burn = path_component.future_segment_starting_at_time(time)
             .unwrap_or_else(|| panic!("Burn not found at time {time}"))
-            .adjust(amount);
+            .as_burn()
+            .unwrap_or_else(|| panic!("Burn not found at time {time}"))
+            .clone();
+        path_component.remove_segments_after(burn.start_point().time());
+        burn.adjust(amount);
+        let mass = burn.end_point().mass();
+        path_component.add_segment(Segment::Burn(burn));
 
         let end_segment = path_component.last_segment();
         let parent = end_segment.parent();
         let position = end_segment.end_position();
         let velocity = end_segment.end_velocity();
         let parent_mass = self.mass(parent);
-        let mass = self.mass(entity);
 
         // Needs to be recalculated after we adjust the burn
-        let end_time = self.path_component_mut(entity).future_segment_starting_at_time(time).end_time();
+        let end_time = self.path_component_mut(entity)
+            .future_segment_starting_at_time(time)
+            .unwrap_or_else(|| panic!("Burn not found at time {time}"))
+            .end_time();
 
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
 
@@ -85,7 +93,7 @@ impl Model {
         }
 
         if let Some(path_component) = self.try_path_component(entity) {
-            if let Segment::Orbit(orbit) = path_component.future_segment_starting_at_time(time) {
+            if let Segment::Orbit(orbit) = path_component.future_segment_at_time(time) {
                 return orbit;
             }
         }
@@ -95,9 +103,9 @@ impl Model {
 
     /// # Panics
     /// Panics if the entity does not have a burn at the given time
-    pub fn burn_at_time(&self, entity: Entity, time: f64) -> &Burn {
+    pub fn burn_starting_at_time(&self, entity: Entity, time: f64) -> &Burn {
         if let Some(path_component) = self.try_path_component(entity) {
-            if let Segment::Burn(burn) = path_component.future_segment_starting_at_time(time) {
+            if let Some(Segment::Burn(burn)) = path_component.future_segment_starting_at_time(time) {
                 return burn;
             }
         }

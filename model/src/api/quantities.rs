@@ -27,7 +27,7 @@ impl Model {
         }
 
         if let Some(path_component) = self.try_path_component(entity) {
-            return path_component.future_segment_ending_at_time(time).position_at_time(time);
+            return path_component.future_segment_at_time(time).position_at_time(time);
         }
 
         error!("Request to get position of entity without path or orbitable components");
@@ -82,7 +82,7 @@ impl Model {
         }
 
         if let Some(path_component) = self.try_path_component(entity) {
-            let segment_at_time = path_component.future_segment_ending_at_time(time);
+            let segment_at_time = path_component.future_segment_at_time(time);
             return segment_at_time.velocity_at_time(time);
         }
 

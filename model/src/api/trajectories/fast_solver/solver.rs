@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{components::ComponentType, api::trajectory_prediction::encounter::{Encounter, EncounterType}, storage::entity_allocator::Entity, Model};
+use crate::{components::ComponentType, api::trajectories::encounter::{Encounter, EncounterType}, storage::entity_allocator::Entity, Model};
 
 use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
 

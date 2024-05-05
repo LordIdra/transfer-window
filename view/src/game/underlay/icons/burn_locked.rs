@@ -67,7 +67,7 @@ impl Icon for BurnLocked {
     }
 
     fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
-        let burn = model.burn_at_time(self.entity, self.time);
+        let burn = model.burn_starting_at_time(self.entity, self.time);
         model.absolute_position(burn.parent()) + burn.start_point().position()
     }
 

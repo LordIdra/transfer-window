@@ -44,7 +44,7 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
     }
 
     let orbit = model.path_component(entity)
-        .future_segment_ending_at_time(time)
+        .future_segment_at_time(time)
         .as_orbit()
         .expect("Segment at requested time is not orbit");
     if let Some(period) = orbit.period() {

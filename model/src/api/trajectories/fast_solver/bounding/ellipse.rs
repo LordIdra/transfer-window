@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use transfer_window_common::numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point};
 
-use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, util::normalize_angle};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectories::fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, util::normalize_angle};
 
 use super::{sdf::make_sdf, util::find_other_stationary_point, window::Window};
 

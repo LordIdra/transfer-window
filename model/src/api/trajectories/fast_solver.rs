@@ -13,8 +13,8 @@ fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
         .end_at(time);
 
     let old_parent = model.path_component(entity).last_segment().parent();
-    let mass = model.mass_at_time(entity, time);
     let new_parent_mass = model.mass_at_time(new_parent, time);
+    let mass = model.path_component(entity).last_segment().end_mass();
 
     let entity_segment = model.path_component(entity).last_segment();
     let old_parent_point = &model.orbitable_component(old_parent).orbit().unwrap().point_at_time(time);
@@ -33,7 +33,7 @@ fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64)
         .end_at(time);
 
     let new_parent_mass = model.mass_at_time(new_parent, time);
-    let mass = model.mass_at_time(entity, time);
+    let mass = model.path_component(entity).last_segment().end_mass();
 
     let entity_segment = model.path_component(entity).last_segment();
     let new_parent_point = &model.orbitable_component(new_parent).orbit().unwrap().point_at_time(time);
@@ -56,7 +56,7 @@ pub fn apply_encounter(model: &mut Model, encounter: &Encounter) {
 
 #[cfg(test)]
 mod test {
-    use crate::{components::ComponentType, api::trajectory_prediction::{fast_solver::{apply_encounter, solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
+    use crate::{components::ComponentType, api::trajectories::{fast_solver::{apply_encounter, solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
 
     fn run_case(name: &str) {
         let (mut model, mut encounters, _, end_time, _) = load_case(name);

@@ -8,7 +8,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
         return
     };
 
-    let Segment::Burn(burn) = model.path_component(entity).future_segment_starting_at_time(time) else {
+    let Some(Segment::Burn(burn)) = model.path_component(entity).future_segment_starting_at_time(time) else {
         return;
     };
     

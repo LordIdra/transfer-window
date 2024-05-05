@@ -70,7 +70,7 @@ impl Icon for ClosestApproach {
 
     fn position(&self, view: &Scene, model: &Model) -> DVec2 {
         let offset = vec2(0.0, self.radius(view, model) / view.camera.zoom());
-        let segment = model.path_component(self.entity).future_segment_ending_at_time(self.time);
+        let segment = model.path_component(self.entity).future_segment_at_time(self.time);
         model.absolute_position(segment.parent()) + segment.position_at_time(self.time) + offset
     }
 

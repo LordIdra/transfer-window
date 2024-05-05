@@ -79,38 +79,25 @@ impl PathComponent {
     /// returns the first one
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn future_segment_ending_at_time(&self, time: f64) -> &Segment {
+    pub fn future_segment_at_time(&self, time: f64) -> &Segment {
         for segment in &self.future_segments {
-            if segment.start_time() <= time && segment.end_time() >= time {
+            if time >= segment.start_time() && time <= segment.end_time(){
                 return segment
             }
         }
         panic!("No segment exists at the given time")
     }
 
-    /// Returns the first segment it finds matching the time
-    /// If the time is exactly on the border between two segments,
-    /// returns the last one
+    /// Returns the first segment it finds exactly matching the start time
     /// # Panics
     /// Panics if the trajectory has no segment at the given time
-    pub fn future_segment_starting_at_time(&self, time: f64) -> &Segment {
+    pub fn future_segment_starting_at_time(&self, time: f64) -> Option<&Segment> {
         for segment in &self.future_segments {
-            if segment.start_time() <= time && segment.end_time() > time {
-                return segment
+            if time == segment.start_time() {
+                return Some(segment)
             }
         }
-        panic!("No segment exists at the given time")
-    }
-
-    /// # Panics
-    /// Panics if the trajectory has no segment at the given time
-    pub fn future_segment_ending_at_time_mut(&mut self, time: f64) -> &mut Segment {
-        for segment in &mut self.future_segments {
-            if segment.start_time() <= time && segment.end_time() > time {
-                return segment
-            }
-        }
-        panic!("No segment exists at the given time")
+        None
     }
 
     /// # Panics
@@ -155,7 +142,7 @@ impl PathComponent {
     }
 
     pub fn mass_at_time(&self, time: f64) -> f64 {
-        match self.future_segment_ending_at_time(time) {
+        match self.future_segment_at_time(time) {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.current_point().mass(),
         }
@@ -253,10 +240,10 @@ mod test {
         path_component.add_segment(Segment::Orbit(orbit_2));
 
         assert!(path_component.past_segments().is_empty());
-        assert!(path_component.future_segment_ending_at_time(105.0).start_time() == 99.9);
+        assert!(path_component.future_segment_at_time(105.0).start_time() == 99.9);
 
-        let end_position_1 = path_component.future_segment_ending_at_time(43.65).end_position();
-        let end_position_2 = path_component.future_segment_ending_at_time(172.01).end_position();
+        let end_position_1 = path_component.future_segment_at_time(43.65).end_position();
+        let end_position_2 = path_component.future_segment_at_time(172.01).end_position();
         let m1 = end_position_1.magnitude();
         let m2 = end_position_2.magnitude();
         let difference = (m1 - m2) / m1;

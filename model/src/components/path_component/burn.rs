@@ -8,7 +8,6 @@ use self::{burn_point::BurnPoint, rocket_equation_function::RocketEquationFuncti
 pub mod burn_point;
 pub mod rocket_equation_function;
 
-const MIN_DURATION: f64 = 0.1;
 const BURN_TIME_STEP: f64 = 0.1;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -90,7 +89,7 @@ impl Burn {
     #[allow(clippy::missing_panics_doc)]
     pub fn duration(&self) -> f64 {
         let final_rocket_equation_function = self.rocket_equation_function.step_by_dv(self.total_dv()).unwrap();
-        f64::max(MIN_DURATION, final_rocket_equation_function.burn_time() - self.rocket_equation_function.burn_time())
+        final_rocket_equation_function.burn_time() - self.rocket_equation_function.burn_time()
     }
 
     pub fn parent(&self) -> Entity {
@@ -149,17 +148,21 @@ impl Burn {
         self.points.clear();
         let end_time = start_point.time() + self.duration();
         self.points.push(start_point.clone());
+        
         while self.end_point().time() + BURN_TIME_STEP < end_time {
             let last = self.points.last().unwrap();
             let time_since_start = self.time_since_start(last.time());
             let mass = self.rocket_equation_function.step_by_time(time_since_start).unwrap().mass();
             self.points.push(last.next(BURN_TIME_STEP, mass, self.absolute_acceleration(time_since_start)));
         }
-        let undershot_time = end_time - self.end_point().time();
-        let last = self.points.last().unwrap();
-        let time_since_start = self.time_since_start(last.time());
-        let mass = self.rocket_equation_function.step_by_time(time_since_start).unwrap().mass();
-        self.points.push(last.next(undershot_time, mass, self.absolute_acceleration(time_since_start)));
+
+        if self.duration() != 0.0 {
+            let undershot_time = end_time - self.end_point().time();
+            let last = self.points.last().unwrap();
+            let time_since_start = self.time_since_start(last.time()) + undershot_time;
+            let mass = self.rocket_equation_function.step_by_time(time_since_start).unwrap().mass();
+            self.points.push(last.next(undershot_time, mass, self.absolute_acceleration(time_since_start)));
+        }
     }
 
     pub fn reset(&mut self) {

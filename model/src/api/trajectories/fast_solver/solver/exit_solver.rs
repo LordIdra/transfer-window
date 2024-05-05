@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::path_component::orbit::Orbit, Model, storage::entity_allocator::Entity, api::trajectory_prediction::encounter::{Encounter, EncounterType}};
+use crate::{components::path_component::orbit::Orbit, Model, storage::entity_allocator::Entity, api::trajectories::encounter::{Encounter, EncounterType}};
 
 use super::MIN_TIME_BEFORE_ENCOUNTER;
 

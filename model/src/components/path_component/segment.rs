@@ -19,6 +19,13 @@ impl Segment {
         }
     }
 
+    pub fn start_mass(&self) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.mass(),
+            Segment::Burn(burn) => burn.start_point().mass(),
+        }
+    }
+
     pub fn start_position(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.start_point().position(),
@@ -30,6 +37,13 @@ impl Segment {
         match self {
             Segment::Orbit(orbit) => orbit.start_point().velocity(),
             Segment::Burn(burn) => burn.start_point().velocity(),
+        }
+    }
+
+    pub fn current_mass(&self) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.mass(),
+            Segment::Burn(burn) => burn.current_point().mass(),
         }
     }
 
@@ -51,6 +65,13 @@ impl Segment {
         match self {
             Segment::Orbit(orbit) => orbit.end_point().time(),
             Segment::Burn(burn) => burn.end_point().time(),
+        }
+    }
+
+    pub fn end_mass(&self) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.mass(),
+            Segment::Burn(burn) => burn.end_point().mass(),
         }
     }
 

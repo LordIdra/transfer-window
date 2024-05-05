@@ -1,4 +1,4 @@
-use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectory_prediction::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectories::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
 
 use super::{sdf::make_sdf, window::Window};
 

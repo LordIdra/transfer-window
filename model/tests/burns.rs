@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_burn_without_engine_or_fuel_tank() {
@@ -19,15 +19,13 @@ fn test_burn_without_engine_or_fuel_tank() {
 
     assert!(!model.can_create_burn(vessel));
 
-    let vessel_component = model.vessel_component_mut(vessel).slots_mut();
     let engine = Slot::Engine(Some(Engine::new(EngineType::Efficient)));
-    *vessel_component.get_mut(SlotLocation::Back) = engine;
+    model.set_slot(vessel, SlotLocation::Back, engine);
 
     assert!(!model.can_create_burn(vessel));
 
-    let vessel_component = model.vessel_component_mut(vessel).slots_mut();
     let fuel_tank = Slot::FuelTank(Some(FuelTank::new(FuelTankType::Medium)));
-    *vessel_component.get_mut(SlotLocation::Middle) = fuel_tank;
+    model.set_slot(vessel, SlotLocation::Middle, fuel_tank);
 
     assert!(model.can_create_burn(vessel));
 }
@@ -51,12 +49,10 @@ fn test_create_burn_with_zero_dv() {
 
     model.update(0.01);
 
-    let vessel_component = model.vessel_component_mut(vessel).slots_mut();
     let engine = Slot::Engine(Some(Engine::new(EngineType::Efficient)));
-    *vessel_component.get_mut(SlotLocation::Back) = engine;
+    model.set_slot(vessel, SlotLocation::Back, engine);
     let fuel_tank = Slot::FuelTank(Some(FuelTank::new(FuelTankType::Medium)));
-    *vessel_component.get_mut(SlotLocation::Middle) = fuel_tank;
-    model.recompute_entire_trajectory(vessel);
+    model.set_slot(vessel, SlotLocation::Middle, fuel_tank);
     assert!(model.can_create_burn(vessel));
 
     let time = 101.0;
@@ -97,19 +93,37 @@ fn test_create_and_adjust_burn() {
 
     model.update(0.01);
 
-    let vessel_component = model.vessel_component_mut(vessel).slots_mut();
-    let engine = Slot::Engine(Some(Engine::new(EngineType::HighThrust)));
-    *vessel_component.get_mut(SlotLocation::Back) = engine;
-    let fuel_tank = Slot::FuelTank(Some(FuelTank::new(FuelTankType::Medium)));
-    *vessel_component.get_mut(SlotLocation::Middle) = fuel_tank;
+    let engine_type = EngineType::HighThrust;
+    let engine = Slot::Engine(Some(Engine::new(engine_type)));
+    model.set_slot(vessel, SlotLocation::Back, engine);
+    let fuel_tank_type = FuelTankType::Medium;
+    let fuel_tank = Slot::FuelTank(Some(FuelTank::new(fuel_tank_type)));
+    model.set_slot(vessel, SlotLocation::Middle, fuel_tank);
     assert!(model.can_create_burn(vessel));
+    
+    let burn_time = 100.0;
+    model.create_burn(vessel, burn_time);
+    model.burn_starting_at_time(vessel, burn_time); // just to make sure empty burns can be acquired
+    model.adjust_burn(vessel, burn_time, vec2(150.0, 0.0));
 
-    model.create_burn(vessel, 100.0);
-    model.adjust_burn(vessel, 100.0, vec2(150.0, 0.0));
-    let start_time = model.path_component(vessel).final_burn().unwrap().start_point().time();
-    let end_time = model.path_component(vessel).final_burn().unwrap().end_point().time();
+    let burn = model.burn_starting_at_time(vessel, burn_time);
+    let start_time = burn.start_point().time();
+    let end_time = burn.end_point().time();
+    let duration = end_time - start_time;
+
     let velocity_before = model.velocity_at_time(vessel, start_time - 1.0);
     let velocity_after = model.velocity_at_time(vessel, end_time + 1.0);
-
     assert!(((velocity_before.magnitude() - velocity_after.magnitude()).abs() - 150.0) < 1.0e-3);
+
+    let mass_before = model.mass_at_time(vessel, start_time - 1.0);
+    let mass_after = model.mass_at_time(vessel, end_time + 1.0);
+    let rocket_equation_function = RocketEquationFunction::new(
+        class.mass(),
+        fuel_tank_type.capacity_kg(),
+        engine_type.fuel_kg_per_second(),
+        engine_type.specific_impulse_space(),
+        duration);
+    assert_eq!(mass_after, rocket_equation_function.mass());
+    println!("mass before = {} mass after = {} expected burnt = {}", mass_before, mass_after, rocket_equation_function.fuel_kg_burnt());
+    assert!(((mass_before - mass_after) - rocket_equation_function.fuel_kg_burnt()).abs() < 1.0e-3);
 }

@@ -66,7 +66,7 @@ pub fn find_other_stationary_point(distance_function: impl Fn(f64) -> f64, known
 mod test {
     use std::f64::consts::PI;
 
-    use crate::api::trajectory_prediction::fast_solver::bounding::util::make_range_containing;
+    use crate::api::trajectories::fast_solver::bounding::util::make_range_containing;
 
     #[test]
     fn test_make_range_containing() {

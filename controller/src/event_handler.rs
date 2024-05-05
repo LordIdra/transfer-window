@@ -119,6 +119,7 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let _span = tracy_client::span!("Create burn");
     let model = controller.model_mut();
     
+    dbg!(time);
     model.create_burn(entity, time);
 }
 
@@ -159,6 +160,6 @@ pub fn set_slot(controller: &mut Controller, entity: Entity, location: SlotLocat
     let _span = tracy_client::span!("Set slot");
     let model = controller.model_mut();
 
-    model.vessel_component_mut(entity).set_slot(location, slot);
+    model.set_slot(entity, location, slot);
     model.recompute_entire_trajectory(entity);
 }

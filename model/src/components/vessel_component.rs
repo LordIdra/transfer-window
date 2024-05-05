@@ -52,11 +52,11 @@ impl VesselComponent {
         &self.slots
     }
 
-    pub fn slots_mut(&mut self) -> &mut Slots {
+    pub(crate) fn slots_mut(&mut self) -> &mut Slots {
         &mut self.slots
     }
 
-    pub fn set_slot(&mut self, location: SlotLocation, slot: Slot) {
+    pub(crate) fn set_slot(&mut self, location: SlotLocation, slot: Slot) {
         self.slots.set(location, slot);
     }
 
@@ -104,9 +104,5 @@ impl VesselComponent {
         let final_mass = self.dry_mass();
         let isp = self.slots().engine()?.type_().specific_impulse_space();
         Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
-    }
-
-    pub fn deplete_fuel(&mut self, fuel_to_deplete_kg: f64) {
-        self.slots.set_fuel_kg(fuel_to_deplete_kg);
     }
 }
