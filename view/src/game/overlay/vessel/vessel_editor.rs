@@ -1,4 +1,4 @@
-use eframe::egui::{self, style::WidgetVisuals, Color32, Context, Image, ImageButton, Pos2, Rect, Response, Rounding, Stroke, Ui};
+use eframe::egui::{self, Color32, Context, Image, ImageButton, Pos2, Rect, Response, Ui};
 use transfer_window_model::components::vessel_component::{system_slot::{Slot, SlotLocation, Slots}, VesselClass};
 
 use crate::game::Scene;
@@ -16,47 +16,27 @@ fn compute_texture_ship_underlay(class: &VesselClass) -> &str {
     }
 }
 
+fn on_slot_clicked(view: &mut Scene, location: SlotLocation) {
+    if let Some(vessel_editor) = &mut view.vessel_editor {
+        if vessel_editor.slot_editor == Some(location) {
+            vessel_editor.slot_editor = None;
+        } else {
+            vessel_editor.slot_editor = Some(location);
+        }
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn draw_slot_from_texture(view: &mut Scene, ui: &mut Ui, texture: &str, color: Color32, location: SlotLocation, center: Pos2, size: f32, translation: f32) {
-    ui.visuals_mut().widgets.inactive = WidgetVisuals {
-        bg_fill: Color32::TRANSPARENT,
-        weak_bg_fill: Color32::TRANSPARENT,
-        bg_stroke: Stroke::new(0.08 * size, color),
-        rounding: Rounding::ZERO,
-        fg_stroke: Stroke::NONE,
-        expansion: 0.0,
-    };
-
-    ui.visuals_mut().widgets.hovered = WidgetVisuals {
-        bg_fill: Color32::from_white_alpha(10),
-        weak_bg_fill: Color32::from_white_alpha(10),
-        bg_stroke: Stroke::new(0.08 * size, color),
-        rounding: Rounding::ZERO,
-        fg_stroke: Stroke::NONE,
-        expansion: 0.0,
-    };
-
-    ui.visuals_mut().widgets.active = WidgetVisuals {
-        bg_fill: Color32::from_white_alpha(20),
-        weak_bg_fill: Color32::from_white_alpha(20),
-        bg_stroke: Stroke::new(0.08 * size, color),
-        rounding: Rounding::ZERO,
-        fg_stroke: Stroke::NONE,
-        expansion: 0.0,
-    };
-
-    let slot_image = ImageButton::new(view.resources.texture_image(texture));
     let slot_position = center + egui::vec2(translation, 0.0);
     let slot_size = egui::Vec2::splat(size);
-    ui.allocate_ui_at_rect(Rect::from_center_size(slot_position, slot_size), |ui| {
+    let slot_rect = Rect::from_center_size(slot_position, slot_size);
+    
+    view.styles.slot_editor_widgets.apply(ui, size, color);
+    ui.allocate_ui_at_rect(slot_rect, |ui| {
+        let slot_image = ImageButton::new(view.resources.texture_image(texture));
         if ui.add(slot_image).clicked() {
-            if let Some(vessel_editor) = &mut view.vessel_editor {
-                if vessel_editor.slot_editor == Some(location) {
-                    vessel_editor.slot_editor = None;
-                } else {
-                    vessel_editor.slot_editor = Some(location);
-                }
-            } 
+            on_slot_clicked(view, location);
         }
 });
 }

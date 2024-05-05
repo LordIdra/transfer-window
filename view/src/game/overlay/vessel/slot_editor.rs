@@ -1,9 +1,9 @@
-use eframe::{egui::{style::WidgetVisuals, Color32, ImageButton, Pos2, Rect, RichText, Rounding, Stroke, Ui}, epaint};
-use transfer_window_model::{components::vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::{Weapon, WeaponType}, Slot, SlotLocation, System}, VesselClass}, storage::entity_allocator::Entity};
+use eframe::{egui::{ImageButton, Pos2, Rect, Ui}, epaint};
+use transfer_window_model::{components::vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::{Weapon, WeaponType}, Slot, SlotLocation}, VesselClass}, storage::entity_allocator::Entity};
 
-use crate::{events::Event, game::Scene, icons::{ICON_FAST_FORWARD, ICON_OIL_BARREL, ICON_PIE_CHART_OUTLINE}};
+use crate::{events::Event, game::Scene};
 
-use super::util::{compute_slot_locations, compute_slot_size, TexturedSlot};
+use super::{tooltips::show_tooltip, util::{compute_slot_locations, compute_slot_size, TexturedSlot}};
 
 /// With respect to the size of the slot
 const SLOT_SELECTOR_HEIGHT_PROPORTION: f32 = 0.5;
@@ -13,62 +13,7 @@ const SLOT_SELECTOR_HEIGHT_OFFSET: f32 = 40.0;
 const SLOT_SELECTOR_SPACING: f32 = 65.0;
 const SLOT_SELECTOR_SIZE: f32 = 60.0;
 
-fn show_tooltip_weapon(ui: &mut Ui, weapon: &Option<Weapon>) {
-    let Some(weapon) = weapon else {
-        ui.label("None");
-        return;
-    };
 
-    let name = match weapon.type_() {
-        WeaponType::Torpedo => "Torpedo",
-    };
-
-    ui.label(name);
-}
-
-fn show_tooltip_fuel_tank(ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
-    let Some(fuel_tank) = fuel_tank else {
-        ui.label("None");
-        return;
-    };
-
-    let type_ = fuel_tank.type_();
-    let name = match type_ {
-        FuelTankType::Small => "Small Fuel Tank",
-        FuelTankType::Medium => "Medium Fuel Tank",
-        FuelTankType::Large => "Large Fuel Tank",
-    };
-
-    ui.label(name);
-    ui.label(RichText::new(format!("{} Capacity: {} L", ICON_OIL_BARREL, type_.capacity_litres())));
-}
-
-fn show_tooltip_engine(ui: &mut Ui, engine: &Option<Engine>) {
-    let Some(engine) = engine else {
-        ui.label("None");
-        return;
-    };
-
-    let type_ = engine.type_();
-    let name = match type_ {
-        EngineType::Efficient => "Efficient Engine",
-        EngineType::HighThrust => "High Thrust Engine",
-    };
-
-
-    ui.label(name);
-    ui.label(RichText::new(format!("{} Fuel Consumption: {} L/s", ICON_OIL_BARREL, type_.fuel_kg_per_second())));
-    ui.label(RichText::new(format!("{} Thrust: {} kN", ICON_FAST_FORWARD, type_.thrust_newtons() / 1000.0)));
-    ui.label(RichText::new(format!("{} Specific Impulse (vacuum): {} s", ICON_PIE_CHART_OUTLINE, type_.specific_impulse_space().round())));
-}
-
-fn show_tooltip(ui: &mut Ui, slot: &Slot) {
-    match slot {
-        Slot::Weapon(weapon) => show_tooltip_weapon(ui, weapon),
-        Slot::FuelTank(fuel_tank) => show_tooltip_fuel_tank(ui, fuel_tank),
-        Slot::Engine(engine) => show_tooltip_engine(ui, engine),
-    };
-}
 
 /// 1 individual item that could be equipped in the slot
 struct SlotSelector {
@@ -149,32 +94,7 @@ impl SlotEditor {
             slot_translation - SLOT_SELECTOR_SPACING * (self.selectors.len() - 1) as f32 / 2.0, 
             -SLOT_SELECTOR_HEIGHT_OFFSET - SLOT_SELECTOR_HEIGHT_PROPORTION * compute_slot_size(self.vessel_class) * scalar);
 
-        ui.visuals_mut().widgets.inactive = WidgetVisuals {
-            bg_fill: Color32::from_rgba_unmultiplied(40, 40, 40, 220),
-            weak_bg_fill: Color32::from_rgba_unmultiplied(40, 40, 40, 220),
-            bg_stroke: Stroke::NONE,
-            rounding: Rounding::ZERO,
-            fg_stroke: Stroke::NONE,
-            expansion: 0.0,
-        };
-
-        ui.visuals_mut().widgets.hovered = WidgetVisuals {
-            bg_fill: Color32::from_rgba_unmultiplied(60, 60, 60, 220),
-            weak_bg_fill: Color32::from_rgba_unmultiplied(60, 60, 60, 220),
-            bg_stroke: Stroke::NONE,
-            rounding: Rounding::ZERO,
-            fg_stroke: Stroke::NONE,
-            expansion: 0.0,
-        };
-
-        ui.visuals_mut().widgets.active = WidgetVisuals {
-            bg_fill: Color32::from_rgba_unmultiplied(80, 80, 80, 220),
-            weak_bg_fill: Color32::from_rgba_unmultiplied(80, 80, 80, 220),
-            bg_stroke: Stroke::NONE,
-            rounding: Rounding::ZERO,
-            fg_stroke: Stroke::NONE,
-            expansion: 0.0,
-        };
+        view.styles.slot_visuals.apply(ui);
 
         for (i, selector) in self.selectors.iter().enumerate() {
             if selector.draw(view, ui, i, first_slot_selector_position) {

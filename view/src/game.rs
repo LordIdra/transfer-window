@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::{Arc, Mutex}};
 use eframe::{egui::Context, glow, Frame};
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use crate::events::Event;
+use crate::{events::Event, styles::Styles};
 
 use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel::VesselEditor, rendering::{geometry_renderer::GeometryRenderer, texture_renderer::TextureRenderer}, resources::Resources, underlay::selected::Selected};
 
@@ -19,6 +19,7 @@ mod underlay;
 mod util;
 
 pub struct Scene {
+    styles: Styles,
     camera: Camera,
     resources: Resources,
     object_renderer: Arc<Mutex<GeometryRenderer>>,
@@ -34,6 +35,7 @@ pub struct Scene {
 
 impl Scene {
     pub fn new(gl: &Arc<glow::Context>, focus: Option<Entity>) -> Self {
+        let styles = Styles::default();
         let mut resources = Resources::new();
         let mut camera = Camera::new();
         camera.set_focus(focus);
@@ -46,7 +48,7 @@ impl Scene {
         let frame_history = FrameHistory::default();
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::Overview;
-        Self { camera, resources, object_renderer, segment_renderer, texture_renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab }
+        Self { styles, camera, resources, object_renderer, segment_renderer, texture_renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab }
     }
 
     pub fn update(&mut self, model: &Model, context: &Context, frame: &Frame) -> Vec<Event> {
