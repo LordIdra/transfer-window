@@ -5,7 +5,7 @@ use log::{debug, error, info};
 use transfer_window_model::Model;
 use transfer_window_view::{events::Event, menu::Scene, View};
 
-use crate::event_handler::{adjust_burn, create_burn, decrease_time_step_level, delete_burn, destroy, increase_time_step_level, load_game, new_game, quit, save_game, set_slot, set_target, start_warp, toggle_paused};
+use crate::event_handler::{adjust_burn, create_burn, decrease_time_step_level, delete_burn, destroy, fire_torpedo, increase_time_step_level, load_game, new_game, quit, save_game, set_slot, set_target, start_warp, toggle_paused};
 
 mod event_handler;
 
@@ -77,7 +77,8 @@ impl Controller {
                 Event::AdjustBurn { entity, time, amount } => adjust_burn(self, entity, time, amount),
                 Event::Destroy { entity } => destroy(self, entity),
                 Event::SetTarget { entity, target } => set_target(self, entity, target),
-                Event::SetSlot { entity, location, slot } => set_slot(self, entity, location, slot),
+                Event::SetSlot { entity, slot_location, slot } => set_slot(self, entity, slot_location, slot),
+                Event::FireTorpedo { entity, slot_location, target } => fire_torpedo(self, entity, slot_location, target),
             }
         }
     }

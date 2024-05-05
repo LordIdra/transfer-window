@@ -1,7 +1,11 @@
 use eframe::{egui::{Align2, Color32, Context, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::VesselComponent, Model};
 
-use crate::game::{overlay::{vessel::VesselEditor, widgets::draw_filled_bar}, underlay::selected::Selected, Scene};
+use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::draw_filled_bar}, underlay::selected::Selected, Scene}};
+
+use self::weapons::draw_weapons;
+
+mod weapons;
 
 fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent) {
     let remaining_fuel = vessel_component.remaining_fuel_litres();
@@ -27,13 +31,13 @@ fn draw_dv(ui: &mut Ui, vessel_component: &VesselComponent) {
     ui.end_row();
 }
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context) {
+pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     let Selected::Vessel(entity) = view.selected.clone() else { 
         return
     };
 
     Window::new("Selected vessel")
-    .title_bar(false)
+        .title_bar(false)
         .resizable(false)
         .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
@@ -45,11 +49,21 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
                 });
             }
 
-            if !vessel_component.can_edit() {
-                if ui.button("Edit").clicked() {
-                    view.vessel_editor = Some(VesselEditor::new(entity));
-                }
+            if vessel_component.can_edit() && ui.button("Edit").clicked() {
+                view.vessel_editor = Some(VesselEditor::new(entity));
             }
             
         });
+
+    let vessel_component = model.vessel_component(entity);
+    let weapon_slots = vessel_component.slots().weapon_slots();
+    if !weapon_slots.is_empty() {
+        Window::new("Weapons")
+            .title_bar(false)
+            .resizable(false)
+            .anchor(Align2::CENTER_BOTTOM, epaint::vec2(0.0, 0.0))
+            .show(context, |ui| {
+                draw_weapons(view, ui, vessel_component, entity, &weapon_slots, events);
+            });
+    }
 }

@@ -50,6 +50,10 @@ impl VesselComponent {
         self.target
     }
 
+    pub fn has_target(&self) -> bool {
+        self.target.is_some()
+    }
+
     pub fn class(&self) -> VesselClass {
         self.class
     }

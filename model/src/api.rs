@@ -5,4 +5,5 @@ pub mod quantities;
 pub mod segments;
 pub mod slots;
 pub mod time;
+pub mod torpedo;
 pub mod trajectories;

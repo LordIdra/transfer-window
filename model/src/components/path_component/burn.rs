@@ -59,7 +59,7 @@ impl Burn {
         let index = (time_since_start / BURN_TIME_STEP) as usize;
         if let Some(closest_previous_point) = self.points.get(index) {
             let undershot_time = time - closest_previous_point.time();
-            let mass = self.rocket_equation_function.step_by_time(time_since_start).unwrap().mass();
+            let mass = self.rocket_equation_function_at_time(time).mass();
             closest_previous_point.next(undershot_time, mass, self.absolute_acceleration(time_since_start))
         } else {
             self.end_point().clone()
@@ -75,7 +75,7 @@ impl Burn {
     }
 
     pub fn remaining_time(&self) -> f64 {
-        self.end_point().time() - self.start_point().time()
+        self.end_point().time() - self.current_point().time()
     }
 
     pub fn is_time_within_burn(&self, time: f64) -> bool {
@@ -108,9 +108,17 @@ impl Burn {
         self.rocket_equation_function.clone()
     }
 
+    pub fn rocket_equation_function_at_time(&self, time: f64) -> RocketEquationFunction {
+        // Slightly annoying workaround to make sure that if the burn expends all our DV, there won't be a panic
+        match self.rocket_equation_function.step_by_time(time) {
+            Some(rocket_equation_function) => rocket_equation_function,
+            None => self.rocket_equation_function.end(),
+        }
+    }
+
     #[allow(clippy::missing_panics_doc)]
     pub fn rocket_equation_function_at_end_of_burn(&self) -> RocketEquationFunction {
-        self.rocket_equation_function.step_by_time(self.duration()).unwrap()
+        self.rocket_equation_function_at_time(self.duration())
     }
 
     pub fn overshot_time(&self, time: f64) -> f64 {
@@ -132,7 +140,7 @@ impl Burn {
         if dv.magnitude() == 0.0 {
             vec2(0.0, 0.0)
         } else {
-            dv.normalize() * self.rocket_equation_function.step_by_time(time).unwrap().acceleration()
+            dv.normalize() * self.rocket_equation_function_at_time(time).acceleration()
         }
     }
 
@@ -152,7 +160,7 @@ impl Burn {
         while self.end_point().time() + BURN_TIME_STEP < end_time {
             let last = self.points.last().unwrap();
             let time_since_start = self.time_since_start(last.time());
-            let mass = self.rocket_equation_function.step_by_time(time_since_start).unwrap().mass();
+            let mass = self.rocket_equation_function_at_time(time_since_start).mass();
             self.points.push(last.next(BURN_TIME_STEP, mass, self.absolute_acceleration(time_since_start)));
         }
 
@@ -160,7 +168,7 @@ impl Burn {
             let undershot_time = end_time - self.end_point().time();
             let last = self.points.last().unwrap();
             let time_since_start = self.time_since_start(last.time()) + undershot_time;
-            let mass = self.rocket_equation_function.step_by_time(time_since_start).unwrap().mass();
+            let mass = self.rocket_equation_function_at_time(time_since_start).mass();
             self.points.push(last.next(undershot_time, mass, self.absolute_acceleration(time_since_start)));
         }
     }

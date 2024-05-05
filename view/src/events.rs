@@ -16,5 +16,6 @@ pub enum Event {
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
     Destroy { entity: Entity },
     SetTarget { entity: Entity, target: Option<Entity> },
-    SetSlot { entity: Entity, location: SlotLocation, slot: Slot },
+    SetSlot { entity: Entity, slot_location: SlotLocation, slot: Slot },
+    FireTorpedo { entity: Entity, slot_location: SlotLocation, target: Entity }
 }
