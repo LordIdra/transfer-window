@@ -5,7 +5,7 @@ use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::{underlay::selected::Selected, util::compute_burn_arrow_position, Scene}};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum BurnAdjustDirection {
     Prograde,
     Retrograde,
@@ -14,7 +14,7 @@ pub enum BurnAdjustDirection {
 }
 
 impl BurnAdjustDirection {
-    pub fn vector(&self) -> DVec2 {
+    pub fn vector(self) -> DVec2 {
         match self {
             BurnAdjustDirection::Prograde => vec2(1.0, 0.0),
             BurnAdjustDirection::Retrograde => vec2(-1.0, 0.0),
@@ -56,7 +56,7 @@ fn burn_adjustment_amount(amount: f64) -> f64 {
 fn compute_drag_adjustment_amount(view: &mut Scene, model: &Model, context: &Context, entity: Entity, time: f64, direction: BurnAdjustDirection, mouse_position: Pos2) -> DVec2 {
     let burn = model.burn_starting_at_time(entity, time);
     let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
-    let arrow_position = compute_burn_arrow_position(view, model, entity, time, &direction);
+    let arrow_position = compute_burn_arrow_position(view, model, entity, time, direction);
     let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, context.screen_rect()) - arrow_position;
     burn_adjustment_amount(arrow_to_mouse.dot(&burn_to_arrow_unit)) * direction.vector() * view.camera.zoom().powi(2)
 }

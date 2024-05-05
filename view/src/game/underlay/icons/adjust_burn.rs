@@ -27,7 +27,7 @@ impl AdjustBurn {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
         let burn = model.burn_starting_at_time(entity, time);
         let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
-        let mut position = compute_burn_arrow_position(view, model, entity, time, &direction);
+        let mut position = compute_burn_arrow_position(view, model, entity, time, direction);
 
         // Additional offset if arrow is being dragged
         if let Some(mouse_position) = pointer.latest_pos() {
@@ -121,7 +121,7 @@ impl Icon for AdjustBurn {
         if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
             if pointer.primary_clicked() {
                 trace!("Started dragging to adjust burn {:?}", self.direction);
-                *state = BurnState::Dragging(self.direction.clone());
+                *state = BurnState::Dragging(self.direction);
             }
         }
     }

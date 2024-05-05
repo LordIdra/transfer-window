@@ -26,7 +26,7 @@ pub fn update(view: &mut Scene, context: &Context) {
     
     context.input(|input| {
         if input.pointer.secondary_down() {
-            update_pan(view, input.pointer.delta())
+            update_pan(view, input.pointer.delta());
         };
 
         if let Some(latest_mouse_position) = input.pointer.latest_pos() {

@@ -1,7 +1,7 @@
 use eframe::{egui::{ImageButton, Pos2, Rect, Ui}, epaint};
 use transfer_window_model::{components::vessel_component::{system_slot::{engine::{Engine, EngineType}, fuel_tank::{FuelTank, FuelTankType}, weapon::{Weapon, WeaponType}, Slot, SlotLocation}, VesselClass}, storage::entity_allocator::Entity};
 
-use crate::{events::Event, game::Scene};
+use crate::{events::Event, game::Scene, styles};
 
 use super::{tooltips::show_tooltip, util::{compute_slot_locations, compute_slot_size, TexturedSlot}};
 
@@ -94,7 +94,7 @@ impl SlotEditor {
             slot_translation - SLOT_SELECTOR_SPACING * (self.selectors.len() - 1) as f32 / 2.0, 
             -SLOT_SELECTOR_HEIGHT_OFFSET - SLOT_SELECTOR_HEIGHT_PROPORTION * compute_slot_size(self.vessel_class) * scalar);
 
-        view.styles.slot_visuals.apply(ui);
+        styles::SlotSelector::apply(ui);
 
         for (i, selector) in self.selectors.iter().enumerate() {
             if selector.draw(view, ui, i, first_slot_selector_position) {

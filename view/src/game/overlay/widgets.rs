@@ -1,5 +1,6 @@
 use eframe::{egui::{vec2, Color32, Pos2, Rect, Rounding, Sense, Stroke, Ui}, emath::RectTransform, epaint};
 
+#[allow(clippy::too_many_arguments)]
 pub fn draw_filled_bar(ui: &mut Ui, width: f32, height: f32, margin: f32, rounding: f32, filled_color: Color32, empty_color: Color32, proportion_filled: f32) {
     let (response, painter) = ui.allocate_painter(epaint::vec2(width, height), Sense::hover());
     let to_screen = RectTransform::from_to(

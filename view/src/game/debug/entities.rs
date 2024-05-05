@@ -50,7 +50,7 @@ fn draw_burn(ui: &mut Ui, burn: &Burn) {
 
 fn draw_orbitable(ui: &mut Ui, orbitable_component: &OrbitableComponent) {
     match orbitable_component.physics() {
-        OrbitableComponentPhysics::Stationary(position) => { ui.label(format!("Position: {:.3?}", position)); }
+        OrbitableComponentPhysics::Stationary(position) => { ui.label(format!("Position: {position:.3?}")); }
         OrbitableComponentPhysics::Orbit(orbit) => { draw_orbit(ui, orbit); }
     }
 }

@@ -1,7 +1,7 @@
 use eframe::egui::{self, Color32, Context, Image, ImageButton, Pos2, Rect, Response, Ui};
 use transfer_window_model::components::vessel_component::{system_slot::{Slot, SlotLocation, Slots}, VesselClass};
 
-use crate::game::Scene;
+use crate::{game::Scene, styles};
 
 use super::util::{compute_slot_locations, compute_slot_size, TexturedSlot};
 
@@ -32,7 +32,7 @@ fn draw_slot_from_texture(view: &mut Scene, ui: &mut Ui, texture: &str, color: C
     let slot_size = egui::Vec2::splat(size);
     let slot_rect = Rect::from_center_size(slot_position, slot_size);
     
-    view.styles.slot_editor_widgets.apply(ui, size, color);
+    styles::SlotEditor::apply(ui, size, color);
     ui.allocate_ui_at_rect(slot_rect, |ui| {
         let slot_image = ImageButton::new(view.resources.texture_image(texture));
         if ui.add(slot_image).clicked() {

@@ -3,7 +3,7 @@
 use eframe::egui::{Context, Style};
 use transfer_window_model::Model;
 
-use crate::events::Event;
+use crate::{events::Event, styles};
 
 use super::Scene;
 
@@ -18,14 +18,14 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw overlay");
 
-    view.styles.default_window_visuals.apply(context);
+    styles::DefaultWindow::apply(context);
     
     fps::update(view, context);
     scale::update(view, context);
     time::update(model, context);
     selected::update(view, model, context, events);
 
-    view.styles.vessel_editor_visuals.apply(context);
+    styles::VesselEditor::apply(context);
 
     vessel::update(view, model, context, events);
 

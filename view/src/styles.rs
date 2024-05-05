@@ -1,18 +1,9 @@
 use eframe::{egui::{style::{Spacing, WidgetVisuals}, Color32, Context, Margin, Rounding, Stroke, Style, Ui, Visuals}, epaint::Shadow};
 
-#[derive(Default)]
-pub struct Styles {
-    pub default_window_visuals: DefaultWindowVisuals,
-    pub vessel_editor_visuals: VesselEditorVisuals,
-    pub slot_visuals: SlotEditorStyle,
-    pub slot_editor_widgets: SlotSelectorStyle,
-}
+pub struct DefaultWindow {}
 
-#[derive(Default)]
-pub struct DefaultWindowVisuals {}
-
-impl DefaultWindowVisuals {
-    pub fn apply(&self, context: &Context) {
+impl DefaultWindow {
+    pub fn apply(context: &Context) {
         context.set_visuals(Visuals {
             window_fill: Color32::from_rgba_unmultiplied(0, 0, 0, 100),
             window_stroke: Stroke::NONE,
@@ -23,11 +14,10 @@ impl DefaultWindowVisuals {
     }
 }
 
-#[derive(Default)]
-pub struct VesselEditorVisuals {}
+pub struct VesselEditor {}
 
-impl VesselEditorVisuals {
-    pub fn apply(&self, context: &Context) {
+impl VesselEditor {
+    pub fn apply(context: &Context) {
         context.set_visuals(Visuals {
             window_fill: Color32::from_rgba_unmultiplied(0, 0, 0, 200),
             window_stroke: Stroke::NONE,
@@ -46,11 +36,10 @@ impl VesselEditorVisuals {
     }
 }
 
-#[derive(Default)]
-pub struct SlotEditorStyle {}
+pub struct SlotSelector {}
 
-impl SlotEditorStyle {
-    pub fn apply(&self, ui: &mut Ui) {
+impl SlotSelector {
+    pub fn apply(ui: &mut Ui) {
         let default_color = Color32::from_rgba_unmultiplied(40, 40, 40, 220);
         let hovered_color = Color32::from_rgba_unmultiplied(60, 60, 60, 220);
         let selected_color = Color32::from_rgba_unmultiplied(80, 80, 80, 220);
@@ -80,11 +69,10 @@ impl SlotEditorStyle {
     }
 }
 
-#[derive(Default)]
-pub struct SlotSelectorStyle {}
+pub struct SlotEditor {}
 
-impl SlotSelectorStyle {
-    pub fn apply(&self, ui: &mut Ui, size: f32, color: Color32) {
+impl SlotEditor {
+    pub fn apply(ui: &mut Ui, size: f32, color: Color32) {
         let default_color = Color32::from_white_alpha(0);
         let hovered_color = Color32::from_white_alpha(10);
         let selected_color = Color32::from_white_alpha(20);
