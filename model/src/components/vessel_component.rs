@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use self::{system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System}, timeline::{Timeline, TimelineEvent}};
+use self::{system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System}, timeline::Timeline};
 
 use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
@@ -31,6 +31,7 @@ impl VesselClass {
 /// Must have `MassComponent` and `PathComponent`
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VesselComponent {
+    ghost: bool,
     timeline: Timeline,
     class: VesselClass,
     slots: Slots,
@@ -40,9 +41,23 @@ pub struct VesselComponent {
 #[allow(clippy::new_without_default)]
 impl VesselComponent {
     pub fn new(class: VesselClass) -> Self {
+        let ghost = false;
         let timeline = Timeline::default();
         let slots = Slots::new(class);
-        Self { timeline, class, slots, target: None }
+        Self { ghost, timeline, class, slots, target: None }
+    }
+
+    pub fn with_ghost(mut self) -> Self {
+        self.ghost = true;
+        self
+    }
+
+    pub fn is_ghost(&self) -> bool {
+        self.ghost
+    }
+
+    pub fn set_ghost(&mut self, ghost: bool) {
+        self.ghost = ghost;
     }
 
     pub fn set_target(&mut self, target: Option<Entity>) {

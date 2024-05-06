@@ -1,4 +1,5 @@
-pub mod fuel_depletion;
-pub mod trajectory_update;
-pub mod time;
-pub mod warp_update_system;
+pub mod update_fuel;
+pub mod update_time;
+pub mod update_timeline;
+pub mod update_trajectory;
+pub mod update_warp;

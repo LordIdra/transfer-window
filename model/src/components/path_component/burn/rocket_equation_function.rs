@@ -20,6 +20,8 @@ impl RocketEquationFunction {
         Self { dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, burn_time }
     }
 
+    /// # Panics
+    /// Panics if the vessel component has no engine installed
     pub fn from_vessel_component(vessel_component: &VesselComponent) -> Self {
         let dry_mass_kg = vessel_component.dry_mass();
         let initial_fuel_mass_kg = vessel_component.remaining_fuel_kg();

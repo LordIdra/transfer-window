@@ -4,7 +4,7 @@ use transfer_window_model::{components::{orbitable_component::OrbitableComponent
 
 use crate::game::{util::add_triangle, Scene};
 
-use self::{burn::compute_burn_color, orbit::{compute_orbitable_orbit_color, compute_path_orbit_color}};
+use self::{burn::compute_burn_color, orbit::{compute_orbitable_orbit_color, compute_vessel_orbit_color}};
 
 mod burn;
 mod orbit;
@@ -63,7 +63,7 @@ fn draw_path_segments(view: &mut Scene, model: &Model, entity: Entity, camera_ce
                     continue;
                 }
                 let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
-                let color = compute_path_orbit_color(view, entity, orbit_index);
+                let color = compute_vessel_orbit_color(view, model, entity, orbit_index);
                 segment_points_data.push((points, color));
                 orbit_index += 1;
             },
@@ -91,7 +91,7 @@ fn draw_orbitable_segment(view: &mut Scene, model: &Model, entity: Entity, camer
         let absolute_parent_position = model.absolute_position(orbit.parent());
         let zoom = view.camera.zoom();
         let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
-        let color = compute_orbitable_orbit_color(view, entity);
+        let color = compute_orbitable_orbit_color(view, model, entity);
         draw_from_points(view, &points, zoom, color);
     }
 }

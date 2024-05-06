@@ -27,6 +27,10 @@ impl PathComponent {
         Self::default().with_segment(Segment::Orbit(orbit))
     }
 
+    pub fn new_with_burn(burn: Burn) -> Self {
+        Self::default().with_segment(Segment::Burn(burn))
+    }
+
     pub fn past_segments(&self) -> &Vec<Segment> {
         &self.past_segments
     }

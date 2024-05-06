@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use components::vessel_component::VesselComponent;
 use serde::{Deserialize, Serialize};
-use systems::{fuel_depletion, time::{self, TimeStep}, trajectory_update, warp_update_system::{self, TimeWarp}};
+use systems::{update_time::TimeStep, update_warp::TimeWarp};
 
 use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
@@ -69,10 +69,11 @@ impl Model {
     pub fn update(&mut self, dt: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Model update");
-        fuel_depletion::update_fuel_depletion(self);
-        warp_update_system::update(self, dt);
-        time::update(self, dt);
-        trajectory_update::update(self, dt);
+        self.update_warp(dt);
+        self.update_time(dt);
+        self.update_fuel();
+        self.update_timeline();
+        self.update_trajectory(dt);
     }
 
     pub fn entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {

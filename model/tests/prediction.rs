@@ -85,18 +85,18 @@ fn test_prediction_with_burn() {
     let vessel_start_position = vec2(0.01041e9, 0.0);
     let vessel_start_velocity = vec2(0.0, 7.250e3);
     let orbit = Orbit::new(earth, vessel_mass, earth_mass, vessel_start_position, vessel_start_velocity, 0.0);
+    let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 10000.0, 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
-        .with_path_component(PathComponent::new_with_orbit(orbit)));
+        .with_path_component(PathComponent::default()
+            .with_segment(Segment::Orbit(orbit))));
 
-        model.recompute_trajectory(vessel);
-
+        
     assert_eq!(model.path_component(vessel).future_segments().len(), 1);
-
-    let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 10000.0, 0.0);
-    let burn = Burn::new(vessel, earth, earth_mass, vessel_start_velocity.normalize(), vec2(1.0e3, 0.0), 0.0, rocket_equation_function, vessel_start_position, vessel_start_velocity);
+        
     model.path_component_mut(vessel).last_segment_mut().as_orbit_mut().unwrap().end_at(0.0);
+    let burn = Burn::new(earth, earth_mass, vessel_start_velocity.normalize(), vec2(1.0e3, 0.0), 0.0, rocket_equation_function, vessel_start_position, vessel_start_velocity);
     model.path_component_mut(vessel).add_segment(Segment::Burn(burn.clone()));
 
     let end_point = burn.end_point();

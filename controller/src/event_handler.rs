@@ -125,7 +125,7 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let _span = tracy_client::span!("Create burn");
     let model = controller.model_mut();
     
-    model.create_burn(entity, time);
+    model.create_burn(entity, time, model.rocket_equation_function_at_end_of_trajectory(entity));
 }
 
 pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {

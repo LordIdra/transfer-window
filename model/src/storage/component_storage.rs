@@ -1,6 +1,5 @@
 use std::collections::HashSet;
 
-use log::error;
 use serde::{Deserialize, Serialize};
 
 use super::entity_allocator::Entity;
@@ -41,8 +40,7 @@ impl<T> ComponentStorage<T> {
             self.entries.push(entry);
         } else {
             // This should never happen
-            error!("Detected allocator and storage desync");
-            panic!("Error recoverable, but exiting anyway before something bad happens");
+            panic!("Detected allocator and storage desync");
         }
     }
 
@@ -51,10 +49,7 @@ impl<T> ComponentStorage<T> {
         let entry = self.entries.get_mut(entity.index());
         if let Some(entry) = entry {
             if let Some(entry) = entry {
-                if entry.generation != entity.generation() {
-                    error!("Attempt to remove a component with an entity that has a different generation");
-                    panic!("Error recoverable, but exiting anyway before something bad happens");
-                }
+                assert!(entry.generation != entity.generation(), "Attempt to remove a component with an entity that has a different generation");
                 self.entities.remove(&entity);
             }
             *entry = None;
@@ -67,8 +62,7 @@ impl<T> ComponentStorage<T> {
         if let Some(t) = self.try_get_mut(entity) {
             return t;
         }
-        error!("Attempted to get nonexistant component");
-        panic!("Unrecoverable error");
+        panic!("Attempted to get nonexistant component");
     }
 
     /// # Panics
@@ -77,8 +71,7 @@ impl<T> ComponentStorage<T> {
         if let Some(t) = self.try_get(entity) {
             return t;
         }
-        error!("Attempted to get nonexistant component");
-        panic!("Unrecoverable error");
+        panic!("Attempted to get nonexistant component");
     }
 
     pub fn try_get_mut(&mut self, entity: Entity) -> Option<&mut T> {

@@ -1,31 +1,45 @@
-use nalgebra_glm::{vec2, DMat2, DVec2};
 use serde::{Deserialize, Serialize};
 
-use crate::components::{path_component::burn::rocket_equation_function::RocketEquationFunction, vessel_component::{system_slot::SlotLocation, VesselClass, VesselComponent}};
+use crate::{components::{path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{system_slot::SlotLocation, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
-#[derive(Debug, Serialize, Deserialize)]
+const TIME_BEFORE_BURN_START: f64 = 0.1;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FireTorpedoEvent {
-    slot_location: SlotLocation, 
-    rocket_equation_function: RocketEquationFunction,
-    tangent: DVec2,
-    delta_v: DVec2,
+    ghost: Entity,
+    slot_location: SlotLocation,
+    burn_time: f64,
 }
 
 impl FireTorpedoEvent {
-    pub fn new(slot_location: SlotLocation, velocity: DVec2) -> Self {
+    pub fn new(model: &mut Model, fire_from: Entity, time: f64, slot_location: SlotLocation) -> Self {
+        let fire_from_orbit = model.orbit_at_time(fire_from, time);
+        let point_at_time = fire_from_orbit.point_at_time(time);
+        let parent_mass = model.mass_at_time(fire_from_orbit.parent(), time);
+        let burn_time = time + TIME_BEFORE_BURN_START;
         let rocket_equation_function = RocketEquationFunction::from_vessel_component(&VesselComponent::new(VesselClass::Torpedo));
-        let tangent = velocity.normalize();
-        let delta_v = vec2(0.0, 0.0);
-        Self { slot_location, rocket_equation_function, tangent, delta_v }
+        let orbit = Orbit::new(
+            fire_from_orbit.parent(), rocket_equation_function.mass(), parent_mass, 
+            point_at_time.position(), point_at_time.velocity(), time);
+        let mut vessel_component = VesselComponent::new(VesselClass::Torpedo).with_ghost();
+        vessel_component.set_target(model.vessel_component(fire_from).target);
+        let ghost = model.allocate(EntityBuilder::default()
+            .with_path_component(PathComponent::new_with_orbit(orbit))
+            .with_vessel_component(vessel_component));
+        model.recompute_trajectory(ghost);
+        model.create_burn(ghost, burn_time, rocket_equation_function);
+        Self { ghost, slot_location, burn_time }
     }
 
-    pub fn rotation_matrix(&self) -> DMat2 {
-        DMat2::new(
-            self.tangent.x, -self.tangent.y, 
-            self.tangent.y, self.tangent.x)
+    pub fn ghost(&self) -> Entity {
+        self.ghost
+    }
+    
+    pub fn burn_time(&self) -> f64 {
+        self.burn_time
     }
 
-    pub fn adjust(&mut self, adjustment: DVec2) {
-        self.delta_v += adjustment;
+    pub fn execute(&self, model: &mut Model) {
+        model.vessel_component_mut(self.ghost).set_ghost(false);
     }
 }

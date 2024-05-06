@@ -1,10 +1,12 @@
+use std::collections::VecDeque;
+
 use serde::{Deserialize, Serialize};
 
 use self::fire_torpedo::FireTorpedoEvent;
 
 pub mod fire_torpedo;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TimelineEventType {
     FireTorpedo(FireTorpedoEvent),
 }
@@ -31,7 +33,7 @@ impl TimelineEventType {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TimelineEvent {
     time: f64,
     type_: TimelineEventType,
@@ -57,12 +59,12 @@ impl TimelineEvent {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Timeline {
-    events: Vec<TimelineEvent>,
+    events: VecDeque<TimelineEvent>,
 }
 
 impl Timeline {
     pub fn add(&mut self, event: TimelineEvent) {
-        self.events.push(event);
+        self.events.push_back(event);
     }
 
     pub fn fire_torpedo_events(&self) -> Vec<&TimelineEvent> {
@@ -72,20 +74,19 @@ impl Timeline {
     }
 
     pub fn event_at_time(&self, time: f64) -> Option<&TimelineEvent> {
-        for event in &self.events {
-            if event.time == time {
-                return Some(event);
-            }
-        }
-        None
+        self.events.iter().find(|event| event.time == time)
     }
 
     pub fn event_at_time_mut(&mut self, time: f64) -> Option<&mut TimelineEvent> {
-        for event in &mut self.events {
-            if event.time == time {
-                return Some(event);
-            }
+        self.events.iter_mut().find(|event| event.time == time)
+    }
+
+    #[allow(clippy::missing_panics_doc)]
+    pub fn pop_events_before(&mut self, time: f64) -> Vec<TimelineEvent> {
+        let mut events = vec![];
+        while self.events.front().is_some_and(|event| event.time < time) {
+            events.push(self.events.pop_front().unwrap());
         }
-        None
+        events
     }
 }

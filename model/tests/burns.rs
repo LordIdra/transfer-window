@@ -59,7 +59,7 @@ fn test_create_burn_with_zero_dv() {
     let mass_before = model.mass_at_time(vessel, time);
     let position_before = model.position_at_time(vessel, time);
     let velocity_before = model.velocity_at_time(vessel, time);
-    model.create_burn(vessel, 100.0);
+    model.create_burn(vessel, 100.0, model.rocket_equation_function_at_end_of_trajectory(vessel));
     let mass_after = model.mass_at_time(vessel, time);
     let position_after = model.position_at_time(vessel, time);
     let velocity_after = model.velocity_at_time(vessel, time);
@@ -102,7 +102,7 @@ fn test_create_and_adjust_burn() {
     assert!(model.can_create_burn(vessel));
     
     let burn_time = 100.0;
-    model.create_burn(vessel, burn_time);
+    model.create_burn(vessel, burn_time, model.rocket_equation_function_at_end_of_trajectory(vessel));
     model.burn_starting_at_time(vessel, burn_time); // just to make sure empty burns can be acquired
     model.adjust_burn(vessel, burn_time, vec2(150.0, 0.0));
 

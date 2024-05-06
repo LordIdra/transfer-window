@@ -23,16 +23,24 @@ pub enum Selected {
 }
 
 impl Selected {
-    pub fn selected_entity(&self) -> Option<Entity> {
+    pub fn entity(&self, model: &Model) -> Option<Entity> {
         match self {
             Selected::None => None,
+            Selected::FireTorpedo { entity, time, state: _ } => Some(model.fire_torpedo_event_at_time(*entity, *time).expect("No fire torpedo event at time").ghost()),
             Selected::Orbitable(entity) 
                 | Selected::Vessel(entity) 
                 | Selected::Burn { entity, time: _, state: _ }
-                | Selected::Point { entity, time: _ }
-                | Selected::FireTorpedo { entity, time: _, state: _ }
-                => Some(*entity),
+                | Selected::Point { entity, time: _ } => Some(*entity),
         }
+    }
+
+    pub fn target(&self, model: &Model) -> Option<Entity> {
+        if let Some(entity) = self.entity(model) {
+            if let Some(vessel_component) = model.try_vessel_component(entity) {
+                return vessel_component.target();
+            }
+        }
+        None
     }
 }
 
@@ -60,9 +68,9 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
     }
 
     match view.selected.clone() {
-        Selected::None => (),
-        Selected::Orbitable(_) => (),
-        Selected::Vessel(_) => (),
+        Selected::None 
+            | Selected::Orbitable(_) 
+            | Selected::Vessel(_) => (),
         Selected::Point { entity: _, time: _ } => segment_point::draw_selected(view, model),
         Selected::Burn { entity: _, time: _, state: _ } => burn::update_drag(view, model, context, events, &pointer),
         Selected::FireTorpedo { entity: _, time: _, state: _ } => fire_torpedo::update_drag(view, model, context, events, &pointer),

@@ -3,7 +3,7 @@ use nalgebra_glm::{vec2, DVec2};
 use crate::{components::path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model};
 
 impl Model {
-    fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
+    pub fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
         if let Some(burn) = self.path_component(entity).final_burn() {
             return burn.rocket_equation_function_at_end_of_burn()
         }
@@ -17,7 +17,7 @@ impl Model {
         self.recompute_trajectory(entity);
     }
 
-    pub fn create_burn(&mut self, entity: Entity, time: f64) {
+    pub fn create_burn(&mut self, entity: Entity, time: f64, rocket_equation_function: RocketEquationFunction) {
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);
 
@@ -25,9 +25,8 @@ impl Model {
         let tangent = path_component.last_segment().end_velocity().normalize();
         let start_position = path_component.last_segment().end_position();
         let start_velocity = path_component.last_segment().end_velocity();
-        let rocket_equation_function = self.rocket_equation_function_at_end_of_trajectory(entity);
         let parent_mass = self.mass(parent);
-        let burn = Burn::new(entity, parent, parent_mass, tangent, vec2(0.0, 0.0), time, rocket_equation_function, start_position, start_velocity);
+        let burn = Burn::new(parent, parent_mass, tangent, vec2(0.0, 0.0), time, rocket_equation_function, start_position, start_velocity);
 
         let end_point = burn.end_point();
         let orbit = Orbit::new(parent, end_point.mass(), parent_mass, end_point.position(), end_point.velocity(), end_point.time());

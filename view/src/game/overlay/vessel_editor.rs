@@ -21,10 +21,6 @@ impl VesselEditor {
     pub fn new(entity: Entity) -> VesselEditor {
         Self { entity, slot_editor: None }
     }
-
-    pub fn entity(&self) -> Entity {
-        self.entity
-    }
 }
 
 /// Returns whether the close button was clicked

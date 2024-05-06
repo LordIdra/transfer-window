@@ -11,13 +11,6 @@ pub fn update(view: &mut Scene, model: &Model) {
             view.camera.set_focus(None);
         }
     }
-    
-    // Delete selected if its entity no longer exists
-    if let Some(entity) = view.selected.selected_entity() {
-        if !model.entity_exists(entity) {
-            view.selected = Selected::None;
-        }
-    }
 
     // Remove selected point if expired
     if let Selected::Point { entity: _, time } = view.selected.clone() {
@@ -39,21 +32,14 @@ pub fn update(view: &mut Scene, model: &Model) {
     if let Selected::FireTorpedo { entity, time, state: _ } = view.selected.clone() {
         if model.fire_torpedo_event_at_time(entity, time).is_none() || time < model.time() {
             trace!("Selected fire torpedo event expired at time={time}");
-            view.selected = Selected::None
+            view.selected = Selected::None;
         }
     }
 
-    // Delete current menu if the entity no longer exists
-    if let Some(entity) = view.right_click_menu {
+    // Delete selected if its entity no longer exists
+    if let Some(entity) = view.selected.entity(model) {
         if !model.entity_exists(entity) {
-            view.right_click_menu = None;
-        }
-    }
-
-    // Delete current vessel editor if the entity no longer exists
-    if let Some(vessel_editor) = view.vessel_editor.as_ref() {
-        if !model.entity_exists(vessel_editor.entity()) {
-            view.vessel_editor = None;
+            view.selected = Selected::None;
         }
     }
 }
