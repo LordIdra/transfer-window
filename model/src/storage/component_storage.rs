@@ -49,7 +49,7 @@ impl<T> ComponentStorage<T> {
         let entry = self.entries.get_mut(entity.index());
         if let Some(entry) = entry {
             if let Some(entry) = entry {
-                assert!(entry.generation != entity.generation(), "Attempt to remove a component with an entity that has a different generation");
+                assert!(entry.generation == entity.generation(), "Attempt to remove a component with an entity that has a different generation");
                 self.entities.remove(&entity);
             }
             *entry = None;
