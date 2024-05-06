@@ -35,9 +35,7 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
                 Selected::Vessel(entity) => {
                     events.push(Event::Destroy { entity });
                 }
-                Selected::Burn { entity, time, .. } => {
-                    events.push(Event::DeleteBurn { entity, time });
-                }
+                // TODO do this for burns
                 _ => {
                     view.selected = Selected::None;
                 }
