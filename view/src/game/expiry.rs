@@ -37,7 +37,7 @@ pub fn update(view: &mut Scene, model: &Model) {
 
     // Remove selected fire torpedo event if expired
     if let Selected::FireTorpedo { entity, time, state: _ } = view.selected.clone() {
-        if model.timeline_event_at_time(entity, time).is_none() || time < model.time() {
+        if model.fire_torpedo_event_at_time(entity, time).is_none() || time < model.time() {
             trace!("Selected fire torpedo event expired at time={time}");
             view.selected = Selected::None
         }

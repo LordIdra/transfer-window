@@ -5,10 +5,12 @@ use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::Scene};
 
-use self::burn::BurnState;
+use self::util::BurnState;
 
 pub mod burn;
+pub mod fire_torpedo;
 pub mod segment_point;
+pub mod util;
 
 #[derive(Debug, Clone)]
 pub enum Selected {
@@ -58,8 +60,11 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
     }
 
     match view.selected.clone() {
+        Selected::None => (),
+        Selected::Orbitable(_) => (),
+        Selected::Vessel(_) => (),
         Selected::Point { entity: _, time: _ } => segment_point::draw_selected(view, model),
         Selected::Burn { entity: _, time: _, state: _ } => burn::update_drag(view, model, context, events, &pointer),
-        _ => ()
+        Selected::FireTorpedo { entity: _, time: _, state: _ } => fire_torpedo::update_drag(view, model, context, events, &pointer),
     }
 }

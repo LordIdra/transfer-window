@@ -127,11 +127,11 @@ impl VesselComponent {
         !self.class.is_torpedo()
     }
 
-    pub fn add_timeline_event(&mut self, event: TimelineEvent) {
-        self.timeline.add(event);
-    }
-
     pub fn timeline(&self) -> &Timeline {
         &self.timeline
+    }
+
+    pub fn timeline_mut(&mut self) -> &mut Timeline {
+        &mut self.timeline
     }
 }

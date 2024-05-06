@@ -166,14 +166,20 @@ pub fn set_slot(controller: &mut Controller, entity: Entity, location: SlotLocat
     let model = controller.model_mut();
 
     model.set_slot(entity, location, slot);
-    model.recompute_entire_trajectory(entity);
 }
 
 pub fn create_fire_torpedo(controller: &mut Controller, entity: Entity, location: SlotLocation, time: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Fire torpedo");
-
     let model = controller.model_mut();
 
     model.add_fire_torpedo_event(entity, location, time);
+}
+
+pub fn adjust_fire_torpedo(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Adjust burn");
+    let model = controller.model_mut();
+    
+    model.adjust_fire_torpedo_event(entity, time, amount);
 }

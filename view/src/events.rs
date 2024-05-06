@@ -17,5 +17,6 @@ pub enum Event {
     Destroy { entity: Entity },
     SetTarget { entity: Entity, target: Option<Entity> },
     SetSlot { entity: Entity, slot_location: SlotLocation, slot: Slot },
-    ScheduleFireTorpedo { entity: Entity, slot_location: SlotLocation, time: f64 }
+    CreateFireTorpedo { entity: Entity, slot_location: SlotLocation, time: f64 },
+    AdjustFireTorpedo { entity: Entity, time: f64, amount: DVec2 },
 }

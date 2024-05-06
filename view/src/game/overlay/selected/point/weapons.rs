@@ -15,7 +15,7 @@ fn draw_fire(view: &mut Scene, ui: &mut Ui, center: Pos2, vessel_component: &Ves
         };
         let image_button = ImageButton::new(view.resources.texture_image(texture));
         if ui.add_enabled(vessel_component.has_target(), image_button).clicked() {
-            let event = Event::ScheduleFireTorpedo { entity, slot_location, time };
+            let event = Event::CreateFireTorpedo { entity, slot_location, time };
             events.push(event);
         }
     });

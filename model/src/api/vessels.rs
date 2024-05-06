@@ -1,4 +1,4 @@
-use crate::{components::vessel_component::{system_slot::{Slot, SlotLocation}, timeline::TimelineEvent}, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::{system_slot::{Slot, SlotLocation}, timeline::fire_torpedo::FireTorpedoEvent}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     pub fn set_slot(&mut self, entity: Entity, location: SlotLocation, slot: Slot) {
@@ -6,8 +6,12 @@ impl Model {
         self.recompute_entire_trajectory(entity);
     }
 
-    pub fn timeline_event_at_time(&self, entity: Entity, time: f64) -> Option<&TimelineEvent> {
-        self.vessel_component(entity).timeline().event_at_time(time)
+    pub fn fire_torpedo_event_at_time(&self, entity: Entity, time: f64) -> Option<&FireTorpedoEvent> {
+        self.vessel_component(entity).timeline().event_at_time(time)?.type_().as_fire_torpedo()
+    }
+
+    pub fn fire_torpedo_event_at_time_mut(&mut self, entity: Entity, time: f64) -> Option<&mut FireTorpedoEvent> {
+        self.vessel_component_mut(entity).timeline_mut().event_at_time_mut(time)?.type_mut().as_fire_torpedo_mut()
     }
 
     pub fn target(&self, entity: Entity) -> Option<Entity> {

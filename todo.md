@@ -75,8 +75,10 @@
 - [1|x] Click button to confirm fire
 - [1|x] Allow deselecting objects
 - [1|x] Show target on all selected objects
-- [1| ] Spawn new torpedo at ship location
-- [1| ] Can plan initial trajectory before firing
+- [1| ] Can adjust initial trajectory before firing
+- [1| ] Allow deleting fire torpedo events
+- [1| ] Preview of initial trajectory
+- [1| ] Spawn new torpedo at ship location with trajectory
 - [1| ] Torpedo stockpile
 - [1| ] Torpedo launcher needs to re-arm
 - [1| ] Yeet torpedo target when torpedo gets close enough

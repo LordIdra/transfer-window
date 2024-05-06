@@ -41,9 +41,6 @@ impl Model {
     /// Panics if there is no burn at the specified time
     pub fn adjust_burn(&mut self, entity: Entity, time: f64, amount: DVec2) {
         let path_component = self.path_component_mut(entity);
-        // The reason we do start time instead of end time is because a burn could have a duration of 0
-        // This would mean we have eg (orbit 0.0 <-> 100) then (burn 100 <-> 100) then (orbit 100 <-> 160)
-        // In this case we'd have to be careful to remove only the orbit starting at 100, which is difficult
         let mut burn = path_component.future_segment_starting_at_time(time)
             .unwrap_or_else(|| panic!("Burn not found at time {time}"))
             .as_burn()

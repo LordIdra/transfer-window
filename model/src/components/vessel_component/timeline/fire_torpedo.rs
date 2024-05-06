@@ -24,4 +24,8 @@ impl FireTorpedoEvent {
             self.tangent.x, -self.tangent.y, 
             self.tangent.y, self.tangent.x)
     }
+
+    pub fn adjust(&mut self, adjustment: DVec2) {
+        self.delta_v += adjustment;
+    }
 }

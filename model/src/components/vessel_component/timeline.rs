@@ -21,6 +21,14 @@ impl TimelineEventType {
             None
         }
     }
+
+    pub fn as_fire_torpedo_mut(&mut self) -> Option<&mut FireTorpedoEvent> {
+        if let TimelineEventType::FireTorpedo(fire_torpedo) = self {
+            Some(fire_torpedo)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -40,6 +48,10 @@ impl TimelineEvent {
 
     pub fn type_(&self) -> &TimelineEventType {
         &self.type_
+    }
+
+    pub fn type_mut(&mut self) -> &mut TimelineEventType {
+        &mut self.type_
     }
 }
 
@@ -61,6 +73,15 @@ impl Timeline {
 
     pub fn event_at_time(&self, time: f64) -> Option<&TimelineEvent> {
         for event in &self.events {
+            if event.time == time {
+                return Some(event);
+            }
+        }
+        None
+    }
+
+    pub fn event_at_time_mut(&mut self, time: f64) -> Option<&mut TimelineEvent> {
+        for event in &mut self.events {
             if event.time == time {
                 return Some(event);
             }

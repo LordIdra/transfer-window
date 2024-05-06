@@ -1,57 +1,11 @@
 use eframe::egui::{Context, PointerState, Pos2};
 use log::trace;
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::DVec2;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::{underlay::selected::Selected, util::compute_burn_arrow_position, Scene}};
 
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum BurnAdjustDirection {
-    Prograde,
-    Retrograde,
-    Normal,
-    Antinormal,
-}
-
-impl BurnAdjustDirection {
-    pub fn vector(self) -> DVec2 {
-        match self {
-            BurnAdjustDirection::Prograde => vec2(1.0, 0.0),
-            BurnAdjustDirection::Retrograde => vec2(-1.0, 0.0),
-            BurnAdjustDirection::Normal => vec2(0.0, 1.0),
-            BurnAdjustDirection::Antinormal => vec2(0.0, -1.0),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum BurnState {
-    Selected,
-    Adjusting,
-    Dragging(BurnAdjustDirection)
-}
-
-impl BurnState {
-    pub fn is_selected(&self) -> bool {
-        matches!(self, Self::Selected)
-    }
-
-    pub fn is_adjusting(&self) -> bool {
-        matches!(self, Self::Adjusting)
-    }
-
-    pub fn is_dragging(&self) -> bool {
-        matches!(self, Self::Dragging(_))
-    }
-}
-
-fn burn_adjustment_amount(amount: f64) -> f64 {
-    if amount.is_sign_positive() {
-        1.0e-8 * amount.powf(2.5)
-    } else {
-        1.0e3 * amount
-    }
-}
+use super::util::{burn_adjustment_amount, BurnAdjustDirection, BurnState};
 
 fn compute_drag_adjustment_amount(view: &mut Scene, model: &Model, context: &Context, entity: Entity, time: f64, direction: BurnAdjustDirection, mouse_position: Pos2) -> DVec2 {
     let burn = model.burn_starting_at_time(entity, time);

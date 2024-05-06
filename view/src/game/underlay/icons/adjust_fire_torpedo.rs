@@ -1,9 +1,9 @@
 use eframe::egui::{PointerState, Rect};
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::vessel_component::timeline::{fire_torpedo::FireTorpedoEvent, TimelineEvent}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, util::compute_adjust_fire_torpedo_arrow_position, Scene};
+use crate::game::{underlay::selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_adjust_fire_torpedo_arrow_position, Scene};
 
 use super::Icon;
 
@@ -25,9 +25,8 @@ pub struct AdjustFireTorpedo {
 
 impl AdjustFireTorpedo {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
-        let event = model.timeline_event_at_time(entity, time).expect("Fire torpedo timeline event does not exist");
-        let fire_torpedo_event = event.type_().as_fire_torpedo().expect("Event is not a fire torpedo event");
-        let event_to_arrow_unit = fire_torpedo_event.rotation_matrix() * direction.vector();
+        let event = model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
+        let event_to_arrow_unit = event.rotation_matrix() * direction.vector();
         let mut position = compute_adjust_fire_torpedo_arrow_position(view, model, entity, time, direction);
 
         // Additional offset if arrow is being dragged
@@ -59,14 +58,6 @@ impl AdjustFireTorpedo {
             }
         }
         icons
-    }
-
-    fn event<'a>(&self, model: &'a Model) -> &'a TimelineEvent {
-        model.timeline_event_at_time(self.entity, self.time).expect("Fire torpedo timeline event does not exist")
-    }
-
-    fn fire_torpedo_event<'a>(&self, model: &'a Model) -> &'a FireTorpedoEvent {
-        self.event(model).type_().as_fire_torpedo().expect("Event is not a fire torpedo event")
     }
 }
 
@@ -108,7 +99,8 @@ impl Icon for AdjustFireTorpedo {
     }
 
     fn facing(&self, _view: &Scene, model: &Model) -> Option<DVec2> {
-        Some(self.fire_torpedo_event(model).rotation_matrix() * self.direction.vector())
+        let event = model.fire_torpedo_event_at_time(self.entity, self.time).expect("No fire torpedo event found");
+        Some(event.rotation_matrix() * self.direction.vector())
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
