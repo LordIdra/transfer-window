@@ -1,6 +1,7 @@
+use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use crate::{components::{path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{system_slot::SlotLocation, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{system_slot::SlotLocation, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 const TIME_BEFORE_BURN_START: f64 = 0.1;
 
@@ -16,19 +17,35 @@ impl FireTorpedoEvent {
         let fire_from_orbit = model.orbit_at_time(fire_from, time);
         let point_at_time = fire_from_orbit.point_at_time(time);
         let parent_mass = model.mass_at_time(fire_from_orbit.parent(), time);
-        let burn_time = time + TIME_BEFORE_BURN_START;
         let rocket_equation_function = RocketEquationFunction::from_vessel_component(&VesselComponent::new(VesselClass::Torpedo));
         let orbit = Orbit::new(
             fire_from_orbit.parent(), rocket_equation_function.mass(), parent_mass, 
             point_at_time.position(), point_at_time.velocity(), time);
+
         let mut vessel_component = VesselComponent::new(VesselClass::Torpedo).with_ghost();
         vessel_component.set_target(model.vessel_component(fire_from).target);
         let ghost = model.allocate(EntityBuilder::default()
+            .with_name_component(NameComponent::new("Torpedo".to_string()))
             .with_path_component(PathComponent::new_with_orbit(orbit))
             .with_vessel_component(vessel_component));
+        
+        let burn_time = time + TIME_BEFORE_BURN_START;
         model.recompute_trajectory(ghost);
         model.create_burn(ghost, burn_time, rocket_equation_function);
+
         Self { ghost, slot_location, burn_time }
+    }
+
+    pub fn execute(&self, model: &mut Model) {
+        model.vessel_component_mut(self.ghost).set_ghost(false);
+    }
+
+    pub fn cancel(&self, model: &mut Model) {
+        model.deallocate(self.ghost);
+    }
+
+    pub fn adjust(&self, model: &mut Model, amount: DVec2) {
+        model.adjust_burn(self.ghost(), self.burn_time(), amount);
     }
 
     pub fn ghost(&self) -> Entity {
@@ -39,7 +56,4 @@ impl FireTorpedoEvent {
         self.burn_time
     }
 
-    pub fn execute(&self, model: &mut Model) {
-        model.vessel_component_mut(self.ghost).set_ghost(false);
-    }
 }

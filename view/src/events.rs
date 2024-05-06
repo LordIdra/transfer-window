@@ -12,11 +12,11 @@ pub enum Event {
     DecreaseTimeStepLevel,
     StartWarp { end_time: f64 },
     CreateBurn { entity: Entity, time: f64 },
-    DeleteBurn { entity: Entity, time: f64 },
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
     Destroy { entity: Entity },
     SetTarget { entity: Entity, target: Option<Entity> },
     SetSlot { entity: Entity, slot_location: SlotLocation, slot: Slot },
     CreateFireTorpedo { entity: Entity, slot_location: SlotLocation, time: f64 },
     AdjustFireTorpedo { entity: Entity, time: f64, amount: DVec2 },
+    CancelLastTimelineEvent { entity: Entity },
 }

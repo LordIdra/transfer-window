@@ -17,14 +17,10 @@ impl Burn {
     pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::VesselComponent]) {
-            // Find the last burn that's not in progress
-            // Previous burns will have a locked icon so we don't want to render those
-            for burn in model.path_component(entity).future_burns().iter().rev() {
-                let time = burn.start_point().time();
-                if time > model.time() {
-                    let icon = Self { entity, time };
+            for event in model.vessel_component(entity).timeline().events() {
+                if event.type_().is_burn() {
+                    let icon = Self { entity, time: event.time() };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
-                    break
                 }
             }
         }
@@ -33,8 +29,12 @@ impl Burn {
 }
 
 impl Icon for Burn {
-    fn texture(&self, _view: &Scene, _model: &Model) -> String {
-        "burn".to_string()
+    fn texture(&self, _view: &Scene, model: &Model) -> String {
+        if model.can_modify_timeline_event(self.entity, self.time) {
+            "burn".to_string()
+        } else {
+            "burn-locked".to_string()
+        }
     }
 
     fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
@@ -82,13 +82,13 @@ impl Icon for Burn {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &mut Scene, model: &Model, pointer: &PointerState) {
         if !pointer.primary_clicked() {
             return;
         }
         
         if let Selected::Burn { entity, time, state } = &mut view.selected {
-            if *entity == self.entity && *time == self.time {
+            if *entity == self.entity && *time == self.time && model.can_modify_timeline_event(self.entity, self.time) {
                 if state.is_selected() {
                     trace!("Burn icon clicked; switching Selected -> Adjusting");
                     *state = BurnState::Adjusting;

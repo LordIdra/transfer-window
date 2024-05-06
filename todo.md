@@ -75,10 +75,13 @@
 - [1|x] Click button to confirm fire
 - [1|x] Allow deselecting objects
 - [1|x] Show target on all selected objects
-- [1| ] Can adjust initial trajectory before firing
-- [1| ] Allow deleting fire torpedo events
-- [1| ] Preview of initial trajectory
-- [1| ] Spawn new torpedo at ship location with trajectory
+- [1|x] Can adjust initial trajectory before firing
+- [1|x] Preview of initial trajectory
+- [1|x] Spawn new torpedo at ship location with trajectory
+- [1|x] Allow deleting and warping to fire torpedo events
+- [1|x] Update deletion logic for burns and launch events
+- [1| ] Disallow creating events before last event
+- [1| ] Disallow cancelling torpedo launch event is torpedo has events queued???
 - [1| ] Torpedo stockpile
 - [1| ] Torpedo launcher needs to re-arm
 - [1| ] Yeet torpedo target when torpedo gets close enough
@@ -95,6 +98,7 @@
 - [1| ] Hide all child icons and segments of object when zoomed out far enough
 - [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
 - [1| ] Show orbital parameters
+- [1| ] Only allow one of each event to prevent double-clicks in a frame causing unexpected behaviour
 
 # On TODO list
 - [1| ] Ballistic weaponry

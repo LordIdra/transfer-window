@@ -5,5 +5,5 @@ pub mod quantities;
 pub mod segments;
 pub mod vessels;
 pub mod time;
-pub mod torpedo;
+pub mod timeline;
 pub mod trajectories;

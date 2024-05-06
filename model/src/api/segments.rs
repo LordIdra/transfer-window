@@ -3,7 +3,7 @@ use nalgebra_glm::{vec2, DVec2};
 use crate::{components::path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model};
 
 impl Model {
-    pub fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
+    pub(crate) fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
         if let Some(burn) = self.path_component(entity).final_burn() {
             return burn.rocket_equation_function_at_end_of_burn()
         }
@@ -11,20 +11,15 @@ impl Model {
         RocketEquationFunction::from_vessel_component(self.vessel_component(entity))
     }
 
-    pub fn delete_segments_after_time_and_recompute_trajectory(&mut self, entity: Entity, time: f64) {
-        let path_component = self.path_component_mut(entity);
-        path_component.remove_segments_after(time);
-        self.recompute_trajectory(entity);
-    }
-
-    pub fn create_burn(&mut self, entity: Entity, time: f64, rocket_equation_function: RocketEquationFunction) {
+    pub(crate) fn create_burn(&mut self, entity: Entity, time: f64, rocket_equation_function: RocketEquationFunction) {
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);
 
-        let parent = path_component.last_segment().parent();
-        let tangent = path_component.last_segment().end_velocity().normalize();
-        let start_position = path_component.last_segment().end_position();
-        let start_velocity = path_component.last_segment().end_velocity();
+        let last_segment = path_component.last_segment();
+        let parent = last_segment.parent();
+        let tangent = last_segment.end_velocity().normalize();
+        let start_position = last_segment.end_position();
+        let start_velocity = last_segment.end_velocity();
         let parent_mass = self.mass(parent);
         let burn = Burn::new(parent, parent_mass, tangent, vec2(0.0, 0.0), time, rocket_equation_function, start_position, start_velocity);
 
@@ -36,35 +31,31 @@ impl Model {
         self.recompute_trajectory(entity);
     }
 
+    pub(crate) fn delete_burn(&mut self, entity: Entity, time: f64) {
+        let path_component = self.path_component_mut(entity);
+        path_component.remove_segments_after(time);
+        self.recompute_trajectory(entity);
+    }
+
     /// # Panics
     /// Panics if there is no burn at the specified time
-    pub fn adjust_burn(&mut self, entity: Entity, time: f64, amount: DVec2) {
-        let path_component = self.path_component_mut(entity);
-        let mut burn = path_component.future_segment_starting_at_time(time)
-            .unwrap_or_else(|| panic!("Burn not found at time {time}"))
-            .as_burn()
-            .unwrap_or_else(|| panic!("Burn not found at time {time}"))
-            .clone();
-        path_component.remove_segments_after(burn.start_point().time());
-        burn.adjust(amount);
+    pub(crate) fn adjust_burn(&mut self, entity: Entity, time: f64, amount: DVec2) {
+        let mut burn = self.burn_starting_at_time(entity, time).clone();
         let mass = burn.end_point().mass();
-        path_component.add_segment(Segment::Burn(burn));
+        burn.adjust(amount);
 
-        let end_segment = path_component.last_segment();
-        let parent = end_segment.parent();
-        let position = end_segment.end_position();
-        let velocity = end_segment.end_velocity();
+        let parent = burn.parent();
+        let position = burn.end_point().position();
+        let velocity = burn.end_point().velocity();
         let parent_mass = self.mass(parent);
-
-        // Needs to be recalculated after we adjust the burn
-        let end_time = self.path_component_mut(entity)
-            .future_segment_starting_at_time(time)
-            .unwrap_or_else(|| panic!("Burn not found at time {time}"))
-            .end_time();
-
+        let end_time = burn.end_point().time();
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
 
-        self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
+        let path_component = self.path_component_mut(entity);
+        path_component.remove_segments_after(burn.start_point().time());
+        path_component.add_segment(Segment::Burn(burn));
+        path_component.add_segment(Segment::Orbit(orbit));
+
         self.recompute_trajectory(entity);
     }
 

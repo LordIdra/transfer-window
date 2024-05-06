@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{burn::BurnEvent, fire_torpedo::FireTorpedoEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -120,20 +120,21 @@ pub fn start_warp(controller: &mut Controller, end_time: f64) {
     controller.model_mut().start_warp(end_time);
 }
 
+pub fn cancel_last_event(controller: &mut Controller, entity: Entity) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Cancel last event");
+    let model = controller.model_mut();
+    
+    model.cancel_last_event(entity);
+}
+
 pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Create burn");
     let model = controller.model_mut();
     
-    model.create_burn(entity, time, model.rocket_equation_function_at_end_of_trajectory(entity));
-}
-
-pub fn delete_burn(controller: &mut Controller, entity: Entity, time: f64) {
-    #[cfg(feature = "profiling")]
-    let _span = tracy_client::span!("Delete burn");
-    let model = controller.model_mut();
-    
-    model.delete_segments_after_time_and_recompute_trajectory(entity, time);
+    let event_type = TimelineEventType::Burn(BurnEvent::new(model, entity, time));
+    model.add_event(entity, TimelineEvent::new(time, event_type));
 }
 
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
@@ -141,7 +142,11 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let _span = tracy_client::span!("Adjust burn");
     let model = controller.model_mut();
     
-    model.adjust_burn(entity, time, amount);
+    model.event_at_time(entity, time)
+        .type_()
+        .as_burn()
+        .unwrap()
+        .adjust(model, amount);
 }
 
 pub fn destroy(controller: &mut Controller, entity: Entity) {
@@ -173,7 +178,8 @@ pub fn create_fire_torpedo(controller: &mut Controller, entity: Entity, location
     let _span = tracy_client::span!("Fire torpedo");
     let model = controller.model_mut();
 
-    model.add_fire_torpedo_event(entity, location, time);
+    let event_type = TimelineEventType::FireTorpedo(FireTorpedoEvent::new(model, entity, time, location));
+    model.add_event(entity, TimelineEvent::new(time, event_type));
 }
 
 pub fn adjust_fire_torpedo(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
@@ -181,5 +187,9 @@ pub fn adjust_fire_torpedo(controller: &mut Controller, entity: Entity, time: f6
     let _span = tracy_client::span!("Adjust burn");
     let model = controller.model_mut();
     
-    model.adjust_fire_torpedo_event(entity, time, amount);
+    model.event_at_time(entity, time)
+        .type_()
+        .as_fire_torpedo()
+        .unwrap()
+        .adjust(model, amount);
 }

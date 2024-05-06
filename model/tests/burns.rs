@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{burn::BurnEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_burn_without_engine_or_fuel_tank() {
@@ -59,7 +59,10 @@ fn test_create_burn_with_zero_dv() {
     let mass_before = model.mass_at_time(vessel, time);
     let position_before = model.position_at_time(vessel, time);
     let velocity_before = model.velocity_at_time(vessel, time);
-    model.create_burn(vessel, 100.0, model.rocket_equation_function_at_end_of_trajectory(vessel));
+
+    let event_type = TimelineEventType::Burn(BurnEvent::new(&mut model, vessel, time));
+    model.add_event(vessel, TimelineEvent::new(time, event_type));
+
     let mass_after = model.mass_at_time(vessel, time);
     let position_after = model.position_at_time(vessel, time);
     let velocity_after = model.velocity_at_time(vessel, time);
@@ -102,9 +105,15 @@ fn test_create_and_adjust_burn() {
     assert!(model.can_create_burn(vessel));
     
     let burn_time = 100.0;
-    model.create_burn(vessel, burn_time, model.rocket_equation_function_at_end_of_trajectory(vessel));
+    let dv = vec2(150.0, 0.0);
+    let event_type = TimelineEventType::Burn(BurnEvent::new(&mut model, vessel, burn_time));
+    model.add_event(vessel, TimelineEvent::new(burn_time, event_type));
     model.burn_starting_at_time(vessel, burn_time); // just to make sure empty burns can be acquired
-    model.adjust_burn(vessel, burn_time, vec2(150.0, 0.0));
+    model.event_at_time(vessel, burn_time)
+        .type_()
+        .as_burn()
+        .unwrap()
+        .adjust(&mut model, dv);
 
     let burn = model.burn_starting_at_time(vessel, burn_time);
     let start_time = burn.start_point().time();
@@ -113,7 +122,7 @@ fn test_create_and_adjust_burn() {
 
     let velocity_before = model.velocity_at_time(vessel, start_time - 1.0);
     let velocity_after = model.velocity_at_time(vessel, end_time + 1.0);
-    assert!(((velocity_before.magnitude() - velocity_after.magnitude()).abs() - 150.0) < 1.0e-3);
+    assert!(((velocity_before.magnitude() - velocity_after.magnitude()).abs() - dv.magnitude()) < 1.0e-3);
 
     let mass_before = model.mass_at_time(vessel, start_time - 1.0);
     let mass_after = model.mass_at_time(vessel, end_time + 1.0);

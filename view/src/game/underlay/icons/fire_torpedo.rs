@@ -15,12 +15,14 @@ pub struct FireTorpedo {
 
 impl FireTorpedo {
     pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
+
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::VesselComponent]) {
-            for event in model.vessel_component(entity).timeline().fire_torpedo_events() {
-                let time = event.time();
-                let icon = Self { entity, time };
-                icons.push(Box::new(icon) as Box<dyn Icon>);
+            for event in model.vessel_component(entity).timeline().events() {
+                if event.type_().is_fire_torpedo() {
+                    let icon = Self { entity, time: event.time() };
+                    icons.push(Box::new(icon) as Box<dyn Icon>);
+                }
             }
         }
         icons
@@ -77,13 +79,13 @@ impl Icon for FireTorpedo {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &mut Scene, model: &Model, pointer: &PointerState) {
         if !pointer.primary_clicked() {
             return;
         }
         
         if let Selected::FireTorpedo { entity, time, state } = &mut view.selected {
-            if *entity == self.entity && *time == self.time {
+            if *entity == self.entity && *time == self.time && model.can_modify_timeline_event(self.entity, self.time) {
                 if state.is_selected() {
                     trace!("Fire torpedo icon clicked; switching Selected -> Adjusting");
                     *state = BurnState::Adjusting;
