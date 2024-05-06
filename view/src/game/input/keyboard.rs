@@ -29,7 +29,7 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
         if input.key_pressed(Key::F12) {
             view.debug_window_open = !view.debug_window_open;
         }
-        
+
         if input.key_pressed(Key::Delete) {
             match view.selected {
                 Selected::Vessel(entity) => {
@@ -43,7 +43,7 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
                 }
             }
         }
-        
+
         if input.key_pressed(Key::Escape) {
             if view.vessel_editor.is_some() {
                 view.vessel_editor = None;
