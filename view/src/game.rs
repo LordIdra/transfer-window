@@ -65,11 +65,21 @@ impl Scene {
         events
     }
 
-    pub fn is_selected(&self, entity: Entity) -> bool {
+    fn is_selected(&self, entity: Entity) -> bool {
         if let Some(selected) = self.selected.selected_entity() {
             selected == entity
         } else {
             false
         }
+    }
+
+    fn toggle_right_click_menu(&mut self, right_clicked: Entity) {
+        if let Some(entity) = self.right_click_menu {
+            if entity == right_clicked {
+                self.right_click_menu = None;
+                return;
+            }
+        }
+        self.right_click_menu = Some(right_clicked)
     }
 }

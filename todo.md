@@ -73,8 +73,8 @@
 - [1|x] Add torpedo system
 - [1|x] Show active weapons at bottom of screen (simple for now)
 - [1|x] Click button to confirm fire
-- [1| ] Allow deselecting objects
-- [1| ] Show target on selected point
+- [1|x] Allow deselecting objects
+- [1|x] Show target on all selected objects
 - [1| ] Spawn new torpedo at ship location
 - [1| ] Can plan initial trajectory before firing
 - [1| ] Torpedo stockpile

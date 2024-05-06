@@ -26,9 +26,11 @@ impl Vessel {
 impl Icon for Vessel {
     fn texture(&self, view: &Scene, model: &Model) -> String {
         if let Some(entity) = view.selected.selected_entity() {
-            if let Some(target) = model.vessel_component(entity).target() {
-                if target == self.entity {
-                    return "spacecraft-target".to_string()
+            if let Some(vessel_component) = model.try_vessel_component(entity) {
+                if let Some(target) = vessel_component.target() {
+                    if target == self.entity {
+                        return "spacecraft-target".to_string()
+                    }
                 }
             }
         }
@@ -83,7 +85,7 @@ impl Icon for Vessel {
         if pointer.primary_clicked() {
             view.selected = Selected::Vessel(self.entity);
         } else if pointer.secondary_clicked() {
-            view.right_click_menu = Some(self.entity);
+            view.toggle_right_click_menu(self.entity);
         }
     }
 }

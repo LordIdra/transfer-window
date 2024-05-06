@@ -11,14 +11,25 @@ fn draw_focus(view: &mut Scene, ui: &mut Ui, entity: Entity) {
     }
 }
 
-fn draw_set_target(ui: &mut Ui, entity: Entity, selected: Entity, events: &mut Vec<Event>) {
-    let can_target = selected != entity;
-    let target_button = Button::new("Set target");
-    if ui.add_enabled(can_target, target_button).clicked() {
-        events.push(Event::SetTarget { 
-            entity: selected, 
-            target: Some(entity) 
-        });
+fn draw_set_target(model: &Model, ui: &mut Ui, right_clicked: Entity, selected: Entity, events: &mut Vec<Event>) {
+    let is_already_target = model.target(selected) == Some(right_clicked);
+    if is_already_target {
+        let button = Button::new("Unset target");
+        if ui.add(button).clicked() {
+            events.push(Event::SetTarget { 
+                entity: selected, 
+                target: None,
+            });
+        }
+    } else {
+        let can_target = (selected != right_clicked) && model.can_change_target(selected);
+        let button = Button::new("Set target");
+        if ui.add_enabled(can_target, button).clicked() {
+            events.push(Event::SetTarget { 
+                entity: selected, 
+                target: Some(right_clicked),
+            });
+        }
     }
 }
 
@@ -34,7 +45,7 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
             if let Some(selected) = view.selected.selected_entity() {
                 if let Some(selected_vessel_component) = model.try_vessel_component(selected) {
                     if selected_vessel_component.can_change_target() {
-                        draw_set_target(ui, right_clicked, selected, events);
+                        draw_set_target(model, ui, right_clicked, selected, events);
                     }
                 }
             }

@@ -82,7 +82,7 @@ impl Icon for Orbitable {
         if pointer.primary_clicked() {
             view.selected = Selected::Orbitable(self.entity);
         } else if pointer.secondary_clicked() {
-            view.right_click_menu = Some(self.entity);
+            view.toggle_right_click_menu(self.entity);
         }
     }
 }
