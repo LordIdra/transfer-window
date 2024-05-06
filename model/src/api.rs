@@ -3,7 +3,7 @@ pub mod closest_point;
 pub mod components;
 pub mod quantities;
 pub mod segments;
-pub mod slots;
+pub mod vessels;
 pub mod time;
 pub mod torpedo;
 pub mod trajectories;

@@ -1,9 +1,9 @@
 use eframe::egui::{PointerState, Rect};
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::path_component::burn::Burn, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::vessel_component::timeline::{fire_torpedo::FireTorpedoEvent, TimelineEvent}, storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, util::compute_burn_arrow_position, Scene};
+use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, util::compute_adjust_fire_torpedo_arrow_position, Scene};
 
 use super::Icon;
 
@@ -16,26 +16,27 @@ fn offset(amount: f64) -> f64 {
 }
 
 #[derive(Debug)]
-pub struct AdjustBurn {
+pub struct AdjustFireTorpedo {
     entity: Entity,
     time: f64,
     position: DVec2,
     direction: BurnAdjustDirection,
 }
 
-impl AdjustBurn {
+impl AdjustFireTorpedo {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
-        let burn = model.burn_starting_at_time(entity, time);
-        let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
-        let mut position = compute_burn_arrow_position(view, model, entity, time, direction);
+        let event = model.timeline_event_at_time(entity, time).expect("Fire torpedo timeline event does not exist");
+        let fire_torpedo_event = event.type_().as_fire_torpedo().expect("Event is not a fire torpedo event");
+        let event_to_arrow_unit = fire_torpedo_event.rotation_matrix() * direction.vector();
+        let mut position = compute_adjust_fire_torpedo_arrow_position(view, model, entity, time, direction);
 
         // Additional offset if arrow is being dragged
         if let Some(mouse_position) = pointer.latest_pos() {
-            if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(drag_direction) } = &view.selected {
+            if let Selected::FireTorpedo { entity: _, time: _, state: BurnState::Dragging(drag_direction) } = &view.selected {
                 if *drag_direction == direction {
                     let arrow_to_mouse = view.camera.window_space_to_world_space(model, mouse_position, screen_rect) - position;
-                    let amount = arrow_to_mouse.dot(&burn_to_arrow_unit);
-                    position += offset(amount) * burn_to_arrow_unit;
+                    let amount = arrow_to_mouse.dot(&event_to_arrow_unit);
+                    position += offset(amount) * event_to_arrow_unit;
                 }
             }
         }
@@ -45,7 +46,7 @@ impl AdjustBurn {
 
     pub fn generate(view: &Scene, model: &Model, pointer: &PointerState, screen_rect: Rect) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        if let Selected::Burn { entity, time, state } = view.selected.clone() {
+        if let Selected::FireTorpedo { entity, time, state } = view.selected.clone() {
             if state.is_adjusting() || state.is_dragging() {
                 let icon = Self::new(view, model, entity, time, BurnAdjustDirection::Prograde, pointer, screen_rect);
                 icons.push(Box::new(icon) as Box<dyn Icon>);
@@ -60,12 +61,16 @@ impl AdjustBurn {
         icons
     }
 
-    fn burn<'a>(&self, model: &'a Model) -> &'a Burn {
-        model.burn_starting_at_time(self.entity, self.time)
+    fn event<'a>(&self, model: &'a Model) -> &'a TimelineEvent {
+        model.timeline_event_at_time(self.entity, self.time).expect("Fire torpedo timeline event does not exist")
+    }
+
+    fn fire_torpedo_event<'a>(&self, model: &'a Model) -> &'a FireTorpedoEvent {
+        self.event(model).type_().as_fire_torpedo().expect("Event is not a fire torpedo event")
     }
 }
 
-impl Icon for AdjustBurn {
+impl Icon for AdjustFireTorpedo {
     fn texture(&self, _view: &Scene, _model: &Model) -> String {
         "adjust-burn-arrow".to_string()
     }
@@ -74,7 +79,7 @@ impl Icon for AdjustBurn {
         if is_overlapped {
             return 0.0;
         }
-        if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(direction) } = &view.selected {
+        if let Selected::FireTorpedo { entity: _, time: _, state: BurnState::Dragging(direction) } = &view.selected {
             if *direction == self.direction {
                 return 1.0;
             }
@@ -98,26 +103,25 @@ impl Icon for AdjustBurn {
 
     fn position(&self, _view: &Scene, _model: &Model, ) -> DVec2 {
         #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Adjust burn position");
+        let _span = tracy_client::span!("Adjust fire torpedo position");
         self.position
     }
 
     fn facing(&self, _view: &Scene, model: &Model) -> Option<DVec2> {
-        let burn = self.burn(model);
-        Some(burn.rotation_matrix() * self.direction.vector())
+        Some(self.fire_torpedo_event(model).rotation_matrix() * self.direction.vector())
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
-        if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(direction) } = &view.selected {
+        if let Selected::FireTorpedo { entity: _, time: _, state: BurnState::Dragging(direction) } = &view.selected {
             return *direction == self.direction
         }
         false
     }
 
     fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
-        if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
+        if let Selected::FireTorpedo { entity: _, time: _, state } = &mut view.selected {
             if pointer.primary_clicked() {
-                trace!("Started dragging to adjust burn {:?}", self.direction);
+                trace!("Started dragging to adjust fire torpedo {:?}", self.direction);
                 *state = BurnState::Dragging(self.direction);
             }
         }

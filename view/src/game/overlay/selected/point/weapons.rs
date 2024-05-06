@@ -3,7 +3,7 @@ use transfer_window_model::{components::vessel_component::{system_slot::{weapon:
 
 use crate::{events::Event, game::{overlay::slot_textures::TexturedSlot, Scene}, styles};
 
-fn draw_fire(view: &mut Scene, ui: &mut Ui, center: Pos2, vessel_component: &VesselComponent, entity: Entity, location: SlotLocation, events: &mut Vec<Event>) {
+fn draw_fire(view: &mut Scene, ui: &mut Ui, center: Pos2, vessel_component: &VesselComponent, entity: Entity, slot_location: SlotLocation, time: f64, events: &mut Vec<Event>) {
     let lock_centre = center + vec2(-27.0, -27.0);
     let lock_size = Vec2::splat(20.0);
     let lock_rect = Rect::from_center_size(lock_centre, lock_size);
@@ -15,13 +15,13 @@ fn draw_fire(view: &mut Scene, ui: &mut Ui, center: Pos2, vessel_component: &Ves
         };
         let image_button = ImageButton::new(view.resources.texture_image(texture));
         if ui.add_enabled(vessel_component.has_target(), image_button).clicked() {
-            let event = Event::FireTorpedo { entity, slot_location: location, target: vessel_component.target().unwrap() };
+            let event = Event::ScheduleFireTorpedo { entity, slot_location, time };
             events.push(event);
         }
     });
 }
 
-fn draw_weapon(view: &mut Scene, ui: &mut Ui, vessel_component: &VesselComponent, entity: Entity, location: SlotLocation, slot: Option<&Weapon>, events: &mut Vec<Event>) {
+fn draw_weapon(view: &mut Scene, ui: &mut Ui, vessel_component: &VesselComponent, entity: Entity, location: SlotLocation, slot: Option<&Weapon>, time: f64, events: &mut Vec<Event>) {
     let texture_name = match slot {
         Some(weapon) => weapon.type_().texture(),
         None => "blank-slot",
@@ -37,15 +37,15 @@ fn draw_weapon(view: &mut Scene, ui: &mut Ui, vessel_component: &VesselComponent
 
             styles::WeaponSlotButton::apply(ui);
             if slot.is_some() {
-                draw_fire(view, ui, center, vessel_component, entity, location, events);
+                draw_fire(view, ui, center, vessel_component, entity, location, time, events);
             }
         });
 }
 
-pub fn draw_weapons(view: &mut Scene, ui: &mut Ui, vessel_component: &VesselComponent, entity: Entity, weapon_slots: &[(SlotLocation, Option<&Weapon>)], events: &mut Vec<Event>) {
+pub fn draw_weapons(view: &mut Scene, ui: &mut Ui, vessel_component: &VesselComponent, entity: Entity, weapon_slots: &[(SlotLocation, Option<&Weapon>)], time: f64, events: &mut Vec<Event>) {
     ui.with_layout(Layout::left_to_right(Align::TOP), |ui| {
         for pair in weapon_slots {
-            draw_weapon(view, ui, vessel_component, entity, pair.0, pair.1, events);
+            draw_weapon(view, ui, vessel_component, entity, pair.0, pair.1, time, events);
         }
     });
 }

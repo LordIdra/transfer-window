@@ -6,6 +6,8 @@ use crate::game::Scene;
 
 use super::Icon;
 
+const RADIUS: f64 = 10.0;
+
 fn compute_time_of_next_periapsis(_model: &Model, orbit: &Orbit) -> Option<f64> {
     let periapsis_time = if orbit.is_ellipse() {
         let mut periapsis_time = orbit.first_periapsis_time();
@@ -26,17 +28,23 @@ fn compute_time_of_next_periapsis(_model: &Model, orbit: &Orbit) -> Option<f64> 
 
 #[derive(Debug)]
 pub struct Periapsis {
-    entity: Entity,
-    time: f64,
+    position: DVec2,
 }
 
 impl Periapsis {
-    pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
+    fn new(view: &Scene, model: &Model, entity: Entity, time: f64) -> Self {
+        let orbit = model.orbit_at_time(entity, time);
+        let offset = vec2(0.0, RADIUS / view.camera.zoom());
+        let position = model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position() + offset;
+        Self { position }
+    }
+
+    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::PathComponent]) {
             for orbit in model.path_component(entity).future_orbits() {
                 if let Some(time) = compute_time_of_next_periapsis(model, orbit) {
-                    let icon = Self { entity, time };
+                    let icon = Self::new(view, model, entity, time);
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
             }
@@ -45,7 +53,7 @@ impl Periapsis {
         for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
             if let Some(orbit) = model.orbitable_component(entity).orbit() {
                 if let Some(time) = compute_time_of_next_periapsis(model, orbit) {
-                    let icon = Self { entity, time };
+                    let icon = Self::new(view, model, entity, time);
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
             }
@@ -69,7 +77,7 @@ impl Icon for Periapsis {
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        10.0
+        RADIUS
     }
 
     fn priorities(&self, _view: &Scene, _model: &Model) -> [u64; 4] {
@@ -81,12 +89,10 @@ impl Icon for Periapsis {
         ]
     }
 
-    fn position(&self, view: &Scene, model: &Model) -> DVec2 {
+    fn position(&self, _view: &Scene, _model: &Model) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Periapsis position");
-        let orbit = model.orbit_at_time(self.entity, self.time);
-        let offset = vec2(0.0, self.radius(view, model) / view.camera.zoom());
-        model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position() + offset
+        self.position
     }
 
     fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {

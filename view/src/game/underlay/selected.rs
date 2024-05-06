@@ -16,7 +16,8 @@ pub enum Selected {
     Orbitable(Entity),
     Vessel(Entity),
     Point { entity: Entity, time: f64 },
-    Burn { entity: Entity, time: f64, state: BurnState }
+    Burn { entity: Entity, time: f64, state: BurnState },
+    FireTorpedo { entity: Entity, time: f64, state: BurnState },
 }
 
 impl Selected {
@@ -27,6 +28,7 @@ impl Selected {
                 | Selected::Vessel(entity) 
                 | Selected::Burn { entity, time: _, state: _ }
                 | Selected::Point { entity, time: _ }
+                | Selected::FireTorpedo { entity, time: _, state: _ }
                 => Some(*entity),
         }
     }

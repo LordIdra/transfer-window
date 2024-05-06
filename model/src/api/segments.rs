@@ -1,6 +1,6 @@
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::{path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment}, vessel_component::system_slot::System}, storage::entity_allocator::Entity, Model};
+use crate::{components::path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
@@ -8,13 +8,7 @@ impl Model {
             return burn.rocket_equation_function_at_end_of_burn()
         }
 
-        let vessel_component = self.vessel_component(entity);
-        let dry_mass_kg = vessel_component.dry_mass();
-        let initial_fuel_mass_kg = vessel_component.remaining_fuel_kg();
-        let engine = vessel_component.slots().engine().unwrap();
-        let fuel_consumption_kg_per_second = engine.type_().fuel_kg_per_second();
-        let specific_impulse = engine.type_().specific_impulse_space();
-        RocketEquationFunction::new(dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, 0.0)
+        RocketEquationFunction::from_vessel_component(self.vessel_component(entity))
     }
 
     pub fn delete_segments_after_time_and_recompute_trajectory(&mut self, entity: Entity, time: f64) {

@@ -32,7 +32,7 @@ pub fn draw_hover(view: &mut Scene, model: &Model, context: &Context, pointer: &
     }
 
     let Some(latest_window) = pointer.latest_pos() else { 
-        return 
+        return;
     };
     
     let select_distance = SELECT_DISTANCE / view.camera.zoom();

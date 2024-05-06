@@ -35,6 +35,14 @@ pub fn update(view: &mut Scene, model: &Model) {
         }
     }
 
+    // Remove selected fire torpedo event if expired
+    if let Selected::FireTorpedo { entity, time, state: _ } = view.selected.clone() {
+        if model.timeline_event_at_time(entity, time).is_none() || time < model.time() {
+            trace!("Selected fire torpedo event expired at time={time}");
+            view.selected = Selected::None
+        }
+    }
+
     // Delete current menu if the entity no longer exists
     if let Some(entity) = view.right_click_menu {
         if !model.entity_exists(entity) {

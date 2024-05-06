@@ -2,11 +2,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use self::system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System};
+use self::{system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System}, timeline::{Timeline, TimelineEvent}};
 
 use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
 pub mod system_slot;
+pub mod timeline;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum VesselClass {
@@ -30,6 +31,7 @@ impl VesselClass {
 /// Must have `MassComponent` and `PathComponent`
 #[derive(Debug, Serialize, Deserialize)]
 pub struct VesselComponent {
+    timeline: Timeline,
     class: VesselClass,
     slots: Slots,
     target: Option<Entity>,
@@ -38,8 +40,9 @@ pub struct VesselComponent {
 #[allow(clippy::new_without_default)]
 impl VesselComponent {
     pub fn new(class: VesselClass) -> Self {
+        let timeline = Timeline::default();
         let slots = Slots::new(class);
-        Self { class, slots, target: None }
+        Self { timeline, class, slots, target: None }
     }
 
     pub fn set_target(&mut self, target: Option<Entity>) {
@@ -122,5 +125,13 @@ impl VesselComponent {
 
     pub fn can_edit(&self) -> bool {
         !self.class.is_torpedo()
+    }
+
+    pub fn add_timeline_event(&mut self, event: TimelineEvent) {
+        self.timeline.add(event);
+    }
+
+    pub fn timeline(&self) -> &Timeline {
+        &self.timeline
     }
 }

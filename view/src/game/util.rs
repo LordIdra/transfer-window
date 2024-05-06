@@ -100,3 +100,12 @@ pub fn compute_burn_arrow_position(view: &Scene, model: &Model, entity: Entity, 
     let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
 }
+
+pub fn compute_adjust_fire_torpedo_arrow_position(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
+    let event = model.timeline_event_at_time(entity, time).expect("Fire torpedo timeline event does not exist");
+    let fire_torpedo_event = event.type_().as_fire_torpedo().expect("Event is not a fire torpedo event");
+    let orbit = model.orbit_at_time(entity, time);
+    let burn_position = model.absolute_position(orbit.parent()) + model.position_at_time(entity, time);
+    let burn_to_arrow_unit = fire_torpedo_event.rotation_matrix() * direction.vector();
+    burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
+}

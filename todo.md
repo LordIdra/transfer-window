@@ -73,14 +73,16 @@
 - [1|x] Add torpedo system
 - [1|x] Show active weapons at bottom of screen (simple for now)
 - [1|x] Click button to confirm fire
-- [1| ] Allow deselecting burn
-- [1| ] Cannot fire until firing solution computed
-- [1|x] Spawn new torpedo at ship location
-- [1| ] Torpedo burns until fuel expended
+- [1| ] Allow deselecting objects
+- [1| ] Show target on selected point
+- [1| ] Spawn new torpedo at ship location
+- [1| ] Can plan initial trajectory before firing
+- [1| ] Torpedo stockpile
+- [1| ] Torpedo launcher needs to re-arm
 - [1| ] Yeet torpedo target when torpedo gets close enough
-- [1| ] Torpedo guidance system
+- [1| ] Torpedo APN guidance system
 - [1| ] Burns cannot use more DV than ship has including previous burns
-- [1| ] Show DV budget while adjusting burn
+- [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
 - [1| ] General UI improvements (cross that bridge later)
 

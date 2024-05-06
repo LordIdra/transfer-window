@@ -3,6 +3,10 @@ use transfer_window_model::{components::path_component::orbit::Orbit, storage::e
 
 use crate::{events::Event, game::{underlay::selected::{burn::BurnState, Selected}, util::format_time, Scene}};
 
+use self::weapons::draw_weapons;
+
+mod weapons;
+
 fn draw_next(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui, view: &mut Scene, entity: Entity) {
     let time = time - period;
     let button = Button::new("Previous orbit");
@@ -75,4 +79,16 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 draw_vessel(model, entity, ui, events, time, view);
             }
         });
+
+    let vessel_component = model.vessel_component(entity);
+    let weapon_slots = vessel_component.slots().weapon_slots();
+    if !weapon_slots.is_empty() {
+        Window::new("Weapons")
+            .title_bar(false)
+            .resizable(false)
+            .anchor(Align2::CENTER_BOTTOM, epaint::vec2(0.0, 0.0))
+            .show(context, |ui| {
+                draw_weapons(view, ui, vessel_component, entity, &weapon_slots, time, events);
+            });
+    }
 }
