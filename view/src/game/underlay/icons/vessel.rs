@@ -16,8 +16,10 @@ impl Vessel {
     pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::VesselComponent]) {
-            let icon = Self { entity };
-            icons.push(Box::new(icon) as Box<dyn Icon>);
+            if !model.vessel_component(entity).is_ghost() {
+                let icon = Self { entity };
+                icons.push(Box::new(icon) as Box<dyn Icon>);
+            }
         }
         icons
     }
@@ -25,13 +27,9 @@ impl Vessel {
 
 impl Icon for Vessel {
     fn texture(&self, view: &Scene, model: &Model) -> String {
-        if let Some(entity) = view.selected.selected_entity() {
-            if let Some(vessel_component) = model.try_vessel_component(entity) {
-                if let Some(target) = vessel_component.target() {
-                    if target == self.entity {
-                        return "spacecraft-target".to_string()
-                    }
-                }
+        if let Some(target) = view.selected.target(model) {
+            if target == self.entity {
+                return "spacecraft-target".to_string()
             }
         }
         "spacecraft".to_string()

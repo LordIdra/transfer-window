@@ -42,7 +42,7 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
         .anchor(Align2::LEFT_BOTTOM, window_position.to_vec2())
         .show(context, |ui| {
             draw_focus(view, ui, right_clicked);
-            if let Some(selected) = view.selected.selected_entity() {
+            if let Some(selected) = view.selected.entity(model) {
                 if let Some(selected_vessel_component) = model.try_vessel_component(selected) {
                     if selected_vessel_component.can_change_target() {
                         draw_set_target(model, ui, right_clicked, selected, events);

@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 use eframe::{egui::Rgba, emath::normalized_angle};
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::VesselClass}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
 
 use crate::game::Scene;
 
@@ -9,23 +9,23 @@ const INITIAL_POINT_COUNT: usize = 50;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-4;
 const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
-pub fn compute_path_orbit_color(view: &Scene, entity: Entity, index: usize) -> Rgba {
-    let colors = if view.is_selected(entity) {
-        [
-            Rgba::from_srgba_unmultiplied(0, 255, 255, 255),
-            Rgba::from_srgba_unmultiplied(0, 255, 255, 170),
-            Rgba::from_srgba_unmultiplied(0, 255, 255, 130),
-            Rgba::from_srgba_unmultiplied(0, 255, 255, 100),
-        ]
-    } else {
-        [Rgba::from_srgba_unmultiplied(0, 255, 255, 60); SEGMENTS_TO_PREDICT]
+pub fn compute_vessel_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
+    let rgb = match model.vessel_component(entity).class() {
+        VesselClass::Torpedo => Rgba::from_rgb(1.0, 0.0, 0.0),
+        VesselClass::Light => Rgba::from_rgb(0.0, 1.0, 1.0),
     };
 
-    colors[index]
+    let alphas = if view.is_selected(model, entity) {
+        [1.0, 0.67, 0.51, 0.39]
+    } else {
+        [0.24; SEGMENTS_TO_PREDICT]
+    };
+
+    Rgba::from_rgba_unmultiplied(rgb.r(), rgb.g(), rgb.b(), alphas[index])
 }
 
-pub fn compute_orbitable_orbit_color(view: &Scene, entity: Entity) -> Rgba {
-    if view.is_selected(entity) {
+pub fn compute_orbitable_orbit_color(view: &Scene, model: &Model, entity: Entity) -> Rgba {
+    if view.is_selected(model, entity) {
         Rgba::from_srgba_unmultiplied(255, 255, 255, 160)
     } else {
         Rgba::from_srgba_unmultiplied(255, 255, 255, 50)

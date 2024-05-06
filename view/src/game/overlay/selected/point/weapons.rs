@@ -3,6 +3,7 @@ use transfer_window_model::{components::vessel_component::{system_slot::{weapon:
 
 use crate::{events::Event, game::{overlay::slot_textures::TexturedSlot, Scene}, styles};
 
+#[allow(clippy::too_many_arguments)]
 fn draw_fire(view: &mut Scene, ui: &mut Ui, center: Pos2, vessel_component: &VesselComponent, entity: Entity, slot_location: SlotLocation, time: f64, events: &mut Vec<Event>) {
     let lock_centre = center + vec2(-27.0, -27.0);
     let lock_size = Vec2::splat(20.0);
@@ -15,12 +16,13 @@ fn draw_fire(view: &mut Scene, ui: &mut Ui, center: Pos2, vessel_component: &Ves
         };
         let image_button = ImageButton::new(view.resources.texture_image(texture));
         if ui.add_enabled(vessel_component.has_target(), image_button).clicked() {
-            let event = Event::ScheduleFireTorpedo { entity, slot_location, time };
+            let event = Event::CreateFireTorpedo { entity, slot_location, time };
             events.push(event);
         }
     });
 }
 
+#[allow(clippy::too_many_arguments)]
 fn draw_weapon(view: &mut Scene, ui: &mut Ui, vessel_component: &VesselComponent, entity: Entity, location: SlotLocation, slot: Option<&Weapon>, time: f64, events: &mut Vec<Event>) {
     let texture_name = match slot {
         Some(weapon) => weapon.type_().texture(),

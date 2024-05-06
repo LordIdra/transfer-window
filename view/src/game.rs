@@ -67,8 +67,8 @@ impl Scene {
         events
     }
 
-    fn is_selected(&self, entity: Entity) -> bool {
-        if let Some(selected) = self.selected.selected_entity() {
+    fn is_selected(&self, model: &Model, entity: Entity) -> bool {
+        if let Some(selected) = self.selected.entity(model) {
             selected == entity
         } else {
             false
@@ -82,6 +82,6 @@ impl Scene {
                 return;
             }
         }
-        self.right_click_menu = Some(right_clicked)
+        self.right_click_menu = Some(right_clicked);
     }
 }

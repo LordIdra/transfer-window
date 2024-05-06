@@ -12,7 +12,6 @@ const BURN_TIME_STEP: f64 = 0.1;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Burn {
-    entity: Entity,
     parent: Entity,
     rocket_equation_function: RocketEquationFunction,
     tangent: DVec2,
@@ -23,10 +22,9 @@ pub struct Burn {
 
 impl Burn {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(entity: Entity, parent: Entity, parent_mass: f64, tangent: DVec2, delta_v: DVec2, start_time: f64, rocket_equation_function: RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
+    pub fn new(parent: Entity, parent_mass: f64, tangent: DVec2, delta_v: DVec2, start_time: f64, rocket_equation_function: RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
         let start_point = BurnPoint::new(parent_mass, rocket_equation_function.mass(), start_time, start_position, start_velocity);
         let mut burn = Self { 
-            entity,
             parent,
             rocket_equation_function,
             tangent,
@@ -64,10 +62,6 @@ impl Burn {
         } else {
             self.end_point().clone()
         }
-    }
-
-    pub fn entity(&self) -> Entity {
-        self.entity
     }
 
     pub fn total_dv(&self) -> f64 {
@@ -191,7 +185,6 @@ mod test {
     #[test]
     pub fn test() {
         let duration = 100.0;
-        let entity = Entity::mock();
         let parent = Entity::mock();
         let parent_mass = 5.972e24; // earth's mass
         let tangent = vec2(1.0, 0.0);
@@ -202,7 +195,7 @@ mod test {
         let start_time = 0.0;
         let start_position = vec2(2.00e6, 0.0);
         let start_velocity = vec2(0.0, 1.0e3);
-        let mut burn = Burn::new(entity, parent, parent_mass, tangent, delta_v, start_time, rocket_equation_function, start_position, start_velocity);
+        let mut burn = Burn::new(parent, parent_mass, tangent, delta_v, start_time, rocket_equation_function, start_position, start_velocity);
         
         let mut tester = BruteForceTester::new(parent_mass, start_position, start_velocity, acceleration_from_time.clone(), BURN_TIME_STEP);
         tester.update(duration);

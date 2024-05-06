@@ -1,4 +1,4 @@
-use crate::{systems::{time::TimeStep, warp_update_system::TimeWarp}, Model};
+use crate::{systems::{update_time::TimeStep, update_warp::TimeWarp}, Model};
 
 impl Model {
     pub fn toggle_paused(&mut self) {

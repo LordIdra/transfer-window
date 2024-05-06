@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::Model;
 
-use super::time::TimeStep;
+use super::update_time::TimeStep;
 
 
 const STOP_BEFORE_TARGET_SECONDS: f64 = 5.0;
@@ -42,31 +42,33 @@ impl TimeWarp {
     }
 }
 
-pub fn update(model: &mut Model, dt: f64) {
-    // Weird double if needed because of borrow checker
-    let warp_finished = if let Some(warp) = &model.warp {
-        model.time >= warp.end_time
-    } else {
-        return;
-    };
-    
-    if warp_finished {
-        trace!("Warp finished");
-        model.warp = None;
-        model.time_step = TimeStep::Level { level: 1, paused: false };
-    }
-
-    if let Some(warp) = &model.warp {
-        let mut speed = warp.compute_warp_speed(model.time);
-        let final_time = model.time + speed * dt;
-        if final_time > warp.end_time {
-            // Oh no, we're about to overshoot
-            // Calculate required warp speed to perfectly land at target point
-            // Add small amount so next frame actually counts this as 'finished'
-            let overshot_time = warp.end_time - model.time;
-            speed = overshot_time / dt + 1.0e-3;
-            trace!("Compensating for warp overshoot of {overshot_time}");
+impl Model {
+    pub fn update_warp(&mut self, dt: f64) {
+        // Weird double if needed because of borrow checker
+        let warp_finished = if let Some(warp) = &self.warp {
+            self.time >= warp.end_time
+        } else {
+            return;
+        };
+        
+        if warp_finished {
+            trace!("Warp finished");
+            self.warp = None;
+            self.time_step = TimeStep::Level { level: 1, paused: false };
         }
-        model.time_step = TimeStep::Warp { speed, paused: false };
+
+        if let Some(warp) = &self.warp {
+            let mut speed = warp.compute_warp_speed(self.time);
+            let final_time = self.time + speed * dt;
+            if final_time > warp.end_time {
+                // Oh no, we're about to overshoot
+                // Calculate required warp speed to perfectly land at target point
+                // Add small amount so next frame actually counts this as 'finished'
+                let overshot_time = warp.end_time - self.time;
+                speed = overshot_time / dt + 1.0e-3;
+                trace!("Compensating for warp overshoot of {overshot_time}");
+            }
+            self.time_step = TimeStep::Warp { speed, paused: false };
+        }
     }
 }

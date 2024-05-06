@@ -1,9 +1,9 @@
 use eframe::egui::{PointerState, Rect, Vec2};
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::path_component::burn::Burn, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::{burn::{BurnAdjustDirection, BurnState}, Selected}, util::compute_burn_arrow_position, Scene};
+use crate::game::{underlay::selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_burn_arrow_position, Scene};
 
 use super::Icon;
 
@@ -59,10 +59,6 @@ impl AdjustBurn {
         }
         icons
     }
-
-    fn burn<'a>(&self, model: &'a Model) -> &'a Burn {
-        model.burn_starting_at_time(self.entity, self.time)
-    }
 }
 
 impl Icon for AdjustBurn {
@@ -103,7 +99,7 @@ impl Icon for AdjustBurn {
     }
 
     fn facing(&self, _view: &Scene, model: &Model) -> Option<DVec2> {
-        let burn = self.burn(model);
+        let burn = model.burn_starting_at_time(self.entity, self.time);
         Some(burn.rotation_matrix() * self.direction.vector())
     }
 

@@ -16,7 +16,7 @@ pub struct ClosestApproach {
 impl ClosestApproach {
     pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        if let Some(entity) = view.selected.selected_entity() {
+        if let Some(entity) = view.selected.entity(model) {
             if let Some(vessel_component) = model.try_vessel_component(entity) {
                 if let Some(target) = vessel_component.target() {
                     if let Some(time) = model.find_next_closest_approach(entity, target, model.time()) {

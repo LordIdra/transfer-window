@@ -22,14 +22,18 @@ fn update_orbitable_component(model: &mut Model, entity: Entity, simulation_dt: 
     }
 }
 
-pub fn update(model: &mut Model, dt: f64) {
-    let time = model.time();
-    let time_step = model.time_step().time_step();
-    let simulation_dt = dt * time_step;
-    for entity in model.entities(vec![ComponentType::PathComponent]) {
-        update_path_component(model, entity, time, simulation_dt);
-    }
-    for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
-        update_orbitable_component(model, entity, simulation_dt);
+impl Model {
+    pub fn update_trajectory(&mut self, dt: f64) {
+        let time = self.time();
+        let time_step = self.time_step().time_step();
+        let simulation_dt = dt * time_step;
+        for entity in self.entities(vec![ComponentType::VesselComponent]) {
+            if !self.vessel_component(entity).is_ghost() {
+                update_path_component(self, entity, time, simulation_dt);
+            }
+        }
+        for entity in self.entities(vec![ComponentType::OrbitableComponent]) {
+            update_orbitable_component(self, entity, simulation_dt);
+        }
     }
 }
