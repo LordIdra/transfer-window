@@ -1,4 +1,4 @@
-use eframe::egui::{Context, PointerState, Pos2};
+use eframe::egui::{Context, PointerState, Pos2, Vec2};
 use log::trace;
 use nalgebra_glm::{vec2, DVec2};
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
@@ -28,7 +28,8 @@ impl BurnAdjustDirection {
 pub enum BurnState {
     Selected,
     Adjusting,
-    Dragging(BurnAdjustDirection)
+    Dragging(BurnAdjustDirection),
+    Scrolling(BurnAdjustDirection, Vec2)
 }
 
 impl BurnState {
@@ -42,6 +43,10 @@ impl BurnState {
 
     pub fn is_dragging(&self) -> bool {
         matches!(self, Self::Dragging(_))
+    }
+
+    pub fn is_scrolling(&self) -> bool {
+        matches!(self, Self::Scrolling(_, _))
     }
 }
 
@@ -73,11 +78,38 @@ pub fn update_drag(view: &mut Scene, model: &Model, context: &Context, events: &
         }
     }
 
-    // Do drag adjustment
-    if let Selected::Burn { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
-        if let Some(mouse_position) = pointer.latest_pos() {
-            let amount = compute_drag_adjustment_amount(view, model, context, entity, time, direction, mouse_position);
-            events.push(Event::AdjustBurn { entity, time, amount });
+    // Do adjustment
+    if let Selected::Burn { entity, time, state } = view.selected.clone() {
+        match state {
+            BurnState::Dragging(direction) => {
+                if let Some(mouse_position) = pointer.latest_pos() {
+                    let amount = compute_drag_adjustment_amount(view, model, context, entity, time, direction, mouse_position);
+                    events.push(Event::AdjustBurn { entity, time, amount });
+                }
+            }
+            // Inspired by KSP-type scrolling
+            BurnState::Scrolling(direction, scroll_delta) => {
+                // I'm quite sure there's some mathematical operation for this,
+                // but I don't know what it is
+                let aligned = match direction {
+                    BurnAdjustDirection::Prograde => vec2(-scroll_delta.y as f64, scroll_delta.x as f64),
+                    BurnAdjustDirection::Retrograde => vec2(scroll_delta.y as f64, scroll_delta.x as f64),
+                    BurnAdjustDirection::Normal => vec2(scroll_delta.x as f64, -scroll_delta.y as f64),
+                    BurnAdjustDirection::Antinormal => vec2(scroll_delta.x as f64, scroll_delta.y as f64),
+                };
+                let length = aligned.norm();
+                let amount_scale = burn_adjustment_amount(length) / length;
+                let amount = aligned * amount_scale * 1e3;
+                events.push(Event::AdjustBurn { entity, time, amount });
+            }
+            _ => {}
+        }
+    }
+
+    if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
+        if state.is_scrolling() {
+            trace!("Stopped scrolling to adjust burn");
+            *state = BurnState::Adjusting;
         }
     }
 }
