@@ -123,10 +123,10 @@ impl Icon for AdjustBurn {
         }
     }
 
-    fn on_scroll(&self, view: &mut Scene, model: &Model, scroll_delta: Vec2) -> bool {
+    fn on_scroll(&self, view: &mut Scene, _model: &Model, scroll_delta: Vec2) -> bool {
         if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
             trace!("Started scrolling to adjust burn {:?}", self.direction);
-            *state = BurnState::Scrolling(self.direction.clone(), scroll_delta);
+            *state = BurnState::Scrolling(self.direction, scroll_delta);
             true
         } else {
             false

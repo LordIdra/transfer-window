@@ -38,7 +38,7 @@ trait Icon: Debug {
     fn is_selected(&self, view: &Scene, model: &Model) -> bool;
     fn on_mouse_over(&self, view: &mut Scene, model: &Model, pointer: &PointerState);
     
-    fn on_scroll(&self, view: &mut Scene, model: &Model, scroll_delta: Vec2) -> bool { false }
+    fn on_scroll(&self, _view: &mut Scene, _model: &Model, _scroll_delta: Vec2) -> bool { false }
 
     fn is_hovered(&self, view: &Scene, model: &Model, mouse_position_window: Pos2, screen_size: Rect) -> bool {
         #[cfg(feature = "profiling")]
