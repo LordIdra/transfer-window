@@ -3,6 +3,7 @@ use crate::{components::vessel_component::{system_slot::{Slot, SlotLocation}, ti
 impl Model {
     pub fn set_slot(&mut self, entity: Entity, location: SlotLocation, slot: Slot) {
         self.vessel_component_mut(entity).set_slot(location, slot);
+        self.vessel_component_mut(entity).timeline_mut().clear();
         self.recompute_entire_trajectory(entity);
     }
 

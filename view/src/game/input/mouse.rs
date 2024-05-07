@@ -29,8 +29,10 @@ pub fn update(view: &mut Scene, context: &Context) {
             update_pan(view, input.pointer.delta());
         };
 
-        if let Some(latest_mouse_position) = input.pointer.latest_pos() {
-            update_zoom(view, latest_mouse_position, input.scroll_delta, context.screen_rect());
+        if !view.icon_captured_scroll {
+            if let Some(latest_mouse_position) = input.pointer.latest_pos() {
+                update_zoom(view, latest_mouse_position, input.scroll_delta, context.screen_rect());
+            }
         }
     });
 }

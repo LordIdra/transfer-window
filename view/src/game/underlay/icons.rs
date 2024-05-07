@@ -1,6 +1,6 @@
 use std::{cmp::Ordering, fmt::Debug};
 
-use eframe::egui::{Context, PointerState, Pos2, Rect};
+use eframe::egui::{Context, PointerState, Pos2, Rect, Vec2};
 use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::Model;
@@ -36,6 +36,8 @@ trait Icon: Debug {
     fn facing(&self, view: &Scene, model: &Model) -> Option<DVec2>;
     fn is_selected(&self, view: &Scene, model: &Model) -> bool;
     fn on_mouse_over(&self, view: &mut Scene, model: &Model, pointer: &PointerState);
+    
+    fn on_scroll(&self, _view: &mut Scene, _model: &Model, _scroll_delta: Vec2) -> bool { false }
 
     fn is_hovered(&self, view: &Scene, model: &Model, mouse_position_window: Pos2, screen_size: Rect) -> bool {
         #[cfg(feature = "profiling")]
@@ -158,6 +160,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw icons");
     let mut any_icon_hovered = false;
+    view.icon_captured_scroll = false;
     context.input(|input| {
         let mut icons = compute_initial_icons(view, model, &input.pointer, context.screen_rect());
         icons.sort_by(|a, b| a.cmp(view, model, &**b));
@@ -168,6 +171,10 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
             if let Some(icon) = compute_mouse_over_icon(view, model, mouse_position_window, context.screen_rect(), &not_overlapped) {
                 any_icon_hovered = true;
                 icon.on_mouse_over(view, model, &input.pointer);
+                let scroll_delta = input.scroll_delta;
+                if (scroll_delta.y != 0.0 || scroll_delta.x != 0.0) && icon.on_scroll(view, model, scroll_delta) {
+                    view.icon_captured_scroll = true;
+                }
             }
         }
 

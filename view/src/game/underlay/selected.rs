@@ -72,7 +72,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             | Selected::Orbitable(_) 
             | Selected::Vessel(_) => (),
         Selected::Point { entity: _, time: _ } => segment_point::draw_selected(view, model),
-        Selected::Burn { entity: _, time: _, state: _ } => burn::update_drag(view, model, context, events, &pointer),
-        Selected::FireTorpedo { entity: _, time: _, state: _ } => fire_torpedo::update_drag(view, model, context, events, &pointer),
+        Selected::Burn { entity: _, time: _, state: _ } => burn::update_adjustment(view, model, context, events, &pointer),
+        Selected::FireTorpedo { entity: _, time: _, state: _ } => fire_torpedo::update_adjustment(view, model, context, events, &pointer),
     }
 }

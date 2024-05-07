@@ -30,6 +30,7 @@ pub struct Scene {
     frame_history: FrameHistory,
     debug_window_open: bool,
     debug_window_tab: DebugWindowTab,
+    icon_captured_scroll: bool,
 }
 
 impl Scene {
@@ -46,7 +47,8 @@ impl Scene {
         let frame_history = FrameHistory::default();
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::Overview;
-        Self { camera, resources, object_renderer, segment_renderer, texture_renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab }
+        let icon_captured_scroll = false;
+        Self { camera, resources, object_renderer, segment_renderer, texture_renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll }
     }
 
     pub fn update(&mut self, model: &Model, context: &Context, frame: &Frame) -> Vec<Event> {
@@ -56,9 +58,9 @@ impl Scene {
         
         self.frame_history.update(context.input(|i| i.time), frame.info().cpu_usage);
         expiry::update(self, model);
-        input::update(self, context, &mut events);
         underlay::draw(self, model, context, &mut events);
         overlay::draw(self, model, context, &mut events);
+        input::update(self, context, &mut events);
         debug::draw(self, model, context);
         rendering::update(self, model, context);
 
