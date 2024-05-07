@@ -15,7 +15,7 @@ fn compute_drag_adjustment_amount(view: &mut Scene, model: &Model, context: &Con
     burn_adjustment_amount(arrow_to_mouse.dot(&burn_to_arrow_unit)) * direction.vector() * view.camera.zoom().powi(2)
 }
 
-pub fn update_drag(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, pointer: &PointerState) {
+pub fn update_adjustment(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, pointer: &PointerState) {
     // Finished dragging
     if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
         if state.is_dragging() {

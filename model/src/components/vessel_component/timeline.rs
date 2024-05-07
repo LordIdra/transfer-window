@@ -129,4 +129,8 @@ impl Timeline {
         }
         events
     }
+
+    pub fn clear(&mut self) {
+        self.events.clear();
+    }
 }
