@@ -80,7 +80,7 @@
 - [1|x] Spawn new torpedo at ship location with trajectory
 - [1|x] Allow deleting and warping to fire torpedo events
 - [1|x] Update deletion logic for burns and launch events
-- [1| ] Disallow creating events before last event
+- [1|x] Disallow creating events before last event
 - [1| ] Disallow cancelling torpedo launch event if torpedo has events queued???
 - [1| ] Torpedo stockpile
 - [1| ] Torpedo launcher needs to re-arm

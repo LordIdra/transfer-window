@@ -42,7 +42,6 @@ impl Burn {
     }
 
     pub fn current_point(&self) -> &BurnPoint {
-        dbg!(&self.current_point);
         &self.current_point
     }
     
