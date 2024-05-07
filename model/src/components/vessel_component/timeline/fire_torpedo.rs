@@ -14,16 +14,17 @@ pub struct FireTorpedoEvent {
 
 impl FireTorpedoEvent {
     pub fn new(model: &mut Model, fire_from: Entity, time: f64, slot_location: SlotLocation) -> Self {
+        let mut vessel_component = VesselComponent::new(VesselClass::Torpedo).with_ghost();
+        vessel_component.set_target(model.vessel_component(fire_from).target);
+
         let fire_from_orbit = model.orbit_at_time(fire_from, time);
         let point_at_time = fire_from_orbit.point_at_time(time);
         let parent_mass = model.mass_at_time(fire_from_orbit.parent(), time);
-        let rocket_equation_function = RocketEquationFunction::from_vessel_component(&VesselComponent::new(VesselClass::Torpedo));
+        let rocket_equation_function = RocketEquationFunction::from_vessel_component(&vessel_component);
         let orbit = Orbit::new(
             fire_from_orbit.parent(), rocket_equation_function.mass(), parent_mass, 
             point_at_time.position(), point_at_time.velocity(), time);
 
-        let mut vessel_component = VesselComponent::new(VesselClass::Torpedo).with_ghost();
-        vessel_component.set_target(model.vessel_component(fire_from).target);
         let ghost = model.allocate(EntityBuilder::default()
             .with_name_component(NameComponent::new("Torpedo".to_string()))
             .with_path_component(PathComponent::new_with_orbit(orbit))

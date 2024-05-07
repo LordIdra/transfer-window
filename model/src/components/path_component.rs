@@ -152,7 +152,7 @@ impl PathComponent {
     pub fn mass_at_time(&self, time: f64) -> f64 {
         match self.future_segment_at_time(time) {
             Segment::Orbit(orbit) => orbit.mass(),
-            Segment::Burn(burn) => burn.current_point().mass(),
+            Segment::Burn(burn) => burn.point_at_time(time).mass(),
         }
     }
 

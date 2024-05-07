@@ -120,12 +120,26 @@ fn test_create_and_adjust_burn() {
     let end_time = burn.end_point().time();
     let duration = end_time - start_time;
 
-    let velocity_before = model.velocity_at_time(vessel, start_time - 1.0);
-    let velocity_after = model.velocity_at_time(vessel, end_time + 1.0);
-    assert!(((velocity_before.magnitude() - velocity_after.magnitude()).abs() - dv.magnitude()) < 1.0e-3);
+    let velocity_before = model.velocity_at_time(vessel, start_time - 0.1);
+    let velocity_after = model.velocity_at_time(vessel, end_time + 0.1);
+    let actual_dv = (velocity_before.magnitude() - velocity_after.magnitude()).abs();
+    println!("DV actual = {} expected = {}", actual_dv, dv.magnitude());
+    assert!((actual_dv - dv.magnitude()) < 1.0e-3);
 
-    let mass_before = model.mass_at_time(vessel, start_time - 1.0);
-    let mass_after = model.mass_at_time(vessel, end_time + 1.0);
+    let test_time = start_time + duration / 2.0;
+    let mass_at_time = model.mass_at_time(vessel, test_time);
+    let rocket_equation_function = RocketEquationFunction::new(
+        class.mass(),
+        fuel_tank_type.capacity_kg(),
+        engine_type.fuel_kg_per_second(),
+        engine_type.specific_impulse_space(),
+        duration / 2.0);
+    assert_eq!(mass_at_time, rocket_equation_function.mass());
+    println!("actual mass = {} expected mass = {}", mass_at_time, rocket_equation_function.mass());
+    assert!((mass_at_time - rocket_equation_function.mass()).abs() < 1.0e-3);
+
+    let mass_before = model.mass_at_time(vessel, start_time - 0.1);
+    let mass_after = model.mass_at_time(vessel, end_time + 0.1);
     let rocket_equation_function = RocketEquationFunction::new(
         class.mass(),
         fuel_tank_type.capacity_kg(),

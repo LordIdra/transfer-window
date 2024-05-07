@@ -42,6 +42,7 @@ impl Burn {
     }
 
     pub fn current_point(&self) -> &BurnPoint {
+        dbg!(&self.current_point);
         &self.current_point
     }
     
@@ -102,9 +103,10 @@ impl Burn {
         self.rocket_equation_function.clone()
     }
 
+    /// `time` is absolute
     pub fn rocket_equation_function_at_time(&self, time: f64) -> RocketEquationFunction {
         // Slightly annoying workaround to make sure that if the burn expends all our DV, there won't be a panic
-        match self.rocket_equation_function.step_by_time(time) {
+        match self.rocket_equation_function.step_by_time(time - self.start_point().time()) {
             Some(rocket_equation_function) => rocket_equation_function,
             None => self.rocket_equation_function.end(),
         }
@@ -112,7 +114,7 @@ impl Burn {
 
     #[allow(clippy::missing_panics_doc)]
     pub fn rocket_equation_function_at_end_of_burn(&self) -> RocketEquationFunction {
-        self.rocket_equation_function_at_time(self.duration())
+        self.rocket_equation_function_at_time(self.end_point().time())
     }
 
     pub fn overshot_time(&self, time: f64) -> f64 {
@@ -153,17 +155,15 @@ impl Burn {
         
         while self.end_point().time() + BURN_TIME_STEP < end_time {
             let last = self.points.last().unwrap();
-            let time_since_start = self.time_since_start(last.time());
-            let mass = self.rocket_equation_function_at_time(time_since_start).mass();
-            self.points.push(last.next(BURN_TIME_STEP, mass, self.absolute_acceleration(time_since_start)));
+            let mass = self.rocket_equation_function_at_time(last.time()).mass();
+            self.points.push(last.next(BURN_TIME_STEP, mass, self.absolute_acceleration(last.time())));
         }
 
         if self.duration() != 0.0 {
-            let undershot_time = end_time - self.end_point().time();
+            let undershot_dt = end_time - self.end_point().time();
             let last = self.points.last().unwrap();
-            let time_since_start = self.time_since_start(last.time()) + undershot_time;
-            let mass = self.rocket_equation_function_at_time(time_since_start).mass();
-            self.points.push(last.next(undershot_time, mass, self.absolute_acceleration(time_since_start)));
+            let mass = self.rocket_equation_function_at_time(end_time).mass();
+            self.points.push(last.next(undershot_dt, mass, self.absolute_acceleration(end_time)));
         }
     }
 

@@ -41,14 +41,14 @@ impl Model {
     /// Panics if there is no burn at the specified time
     pub(crate) fn adjust_burn(&mut self, entity: Entity, time: f64, amount: DVec2) {
         let mut burn = self.burn_starting_at_time(entity, time).clone();
-        let mass = burn.end_point().mass();
         burn.adjust(amount);
-
+        
         let parent = burn.parent();
         let position = burn.end_point().position();
         let velocity = burn.end_point().velocity();
-        let parent_mass = self.mass(parent);
+        let mass = burn.end_point().mass();
         let end_time = burn.end_point().time();
+        let parent_mass = self.mass(parent);
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, end_time);
 
         let path_component = self.path_component_mut(entity);
