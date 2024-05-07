@@ -27,7 +27,7 @@ pub fn update_drag(view: &mut Scene, model: &Model, context: &Context, events: &
         }
     }
 
-    // Do adjustment
+    // Do scroll adjustment
     if let Selected::Burn { entity, time, state } = view.selected.clone() {
         match state {
             BurnState::Dragging(direction) => {
@@ -38,8 +38,7 @@ pub fn update_drag(view: &mut Scene, model: &Model, context: &Context, events: &
             }
             // Inspired by KSP-type scrolling
             BurnState::Scrolling(direction, scroll_delta) => {
-                // I'm quite sure there's some mathematical operation for this,
-                // but I don't know what it is
+                // Use this instead of direction.vector() because it's honestly just simpler like this
                 let aligned = match direction {
                     BurnAdjustDirection::Prograde => vec2(-scroll_delta.y as f64, scroll_delta.x as f64),
                     BurnAdjustDirection::Retrograde => vec2(scroll_delta.y as f64, scroll_delta.x as f64),
@@ -57,7 +56,6 @@ pub fn update_drag(view: &mut Scene, model: &Model, context: &Context, events: &
 
     if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
         if state.is_scrolling() {
-            trace!("Stopped scrolling to adjust burn");
             *state = BurnState::Adjusting;
         }
     }

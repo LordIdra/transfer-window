@@ -30,7 +30,7 @@ pub struct Scene {
     frame_history: FrameHistory,
     debug_window_open: bool,
     debug_window_tab: DebugWindowTab,
-    icon_captured_scroll: bool
+    icon_captured_scroll: bool,
 }
 
 impl Scene {
