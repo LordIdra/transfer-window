@@ -81,11 +81,10 @@
 - [1|x] Allow deleting and warping to fire torpedo events
 - [1|x] Update deletion logic for burns and launch events
 - [1|x] Disallow creating events before last event
-- [1| ] Disallow cancelling torpedo launch event if torpedo has events queued???
 - [1| ] Torpedo stockpile
 - [1| ] Torpedo launcher needs to re-arm
-- [1| ] Yeet torpedo target when torpedo gets close enough
 - [1| ] Torpedo APN guidance system
+- [1| ] Yeet torpedo target when torpedo gets close enough
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
