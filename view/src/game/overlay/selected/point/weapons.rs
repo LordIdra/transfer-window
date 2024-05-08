@@ -9,13 +9,14 @@ fn draw_fire(view: &mut Scene, ui: &mut Ui, center: Pos2, vessel_component: &Ves
     let lock_size = Vec2::splat(20.0);
     let lock_rect = Rect::from_center_size(lock_centre, lock_size);
     ui.allocate_ui_at_rect(lock_rect, |ui| {
-        let texture = if vessel_component.has_target() {
+        let can_create = vessel_component.has_target() && vessel_component.can_create_timeline_event(time);
+        let texture = if can_create {
             "fire-possible"
         } else {
             "fire-disabled"
         };
         let image_button = ImageButton::new(view.resources.texture_image(texture));
-        if ui.add_enabled(vessel_component.has_target(), image_button).clicked() {
+        if ui.add_enabled(can_create, image_button).clicked() {
             let event = Event::CreateFireTorpedo { entity, slot_location, time };
             events.push(event);
         }

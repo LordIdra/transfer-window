@@ -149,4 +149,18 @@ impl VesselComponent {
     pub fn timeline_mut(&mut self) -> &mut Timeline {
         &mut self.timeline
     }
+
+    pub fn can_create_timeline_event(&self, time: f64) -> bool {
+        match self.timeline().last_event() {
+            Some(event) => event.time() < time,
+            None => true,
+        }
+    }
+
+    pub fn can_modify_timeline_event(&self, time: f64) -> bool {
+        match self.timeline().last_event() {
+            Some(event) => time == event.time(),
+            None => false,
+        }
+    }
 }

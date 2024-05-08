@@ -101,6 +101,9 @@ impl Timeline {
     }
 
     pub fn add(&mut self, event: TimelineEvent) {
+        if let Some(last_event) = self.last_event() {
+            assert!(event.time >= last_event.time);
+        }
         self.events.push_back(event);
     }
 

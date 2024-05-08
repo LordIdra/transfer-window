@@ -21,16 +21,10 @@ impl Model {
     }
 
     pub fn can_modify_timeline_event(&self, entity: Entity, time: f64) -> bool {
-        match self.vessel_component(entity).timeline().last_event() {
-            Some(event) => time == event.time(),
-            None => false,
-        }
+        self.vessel_component(entity).can_modify_timeline_event(time)
     }
 
     pub fn can_create_timeline_event(&self, entity: Entity, time: f64) -> bool {
-        match self.vessel_component(entity).timeline().last_event() {
-            Some(event) => event.time() < time,
-            None => true,
-        }
+        self.vessel_component(entity).can_create_timeline_event(time)
     }
 }
