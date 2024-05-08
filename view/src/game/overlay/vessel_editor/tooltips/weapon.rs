@@ -8,7 +8,7 @@ pub fn show_tooltip(ui: &mut Ui, weapon: &Option<Weapon>) {
     };
 
     let name = match weapon.type_() {
-        WeaponType::Torpedo => "Torpedo",
+        WeaponType::Torpedo { stockpile: _, cooldown_seconds: _ } => "Torpedo",
     };
 
     ui.label(name);

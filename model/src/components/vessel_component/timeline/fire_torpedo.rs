@@ -7,6 +7,7 @@ const TIME_BEFORE_BURN_START: f64 = 0.1;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FireTorpedoEvent {
+    fire_from: Entity,
     ghost: Entity,
     slot_location: SlotLocation,
     burn_time: f64,
@@ -34,11 +35,17 @@ impl FireTorpedoEvent {
         model.recompute_trajectory(ghost);
         model.create_burn(ghost, burn_time, rocket_equation_function);
 
-        Self { ghost, slot_location, burn_time }
+        Self { fire_from, ghost, slot_location, burn_time }
     }
 
     pub fn execute(&self, model: &mut Model) {
         model.vessel_component_mut(self.ghost).set_ghost(false);
+        let weapon = model.vessel_component_mut(self.fire_from)
+            .slots_mut()
+            .get_mut(self.slot_location)
+            .as_weapon_mut()
+            .expect("Weapon slot does not contain a weapon");
+        weapon.as_torpedo()
     }
 
     pub fn cancel(&self, model: &mut Model) {

@@ -4,7 +4,7 @@ use super::{System, SystemType};
 
 pub const FUEL_DENSITY: f64 = 1.0; // both RP-1 and LOX are very roughly 1.0kg/L
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FuelTankType {
     Torpedo,
     Small,

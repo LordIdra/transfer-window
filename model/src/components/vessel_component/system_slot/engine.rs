@@ -4,7 +4,7 @@ use crate::components::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
 use super::{System, SystemType};
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum EngineType {
     Torpedo,
     Efficient,

@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::Model;
@@ -67,10 +68,12 @@ impl TimelineEvent {
     }
 
     pub fn execute(&self, model: &mut Model) {
+        debug!("Executing timeline event {:?}", self);
         self.type_.execute(model);
     }
 
     pub fn cancel(&self, model: &mut Model) {
+        debug!("Cancelling timeline event {:?}", self);
         self.type_.cancel(model);
     }
 

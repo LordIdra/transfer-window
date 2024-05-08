@@ -47,6 +47,34 @@ impl Slot {
         matches!(self, Slot::Engine(_))
     }
 
+    pub fn as_weapon(&self) -> Option<&Weapon> {
+        match self {
+            Slot::Weapon(weapon) => weapon.as_ref(),
+            _ => panic!("Attempt to get non-weapon slot as weapon slot"),
+        }
+    }
+
+    pub fn as_weapon_mut(&mut self) -> Option<&mut Weapon> {
+        match self {
+            Slot::Weapon(weapon) => weapon.as_mut(),
+            _ => panic!("Attempt to get non-weapon slot as weapon slot"),
+        }
+    }
+    
+    pub fn as_fuel_tank(&self) -> Option<&FuelTank> {
+        match self {
+            Slot::FuelTank(fuel_tank) => fuel_tank.as_ref(),
+            _ => panic!("Attempt to get non-fuel-tank slot as fuel-tank slot"),
+        }
+    }
+
+    pub fn as_engine(&self) -> Option<&Engine> {
+        match self {
+            Slot::Engine(engine) => engine.as_ref(),
+            _ => panic!("Attempt to get non-engine slot as engine slot"),
+        }
+    }
+
     pub fn new_weapon(type_: WeaponType) -> Self {
         Self::Weapon(Some(Weapon::new(type_)))
     }

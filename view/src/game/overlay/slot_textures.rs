@@ -28,7 +28,7 @@ impl TexturedSlot for FuelTankType {
 impl TexturedSlot for WeaponType {
     fn texture(&self) -> &str {
         match self {
-            WeaponType::Torpedo => "torpedo",
+            WeaponType::Torpedo { stockpile: _, cooldown_seconds: _ } => "torpedo",
         }
     }
 }

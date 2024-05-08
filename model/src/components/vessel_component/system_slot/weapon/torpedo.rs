@@ -1,0 +1,17 @@
+use serde::{Deserialize, Serialize};
+
+
+const STOCKPILE: usize = 3;
+const COOLDOWN: f64 = 3600.0;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Torpedo {
+    stockpile: usize,
+    cooldown: f64,
+}
+
+impl Torpedo {
+    pub fn new() -> Self {
+        Self { stockpile: STOCKPILE, cooldown: 0.0 }
+    }
+}

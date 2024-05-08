@@ -1,18 +1,31 @@
 use serde::{Deserialize, Serialize};
 
+use self::torpedo::Torpedo;
+
 use super::{System, SystemType};
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+mod torpedo;
+
+
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum WeaponType {
-    Torpedo
+    Torpedo(Torpedo),
 }
 
 impl SystemType for WeaponType {}
 
 impl WeaponType {
     pub const TYPES: [WeaponType; 1] = [
-        WeaponType::Torpedo,
+        WeaponType::Torpedo(Torpedo::new())
     ];
+
+    pub fn as_torpedo(&self) -> &Torpedo {
+        match self {
+            WeaponType::Torpedo(torpedo) => torpedo,
+            _ => panic!("Attempt to get non-torpedo weapon as torpedo"),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
