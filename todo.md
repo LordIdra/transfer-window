@@ -84,7 +84,6 @@
 - [1|x] Torpedo stockpile
 - [1|x] Torpedoes have some velocity by default so they're not just buried under the ship icon
 - [1|x] Min/max zoom levels....
-- [1| ] Hotkey to zoom in (so planet covers most of screen, or to max zoom if vessel) or out (so parent SOI could fit on screen)
 - [1| ] Only allow one of each event to prevent double-clicks in a frame causing unexpected behaviour
 - [1| ] Icons per vessel class
 - [1| ] Torpedo APN guidance system

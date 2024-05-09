@@ -40,18 +40,6 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
                 view.camera.set_focus(Some(entity));
             }
         }
-
-        if input.key_pressed(Key::Z) {
-            if let Some(focus) = view.camera.focus() {
-                let zoom = if let Some(orbitable_component) = model.try_orbitable_component(focus) {
-                    1.0 / orbitable_component.radius()
-                } else {
-                    MAX_ZOOM
-                };
-                view.camera.set_zoom(zoom);
-                view.camera.reset_panning();
-            }
-        }
         
         if input.pointer.secondary_down() {
             update_pan(view, input.pointer.delta());
