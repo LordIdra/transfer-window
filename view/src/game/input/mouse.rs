@@ -3,7 +3,7 @@ use nalgebra_glm::vec2;
 
 use super::Scene;
 
-const MIN_ZOOM: f64 = 5.0e-6;
+const MIN_ZOOM: f64 = 5.0e-7;
 const MAX_ZOOM: f64 = 1.0;
 const ZOOM_SENSITIVITY: f64 = 0.003;
 
