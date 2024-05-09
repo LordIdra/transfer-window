@@ -6,8 +6,6 @@ use super::{System, SystemType};
 
 mod torpedo;
 
-
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum WeaponType {
     Torpedo(Torpedo),
