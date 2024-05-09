@@ -82,7 +82,7 @@
 - [1|x] Update deletion logic for burns and launch events
 - [1|x] Disallow creating events before last event
 - [1|x] Torpedo stockpile
-- [1| ] Min/max zoom levels....
+- [1|x] Min/max zoom levels....
 - [1|x] Torpedoes have some velocity by default so they're not just buried under the ship icon
 - [1| ] Icons per vessel class
 - [1| ] Torpedo APN guidance system
