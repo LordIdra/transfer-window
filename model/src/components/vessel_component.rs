@@ -134,10 +134,6 @@ impl VesselComponent {
         Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
     }
 
-    pub fn can_change_target(&self) -> bool {
-        !self.class.is_torpedo()
-    }
-
     pub fn can_edit_ever(&self) -> bool {
         !self.class.is_torpedo()
     }

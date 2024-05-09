@@ -14,13 +14,6 @@ impl Model {
         self.try_vessel_component(entity)?.target()
     }
 
-    pub fn can_change_target(&self, entity: Entity) -> bool {
-        match self.try_vessel_component(entity) {
-            Some(vessel_component) => vessel_component.can_change_target(),
-            None => false,
-        }
-    }
-
     pub fn can_edit(&self, entity: Entity) -> bool {
         self.vessel_component(entity).can_edit_ever() 
             && self.vessel_component(entity).timeline().events().is_empty() 

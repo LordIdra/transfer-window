@@ -22,7 +22,7 @@ fn draw_set_target(model: &Model, ui: &mut Ui, right_clicked: Entity, selected: 
             });
         }
     } else {
-        let can_target = (selected != right_clicked) && model.can_change_target(selected);
+        let can_target = selected != right_clicked;
         let button = Button::new("Set target");
         if ui.add_enabled(can_target, button).clicked() {
             events.push(Event::SetTarget { 
@@ -43,10 +43,8 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
         .show(context, |ui| {
             draw_focus(view, ui, right_clicked);
             if let Some(selected) = view.selected.entity(model) {
-                if let Some(selected_vessel_component) = model.try_vessel_component(selected) {
-                    if selected_vessel_component.can_change_target() {
-                        draw_set_target(model, ui, right_clicked, selected, events);
-                    }
+                if model.try_vessel_component(selected).is_some() {
+                    draw_set_target(model, ui, right_clicked, selected, events);
                 }
             }
         });
