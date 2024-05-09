@@ -82,8 +82,10 @@
 - [1|x] Update deletion logic for burns and launch events
 - [1|x] Disallow creating events before last event
 - [1|x] Torpedo stockpile
-- [1|x] Min/max zoom levels....
 - [1|x] Torpedoes have some velocity by default so they're not just buried under the ship icon
+- [1|x] Min/max zoom levels....
+- [1| ] Hotkey to zoom in (so planet covers most of screen, or to max zoom if vessel) or out (so parent SOI could fit on screen)
+- [1| ] Only allow one of each event to prevent double-clicks in a frame causing unexpected behaviour
 - [1| ] Icons per vessel class
 - [1| ] Torpedo APN guidance system
 - [1| ] Yeet torpedo target when torpedo gets close enough
@@ -91,8 +93,6 @@
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
 - [1| ] General UI improvements (cross that bridge later)
-- [1| ] Only allow one of each event to prevent double-clicks in a frame causing unexpected behaviour
-- [1| ] Hotkey to zoom in (so planet covers most of screen, or to 100m of vessel) or out (so parent SOI could fit on screen)
 
 # Stuff to do later because other stuff needs to be in place first
 - [1| ] Dim P/A icons when moused over and don't count as hovered????
