@@ -24,7 +24,7 @@ pub fn new_game(controller: &mut Controller) {
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(5.9722e24, 0.5, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(5.9722e24, 6.371e6, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
     let orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0).with_end_at(1.0e10);

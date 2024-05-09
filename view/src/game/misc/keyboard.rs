@@ -10,10 +10,6 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
     let _span = tracy_client::span!("Update keyboard");
 
     context.input(|input| {
-        if input.key_pressed(Key::R) {
-            view.camera.reset_panning();
-        }
-
         if input.key_pressed(Key::Space) {
             events.push(Event::TogglePaused);
         }

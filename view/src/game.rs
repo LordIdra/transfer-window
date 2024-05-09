@@ -11,7 +11,7 @@ mod camera;
 mod debug;
 mod expiry;
 mod frame_history;
-mod input;
+mod misc;
 mod overlay;
 mod rendering;
 mod resources;
@@ -57,10 +57,10 @@ impl Scene {
         let mut events = vec![];
         
         self.frame_history.update(context.input(|i| i.time), frame.info().cpu_usage);
+        misc::update(self, model, context, &mut events);
         expiry::update(self, model);
         underlay::draw(self, model, context, &mut events);
         overlay::draw(self, model, context, &mut events);
-        input::update(self, context, &mut events);
         debug::draw(self, model, context);
         rendering::update(self, model, context);
 

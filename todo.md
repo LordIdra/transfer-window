@@ -93,6 +93,7 @@
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
 - [1| ] General UI improvements (cross that bridge later)
+- [1| ] Fix or probably remove burn scrolling (probably not worth it for added complexity)
 
 # Stuff to do later because other stuff needs to be in place first
 - [1| ] Dim P/A icons when moused over and don't count as hovered????

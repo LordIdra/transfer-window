@@ -1,10 +1,11 @@
-use eframe::egui::{self, Context, Pos2, Rect, Vec2};
+use eframe::egui::{self, Context, Key, Pos2, Rect, Vec2};
 use nalgebra_glm::vec2;
+use transfer_window_model::Model;
 
 use super::Scene;
 
-const MIN_ZOOM: f64 = 5.0e-7;
-const MAX_ZOOM: f64 = 1.0;
+pub const MIN_ZOOM: f64 = 5.0e-7;
+pub const MAX_ZOOM: f64 = 1.0;
 const ZOOM_SENSITIVITY: f64 = 0.003;
 
 fn update_pan(view: &mut Scene, mouse_delta: Vec2) {
@@ -25,17 +26,39 @@ fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui
     view.camera.set_zoom(actual_new_zoom);
 }
 
-pub fn update(view: &mut Scene, context: &Context) {
+pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     #[cfg(feature = "profiling")]
-    let _span = tracy_client::span!("Update mouse");
+    let _span = tracy_client::span!("Update camera");
     
     context.input(|input| {
+        if input.key_pressed(Key::R) {
+            view.camera.reset_panning();
+        }
+        
+        if input.key_pressed(Key::F) {
+            if let Some(entity) = view.selected.entity(model) {
+                view.camera.set_focus(Some(entity));
+            }
+        }
+
+        if input.key_pressed(Key::Z) {
+            if let Some(focus) = view.camera.focus() {
+                let zoom = if let Some(orbitable_component) = model.try_orbitable_component(focus) {
+                    1.0 / orbitable_component.radius()
+                } else {
+                    MAX_ZOOM
+                };
+                view.camera.set_zoom(zoom);
+                view.camera.reset_panning();
+            }
+        }
+        
         if input.pointer.secondary_down() {
             update_pan(view, input.pointer.delta());
         };
 
-        if !view.icon_captured_scroll {
-            if let Some(latest_mouse_position) = input.pointer.latest_pos() {
+        if let Some(latest_mouse_position) = input.pointer.latest_pos() {
+            if input.scroll_delta.length() != 0.0 {
                 update_zoom(view, latest_mouse_position, input.scroll_delta, context.screen_rect());
             }
         }
