@@ -1,7 +1,7 @@
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{system_slot::SlotLocation, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{system_slot::{SlotLocation, System}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 const TIME_BEFORE_BURN_START: f64 = 0.1;
 
@@ -45,7 +45,7 @@ impl FireTorpedoEvent {
             .get_mut(self.slot_location)
             .as_weapon_mut()
             .expect("Weapon slot does not contain a weapon");
-        weapon.as_torpedo()
+        weapon.type_mut().as_torpedo_mut().deplete();
     }
 
     pub fn cancel(&self, model: &mut Model) {
@@ -64,4 +64,7 @@ impl FireTorpedoEvent {
         self.burn_time
     }
 
+    pub fn slot_location(&self) -> SlotLocation {
+        self.slot_location
+    }
 }

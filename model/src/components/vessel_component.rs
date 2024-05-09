@@ -88,36 +88,24 @@ impl VesselComponent {
         self.slots.set(location, slot);
     }
 
-    pub fn remaining_fuel_litres(&self) -> f64 {
-        let mut current_fuel = 0.0;
-        for fuel_tank in self.slots.fuel_tanks() {
-            current_fuel += fuel_tank.remaining_litres();
-        }
-        current_fuel
-    }
-
-    pub fn remaining_fuel_kg(&self) -> f64 {
-        self.remaining_fuel_litres() * FUEL_DENSITY
-    }
-
-    pub fn max_fuel_litres(&self) -> f64 {
-        let mut current_fuel = 0.0;
-        for fuel_tank in self.slots.fuel_tanks() {
-            current_fuel += fuel_tank.type_().capacity_litres();
-        }
-        current_fuel
-    }
-
-    pub fn max_fuel_kg(&self) -> f64 {
-        self.max_fuel_litres() * FUEL_DENSITY
-    }
-
     pub fn dry_mass(&self) -> f64 {
         self.class.mass()
     }
 
     pub fn mass(&self) -> f64 {
-        self.dry_mass() + self.remaining_fuel_kg() * FUEL_DENSITY
+        self.dry_mass() + self.fuel_kg() * FUEL_DENSITY
+    }
+
+    pub fn max_fuel_litres(&self) -> f64 {
+        let mut fuel = 0.0;
+        for fuel_tank in self.slots.fuel_tanks() {
+            fuel += fuel_tank.type_().capacity_litres();
+        }
+        fuel
+    }
+
+    pub fn max_fuel_kg(&self) -> f64 {
+        self.max_fuel_litres() * FUEL_DENSITY
     }
 
     pub fn max_dv(&self) -> Option<f64> {
@@ -127,7 +115,19 @@ impl VesselComponent {
         Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
     }
 
-    pub fn remaining_dv(&self) -> Option<f64> {
+    pub fn fuel_litres(&self) -> f64 {
+        let mut fuel = 0.0;
+        for fuel_tank in self.slots.fuel_tanks() {
+            fuel += fuel_tank.remaining_litres();
+        }
+        fuel
+    }
+
+    pub fn fuel_kg(&self) -> f64 {
+        self.fuel_litres() * FUEL_DENSITY
+    }
+
+    pub fn dv(&self) -> Option<f64> {
         let initial_mass = self.mass();
         let final_mass = self.dry_mass();
         let isp = self.slots().engine()?.type_().specific_impulse_space();
@@ -138,7 +138,7 @@ impl VesselComponent {
         !self.class.is_torpedo()
     }
 
-    pub fn can_edit(&self) -> bool {
+    pub fn can_edit_ever(&self) -> bool {
         !self.class.is_torpedo()
     }
 
@@ -162,5 +162,18 @@ impl VesselComponent {
             Some(event) => time == event.time(),
             None => false,
         }
+    }
+
+    pub fn final_torpedoes(&self, slot_location: SlotLocation) -> usize { 
+        let initial_torpedoes = self.slots()
+            .get(slot_location)
+            .as_weapon()
+            .unwrap()
+            .type_()
+            .as_torpedo()
+            .stockpile();
+        let depleted_torpedoes = self.timeline()
+            .depleted_torpedoes(slot_location);
+        initial_torpedoes - depleted_torpedoes
     }
 }

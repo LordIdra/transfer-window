@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{burn::BurnEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{start_burn::BurnEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_burn_without_engine_or_fuel_tank() {
@@ -97,10 +97,10 @@ fn test_create_and_adjust_burn() {
     model.update(0.01);
 
     let engine_type = EngineType::HighThrust;
-    let engine = Slot::new_engine(engine_type);
+    let engine = Slot::new_engine(engine_type.clone());
     model.set_slot(vessel, SlotLocation::Back, engine);
     let fuel_tank_type = FuelTankType::Medium;
-    let fuel_tank = Slot::new_fuel_tank(fuel_tank_type);
+    let fuel_tank = Slot::new_fuel_tank(fuel_tank_type.clone());
     model.set_slot(vessel, SlotLocation::Middle, fuel_tank);
     assert!(model.can_create_burn(vessel));
     

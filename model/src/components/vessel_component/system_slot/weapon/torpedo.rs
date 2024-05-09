@@ -14,4 +14,16 @@ impl Torpedo {
     pub fn new() -> Self {
         Self { stockpile: STOCKPILE, cooldown: 0.0 }
     }
+
+    pub fn deplete(&mut self) {
+        self.stockpile -= 1;
+    }
+
+    pub fn max_stockpile(&self) -> usize {
+        STOCKPILE
+    }
+
+    pub fn stockpile(&self) -> usize {
+        self.stockpile
+    }
 }

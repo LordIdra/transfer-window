@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{burn::BurnEvent, fire_torpedo::FireTorpedoEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{start_burn::BurnEvent, fire_torpedo::FireTorpedoEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -38,19 +38,19 @@ pub fn new_game(controller: &mut Controller) {
         .with_name_component(NameComponent::new("Moon".to_string()))
         .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3, OrbitableComponentPhysics::Orbit(orbit))));
 
-    let orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let orbit = Orbit::circle(earth, VesselClass::Light.mass(), 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let _spacecraft_1 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Spacecraft 1".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    let orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(0.2e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let orbit = Orbit::circle(earth, VesselClass::Light.mass(), 5.9722e24, vec2(0.2e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let _spacecraft_2 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Spacecraft 2".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    let orbit = Orbit::circle(moon, 2.0e2, 0.07346e24, vec2(0.3e8, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let orbit = Orbit::circle(moon, VesselClass::Light.mass(), 0.07346e24, vec2(0.3e8, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let _spacecraft_3 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Spacecraft 3".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))

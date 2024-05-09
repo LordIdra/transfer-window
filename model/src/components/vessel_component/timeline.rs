@@ -5,9 +5,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::Model;
 
-use self::{burn::BurnEvent, fire_torpedo::FireTorpedoEvent};
+use self::{start_burn::BurnEvent, fire_torpedo::FireTorpedoEvent};
 
-pub mod burn;
+use super::system_slot::SlotLocation;
+
+pub mod start_burn;
 pub mod fire_torpedo;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -119,11 +121,25 @@ impl Timeline {
         self.events.back().cloned()
     }
 
+    pub fn depleted_torpedoes(&self, slot_location :SlotLocation) -> usize {
+        self.events.iter()
+            .filter(|event| event.type_.as_fire_torpedo().is_some_and(|fire_torpedo| fire_torpedo.slot_location() == slot_location))
+            .count()
+    }
+
     /// Includes any event at `time`
     /// # Panics
     /// Panics if there is no last event
     pub fn pop_last_event(&mut self) -> TimelineEvent {
         self.events.pop_back().unwrap()
+    }
+
+    pub fn events_before(&mut self, time: f64) -> Vec<TimelineEvent> {
+        let mut events = vec![];
+        while self.events.front().is_some_and(|event| event.time < time) {
+            events.push(self.events.front().unwrap().clone());
+        }
+        events
     }
 
     /// Does not include any event at `time`

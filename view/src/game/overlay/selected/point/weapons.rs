@@ -9,7 +9,9 @@ fn draw_fire(view: &mut Scene, ui: &mut Ui, center: Pos2, vessel_component: &Ves
     let lock_size = Vec2::splat(20.0);
     let lock_rect = Rect::from_center_size(lock_centre, lock_size);
     ui.allocate_ui_at_rect(lock_rect, |ui| {
-        let can_create = vessel_component.has_target() && vessel_component.can_create_timeline_event(time);
+        let can_create = vessel_component.has_target() 
+            && vessel_component.can_create_timeline_event(time) 
+            && vessel_component.final_torpedoes(slot_location) != 0;
         let texture = if can_create {
             "fire-possible"
         } else {

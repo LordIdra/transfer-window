@@ -14,10 +14,12 @@ pub enum EngineType {
 impl SystemType for EngineType {}
 
 impl EngineType {
-    pub const TYPES: [EngineType; 2] = [
-        EngineType::Efficient, 
-        EngineType::HighThrust,
-    ];
+    pub fn types() -> [Self; 2] {
+        [
+            EngineType::Efficient, 
+            EngineType::HighThrust,
+        ]
+    }
 
     pub fn fuel_kg_per_second(&self) -> f64 {
         match self {
@@ -50,6 +52,10 @@ impl System for Engine {
     
     fn type_(&self) -> &Self::Type {
         &self.type_
+    }
+
+    fn type_mut(&mut self) -> &mut Self::Type {
+        &mut self.type_
     }
 }
 

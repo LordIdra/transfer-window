@@ -57,7 +57,7 @@ impl SlotEditor {
         match slot {
             Slot::Weapon(_) => {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::Weapon(None)));
-                for type_ in WeaponType::TYPES {
+                for type_ in WeaponType::types() {
                     let texture = type_.texture().to_string();
                     let slot = Slot::new_weapon(type_);
                     selectors.push(SlotSelector::new(texture, slot));
@@ -66,7 +66,7 @@ impl SlotEditor {
 
             Slot::FuelTank(_) => {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::FuelTank(None)));
-                for type_ in FuelTankType::TYPES {
+                for type_ in FuelTankType::types() {
                     let texture = type_.texture().to_string();
                     let slot = Slot::new_fuel_tank(type_);
                     selectors.push(SlotSelector::new(texture, slot));
@@ -75,7 +75,7 @@ impl SlotEditor {
 
             Slot::Engine(_) => {
                 selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::Engine(None)));
-                for type_ in EngineType::TYPES {
+                for type_ in EngineType::types() {
                     let texture = type_.texture().to_string();
                     let slot = Slot::new_engine(type_);
                     selectors.push(SlotSelector::new(texture, slot));

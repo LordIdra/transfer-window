@@ -14,6 +14,7 @@ pub mod weapon;
 pub trait System {
     type Type: SystemType;
     fn type_(&self) -> &Self::Type;
+    fn type_mut(&mut self) -> &mut Self::Type;
 }
 
 pub trait SystemType {}

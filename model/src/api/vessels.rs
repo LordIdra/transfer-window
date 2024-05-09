@@ -3,7 +3,6 @@ use crate::{components::vessel_component::{system_slot::{Slot, SlotLocation}, ti
 impl Model {
     pub fn set_slot(&mut self, entity: Entity, location: SlotLocation, slot: Slot) {
         self.vessel_component_mut(entity).set_slot(location, slot);
-        self.vessel_component_mut(entity).timeline_mut().clear();
         self.recompute_entire_trajectory(entity);
     }
 
@@ -20,5 +19,11 @@ impl Model {
             Some(vessel_component) => vessel_component.can_change_target(),
             None => false,
         }
+    }
+
+    pub fn can_edit(&self, entity: Entity) -> bool {
+        self.vessel_component(entity).can_edit_ever() 
+            && self.vessel_component(entity).timeline().events().is_empty() 
+            && self.path_component(entity).final_burn().is_none()
     }
 }

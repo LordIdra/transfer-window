@@ -174,7 +174,18 @@ impl Model {
         panic!("Request to get mass of entity without orbitable or vessel components");
     }
 
-    pub fn distance(&self, entity_a: Entity, entity_b: Entity) -> f64 {
-        (self.absolute_position(entity_a) - self.absolute_position(entity_b)).magnitude()
+    /// Returns none if the entity does not have an engine
+    /// # Panics
+    /// Panics if the entity does not have a vessel component
+    pub fn final_dv(&self, entity: Entity) -> Option<f64> {
+        if let Some(vessel_component) = self.try_vessel_component(entity) {
+            if let Some(final_burn) = self.path_component(entity).final_burn() {
+                let current_time = final_burn.current_point().time();
+                return Some(final_burn.rocket_equation_function_at_time(current_time).remaining_dv());
+            }
+            return vessel_component.dv();
+        }
+
+        panic!("Request to get dv of entity without vessel component");
     }
 }

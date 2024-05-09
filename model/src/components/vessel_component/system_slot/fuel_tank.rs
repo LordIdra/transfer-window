@@ -15,11 +15,13 @@ pub enum FuelTankType {
 impl SystemType for FuelTankType {}
 
 impl FuelTankType {
-    pub const TYPES: [FuelTankType; 3] = [
-        FuelTankType::Small, 
-        FuelTankType::Medium,
-        FuelTankType::Large,
-    ];
+    pub fn types() -> [Self; 3] {
+        [
+            FuelTankType::Small, 
+            FuelTankType::Medium,
+            FuelTankType::Large,
+        ]
+    }
 
     pub fn capacity_litres(&self) -> f64 {
         match self {
@@ -47,11 +49,16 @@ impl System for FuelTank {
     fn type_(&self) -> &Self::Type {
         &self.type_
     }
+
+    fn type_mut(&mut self) -> &mut Self::Type {
+        &mut self.type_
+    }
 }
 
 impl FuelTank {
     pub fn new(type_: FuelTankType) -> Self {
-        FuelTank { type_, remaining_litres: type_.capacity_litres() }
+        let remaining_litres = type_.capacity_litres();
+        FuelTank { type_, remaining_litres }
     }
 
     pub fn remaining_litres(&self) -> f64 {
@@ -62,7 +69,7 @@ impl FuelTank {
         self.remaining_litres * FUEL_DENSITY
     }
 
-    pub fn set_remaining(&mut self, to_deplete_kg: f64) {
-        self.remaining_litres = to_deplete_kg / FUEL_DENSITY;
+    pub fn set_remaining(&mut self, new_remaining: f64) {
+        self.remaining_litres = new_remaining / FUEL_DENSITY;
     }
 }

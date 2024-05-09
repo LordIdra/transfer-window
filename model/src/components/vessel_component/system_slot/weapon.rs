@@ -16,11 +16,20 @@ pub enum WeaponType {
 impl SystemType for WeaponType {}
 
 impl WeaponType {
-    pub const TYPES: [WeaponType; 1] = [
-        WeaponType::Torpedo(Torpedo::new())
-    ];
+    pub fn types() -> [Self; 1] {
+        [
+            WeaponType::Torpedo(Torpedo::new())
+        ]
+    }
 
     pub fn as_torpedo(&self) -> &Torpedo {
+        match self {
+            WeaponType::Torpedo(torpedo) => torpedo,
+            _ => panic!("Attempt to get non-torpedo weapon as torpedo"),
+        }
+    }
+
+    pub fn as_torpedo_mut(&mut self) -> &mut Torpedo {
         match self {
             WeaponType::Torpedo(torpedo) => torpedo,
             _ => panic!("Attempt to get non-torpedo weapon as torpedo"),
@@ -38,6 +47,10 @@ impl System for Weapon {
     
     fn type_(&self) -> &Self::Type {
         &self.type_
+    }
+
+    fn type_mut(&mut self) -> &mut Self::Type {
+        &mut self.type_
     }
 }
 

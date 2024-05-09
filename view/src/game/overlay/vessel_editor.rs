@@ -39,16 +39,20 @@ fn draw_header(view: &mut Scene, model: &Model, ui: &mut Ui, entity: Entity) -> 
 }
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
-    if view.vessel_editor.is_none() {
+    let Some(vessel_editor) = view.vessel_editor.clone() else {
         return;
     };
+
+    if !model.can_edit(vessel_editor.entity) {
+        view.vessel_editor = None;
+        return;
+    }
 
     Window::new("Vessel editor")
         .title_bar(false)
         .resizable(false)
         .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
-            let vessel_editor = view.vessel_editor.as_ref().unwrap().clone();
             let should_close = draw_header(view, model, ui, vessel_editor.entity);
             let vessel_component = model.vessel_component(vessel_editor.entity);
             let vessel_class = vessel_component.class();

@@ -24,7 +24,7 @@ impl RocketEquationFunction {
     /// Panics if the vessel component has no engine installed
     pub fn from_vessel_component(vessel_component: &VesselComponent) -> Self {
         let dry_mass_kg = vessel_component.dry_mass();
-        let initial_fuel_mass_kg = vessel_component.remaining_fuel_kg();
+        let initial_fuel_mass_kg = vessel_component.fuel_kg();
         let engine = vessel_component.slots().engine().unwrap();
         let fuel_consumption_kg_per_second = engine.type_().fuel_kg_per_second();
         let specific_impulse = engine.type_().specific_impulse_space();
@@ -72,6 +72,12 @@ impl RocketEquationFunction {
     pub fn used_dv(&self) -> f64 {
         let start_mass = self.dry_mass_kg + self.initial_fuel_mass_kg;
         let end_mass = self.mass();
+        STANDARD_GRAVITY * self.specific_impulse * f64::ln(start_mass / end_mass)
+    }
+
+    pub fn remaining_dv(&self) -> f64 {
+        let start_mass = self.mass();
+        let end_mass = self.dry_mass_kg;
         STANDARD_GRAVITY * self.specific_impulse * f64::ln(start_mass / end_mass)
     }
 
