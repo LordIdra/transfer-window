@@ -102,6 +102,8 @@ impl Timeline {
         &self.events
     }
 
+    /// # Panics
+    /// Panics if the event occurs before the last event
     pub fn add(&mut self, event: TimelineEvent) {
         if let Some(last_event) = self.last_event() {
             assert!(event.time >= last_event.time);
@@ -134,6 +136,7 @@ impl Timeline {
         self.events.pop_back().unwrap()
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn events_before(&mut self, time: f64) -> Vec<TimelineEvent> {
         let mut events = vec![];
         while self.events.front().is_some_and(|event| event.time < time) {

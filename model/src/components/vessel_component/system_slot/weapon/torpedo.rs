@@ -11,6 +11,7 @@ pub struct Torpedo {
 }
 
 impl Torpedo {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { stockpile: STOCKPILE, cooldown: 0.0 }
     }
@@ -19,6 +20,7 @@ impl Torpedo {
         self.stockpile -= 1;
     }
 
+    #[allow(clippy::unused_self)]
     pub fn max_stockpile(&self) -> usize {
         STOCKPILE
     }

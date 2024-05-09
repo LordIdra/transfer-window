@@ -47,7 +47,7 @@ fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
     let dv_proportion = torpedoes as f32 / max_torpedoes as f32;
     ui.label("Torpedoes");
     draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::WHITE, Color32::DARK_GRAY, dv_proportion);
-    ui.label(format!("{} / {}", torpedoes, max_torpedoes));
+    ui.label(format!("{torpedoes} / {max_torpedoes}"));
     ui.end_row();
 }
 
@@ -71,7 +71,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
             });
 
             if vessel_component.can_edit_ever() {
-                if ui.add_enabled(model.can_edit(entity), Button::new("Edit")).clicked() {
+                let button = Button::new("Edit");
+                if ui.add_enabled(model.can_edit(entity), button).clicked() {
                     view.vessel_editor = Some(VesselEditor::new(entity));
                 }
             }

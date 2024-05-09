@@ -160,6 +160,8 @@ impl VesselComponent {
         }
     }
 
+    /// # Panics
+    /// Panics if the slot does not exist or is not a torpedo
     pub fn final_torpedoes(&self, slot_location: SlotLocation) -> usize { 
         let initial_torpedoes = self.slots()
             .get(slot_location)

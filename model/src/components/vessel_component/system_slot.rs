@@ -48,6 +48,7 @@ impl Slot {
         matches!(self, Slot::Engine(_))
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn as_weapon(&self) -> Option<&Weapon> {
         match self {
             Slot::Weapon(weapon) => weapon.as_ref(),
@@ -55,6 +56,7 @@ impl Slot {
         }
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn as_weapon_mut(&mut self) -> Option<&mut Weapon> {
         match self {
             Slot::Weapon(weapon) => weapon.as_mut(),
@@ -62,6 +64,7 @@ impl Slot {
         }
     }
     
+    #[allow(clippy::missing_panics_doc)]
     pub fn as_fuel_tank(&self) -> Option<&FuelTank> {
         match self {
             Slot::FuelTank(fuel_tank) => fuel_tank.as_ref(),
@@ -69,6 +72,7 @@ impl Slot {
         }
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn as_engine(&self) -> Option<&Engine> {
         match self {
             Slot::Engine(engine) => engine.as_ref(),

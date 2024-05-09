@@ -38,6 +38,8 @@ impl FireTorpedoEvent {
         Self { fire_from, ghost, slot_location, burn_time }
     }
 
+    /// # Panics
+    /// Panics if the weapon slot requested does not in fact contain a weapon or is not a torpedo
     pub fn execute(&self, model: &mut Model) {
         model.vessel_component_mut(self.ghost).set_ghost(false);
         let weapon = model.vessel_component_mut(self.fire_from)

@@ -22,6 +22,7 @@ impl WeaponType {
         ]
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn as_torpedo(&self) -> &Torpedo {
         match self {
             WeaponType::Torpedo(torpedo) => torpedo,
@@ -29,6 +30,7 @@ impl WeaponType {
         }
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn as_torpedo_mut(&mut self) -> &mut Torpedo {
         match self {
             WeaponType::Torpedo(torpedo) => torpedo,
