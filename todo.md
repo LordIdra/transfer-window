@@ -84,8 +84,8 @@
 - [1|x] Torpedo stockpile
 - [1|x] Torpedoes have some velocity by default so they're not just buried under the ship icon
 - [1|x] Min/max zoom levels....
-- [1| ] Only allow one of each event to prevent double-clicks in a frame causing unexpected behaviour
-- [1| ] Icons per vessel class
+- [1|x] Icons per vessel class
+- [1x ] Icons face vessel velocity
 - [1| ] Torpedo APN guidance system
 - [1| ] Yeet torpedo target when torpedo gets close enough
 - [1| ] Burns cannot use more DV than ship has including previous burns

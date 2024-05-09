@@ -1,6 +1,6 @@
 use eframe::egui::PointerState;
-use nalgebra_glm::DVec2;
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
+use nalgebra_glm::{vec2, DVec2};
+use transfer_window_model::{components::{vessel_component::VesselClass, ComponentType}, storage::entity_allocator::Entity, Model};
 
 use crate::game::{underlay::selected::Selected, Scene};
 
@@ -27,12 +27,16 @@ impl Vessel {
 
 impl Icon for Vessel {
     fn texture(&self, view: &Scene, model: &Model) -> String {
+        let mut base_name = match model.vessel_component(self.entity).class() {
+            VesselClass::Torpedo => "vessel-icon-torpedo",
+            VesselClass::Light => "vessel-icon-light",
+        }.to_string();
         if let Some(target) = view.selected.target(model) {
             if target == self.entity {
-                return "spacecraft-target".to_string()
+                base_name += "-target"
             }
         }
-        "spacecraft".to_string()
+        base_name
     }
 
     fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
@@ -49,7 +53,7 @@ impl Icon for Vessel {
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        10.0
+        12.0
     }
 
     fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
@@ -67,8 +71,9 @@ impl Icon for Vessel {
         model.absolute_position(self.entity)
     }
 
-    fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {
-        None
+    fn facing(&self, _view: &Scene, model: &Model) -> Option<DVec2> {
+        let direction = model.velocity(self.entity).normalize();
+        Some(vec2(-direction.y, direction.x))
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
