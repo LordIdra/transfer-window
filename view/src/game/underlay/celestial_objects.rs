@@ -24,9 +24,14 @@ pub fn draw(view: &Scene, model: &Model) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw celestial objects");
     for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
+        let name = model.name_component(entity).name().to_ascii_lowercase();
         let position = model.absolute_position(entity);
-        let radius = model.orbitable_component(entity).radius();
+        let orbitable = model.orbitable_component(entity);
+        let rotation = orbitable.rotation();
+        let radius = orbitable.radius();
         let mut vertices = compute_celestial_object_vertices(position, radius);
-        view.object_renderer.lock().unwrap().add_vertices(&mut vertices);
+        let mut renderer = view.object_renderers[&name].lock().unwrap();
+        renderer.add_vertices(&mut vertices);
+        renderer.set_rotation(rotation);
     }
 }

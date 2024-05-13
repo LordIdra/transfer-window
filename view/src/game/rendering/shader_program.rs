@@ -67,6 +67,11 @@ impl ShaderProgram {
         self.use_program();
         unsafe { self.gl.uniform_matrix_3_f32_slice(Some(&Self::location(self, name)), false, v); }
     }
+    
+    pub fn uniform_float(&self, name: &str, v: f32) {
+        self.use_program();
+        unsafe { self.gl.uniform_1_f32(Some(&Self::location(self, name)), v); }
+    }
 }
 
 impl Drop for ShaderProgram {

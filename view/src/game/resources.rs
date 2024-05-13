@@ -6,7 +6,7 @@ use image::GenericImageView;
 
 use crate::game::rendering::texture;
 
-use super::rendering::texture_renderer::TextureRenderer;
+use super::rendering::{texture_renderer::TextureRenderer, object_renderer::ObjectRenderer};
 
 fn directory_entries(directory: String) -> Vec<DirEntry> {
     fs::read_dir(directory)
@@ -42,6 +42,7 @@ impl Texture {
 /// Loads all textures in the resources folder upon initialization
 pub struct Resources {
     texture_names: Vec<String>,
+    object_names: Vec<String>,
     textures: HashMap<String, Texture>,
 }
 
@@ -51,15 +52,21 @@ impl Resources {
             .into_iter()
             .map(|entry| entry_name(&entry))
             .collect();
-        let textures = directory_entries("view/resources/textures/icon".to_string())
+        let object_names = directory_entries("view/resources/textures/planet".to_string())
             .into_iter()
+            .map(|entry| entry_name(&entry))
+            .collect();
+        let textures = directory_entries("view/resources/textures".to_string())
+            .into_iter()
+            .flat_map(|entry| entry.path().read_dir().unwrap())
+            .map(|entry| entry.unwrap())
             .map(|entry| (entry_name(&entry), entry))
             .map(|(name, texture)| (name, Texture::new(&texture)))
             .collect();
-        Resources { texture_names, textures }
+        Resources { texture_names, object_names, textures }
     }
 
-    pub fn build_renderers(&mut self, gl: &Arc<Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
+    pub fn build_texture_renderers(&mut self, gl: &Arc<Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
         let mut texture_renderers = HashMap::new();
         for texture_name in &self.texture_names().clone() {
             let texture = self.gl_texture(gl.clone(), texture_name.as_str());
@@ -67,6 +74,16 @@ impl Resources {
             texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
         }
         texture_renderers
+    }
+    
+    pub fn build_object_renderers(&mut self, gl: &Arc<Context>) -> HashMap<String, Arc<Mutex<ObjectRenderer>>> {
+        let mut planet_renderers = HashMap::new();
+        for texture_name in &self.texture_names().clone() {
+            let texture = self.gl_texture(gl.clone(), texture_name.as_str());
+            let planet_renderer = ObjectRenderer::new(gl.clone(), texture.clone());
+            planet_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(planet_renderer)));
+        }
+        planet_renderers
     }
 
     pub fn texture_names(&self) -> &Vec<String> {

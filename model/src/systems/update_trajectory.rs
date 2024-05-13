@@ -1,3 +1,4 @@
+use std::time::Duration;
 use crate::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
 fn update_path_component(model: &mut Model, entity: Entity, time: f64, simulation_dt: f64) {
@@ -17,7 +18,9 @@ fn update_path_component(model: &mut Model, entity: Entity, time: f64, simulatio
 }
 
 fn update_orbitable_component(model: &mut Model, entity: Entity, simulation_dt: f64) {
-    if let Some(orbit) = model.orbitable_component_mut(entity).orbit_mut() {
+    let orbitable_component = model.orbitable_component_mut(entity);
+    orbitable_component.add_rotation(Duration::from_secs_f64(simulation_dt));
+    if let Some(orbit) = orbitable_component.orbit_mut() {
         orbit.next(simulation_dt);
     }
 }

@@ -1,3 +1,4 @@
+use std::time::Duration;
 use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 
@@ -44,12 +45,15 @@ impl OrbitableComponentPhysics {
 pub struct OrbitableComponent {
     mass: f64,
     radius: f64,
+    rotation_period: Duration,
+    cumulative_rotation: Duration,
     physics: OrbitableComponentPhysics,
 }
 
 impl OrbitableComponent {
-    pub fn new(mass: f64, radius: f64, physics: OrbitableComponentPhysics) -> Self {
-        Self { mass, radius, physics }
+    pub fn new(mass: f64, radius: f64, rotation_period: Duration, physics: OrbitableComponentPhysics) -> Self {
+        let cumulative_rotation = Duration::from_secs(0);
+        Self { mass, radius, rotation_period, cumulative_rotation, physics }
     }
 
     pub fn mass(&self) -> f64 {
@@ -58,6 +62,20 @@ impl OrbitableComponent {
 
     pub fn radius(&self) -> f64 {
         self.radius
+    }
+    
+    pub fn rotation_period(&self) -> Duration {
+        self.rotation_period
+    }
+    
+    pub fn rotation(&self) -> f32 {
+        let rotation_period = self.rotation_period.as_secs_f32();
+        let cumulative_rotation = self.cumulative_rotation.as_secs_f32();
+        cumulative_rotation / rotation_period * 2.0 * std::f32::consts::PI
+    }
+    
+    pub fn add_rotation(&mut self, duration: Duration) {
+        self.cumulative_rotation += duration;
     }
 
     pub fn orbit(&self) -> Option<&Orbit> {
