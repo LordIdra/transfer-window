@@ -47,19 +47,19 @@ pub struct Resources {
 
 impl Resources {
     pub fn new() -> Self {
-        let texture_names = directory_entries("view/resources/textures".to_string())
+        let texture_names = directory_entries("view/resources/textures/icon".to_string())
             .into_iter()
             .map(|entry| entry_name(&entry))
             .collect();
-        let textures = directory_entries("view/resources/textures".to_string())
+        let textures = directory_entries("view/resources/textures/icon".to_string())
             .into_iter()
             .map(|entry| (entry_name(&entry), entry))
-            .map(|entry| (entry.0, Texture::new(&entry.1)))
+            .map(|(name, texture)| (name, Texture::new(&texture)))
             .collect();
         Resources { texture_names, textures }
     }
 
-    pub fn build_renderers(&mut self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
+    pub fn build_renderers(&mut self, gl: &Arc<Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
         let mut texture_renderers = HashMap::new();
         for texture_name in &self.texture_names().clone() {
             let texture = self.gl_texture(gl.clone(), texture_name.as_str());
