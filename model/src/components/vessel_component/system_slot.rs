@@ -106,7 +106,7 @@ pub struct Slots {
 impl Slots {
     pub fn new(class: VesselClass) -> Self {
         let slots = match class {
-            VesselClass::Torpedo => [
+            VesselClass::Torpedo(_) => [
                 (SlotLocation::TorpedoFuelTank, Slot::new_fuel_tank(FuelTankType::Torpedo)),
                 (SlotLocation::TorpedoEngine, Slot::new_engine(EngineType::Torpedo)),
             ].into_iter().collect(),

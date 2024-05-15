@@ -76,5 +76,10 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
                     view.vessel_editor = Some(VesselEditor::new(entity));
                 }
             }
+
+            let button = Button::new("Enable guidance");
+            if ui.add_enabled(model.can_torpedo_enable_guidance(entity), button).clicked() {
+                view.vessel_editor = Some(VesselEditor::new(entity));
+            }
         });
 }

@@ -28,7 +28,7 @@ impl Vessel {
 impl Icon for Vessel {
     fn texture(&self, view: &Scene, model: &Model) -> String {
         let mut base_name = match model.vessel_component(self.entity).class() {
-            VesselClass::Torpedo => "vessel-icon-torpedo",
+            VesselClass::Torpedo(_) => "vessel-icon-torpedo",
             VesselClass::Light => "vessel-icon-light",
         }.to_string();
         if let Some(target) = view.selected.target(model) {

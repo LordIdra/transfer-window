@@ -1,7 +1,7 @@
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{system_slot::{SlotLocation, System}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{class::torpedo::Torpedo, system_slot::{SlotLocation, System}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 const TIME_BEFORE_BURN_START: f64 = 0.1;
 const INITIAL_DV: DVec2 = DVec2::new(0.0, 1.0);
@@ -16,7 +16,7 @@ pub struct FireTorpedoEvent {
 
 impl FireTorpedoEvent {
     pub fn new(model: &mut Model, fire_from: Entity, time: f64, slot_location: SlotLocation) -> Self {
-        let mut vessel_component = VesselComponent::new(VesselClass::Torpedo).with_ghost();
+        let mut vessel_component = VesselComponent::new(VesselClass::Torpedo(Torpedo::default())).with_ghost();
         vessel_component.set_target(model.vessel_component(fire_from).target);
 
         let fire_from_orbit = model.orbit_at_time(fire_from, time);

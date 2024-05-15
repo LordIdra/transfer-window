@@ -11,7 +11,7 @@ const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
 pub fn compute_vessel_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
     let rgb = match model.vessel_component(entity).class() {
-        VesselClass::Torpedo => Rgba::from_rgb(1.0, 0.0, 0.0),
+        VesselClass::Torpedo(_) => Rgba::from_rgb(1.0, 0.0, 0.0),
         VesselClass::Light => Rgba::from_rgb(0.0, 1.0, 1.0),
     };
 

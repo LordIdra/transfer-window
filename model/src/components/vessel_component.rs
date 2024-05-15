@@ -2,29 +2,30 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use self::{system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System}, timeline::Timeline};
+use self::{class::torpedo::Torpedo, system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System}, timeline::Timeline};
 
 use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
+pub mod class;
 pub mod system_slot;
 pub mod timeline;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum VesselClass {
-    Torpedo,
+    Torpedo(Torpedo),
     Light,
 }
 
 impl VesselClass {
     pub fn mass(&self) -> f64 {
         match self {
-            VesselClass::Torpedo => 1.0e3,
+            VesselClass::Torpedo(_) => 1.0e3,
             VesselClass::Light => 1.0e4,
         }
     }
 
     pub fn is_torpedo(self) -> bool {
-        matches!(self, Self::Torpedo)
+        matches!(self, Self::Torpedo(_))
     }
 }
 
@@ -74,6 +75,10 @@ impl VesselComponent {
 
     pub fn class(&self) -> VesselClass {
         self.class
+    }
+
+    pub fn class_mut(&mut self) -> &mut VesselClass {
+        &mut self.class
     }
 
     pub fn slots(&self) -> &Slots {
