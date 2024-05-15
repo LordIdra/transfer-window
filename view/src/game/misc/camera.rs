@@ -46,7 +46,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
         };
 
         if let Some(latest_mouse_position) = input.pointer.latest_pos() {
-            if input.scroll_delta.length() != 0.0 {
+            println!("{}", view.icon_captured_scroll);
+            if input.scroll_delta.length() != 0.0 && !view.icon_captured_scroll {
                 update_zoom(view, latest_mouse_position, input.scroll_delta, context.screen_rect());
             }
         }
