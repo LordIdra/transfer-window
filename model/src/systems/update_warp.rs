@@ -43,7 +43,7 @@ impl TimeWarp {
 }
 
 impl Model {
-    pub fn update_warp(&mut self, dt: f64) {
+    pub(crate) fn update_warp(&mut self, dt: f64) {
         // Weird double if needed because of borrow checker
         let warp_finished = if let Some(warp) = &self.warp {
             self.time >= warp.end_time

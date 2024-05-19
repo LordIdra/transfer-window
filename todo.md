@@ -86,21 +86,19 @@
 - [1|x] Min/max zoom levels....
 - [1|x] Icons per vessel class
 - [1|x] Icons face vessel velocity
-- [1| ] Fix closest point weirdness??
-- [1| ] Fix backward burn dragging
-- [1| ] Torpedo APN guidance system
+- [1| ] Torpedo APN guidance system -> consider entire trajectory for now ie no fog or war, use ITP for intercepts given degrees requirement?
 - [1| ] Yeet torpedo target when torpedo gets close enough
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
 - [1| ] General UI improvements (cross that bridge later)
-- [1| ] Fix or probably remove burn scrolling (probably not worth it for added complexity)
 
 # Stuff to do later because other stuff needs to be in place first
 - [1| ] Dim P/A icons when moused over and don't count as hovered????
 - [1| ] Hide all child icons and segments of object when zoomed out far enough
 - [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
-- [1| ] Show orbital parameters
+- [1| ] Show upcoming segments including timeline events
+- [1| ] Show orbit/burn parameters
 
 # On TODO list
 - [1| ] Ballistic weaponry
@@ -108,5 +106,10 @@
 - [1| ] PDC automatic targeting system
 - [1| ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 - [1| ] PDC shells not affected by gravity?
-- [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 - [1| ] Collisions with planets (nearly forgot about that lmao)
+
+# Boring shit that needs fixing
+- [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
+- [1| ] Fix closest point weirdness??
+- [1| ] Fix backward burn dragging
+- [1| ] Fix or probably remove burn scrolling (probably not worth it for added complexity)

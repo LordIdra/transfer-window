@@ -9,7 +9,7 @@ fn update_entity_timeline(model: &mut Model, entity: Entity) {
 }
 
 impl Model {
-    pub fn update_timeline(&mut self) {
+    pub(crate) fn update_timeline(&mut self) {
         for entity in self.entities(vec![ComponentType::VesselComponent]) {
             update_entity_timeline(self, entity);
         }

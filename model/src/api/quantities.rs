@@ -188,4 +188,12 @@ impl Model {
 
         panic!("Request to get dv of entity without vessel component");
     }
+
+    pub fn distance(&self, entity: Entity, other_entity: Entity) -> f64 {
+        (self.absolute_position(entity) - self.absolute_position(other_entity)).magnitude()
+    }
+
+    pub fn distance_at_time(&self, entity: Entity, other_entity: Entity, time: f64) -> f64 {
+        (self.absolute_position_at_time(entity, time) - self.absolute_position_at_time(other_entity, time)).magnitude()
+    }
 }

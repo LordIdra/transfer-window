@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Button, Color32, Context, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::{system_slot::System, VesselComponent}, Model};
 
-use crate::game::{overlay::{vessel_editor::VesselEditor, widgets::draw_filled_bar}, underlay::selected::Selected, Scene};
+use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::draw_filled_bar}, underlay::selected::Selected, Scene}};
 
 fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent) {
     let remaining_fuel = vessel_component.fuel_litres();
@@ -51,7 +51,7 @@ fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
     ui.end_row();
 }
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context) {
+pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     let Selected::Vessel(entity) = view.selected.clone() else { 
         return
     };
@@ -79,7 +79,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
 
             let button = Button::new("Enable guidance");
             if ui.add_enabled(model.can_torpedo_enable_guidance(entity), button).clicked() {
-                view.vessel_editor = Some(VesselEditor::new(entity));
+                events.push(Event::EnableTorpedoGuidance { entity });
             }
         });
 }

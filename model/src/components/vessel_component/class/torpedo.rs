@@ -9,4 +9,12 @@ impl Torpedo {
     pub fn default() -> Self {
         Self { guidance_enabled: false }
     }
+
+    pub fn guidance_enabled(&self) -> bool {
+        self.guidance_enabled
+    }
+
+    pub fn enable_guidance(&mut self) {
+        self.guidance_enabled = true;
+    }
 }

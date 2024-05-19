@@ -187,3 +187,15 @@ pub fn adjust_fire_torpedo(controller: &mut Controller, entity: Entity, time: f6
         .unwrap()
         .adjust(model, amount);
 }
+
+pub fn enable_torpedo_guidance(controller: &mut Controller, entity: Entity) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Enable torpedo guidance");
+    let model = controller.model_mut();
+
+    let VesselClass::Torpedo(torpedo) = model.vessel_component_mut(entity).class_mut() else {
+        panic!("Cannot enable guidance on non-torpedo vessel");
+    };
+
+    torpedo.enable_guidance();
+}

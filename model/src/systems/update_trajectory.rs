@@ -23,7 +23,7 @@ fn update_orbitable_component(model: &mut Model, entity: Entity, simulation_dt: 
 }
 
 impl Model {
-    pub fn update_trajectory(&mut self, dt: f64) {
+    pub(crate) fn update_trajectory(&mut self, dt: f64) {
         let time = self.time();
         let time_step = self.time_step().time_step();
         let simulation_dt = dt * time_step;

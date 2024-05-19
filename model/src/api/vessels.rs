@@ -25,7 +25,7 @@ impl Model {
 
     pub fn can_torpedo_enable_guidance(&self, entity: Entity) -> bool {
         let vessel_component = &self.vessel_component(entity);
-        let Some(target) = vessel_component.target() else { 
+        let Some(target) = vessel_component.target() else {
             return false;
         };
 

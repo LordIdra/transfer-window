@@ -175,8 +175,7 @@ impl PathComponent {
                     if burn.start_point().time() >= time {
                         self.future_segments.pop_back();
                     } else if burn.is_time_within_burn(time) {
-                        error!("Attempt to split a burn");
-                        panic!("Error recoverable, but exiting anyway before something bad happens");
+                        panic!("Attempt to split a burn");
                     } else {
                         return;
                     }
