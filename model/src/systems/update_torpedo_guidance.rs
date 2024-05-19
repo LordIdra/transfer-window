@@ -3,6 +3,9 @@ use nalgebra_glm::vec2;
 
 use crate::{components::{vessel_component::{timeline::{start_burn::BurnEvent, TimelineEvent, TimelineEventType}, VesselClass}, ComponentType}, storage::entity_allocator::Entity, Model};
 
+const LINE_OF_SIGHT_RATE_DELTA: f64 = 0.1;
+const PROPORTIONALITY_CONSTANT: f64 = 3.0;
+
 // https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=5217080
 // https://gamedev.stackexchange.com/questions/118162/how-to-calculate-the-closing-speed-of-two-objects 
 // https://en.wikipedia.org/wiki/Proportional_navigation
@@ -25,11 +28,9 @@ fn update_guidance(model: &mut Model, entity: Entity) {
     let displacement = absolute_position - target_absolute_position;
     let closing_speed = -(absolute_velocity - target_absolute_velocity).dot(&displacement) / displacement.magnitude();
     
-    const LINE_OF_SIGHT_RATE_DELTA: f64 = 0.1;
     let future_displacement = model.absolute_position_at_time(entity, model.time + LINE_OF_SIGHT_RATE_DELTA) - model.absolute_position_at_time(target, model.time + LINE_OF_SIGHT_RATE_DELTA);
     let line_of_sight_rate = (f64::atan2(displacement.y, displacement.x) - f64::atan2(future_displacement.y, future_displacement.x)) / LINE_OF_SIGHT_RATE_DELTA;
 
-    const PROPORTIONALITY_CONSTANT: f64 = 3.0;
     let acceleration_unit = vec2(-displacement.y, displacement.x).normalize();
     let acceleration = acceleration_unit * PROPORTIONALITY_CONSTANT * closing_speed * line_of_sight_rate;
 
@@ -45,7 +46,7 @@ fn update_guidance(model: &mut Model, entity: Entity) {
         .type_()
         .as_burn()
         .unwrap()
-        .adjust(model, acceleration)
+        .adjust(model, acceleration);
 }
 
 impl Model {

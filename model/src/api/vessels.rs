@@ -58,7 +58,7 @@ impl Model {
             return false;
         }
 
-        return true;
+        true
 
         // strategy: while guidance enabled:
         // if intersection distance > optimal distance

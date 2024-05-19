@@ -33,7 +33,7 @@ impl Icon for Vessel {
         }.to_string();
         if let Some(target) = view.selected.target(model) {
             if target == self.entity {
-                base_name += "-target"
+                base_name += "-target";
             }
         }
         base_name

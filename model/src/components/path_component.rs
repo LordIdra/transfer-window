@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use log::{error, trace};
+use log::trace;
 use serde::{Deserialize, Serialize};
 
 use self::{burn::Burn, orbit::Orbit, segment::Segment};

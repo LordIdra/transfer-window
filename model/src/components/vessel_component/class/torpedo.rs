@@ -6,6 +6,7 @@ pub struct Torpedo {
 }
 
 impl Torpedo {
+    #[allow(clippy::should_implement_trait)]
     pub fn default() -> Self {
         Self { guidance_enabled: false }
     }
