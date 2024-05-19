@@ -57,10 +57,10 @@ impl Scene {
         let mut events = vec![];
         
         self.frame_history.update(context.input(|i| i.time), frame.info().cpu_usage);
-        misc::update(self, model, context, &mut events);
         expiry::update(self, model);
         underlay::draw(self, model, context, &mut events);
         overlay::draw(self, model, context, &mut events);
+        misc::update(self, model, context, &mut events);
         debug::draw(self, model, context);
         rendering::update(self, model, context);
 
