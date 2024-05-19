@@ -25,7 +25,7 @@ impl EngineType {
         match self {
             EngineType::Torpedo => 10.0,
             EngineType::Efficient => 5.0,
-            EngineType::HighThrust => 30.0,
+            EngineType::HighThrust => 120.0,
         }
     }
 
@@ -33,7 +33,7 @@ impl EngineType {
         match self {
             EngineType::Torpedo => 25000.0,
             EngineType::Efficient => 15000.0,
-            EngineType::HighThrust => 75000.0,
+            EngineType::HighThrust => 300000.0,
         }
     }
 
