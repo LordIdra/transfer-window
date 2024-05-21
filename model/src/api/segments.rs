@@ -61,6 +61,12 @@ impl Model {
         self.recompute_trajectory(entity);
     }
 
+    pub(crate) fn delete_guidance(&mut self, entity: Entity, time: f64) {
+        let path_component = self.path_component_mut(entity);
+        path_component.remove_segments_after(time);
+        self.recompute_trajectory(entity);
+    }
+
     pub(crate) fn delete_burn(&mut self, entity: Entity, time: f64) {
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);

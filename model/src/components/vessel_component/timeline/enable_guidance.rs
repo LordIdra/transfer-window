@@ -17,8 +17,7 @@ impl EnableGuidanceEvent {
     pub fn execute(&self, _model: &mut Model) {}
 
     pub fn cancel(&self, model: &mut Model) {
-        // TODO
-        // model.delete_guidance(self.entity, self.time);
+        model.delete_guidance(self.entity, self.time);
     }
 
     pub fn time(&self) -> f64 {

@@ -89,10 +89,11 @@
 - [1|x] Torpedo PN guidance system -> consider entire trajectory for now ie no fog or war
 - [1|x] Visualise guidance segment
 - [1| ] Better collision detection
-- [1| ] Variable time step for accuracy
 - [1| ] Collision event which yeets both vessels
 - [1| ] Draw orbit after guidance end only if miss
 - [1| ] Recompute guidance segment if collision no longer happening
+- [1| ] Guidance icon
+- [1| ] Cancel guidance
 - [1| ] Yeet torpedo target when torpedo gets close enough
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Show DV budget while adjusting burns

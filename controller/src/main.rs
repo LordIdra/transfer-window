@@ -80,7 +80,7 @@ impl Controller {
                 Event::CreateFireTorpedo { entity, slot_location, time } => create_fire_torpedo(self, entity, slot_location, time),
                 Event::AdjustFireTorpedo { entity, time, amount } => adjust_fire_torpedo(self, entity, time, amount),
                 Event::CancelLastTimelineEvent { entity } => cancel_last_event(self, entity),
-                Event::EnableTorpedoGuidance { entity, time } => enable_torpedo_guidance(self, entity, time),
+                Event::CreateGuidance { entity, time } => enable_torpedo_guidance(self, entity, time),
             }
         }
     }
