@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, PathComponent}, vessel_component::{class::torpedo::Torpedo, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, PathComponent}, vessel_component::{timeline::{enable_guidance::EnableGuidanceEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_almost_static_target() {
@@ -18,7 +18,7 @@ fn test_almost_static_target() {
         .with_vessel_component(vessel_component)
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
-    let mut vessel_component = VesselComponent::new(VesselClass::Torpedo(Torpedo::default()));
+    let mut vessel_component = VesselComponent::new(VesselClass::Torpedo);
     vessel_component.set_target(Some(target));
     let orbit = Orbit::new(parent, vessel_component.mass(), parent_mass, vec2(1.0e6, -1.0e4), vec2(-10.0, 100.0), 0.0);
     let torpedo = model.allocate(EntityBuilder::default()
@@ -30,10 +30,11 @@ fn test_almost_static_target() {
     assert_eq!(model.path_component(target).future_segments().len(), 1);
     model.recompute_trajectory(torpedo);
     assert!(model.can_torpedo_enable_guidance(torpedo));
-    let VesselClass::Torpedo(torpedo_class) = model.vessel_component_mut(torpedo).class_mut() else {
+    let VesselClass::Torpedo = model.vessel_component_mut(torpedo).class_mut() else {
         unreachable!();
     };
-    torpedo_class.enable_guidance();
+    let event = TimelineEvent::new(0.0, TimelineEventType::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 0.0)));
+    model.add_event(torpedo, event);
 
     let time_to_step = 200.0;
     // let time_step = 0.0167; // about 1 frame

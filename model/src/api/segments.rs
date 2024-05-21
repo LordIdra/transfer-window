@@ -1,6 +1,6 @@
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::{path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, guidance::Guidance, orbit::Orbit, segment::Segment}, vessel_component::VesselClass}, storage::entity_allocator::Entity, Model};
+use crate::{components::path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, guidance::Guidance, orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     pub(crate) fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
@@ -36,11 +36,11 @@ impl Model {
     }
 
     pub(crate) fn create_guidance(&mut self, entity: Entity, time: f64) {
-        let VesselClass::Torpedo(torpedo) = self.vessel_component_mut(entity).class_mut() else {
-            panic!("Cannot enable guidance on non-torpedo vessel");
-        };
+        assert!(self.vessel_component_mut(entity).class_mut().is_torpedo());
 
-        let target = self.vessel_component(entity).target().expect("Cannot enable guidance on torpedo without a target");
+        let target = self.vessel_component(entity)
+            .target()
+            .expect("Cannot enable guidance on torpedo without a target");
         
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);

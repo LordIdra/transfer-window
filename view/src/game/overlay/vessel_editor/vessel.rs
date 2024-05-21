@@ -12,7 +12,7 @@ const ENGINE_SLOT_COLOR: Color32 = Color32::from_rgb(2, 192, 240);
 
 fn compute_texture_ship_underlay(class: &VesselClass) -> &str {
     match class {
-        VesselClass::Torpedo(_) => unreachable!(),
+        VesselClass::Torpedo => unreachable!(),
         VesselClass::Light => "ship-light",
     }
 }
