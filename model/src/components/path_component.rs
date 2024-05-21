@@ -3,11 +3,12 @@ use std::collections::VecDeque;
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use self::{burn::Burn, orbit::Orbit, segment::Segment};
+use self::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment};
 
 #[cfg(test)]
 mod brute_force_tester;
 pub mod burn;
+pub mod guidance;
 pub mod orbit;
 pub mod segment;
 
@@ -62,13 +63,20 @@ impl PathComponent {
             .filter_map(|segment| segment.as_burn())
             .collect()
     }
+    
+    pub fn future_guidance(&self) -> Vec<&Guidance> {
+        self.future_segments.iter()
+            .filter_map(|segment| segment.as_guidance())
+            .collect()
+    }
 
-    pub fn future_orbits_after_final_burn(&self) -> Vec<&Orbit> {
+    pub fn future_orbits_after_final_non_orbit(&self) -> Vec<&Orbit> {
         let mut orbits = vec![];
         for segment in self.future_segments.iter().rev() {
             match segment {
-                Segment::Burn(_) => break,
                 Segment::Orbit(orbit) => orbits.push(orbit),
+                Segment::Burn(_) => break,
+                Segment::Guidance(_) => break,
             }
         }
         orbits
@@ -77,9 +85,13 @@ impl PathComponent {
     pub fn final_burn(&self) -> Option<&Burn> {
         self.future_burns().last().copied()
     }
-
+    
     pub fn final_orbit(&self) -> Option<&Orbit> {
         self.future_orbits().last().copied()
+    }
+    
+    pub fn final_guidance(&self) -> Option<&Guidance> {
+        self.future_guidance().last().copied()
     }
 
     /// Returns the first segment it finds matching the time
@@ -146,6 +158,7 @@ impl PathComponent {
         match self.current_segment() {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.current_point().mass(),
+            Segment::Guidance(guidance) => guidance.current_point().mass(),
         }
     }
 
@@ -153,6 +166,7 @@ impl PathComponent {
         match self.future_segment_at_time(time) {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.point_at_time(time).mass(),
+            Segment::Guidance(guidance) => guidance.point_at_time(time).mass(),
         }
     }
 
@@ -180,6 +194,17 @@ impl PathComponent {
                         return;
                     }
                 },
+
+                Segment::Guidance(guidance) => {
+                    if guidance.start_point().time() >= time {
+                        self.future_segments.pop_back();
+                    } else if guidance.is_time_within_guidance(time) {
+                        panic!("Attempt to split a guidance segment");
+                    } else {
+                        return;
+                    }
+                },
+
                 Segment::Orbit(orbit) => {
                     if orbit.start_point().time() >= time {
                         self.future_segments.pop_back();

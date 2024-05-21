@@ -1,11 +1,15 @@
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model};
+use crate::{components::{path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, guidance::Guidance, orbit::Orbit, segment::Segment}, vessel_component::VesselClass}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     pub(crate) fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
         if let Some(burn) = self.path_component(entity).final_burn() {
-            return burn.rocket_equation_function_at_end_of_burn()
+            return burn.rocket_equation_function_at_end_of_burn();
+        }
+
+        if let Some(guidance) = self.path_component(entity).final_guidance() {
+            return guidance.rocket_equation_function_at_end_of_guidance();
         }
 
         RocketEquationFunction::from_vessel_component(self.vessel_component(entity))
@@ -27,6 +31,32 @@ impl Model {
         let orbit = Orbit::new(parent, end_point.mass(), parent_mass, end_point.position(), end_point.velocity(), end_point.time());
 
         self.path_component_mut(entity).add_segment(Segment::Burn(burn));
+        self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
+        self.recompute_trajectory(entity);
+    }
+
+    pub(crate) fn create_guidance(&mut self, entity: Entity, time: f64) {
+        let VesselClass::Torpedo(torpedo) = self.vessel_component_mut(entity).class_mut() else {
+            panic!("Cannot enable guidance on non-torpedo vessel");
+        };
+
+        let target = self.vessel_component(entity).target().expect("Cannot enable guidance on torpedo without a target");
+        
+        let path_component = self.path_component_mut(entity);
+        path_component.remove_segments_after(time);
+
+        let last_segment = path_component.last_segment();
+        let parent = last_segment.parent();
+        let start_position = last_segment.end_position();
+        let start_velocity = last_segment.end_velocity();
+        let parent_mass = self.mass(parent);
+        let rocket_equation_function = self.rocket_equation_function_at_end_of_trajectory(entity);
+        let guidance = Guidance::new(self, parent, target, parent_mass, time, rocket_equation_function, start_position, start_velocity);
+
+        let end_point = guidance.end_point();
+        let orbit = Orbit::new(parent, end_point.mass(), parent_mass, end_point.position(), end_point.velocity(), end_point.time());
+
+        self.path_component_mut(entity).add_segment(Segment::Guidance(guidance));
         self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
         self.recompute_trajectory(entity);
     }

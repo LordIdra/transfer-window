@@ -3,8 +3,13 @@ use serde::{Deserialize, Serialize};
 use crate::components::{path_component::orbit::scary_math::STANDARD_GRAVITY, vessel_component::{system_slot::System, VesselComponent}};
 
 /// Helper struct for computing vessel mass after N seconds of
-/// firing its engine using the rocket equation
-/// See <https://en.wikipedia.org/wiki/Tsiolkovsky_rocket_equation>
+/// firing its engine using the rocket equation.
+/// See <https://en.wikipedia.org/wiki/Tsiolkovsky_rocket_equation>.
+/// Something to note that might be confusing: `burn_time` is a
+/// measure of the time spent burning *at full thrust.* For example,
+/// if we burnt for 10 seconds at full thrust, 10 seconds of burn
+/// time would be added. If we burnt at half thrust, around (but
+/// not exactly, due to rocket equation) 5 seconds would be added
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RocketEquationFunction {
     dry_mass_kg: f64,

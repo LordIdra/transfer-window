@@ -4,9 +4,8 @@ use transfer_window_model::{components::{orbitable_component::OrbitableComponent
 
 use crate::game::{util::add_triangle, Scene};
 
-use self::{burn::compute_burn_color, orbit::{compute_orbitable_orbit_color, compute_vessel_orbit_color}};
-
 mod burn;
+mod guidance;
 mod orbit;
 
 const RADIUS: f64 = 0.8;
@@ -63,14 +62,21 @@ fn draw_path_segments(view: &mut Scene, model: &Model, entity: Entity, camera_ce
                     continue;
                 }
                 let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
-                let color = compute_vessel_orbit_color(view, model, entity, orbit_index);
+                let color = orbit::compute_color_vessel(view, model, entity, orbit_index);
                 segment_points_data.push((points, color));
                 orbit_index += 1;
             },
 
             Segment::Burn(burn) => {
                 let points = burn::compute_points(burn, absolute_parent_position, camera_centre, zoom);
-                let color = compute_burn_color();
+                let color = burn::compute_color();
+                segment_points_data.push((points, color));
+                orbit_index = 0;
+            }
+
+            Segment::Guidance(guidance) => {
+                let points = guidance::compute_points(guidance, absolute_parent_position, camera_centre, zoom);
+                let color = guidance::compute_color();
                 segment_points_data.push((points, color));
                 orbit_index = 0;
             }
@@ -91,7 +97,7 @@ fn draw_orbitable_segment(view: &mut Scene, model: &Model, entity: Entity, camer
         let absolute_parent_position = model.absolute_position(orbit.parent());
         let zoom = view.camera.zoom();
         let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
-        let color = compute_orbitable_orbit_color(view, model, entity);
+        let color = orbit::compute_color_orbitable(view, model, entity);
         draw_from_points(view, &points, zoom, color);
     }
 }

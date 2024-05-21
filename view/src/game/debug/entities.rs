@@ -1,5 +1,5 @@
 use eframe::egui::{ScrollArea, Ui};
-use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::{burn_point::BurnPoint, Burn}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment, PathComponent}}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::{burn_point::BurnPoint, Burn}, guidance::{guidance_point::GuidancePoint, Guidance}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment, PathComponent}}, storage::entity_allocator::Entity, Model};
 
 use crate::game::util::format_time;
 
@@ -15,6 +15,13 @@ fn draw_orbit_point(ui: &mut Ui, orbit_point: &OrbitPoint) {
     ui.label(format!("Time: {:.3?}", orbit_point.time()));
     ui.label(format!("Time since periapsis: {:.3?}", orbit_point.time_since_periapsis()));
     ui.label(format!("Theta: {:.3?}", orbit_point.theta()));
+}
+
+fn draw_guidance_point(ui: &mut Ui, burn_point: &GuidancePoint) {
+    ui.label(format!("Position: {:.3?}", burn_point.position()));
+    ui.label(format!("Velocity: {:.3?}", burn_point.velocity()));
+    ui.label(format!("PN Acceleration: {:.3?}", burn_point.guidance_acceleration()));
+    ui.label(format!("Time: {:.3?}", burn_point.time()));
 }
 
 fn draw_orbit(ui: &mut Ui, orbit: &Orbit) {
@@ -55,11 +62,19 @@ fn draw_orbitable(ui: &mut Ui, orbitable_component: &OrbitableComponent) {
     }
 }
 
+fn draw_guidance(ui: &mut Ui, guidance: &Guidance) {
+    ui.label(format!("Duration: {}", format_time(guidance.duration())));
+    ui.collapsing("Start", |ui| draw_guidance_point(ui, guidance.start_point()));
+    ui.collapsing("Current", |ui| draw_guidance_point(ui, guidance.current_point()));
+    ui.collapsing("End", |ui| draw_guidance_point(ui, guidance.end_point()));
+}
+
 fn draw_path(ui: &mut Ui, path_component: &PathComponent) {
     for segment in path_component.future_segments() {
         match segment {
             Segment::Orbit(orbit) => draw_orbit(ui, orbit),
             Segment::Burn(burn) => draw_burn(ui, burn),
+            Segment::Guidance(guidance) => draw_guidance(ui, guidance),
         }
     } 
 }

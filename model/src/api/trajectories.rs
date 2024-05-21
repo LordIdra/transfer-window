@@ -56,7 +56,7 @@ impl Model {
 
     pub fn recompute_trajectory(&mut self, entity: Entity) {
         // Add 1 because the final orbit will have duration 0
-        let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - self.path_component(entity).future_orbits_after_final_burn().len();
+        let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - self.path_component(entity).future_orbits_after_final_non_orbit().len();
         self.predict(entity, 1.0e10, segments_to_predict);
     }
 

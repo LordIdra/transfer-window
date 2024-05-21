@@ -74,7 +74,6 @@ impl Model {
         self.update_fuel();
         self.update_timeline();
         self.update_trajectory(dt);
-        self.update_torpedo_guidance();
     }
 
     pub fn entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {

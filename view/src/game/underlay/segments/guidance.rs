@@ -1,17 +1,17 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::DVec2;
-use transfer_window_model::components::path_component::burn::Burn;
+use transfer_window_model::components::path_component::guidance::Guidance;
 
 const INITIAL_POINT_COUNT: usize = 50;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-3;
 const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
 pub fn compute_color() -> Rgba {
-    Rgba::from_srgba_premultiplied(255, 255, 255, 255)
+    Rgba::from_srgba_premultiplied(0, 255, 200, 255)
 }
 
 /// Uses triangle heuristic as described in <https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation>
-pub fn tessellate(burn: &Burn, mut points: Vec<(f64, DVec2)>, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<(f64, DVec2)> {
+pub fn tessellate(guidance: &Guidance, mut points: Vec<(f64, DVec2)>, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<(f64, DVec2)> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Tessellate");
 
@@ -41,8 +41,8 @@ pub fn tessellate(burn: &Burn, mut points: Vec<(f64, DVec2)>, absolute_parent_po
         if area / min_distance > TESSELLATION_THRESHOLD {
             let new_time_1 = (point1.0 + point2.0) / 2.0;
             let new_time_2 = (point2.0 + point3.0) / 2.0;
-            let new_position_1 = burn.point_at_time(new_time_1).position();
-            let new_position_2 = burn.point_at_time(new_time_2).position();
+            let new_position_1 = guidance.point_at_time(new_time_1).position();
+            let new_position_2 = guidance.point_at_time(new_time_2).position();
 
             points.insert(i + 1, (new_time_1, absolute_parent_position + new_position_1));
             points.insert(i + 3, (new_time_2, absolute_parent_position + new_position_2));
@@ -54,26 +54,26 @@ pub fn tessellate(burn: &Burn, mut points: Vec<(f64, DVec2)>, absolute_parent_po
     points
 }
 
-fn find_initial_points(burn: &Burn, absolute_parent_position: DVec2) -> Vec<(f64, DVec2)> {
+fn find_initial_points(guidance: &Guidance, absolute_parent_position: DVec2) -> Vec<(f64, DVec2)> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Find initial burn points");
-    let start_time = burn.current_point().time();
-    let time_to_step_through = burn.remaining_time();
+    let start_time = guidance.current_point().time();
+    let time_to_step_through = guidance.remaining_time();
 
     let mut initial_points = vec![];
     for i in 0..=INITIAL_POINT_COUNT {
         let time = start_time + (i as f64 / INITIAL_POINT_COUNT as f64) * time_to_step_through;
-        initial_points.push((time, absolute_parent_position + burn.point_at_time(time).position()));
+        initial_points.push((time, absolute_parent_position + guidance.point_at_time(time).position()));
     }
 
     initial_points
 }
 
-pub fn compute_points(burn: &Burn, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<DVec2> {
+pub fn compute_points(guidance: &Guidance, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<DVec2> {
     #[cfg(feature = "profiling")]
-    let _span = tracy_client::span!("Compute burn points");
-    let points = find_initial_points(burn, absolute_parent_position);
-    let points = tessellate(burn, points, absolute_parent_position, camera_centre, zoom);
+    let _span = tracy_client::span!("Compute guidance points");
+    let points = find_initial_points(guidance, absolute_parent_position);
+    let points = tessellate(guidance, points, absolute_parent_position, camera_centre, zoom);
     let mut new_points = vec![];
     for (_, position) in points {
         new_points.push(position);

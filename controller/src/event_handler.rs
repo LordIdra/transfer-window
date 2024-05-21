@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{start_burn::BurnEvent, fire_torpedo::FireTorpedoEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::BurnEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -188,14 +188,11 @@ pub fn adjust_fire_torpedo(controller: &mut Controller, entity: Entity, time: f6
         .adjust(model, amount);
 }
 
-pub fn enable_torpedo_guidance(controller: &mut Controller, entity: Entity) {
+pub fn enable_torpedo_guidance(controller: &mut Controller, entity: Entity, time: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Enable torpedo guidance");
     let model = controller.model_mut();
 
-    let VesselClass::Torpedo(torpedo) = model.vessel_component_mut(entity).class_mut() else {
-        panic!("Cannot enable guidance on non-torpedo vessel");
-    };
-
-    torpedo.enable_guidance();
+    let event_type = TimelineEventType::EnableGuidance(EnableGuidanceEvent::new(model, entity, time));
+    model.add_event(entity, TimelineEvent::new(time, event_type));
 }

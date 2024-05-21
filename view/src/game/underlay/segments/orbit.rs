@@ -9,7 +9,7 @@ const INITIAL_POINT_COUNT: usize = 50;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-4;
 const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
-pub fn compute_vessel_orbit_color(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
+pub fn compute_color_vessel(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
     let rgb = match model.vessel_component(entity).class() {
         VesselClass::Torpedo(_) => Rgba::from_rgb(1.0, 0.0, 0.0),
         VesselClass::Light => Rgba::from_rgb(0.0, 1.0, 1.0),
@@ -24,7 +24,7 @@ pub fn compute_vessel_orbit_color(view: &Scene, model: &Model, entity: Entity, i
     Rgba::from_rgba_unmultiplied(rgb.r(), rgb.g(), rgb.b(), alphas[index])
 }
 
-pub fn compute_orbitable_orbit_color(view: &Scene, model: &Model, entity: Entity) -> Rgba {
+pub fn compute_color_orbitable(view: &Scene, model: &Model, entity: Entity) -> Rgba {
     if view.is_selected(model, entity) {
         Rgba::from_srgba_unmultiplied(255, 255, 255, 160)
     } else {
@@ -74,7 +74,7 @@ pub fn tessellate(interpolate: impl Fn(DVec2, DVec2) -> DVec2, mut points: Vec<D
     points
 }
 
-fn find_initial_points_orbit(orbit: &Orbit, absolute_parent_position: DVec2) -> Vec<DVec2> {
+fn find_initial_points(orbit: &Orbit, absolute_parent_position: DVec2) -> Vec<DVec2> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Find initial orbit points");
     let start_angle = normalized_angle(orbit.current_point().theta() as f32);
@@ -106,7 +106,7 @@ fn interpolate_angles(mut angle_1: f64, mut angle_2: f64) -> f64 {
 pub fn compute_points(orbit: &Orbit, absolute_parent_position: DVec2, camera_centre: DVec2, zoom: f64) -> Vec<DVec2> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute orbit points");
-    let points = find_initial_points_orbit(orbit, absolute_parent_position);
+    let points = find_initial_points(orbit, absolute_parent_position);
     let interpolate = |point1: DVec2, point2: DVec2| {
         let theta_1 = f64::atan2(point1.y, point1.x);
         let theta_2 = f64::atan2(point2.y, point2.x);

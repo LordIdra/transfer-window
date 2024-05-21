@@ -18,6 +18,6 @@ pub enum Event {
     SetSlot { entity: Entity, slot_location: SlotLocation, slot: Slot },
     CreateFireTorpedo { entity: Entity, slot_location: SlotLocation, time: f64 },
     AdjustFireTorpedo { entity: Entity, time: f64, amount: DVec2 },
-    EnableTorpedoGuidance { entity: Entity },
+    EnableTorpedoGuidance { entity: Entity, time: f64, },
     CancelLastTimelineEvent { entity: Entity },
 }

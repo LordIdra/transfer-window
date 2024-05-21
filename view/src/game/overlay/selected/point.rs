@@ -47,6 +47,13 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
         view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
     }
 
+    if vessel_component.class().is_torpedo() {
+        let button = Button::new("Enable guidance");
+        if ui.add_enabled(model.can_torpedo_enable_guidance(entity), button).clicked() {
+            events.push(Event::EnableTorpedoGuidance { entity, time });
+        }
+    }
+
     let orbit = model.path_component(entity)
         .future_segment_at_time(time)
         .as_orbit()

@@ -12,5 +12,5 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
     point::update(view, model, context, events);
     burn::update(view, model, context, events);
     fire_torpedo::update(view, model, context, events);
-    vessel::update(view, model, context, events);
+    vessel::update(view, model, context);
 }

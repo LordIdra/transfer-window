@@ -5,10 +5,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::Model;
 
-use self::{start_burn::BurnEvent, fire_torpedo::FireTorpedoEvent};
+use self::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::BurnEvent};
 
 use super::system_slot::SlotLocation;
 
+pub mod enable_guidance;
 pub mod start_burn;
 pub mod fire_torpedo;
 
@@ -16,6 +17,7 @@ pub mod fire_torpedo;
 pub enum TimelineEventType {
     FireTorpedo(FireTorpedoEvent),
     Burn(BurnEvent),
+    EnableGuidance(EnableGuidanceEvent),
 }
 
 impl TimelineEventType {
@@ -23,6 +25,7 @@ impl TimelineEventType {
         match self {
             TimelineEventType::FireTorpedo(event) => event.execute(model),
             TimelineEventType::Burn(event) => event.execute(model),
+            TimelineEventType::EnableGuidance(event) => event.execute(model),
         }
     }
 
@@ -30,6 +33,7 @@ impl TimelineEventType {
         match self {
             TimelineEventType::FireTorpedo(event) => event.cancel(model),
             TimelineEventType::Burn(event) => event.cancel(model),
+            TimelineEventType::EnableGuidance(event) => event.cancel(model),
         }
     }
 
