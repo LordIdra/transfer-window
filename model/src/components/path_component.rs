@@ -75,8 +75,7 @@ impl PathComponent {
         for segment in self.future_segments.iter().rev() {
             match segment {
                 Segment::Orbit(orbit) => orbits.push(orbit),
-                Segment::Burn(_) => break,
-                Segment::Guidance(_) => break,
+                Segment::Burn(_) | Segment::Guidance(_) => break,
             }
         }
         orbits

@@ -51,7 +51,7 @@ impl Model {
         let start_velocity = last_segment.end_velocity();
         let parent_mass = self.mass(parent);
         let rocket_equation_function = self.rocket_equation_function_at_end_of_trajectory(entity);
-        let guidance = Guidance::new(self, parent, target, parent_mass, time, rocket_equation_function, start_position, start_velocity);
+        let guidance = Guidance::new(self, parent, target, parent_mass, time, &rocket_equation_function, start_position, start_velocity);
 
         let end_point = guidance.end_point();
         let orbit = Orbit::new(parent, end_point.mass(), parent_mass, end_point.position(), end_point.velocity(), end_point.time());

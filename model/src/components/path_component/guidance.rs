@@ -26,7 +26,7 @@ fn proportional_guidance_acceleration(absolute_position: DVec2, target_absolute_
     acceleration_unit * PROPORTIONALITY_CONSTANT * closing_speed * line_of_sight_rate
 }
 
-fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_rocket_equation_function: RocketEquationFunction, start_point: &GuidancePoint) -> Vec<GuidancePoint> {
+fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_rocket_equation_function: &RocketEquationFunction, start_point: &GuidancePoint) -> Vec<GuidancePoint> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute guidance points");
     let mut points = vec![start_point.clone()];
@@ -76,13 +76,14 @@ pub struct Guidance {
 
 impl Guidance {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(model: &Model, parent: Entity, target: Entity, parent_mass: f64, start_time: f64, rocket_equation_function: RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
+    pub fn new(model: &Model, parent: Entity, target: Entity, parent_mass: f64, start_time: f64, rocket_equation_function: &RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
         let start_point = GuidancePoint::new(parent_mass, rocket_equation_function.mass(), start_time, start_position, start_velocity, vec2(0.0, 0.0), 0.0);
+        let points = compute_guidance_points(model, parent, target, rocket_equation_function, &start_point);
         Self { 
             parent,
             rocket_equation_function: rocket_equation_function.clone(),
             current_point: start_point.clone(),
-            points: compute_guidance_points(model, parent, target, rocket_equation_function, &start_point),
+            points,
         }
     }
 
