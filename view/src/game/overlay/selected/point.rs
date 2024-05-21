@@ -49,7 +49,7 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
 
     if vessel_component.class().is_torpedo() {
         let button = Button::new("Enable guidance");
-        if ui.add_enabled(model.can_torpedo_enable_guidance(entity), button).clicked() {
+        if ui.add_enabled(model.can_torpedo_enable_guidance(entity, time), button).clicked() {
             events.push(Event::CreateGuidance { entity, time });
         }
     }

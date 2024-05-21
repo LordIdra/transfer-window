@@ -1,7 +1,4 @@
-use crate::{components::{path_component::segment::Segment, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::fire_torpedo::FireTorpedoEvent}}, storage::entity_allocator::Entity, Model};
-
-const MAX_GUIDANCE_ORBIT_FRACTION: f64 = 0.2;
-const MAX_GUIDANCE_ANGLE: f64 = 0.2;
+use crate::{components::{path_component::guidance::MAX_GUIDANCE_TIME, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::fire_torpedo::FireTorpedoEvent}}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     pub fn set_slot(&mut self, entity: Entity, location: SlotLocation, slot: Slot) {
@@ -23,7 +20,7 @@ impl Model {
             && self.path_component(entity).final_burn().is_none()
     }
 
-    pub fn can_torpedo_enable_guidance(&self, entity: Entity) -> bool {
+    pub fn can_torpedo_enable_guidance(&self, entity: Entity, time: f64) -> bool {
         let vessel_component = &self.vessel_component(entity);
         let Some(target) = vessel_component.target() else {
             return false;
@@ -33,28 +30,11 @@ impl Model {
             return false;
         };
 
-        let Some(next_closest_approach) = self.find_next_closest_approach(entity, target, self.time) else {
+        let Some(next_closest_approach_time) = self.find_next_closest_approach(entity, target, time) else {
             return false;
         };
 
-        let current_segment = self.path_component(entity).current_segment();
-        let segment_at_approach = self.path_component(entity).future_segment_at_time(next_closest_approach);
-        if current_segment.start_time() != segment_at_approach.start_time() {
-            return false;
-        }
-
-        let Segment::Orbit(orbit) = current_segment else {
-            return false;
-        };
-
-        let time_to_encounter = next_closest_approach - self.time;
-        if let Some(period) = orbit.period() {
-            if time_to_encounter / period > MAX_GUIDANCE_ORBIT_FRACTION {
-                return false;
-            }
-        }
-
-        if self.velocity(entity).angle(&self.velocity_at_time(entity, next_closest_approach)) > MAX_GUIDANCE_ANGLE {
+        if next_closest_approach_time - time >= MAX_GUIDANCE_TIME {
             return false;
         }
 

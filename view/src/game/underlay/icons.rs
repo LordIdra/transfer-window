@@ -7,7 +7,7 @@ use transfer_window_model::Model;
 
 use crate::game::{util::{add_textured_square, add_textured_square_facing}, Scene};
 
-use self::{adjust_burn::AdjustBurn, adjust_fire_torpedo::AdjustFireTorpedo, apoapsis::Apoapsis, burn::Burn, closest_approach::ClosestApproach, fire_torpedo::FireTorpedo, orbitable::Orbitable, periapsis::Periapsis, vessel::Vessel};
+use self::{adjust_burn::AdjustBurn, adjust_fire_torpedo::AdjustFireTorpedo, apoapsis::Apoapsis, burn::Burn, closest_approach::ClosestApproach, fire_torpedo::FireTorpedo, guidance::Guidance, orbitable::Orbitable, periapsis::Periapsis, vessel::Vessel};
 
 mod adjust_burn;
 mod adjust_fire_torpedo;
@@ -15,6 +15,7 @@ mod apoapsis;
 mod burn;
 mod closest_approach;
 mod fire_torpedo;
+mod guidance;
 mod orbitable;
 mod periapsis;
 mod vessel;
@@ -82,6 +83,7 @@ fn compute_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, sc
     icons.append(&mut Burn::generate(model));
     icons.append(&mut ClosestApproach::generate(view, model));
     icons.append(&mut FireTorpedo::generate(model));
+    icons.append(&mut Guidance::generate(model));
     icons.append(&mut Orbitable::generate(model));
     icons.append(&mut Periapsis::generate(view, model));
     icons.append(&mut Vessel::generate(model));

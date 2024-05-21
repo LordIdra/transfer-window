@@ -33,9 +33,10 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
                     | Selected::Vessel(_) 
                     | Selected::Point { entity: _, time: _ } => (),
                 Selected::Burn { entity, time: _, state: _ }
-                    | Selected::FireTorpedo { entity, time: _, state: _ } => {
-                    events.push(Event::CancelLastTimelineEvent { entity });
-                    view.selected = Selected::None;
+                    | Selected::FireTorpedo { entity, time: _, state: _ } 
+                    | Selected::EnableGuidance { entity, time: _ } => {
+                        events.push(Event::CancelLastTimelineEvent { entity });
+                        view.selected = Selected::None;
                 }
             }
         }

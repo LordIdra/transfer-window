@@ -45,6 +45,10 @@ impl TimelineEventType {
         matches!(self, TimelineEventType::Burn(_))
     }
 
+    pub fn is_enable_guidance(&self) -> bool {
+        matches!(self, TimelineEventType::EnableGuidance(_))
+    }
+
     pub fn as_fire_torpedo(&self) -> Option<FireTorpedoEvent> {
         if let TimelineEventType::FireTorpedo(fire_torpedo) = self {
             Some(fire_torpedo.clone())
@@ -56,6 +60,14 @@ impl TimelineEventType {
     pub fn as_burn(&self) -> Option<BurnEvent> {
         if let TimelineEventType::Burn(burn) = self {
             Some(burn.clone())
+        } else {
+            None
+        }
+    }
+
+    pub fn as_enable_guidance(&self) -> Option<EnableGuidanceEvent> {
+        if let TimelineEventType::EnableGuidance(enable_guidance) = self {
+            Some(enable_guidance.clone())
         } else {
             None
         }

@@ -20,6 +20,7 @@ pub enum Selected {
     Point { entity: Entity, time: f64 },
     Burn { entity: Entity, time: f64, state: BurnState },
     FireTorpedo { entity: Entity, time: f64, state: BurnState },
+    EnableGuidance { entity: Entity, time: f64 }
 }
 
 impl Selected {
@@ -30,7 +31,8 @@ impl Selected {
             Selected::Orbitable(entity) 
                 | Selected::Vessel(entity) 
                 | Selected::Burn { entity, time: _, state: _ }
-                | Selected::Point { entity, time: _ } => Some(*entity),
+                | Selected::Point { entity, time: _ } 
+                | Selected::EnableGuidance { entity, time: _ } => Some(*entity),
         }
     }
 
@@ -70,7 +72,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
     match view.selected.clone() {
         Selected::None 
             | Selected::Orbitable(_) 
-            | Selected::Vessel(_) => (),
+            | Selected::Vessel(_) 
+            | Selected::EnableGuidance { entity: _, time: _ }=> (),
         Selected::Point { entity: _, time: _ } => segment_point::draw_selected(view, model),
         Selected::Burn { entity: _, time: _, state: _ } => burn::update_adjustment(view, model, context, events, &pointer),
         Selected::FireTorpedo { entity: _, time: _, state: _ } => fire_torpedo::update_adjustment(view, model, context, events, &pointer),

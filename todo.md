@@ -92,13 +92,17 @@
 - [1| ] Collision event which yeets both vessels
 - [1| ] Draw orbit after guidance end only if miss
 - [1| ] Recompute guidance segment if collision no longer happening
-- [1| ] Guidance icon
-- [1| ] Cancel guidance
+- [1|x] Actually determine whether guidance can be enabled at selected point
+- [1|x] Guidance icon
+- [1|x] Cancel guidance
 - [1| ] Yeet torpedo target when torpedo gets close enough
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
 - [1| ] General UI improvements (cross that bridge later)
+- [1| ] Allow selecting points on burns or guidance
+- [1| ] Allow cancelling burns/guidance midway through
+- [1| ] More detail (eg in tooltips) about why buttons can't be pressed
 
 # Stuff to do later because other stuff needs to be in place first
 - [1| ] Dim P/A icons when moused over and don't count as hovered????
@@ -121,3 +125,4 @@
 - [1| ] Fix backward burn dragging
 - [1| ] Fix or remove burn scrolling?
 - [1| ] Preload images to fix weird loading delay in editor
+- [1| ] Add actual logging before prototype release

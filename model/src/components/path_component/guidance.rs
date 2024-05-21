@@ -8,7 +8,7 @@ use self::guidance_point::GuidancePoint;
 use super::burn::rocket_equation_function::RocketEquationFunction;
 
 const INTERCEPT_DISTANCE: f64 = 100.0;
-const MAX_GUIDANCE_TIME: f64 = 60.0 * 60.0;
+pub const MAX_GUIDANCE_TIME: f64 = 60.0 * 30.0;
 const GUIDANCE_TIME_STEP: f64 = 0.05;
 const LINE_OF_SIGHT_RATE_DELTA: f64 = 0.1;
 const PROPORTIONALITY_CONSTANT: f64 = 3.0;
