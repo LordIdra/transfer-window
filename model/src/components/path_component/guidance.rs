@@ -46,6 +46,9 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_
         let distance = (absolute_position - target_absolute_position).magnitude();
         if distance < INTERCEPT_DISTANCE {
             // TODO make this account for intercept between 2 points lol
+            // if intercept before next time:
+            // use itp to find time
+            // step to that time
             break;
         }
 

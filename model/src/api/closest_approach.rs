@@ -3,6 +3,8 @@ use transfer_window_common::numerical_methods::itp::itp;
 
 use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
 
+const DISTANCE_DERIVATIVE_DELTA: f64 = 0.1;
+
 /// Step time needs to be large enough to be performant but small 
 /// enough to catch all approaches. We choose this by choosing the 
 /// minimum of the durations, and if applicable, periods, then dividing 
@@ -82,7 +84,7 @@ impl Model {
             let end_time = f64::min(orbit_a.end_point().time(), orbit_b.end_point().time());
             let time_step = compute_time_step(orbit_a, orbit_b, start_time, end_time);
             let distance = |time: f64| (orbit_a.point_at_time(time).position() - orbit_b.point_at_time(time).position()).magnitude();
-            let distance_prime = |time: f64| (distance(time + 2.0) - distance(time)) / 2.0;
+            let distance_prime = |time: f64| (distance(time + DISTANCE_DERIVATIVE_DELTA) - distance(time)) / DISTANCE_DERIVATIVE_DELTA;
 
             if start_time > end_time {
                 continue;
