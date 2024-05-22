@@ -127,6 +127,6 @@
 - [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 - [1| ] Fix closest point weirdness??
 - [1| ] Fix backward burn dragging
-- [1| ] Fix or remove burn scrolling?
+- [1|x] Fix or remove burn scrolling?
 - [1| ] Preload images to fix weird loading delay in editor
 - [1| ] Add actual logging before prototype release

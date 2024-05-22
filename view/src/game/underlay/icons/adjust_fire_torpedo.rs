@@ -1,4 +1,4 @@
-use eframe::egui::{PointerState, Rect, Vec2};
+use eframe::egui::{PointerState, Rect};
 use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
@@ -116,16 +116,6 @@ impl Icon for AdjustFireTorpedo {
                 trace!("Started dragging to adjust fire torpedo {:?}", self.direction);
                 *state = BurnState::Dragging(self.direction);
             }
-        }
-    }
-
-    fn on_scroll(&self, view: &mut Scene, _model: &Model, scroll_delta: Vec2) -> bool {
-        if let Selected::FireTorpedo { entity: _, time: _, state } = &mut view.selected {
-            trace!("Scrolled to adjust fire torpedo {:?}", self.direction);
-            *state = BurnState::Scrolling(self.direction, scroll_delta);
-            true
-        } else {
-            false
         }
     }
 }
