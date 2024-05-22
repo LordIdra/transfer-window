@@ -1,4 +1,3 @@
-use eframe::egui::Vec2;
 use nalgebra_glm::{vec2, DVec2};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -25,7 +24,6 @@ pub enum BurnState {
     Selected,
     Adjusting,
     Dragging(BurnAdjustDirection),
-    Scrolling(BurnAdjustDirection, Vec2)
 }
 
 impl BurnState {
@@ -39,10 +37,6 @@ impl BurnState {
 
     pub fn is_dragging(&self) -> bool {
         matches!(self, Self::Dragging(_))
-    }
-    
-    pub fn is_scrolling(&self) -> bool {
-        matches!(self, Self::Scrolling(_, _))
     }
 }
 
