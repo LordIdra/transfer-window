@@ -4,12 +4,8 @@ use crate::{components::path_component::{burn::{rocket_equation_function::Rocket
 
 impl Model {
     pub(crate) fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
-        if let Some(burn) = self.path_component(entity).final_burn() {
-            return burn.rocket_equation_function_at_end_of_burn();
-        }
-
-        if let Some(guidance) = self.path_component(entity).final_guidance() {
-            return guidance.rocket_equation_function_at_end_of_guidance();
+        if let Some(rocket_equation_function) = self.path_component(entity).final_rocket_equation_function() {
+            return rocket_equation_function;
         }
 
         RocketEquationFunction::from_vessel_component(self.vessel_component(entity))

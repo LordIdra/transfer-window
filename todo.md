@@ -92,7 +92,7 @@
 - [1|x] Guidance icon
 - [1|x] Cancel guidance
 
-- [1| ] Better collision detection
+- [1|x] Better collision detection
 - [1| ] Collision event which yeets both vessels
 - [1| ] Draw orbit after guidance end only if miss
 - [1| ] Recompute guidance segment if collision no longer happening
@@ -105,6 +105,8 @@
 - [1| ] Allow selecting points on burns or guidance
 - [1| ] Allow cancelling burns/guidance midway through
 - [1| ] More detail (eg in tooltips) about why buttons can't be pressed
+- [1| ] Close context menu on option selected
+- [1| ] Select new burn/guidance/etc created
 
 # Stuff to do later because other stuff needs to be in place first
 - [1| ] Dim P/A icons when moused over and don't count as hovered????

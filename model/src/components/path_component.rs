@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use self::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment};
+use self::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, guidance::Guidance, orbit::Orbit, segment::Segment};
 
 #[cfg(test)]
 mod brute_force_tester;
@@ -91,6 +91,19 @@ impl PathComponent {
     
     pub fn final_guidance(&self) -> Option<&Guidance> {
         self.future_guidance().last().copied()
+    }
+
+    // Returns none if the path contains no burns or guidance segments
+    pub fn final_rocket_equation_function(&self) -> Option<RocketEquationFunction> {
+        for segment in self.future_segments.iter().rev() {
+            if let Segment::Burn(burn) = segment {
+                return Some(burn.final_rocket_equation_function());
+            }
+            if let Segment::Guidance(guidance) = segment {
+                return Some(guidance.final_rocket_equation_function());
+            }
+        }
+        None
     }
 
     /// Returns the first segment it finds matching the time

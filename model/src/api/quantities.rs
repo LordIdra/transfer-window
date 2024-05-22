@@ -179,9 +179,8 @@ impl Model {
     /// Panics if the entity does not have a vessel component
     pub fn final_dv(&self, entity: Entity) -> Option<f64> {
         if let Some(vessel_component) = self.try_vessel_component(entity) {
-            if let Some(final_burn) = self.path_component(entity).final_burn() {
-                let current_time = final_burn.current_point().time();
-                return Some(final_burn.rocket_equation_function_at_time(current_time).remaining_dv());
+            if let Some(rocket_equation_function) = self.path_component(entity).final_rocket_equation_function() {
+                return Some(rocket_equation_function.remaining_dv());
             }
             return vessel_component.dv();
         }

@@ -1,4 +1,4 @@
-use crate::{components::{path_component::guidance::MAX_GUIDANCE_TIME, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::fire_torpedo::FireTorpedoEvent}}, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::{system_slot::{Slot, SlotLocation}, timeline::fire_torpedo::FireTorpedoEvent}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     pub fn set_slot(&mut self, entity: Entity, location: SlotLocation, slot: Slot) {
@@ -20,9 +20,9 @@ impl Model {
             && self.path_component(entity).final_burn().is_none()
     }
 
-    pub fn can_torpedo_enable_guidance(&self, entity: Entity, time: f64) -> bool {
+    pub fn can_torpedo_enable_guidance(&self, entity: Entity) -> bool {
         let vessel_component = &self.vessel_component(entity);
-        let Some(target) = vessel_component.target() else {
+        if vessel_component.target().is_none() {
             return false;
         };
 
@@ -30,19 +30,6 @@ impl Model {
             return false;
         };
 
-        let Some(next_closest_approach_time) = self.find_next_closest_approach(entity, target, time) else {
-            return false;
-        };
-
-        if next_closest_approach_time - time >= MAX_GUIDANCE_TIME {
-            return false;
-        }
-
         true
-
-        // strategy: while guidance enabled:
-        // if intersection distance > optimal distance
-        // compute derivative at intersection time
-        // 
     }
 }

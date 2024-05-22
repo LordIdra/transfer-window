@@ -33,13 +33,8 @@ fn draw_orbits(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui) {
 }
 
 fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Event>, time: f64, view: &mut Scene) {
-    let has_burn_before_requested_time = if let Some(final_burn) = model.path_component(entity).final_burn() {
-        time < final_burn.start_point().time()
-    } else {
-        false
-    };
     let vessel_component = model.vessel_component(entity);
-    let can_create_burn = vessel_component.slots().engine().is_some() && !has_burn_before_requested_time;
+    let can_create_burn = vessel_component.slots().engine().is_some() && model.can_create_timeline_event(entity, time);
 
     let create_burn_button = Button::new("Create burn");
     if ui.add_enabled(can_create_burn, create_burn_button).clicked() {
@@ -49,7 +44,8 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
 
     if vessel_component.class().is_torpedo() {
         let button = Button::new("Enable guidance");
-        if ui.add_enabled(model.can_torpedo_enable_guidance(entity, time), button).clicked() {
+        let can_enable_guidance = model.can_torpedo_enable_guidance(entity) && model.can_create_timeline_event(entity, time);
+        if ui.add_enabled(can_enable_guidance, button).clicked() {
             events.push(Event::CreateGuidance { entity, time });
         }
     }

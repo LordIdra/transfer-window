@@ -112,7 +112,7 @@ impl Burn {
     }
 
     #[allow(clippy::missing_panics_doc)]
-    pub fn rocket_equation_function_at_end_of_burn(&self) -> RocketEquationFunction {
+    pub fn final_rocket_equation_function(&self) -> RocketEquationFunction {
         self.rocket_equation_function_at_time(self.end_point().time())
     }
 
