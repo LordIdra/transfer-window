@@ -135,7 +135,7 @@ fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, s
         add_textured_square(&mut vertices, icon.position(view, model), radius, alpha);
     }
     
-    let Some(texture_renderer) = view.texture_renderers.get(&icon.texture(view, model)) else {
+    let Some(texture_renderer) = view.resources.renderer(&icon.texture(view, model)) else {
         error!("Texture {} does not exist ", icon.texture(view, model));
         return
     };

@@ -16,7 +16,11 @@ fn draw_selected_circle(view: &mut Scene, model: &Model, entity: Entity, time: f
     let segment = path_component.future_segment_at_time(time);
     let point = model.absolute_position(segment.parent()) + segment.position_at_time(time);
     add_textured_square(&mut vertices, point, select_radius, alpha);
-    view.texture_renderers.get("circle").unwrap().lock().unwrap().add_vertices(&mut vertices);
+    view.resources.renderer("circle")
+        .unwrap()
+        .lock()
+        .unwrap()
+        .add_vertices(&mut vertices);
 }
 
 #[allow(clippy::too_many_arguments)]

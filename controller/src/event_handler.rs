@@ -51,7 +51,7 @@ pub fn new_game(controller: &mut Controller) {
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
     controller.model = Some(model);
-    controller.view = View::GameScene(Scene::new(&controller.gl, Some(earth)));
+    controller.view = View::GameScene(Scene::new(&controller.gl, controller.resources.clone(), Some(earth)));
 }
 
 pub fn save_game(controller: &Controller, name: &str) {
@@ -87,7 +87,7 @@ pub fn load_game(controller: &mut Controller, name: &str) {
      };
 
      controller.model = Some(model);
-     controller.view = View::GameScene(Scene::new(&controller.gl, None));
+     controller.view = View::GameScene(Scene::new(&controller.gl, controller.resources.clone(), None));
 }
 
 pub fn toggle_paused(controller: &mut Controller) {

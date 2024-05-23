@@ -3,7 +3,7 @@ use std::{sync::Arc, time::Instant};
 use eframe::{egui::{Context, FontData, FontDefinitions, FontFamily}, glow, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
 use log::{debug, error, info};
 use transfer_window_model::Model;
-use transfer_window_view::{events::Event, menu::Scene, View};
+use transfer_window_view::{events::Event, menu::Scene, resources::Resources, View};
 
 use crate::event_handler::{adjust_burn, adjust_fire_torpedo, cancel_last_event, create_burn, create_fire_torpedo, decrease_time_step_level, destroy, enable_torpedo_guidance, increase_time_step_level, load_game, new_game, quit, save_game, set_slot, set_target, start_warp, toggle_paused};
 
@@ -11,6 +11,7 @@ mod event_handler;
 
 struct Controller {
     gl: Arc<glow::Context>,
+    resources: Arc<Resources>,
     model: Option<Model>,
     view: View,
     last_frame: Instant,
@@ -35,10 +36,11 @@ impl Controller {
 
         egui_extras::install_image_loaders(&creation_context.egui_ctx);
         let gl = creation_context.gl.as_ref().unwrap().clone();
+        let resources = Arc::new(Resources::new(&gl, &creation_context.egui_ctx));
         let model = None;
         let view = View::MenuScene(Scene::default());
         let last_frame = Instant::now();
-        Box::new(Self { gl, model, view, last_frame })
+        Box::new(Self { gl, resources, model, view, last_frame })
     }
 
     pub fn model(&self) -> &Model {
