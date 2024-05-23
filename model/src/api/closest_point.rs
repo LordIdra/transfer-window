@@ -65,7 +65,6 @@ impl Model {
                     continue
                 }
 
-                closest_distance = distance;
                 if time > orbit.current_point().time() && time < orbit.end_point().time() {
                     closest_point = Some((entity, time));
                     closest_distance = distance;
