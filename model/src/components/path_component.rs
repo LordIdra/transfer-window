@@ -192,7 +192,7 @@ impl PathComponent {
     }
 
     /// # Panics
-    /// Panics if the segment at `time` is a burn
+    /// Panics if the segment at `time` is a burn or guidance segment
     pub fn remove_segments_after(&mut self, time: f64) {
         loop {
             match self.future_segments.back_mut().as_mut().unwrap() {
@@ -230,13 +230,16 @@ impl PathComponent {
         }
     }
 
+    pub fn remove_last_segment(&mut self) {
+        self.future_segments.pop_back();
+    }
+
     /// # Panics
     /// Panics if there are no more future segments after the finished segment
     pub fn on_segment_finished(&mut self, time: f64) {
         trace!("Segment finished at time={time}");
-        let overshot_time = self.current_segment().overshot_time(time);
         self.past_segments.push(self.future_segments.pop_front().expect("No more future segments"));
-        self.current_segment_mut().next(overshot_time);
+        self.current_segment_mut().next(time);
     }
 
     pub fn clear_future_segments(&mut self) {

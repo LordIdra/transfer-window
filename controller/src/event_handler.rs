@@ -3,7 +3,7 @@ use std::fs;
 use eframe::Frame;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::BurnEvent, TimelineEvent, TimelineEventType}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::BurnEvent, TimelineEvent}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
@@ -127,8 +127,8 @@ pub fn create_burn(controller: &mut Controller, entity: Entity, time: f64) {
     let _span = tracy_client::span!("Create burn");
     let model = controller.model_mut();
     
-    let event_type = TimelineEventType::Burn(BurnEvent::new(model, entity, time));
-    model.add_event(entity, TimelineEvent::new(time, event_type));
+    let event = TimelineEvent::Burn(BurnEvent::new(model, entity, time));
+    model.add_event(entity, event);
 }
 
 pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
@@ -137,7 +137,6 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let model = controller.model_mut();
     
     model.event_at_time(entity, time)
-        .type_()
         .as_burn()
         .unwrap()
         .adjust(model, amount);
@@ -172,8 +171,8 @@ pub fn create_fire_torpedo(controller: &mut Controller, entity: Entity, location
     let _span = tracy_client::span!("Fire torpedo");
     let model = controller.model_mut();
 
-    let event_type = TimelineEventType::FireTorpedo(FireTorpedoEvent::new(model, entity, time, location));
-    model.add_event(entity, TimelineEvent::new(time, event_type));
+    let event = TimelineEvent::FireTorpedo(FireTorpedoEvent::new(model, entity, time, location));
+    model.add_event(entity, event);
 }
 
 pub fn adjust_fire_torpedo(controller: &mut Controller, entity: Entity, time: f64, amount: DVec2) {
@@ -182,7 +181,6 @@ pub fn adjust_fire_torpedo(controller: &mut Controller, entity: Entity, time: f6
     let model = controller.model_mut();
     
     model.event_at_time(entity, time)
-        .type_()
         .as_fire_torpedo()
         .unwrap()
         .adjust(model, amount);
@@ -193,6 +191,6 @@ pub fn enable_torpedo_guidance(controller: &mut Controller, entity: Entity, time
     let _span = tracy_client::span!("Enable torpedo guidance");
     let model = controller.model_mut();
 
-    let event_type = TimelineEventType::EnableGuidance(EnableGuidanceEvent::new(model, entity, time));
-    model.add_event(entity, TimelineEvent::new(time, event_type));
+    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(model, entity, time));
+    model.add_event(entity, event);
 }

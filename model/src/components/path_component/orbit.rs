@@ -151,10 +151,6 @@ impl Orbit {
         time > self.start_point.time() && time < self.end_point.time()
     }
 
-    pub fn overshot_time(&self, time: f64) -> f64 {
-        time - self.end_point.time()
-    }
-
     pub fn time_since_first_periapsis(&self, theta: f64) -> f64 {
         let mut x = self.time_since_last_periapsis(theta);
         if let Some(period) = self.period() {
@@ -203,7 +199,8 @@ impl Orbit {
         self.current_point = self.start_point.clone();
     }
 
-    pub fn next(&mut self, delta_time: f64) {
+    pub fn next(&mut self, time: f64) {
+        let delta_time = time - self.current_point.time();
         self.current_point = self.current_point.next(&self.conic, delta_time);
     }
 }

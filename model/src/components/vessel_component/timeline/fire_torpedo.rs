@@ -8,6 +8,7 @@ const INITIAL_DV: DVec2 = DVec2::new(0.0, 1.0);
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FireTorpedoEvent {
+    time: f64,
     fire_from: Entity,
     ghost: Entity,
     slot_location: SlotLocation,
@@ -37,7 +38,7 @@ impl FireTorpedoEvent {
         model.create_burn(ghost, burn_time, rocket_equation_function);
         model.adjust_burn(ghost, burn_time, INITIAL_DV);
 
-        Self { fire_from, ghost, slot_location, burn_time }
+        Self { time, fire_from, ghost, slot_location, burn_time }
     }
 
     /// # Panics
@@ -58,6 +59,10 @@ impl FireTorpedoEvent {
 
     pub fn adjust(&self, model: &mut Model, amount: DVec2) {
         model.adjust_burn(self.ghost(), self.burn_time(), amount);
+    }
+
+    pub fn time(&self) -> f64 {
+        self.time
     }
 
     pub fn ghost(&self) -> Entity {

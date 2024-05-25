@@ -1,9 +1,16 @@
+use log::debug;
+
 use crate::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
 fn update_entity_timeline(model: &mut Model, entity: Entity) {
     let time = model.time();
-    let events = model.vessel_component_mut(entity).timeline_mut().pop_events_before(time);
+    let Some(vessel_component) = model.try_vessel_component_mut(entity) else {
+        // Vessel was destroyed in a previously executed event
+        return;
+    };
+    let events = vessel_component.timeline_mut().pop_events_before(time);
     for event in events {
+        debug!("Executing event {event:?}");
         event.execute(model);
     }
 }

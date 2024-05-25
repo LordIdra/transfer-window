@@ -1,11 +1,16 @@
+use log::debug;
+
 use crate::{components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
 
 impl Model {
-    pub fn cancel_last_event(&mut self, fire_from: Entity) {
-        self.vessel_component_mut(fire_from).timeline_mut().pop_last_event().cancel(self);
+    pub fn cancel_last_event(&mut self, entity: Entity) {
+        let event = &self.vessel_component_mut(entity).timeline_mut().pop_last_event();
+        debug!("Cancelled timeline event {event:?}");
+        event.cancel(self);
     }
 
     pub fn add_event(&mut self, entity: Entity, event: TimelineEvent) {
+        debug!("Adding event {event:?}");
         self.vessel_component_mut(entity)
             .timeline_mut()
             .add(event);

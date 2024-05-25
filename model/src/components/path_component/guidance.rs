@@ -17,6 +17,10 @@ const DISTANCE_DERIVATIVE_DELTA: f64 = 0.001;
 
 pub mod guidance_point;
 
+pub fn will_intercept(intercept_distance: f64) -> bool {
+    intercept_distance < MAX_INTERCEPT_DISTANCE
+}
+
 fn proportional_guidance_acceleration(absolute_position: DVec2, target_absolute_position: DVec2, absolute_velocity: DVec2, target_absolute_velocity: DVec2) -> DVec2 {
     let displacement = absolute_position - target_absolute_position;
     let closing_speed = -(absolute_velocity - target_absolute_velocity).dot(&displacement) / displacement.magnitude();
@@ -28,7 +32,7 @@ fn proportional_guidance_acceleration(absolute_position: DVec2, target_absolute_
     acceleration_unit * PROPORTIONALITY_CONSTANT * closing_speed * line_of_sight_rate
 }
 
-fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_rocket_equation_function: &RocketEquationFunction, start_point: &GuidancePoint) -> Vec<GuidancePoint> {
+fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_rocket_equation_function: &RocketEquationFunction, start_point: &GuidancePoint) -> (bool, Vec<GuidancePoint>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute guidance points");
     let mut points = vec![start_point.clone()];
@@ -41,7 +45,7 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_
 
         let Some(rocket_equation_function) = start_rocket_equation_function.step_by_dv(dv) else {
             // We've run out of fuel
-            break;
+            return (false, points);
         };
 
         // Check if we are on an intercept trajectory
@@ -57,15 +61,15 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_
             // Distance derivative sign flips, so we have a minimum distance within GUIDANCE_TIME_STEP
             let intercept_delta_time = itp(&distance_prime_at_delta_time, 0.0, GUIDANCE_TIME_STEP);
             let intercept_distance = distance_at_delta_time(intercept_delta_time);
-            if intercept_distance < MAX_INTERCEPT_DISTANCE {
+            if will_intercept(intercept_distance) {
                 // We have an intercept
                 points.push(last.next(intercept_delta_time, rocket_equation_function.mass()));
-                break;
+                return (true, points);
             }
         }
 
         if time - start_point.time() > MAX_GUIDANCE_TIME {
-            break;
+            return (false, points);
         }
 
         let absolute_position = model.absolute_position_at_time(parent, time) + last.position();
@@ -86,28 +90,30 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_
         dv += actual_acceleration.magnitude() * GUIDANCE_TIME_STEP;
         points.push(last.next_with_new_acceleration_and_dv(GUIDANCE_TIME_STEP, mass, actual_acceleration));
     }
-
-    points
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Guidance {
     parent: Entity,
+    target: Entity,
     rocket_equation_function: RocketEquationFunction,
     current_point: GuidancePoint,
     points: Vec<GuidancePoint>,
+    will_intercept: bool,
 }
 
 impl Guidance {
     #[allow(clippy::too_many_arguments)]
     pub fn new(model: &Model, parent: Entity, target: Entity, parent_mass: f64, start_time: f64, rocket_equation_function: &RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
         let start_point = GuidancePoint::new(parent_mass, rocket_equation_function.mass(), start_time, start_position, start_velocity, vec2(0.0, 0.0), 0.0);
-        let points = compute_guidance_points(model, parent, target, rocket_equation_function, &start_point);
+        let (will_intercept, points) = compute_guidance_points(model, parent, target, rocket_equation_function, &start_point);
         Self { 
             parent,
+            target,
             rocket_equation_function: rocket_equation_function.clone(),
             current_point: start_point.clone(),
             points,
+            will_intercept,
         }
     }
 
@@ -159,6 +165,10 @@ impl Guidance {
         self.parent
     }
 
+    pub fn target(&self) -> Entity {
+        self.target
+    }
+
     pub fn is_finished(&self) -> bool {
         self.current_point.time() >= self.end_point().time()
     }
@@ -190,15 +200,16 @@ impl Guidance {
         self.rocket_equation_function_at_time(self.end_point().time())
     }
 
-    pub fn overshot_time(&self, time: f64) -> f64 {
-        time - self.end_point().time()
+    pub fn will_intercept(&self) -> bool {
+        self.will_intercept
     }
 
     pub fn reset(&mut self) {
         self.current_point = self.start_point().clone();
     }
 
-    pub fn next(&mut self, delta_time: f64) {
+    pub fn next(&mut self, time: f64) {
+        let delta_time = time - self.current_point.time();
         self.current_point = self.point_at_time(self.current_point.time() + delta_time);
     }
 }

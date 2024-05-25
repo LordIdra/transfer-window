@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 
-use log::debug;
+use intercept::InterceptEvent;
+use log::trace;
 use serde::{Deserialize, Serialize};
 
 use crate::Model;
@@ -9,102 +10,97 @@ use self::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent,
 
 use super::system_slot::SlotLocation;
 
+pub mod intercept;
 pub mod enable_guidance;
 pub mod start_burn;
 pub mod fire_torpedo;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum TimelineEventType {
+pub enum TimelineEvent {
+    Intercept(InterceptEvent),
     FireTorpedo(FireTorpedoEvent),
     Burn(BurnEvent),
     EnableGuidance(EnableGuidanceEvent),
 }
 
-impl TimelineEventType {
+impl TimelineEvent {
     pub fn execute(&self, model: &mut Model) {
         match self {
-            TimelineEventType::FireTorpedo(event) => event.execute(model),
-            TimelineEventType::Burn(event) => event.execute(model),
-            TimelineEventType::EnableGuidance(event) => event.execute(model),
+            TimelineEvent::Burn(event) => event.execute(model),
+            TimelineEvent::Intercept(event) => event.execute(model),
+            TimelineEvent::EnableGuidance(event) => event.execute(model),
+            TimelineEvent::FireTorpedo(event) => event.execute(model),
         }
     }
 
     pub fn cancel(&self, model: &mut Model) {
         match self {
-            TimelineEventType::FireTorpedo(event) => event.cancel(model),
-            TimelineEventType::Burn(event) => event.cancel(model),
-            TimelineEventType::EnableGuidance(event) => event.cancel(model),
+            TimelineEvent::Burn(event) => event.cancel(model),
+            TimelineEvent::Intercept(event) => event.cancel(model),
+            TimelineEvent::EnableGuidance(event) => event.cancel(model),
+            TimelineEvent::FireTorpedo(event) => event.cancel(model),
         }
     }
 
-    pub fn is_fire_torpedo(&self) -> bool {
-        matches!(self, TimelineEventType::FireTorpedo(_))
+    pub fn time(&self) -> f64 {
+        match self {
+            TimelineEvent::Burn(event) => event.time(),
+            TimelineEvent::Intercept(event) => event.time(),
+            TimelineEvent::EnableGuidance(event) => event.time(),
+            TimelineEvent::FireTorpedo(event) => event.time(),
+        }
+    }
+
+    pub fn blocks_modifying_earlier_events(&self) -> bool {
+        !self.is_intercept()
     }
 
     pub fn is_burn(&self) -> bool {
-        matches!(self, TimelineEventType::Burn(_))
+        matches!(self, TimelineEvent::Burn(_))
     }
 
+    pub fn is_intercept(&self) -> bool {
+        matches!(self, TimelineEvent::Intercept(_))
+    }
+    
     pub fn is_enable_guidance(&self) -> bool {
-        matches!(self, TimelineEventType::EnableGuidance(_))
+        matches!(self, TimelineEvent::EnableGuidance(_))
     }
 
-    pub fn as_fire_torpedo(&self) -> Option<FireTorpedoEvent> {
-        if let TimelineEventType::FireTorpedo(fire_torpedo) = self {
-            Some(fire_torpedo.clone())
+    pub fn is_fire_torpedo(&self) -> bool {
+        matches!(self, TimelineEvent::FireTorpedo(_))
+    }
+
+    pub fn as_burn(&self) -> Option<BurnEvent> {
+        if let TimelineEvent::Burn(event_type) = self {
+            Some(event_type.clone())
         } else {
             None
         }
     }
 
-    pub fn as_burn(&self) -> Option<BurnEvent> {
-        if let TimelineEventType::Burn(burn) = self {
-            Some(burn.clone())
+    pub fn as_intercept(&self) -> Option<InterceptEvent> {
+        if let TimelineEvent::Intercept(event_type) = self {
+            Some(event_type.clone())
         } else {
             None
         }
     }
 
     pub fn as_enable_guidance(&self) -> Option<EnableGuidanceEvent> {
-        if let TimelineEventType::EnableGuidance(enable_guidance) = self {
-            Some(enable_guidance.clone())
+        if let TimelineEvent::EnableGuidance(event_type) = self {
+            Some(event_type.clone())
         } else {
             None
         }
     }
-}
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct TimelineEvent {
-    time: f64,
-    type_: TimelineEventType,
-}
-
-impl TimelineEvent {
-    pub fn new(time: f64, type_: TimelineEventType) -> Self {
-        Self { time, type_ }
-    }
-
-    pub fn execute(&self, model: &mut Model) {
-        debug!("Executing timeline event {:?}", self);
-        self.type_.execute(model);
-    }
-
-    pub fn cancel(&self, model: &mut Model) {
-        debug!("Cancelling timeline event {:?}", self);
-        self.type_.cancel(model);
-    }
-
-    pub fn time(&self) -> f64 {
-        self.time
-    }
-
-    pub fn type_(&self) -> &TimelineEventType {
-        &self.type_
-    }
-
-    pub fn type_mut(&mut self) -> &mut TimelineEventType {
-        &mut self.type_
+    pub fn as_fire_torpedo(&self) -> Option<FireTorpedoEvent> {
+        if let TimelineEvent::FireTorpedo(event_type) = self {
+            Some(event_type.clone())
+        } else {
+            None
+        }
     }
 }
 
@@ -121,27 +117,32 @@ impl Timeline {
     /// # Panics
     /// Panics if the event occurs before the last event
     pub fn add(&mut self, event: TimelineEvent) {
-        if let Some(last_event) = self.last_event() {
-            assert!(event.time >= last_event.time);
+        let mut i = 0;
+        while i < self.events.len() && self.events[i].time() < event.time() {
+            i += 1;
         }
-        self.events.push_back(event);
+        trace!("Adding new timeline event {event:?} at index {i}");
+        self.events.insert(i, event);
     }
 
     pub fn event_at_time(&self, time: f64) -> Option<&TimelineEvent> {
-        self.events.iter().find(|event| event.time == time)
-    }
-
-    pub fn event_at_time_mut(&mut self, time: f64) -> Option<&mut TimelineEvent> {
-        self.events.iter_mut().find(|event| event.time == time)
+        self.events.iter().find(|event| event.time() == time)
     }
 
     pub fn last_event(&self) -> Option<TimelineEvent> {
         self.events.back().cloned()
     }
 
+    pub fn last_modification_blocking_event(&self) -> Option<TimelineEvent> {
+        self.events.iter()
+            .rev()
+            .find(|event| event.blocks_modifying_earlier_events())
+            .cloned()
+    }
+
     pub fn depleted_torpedoes(&self, slot_location :SlotLocation) -> usize {
         self.events.iter()
-            .filter(|event| event.type_.as_fire_torpedo().is_some_and(|fire_torpedo| fire_torpedo.slot_location() == slot_location))
+            .filter(|event| event.as_fire_torpedo().is_some_and(|fire_torpedo| fire_torpedo.slot_location() == slot_location))
             .count()
     }
 
@@ -152,26 +153,13 @@ impl Timeline {
         self.events.pop_back().unwrap()
     }
 
-    #[allow(clippy::missing_panics_doc)]
-    pub fn events_before(&mut self, time: f64) -> Vec<TimelineEvent> {
-        let mut events = vec![];
-        while self.events.front().is_some_and(|event| event.time < time) {
-            events.push(self.events.front().unwrap().clone());
-        }
-        events
-    }
-
     /// Does not include any event at `time`
     #[allow(clippy::missing_panics_doc)]
     pub fn pop_events_before(&mut self, time: f64) -> Vec<TimelineEvent> {
         let mut events = vec![];
-        while self.events.front().is_some_and(|event| event.time < time) {
+        while self.events.front().is_some_and(|event| event.time() < time) {
             events.push(self.events.pop_front().unwrap());
         }
         events
-    }
-
-    pub fn clear(&mut self) {
-        self.events.clear();
     }
 }

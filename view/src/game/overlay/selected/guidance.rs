@@ -27,6 +27,10 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             let can_delete = model.can_modify_timeline_event(entity, time);
             let delete_button = Button::new("Cancel");
             if ui.add_enabled(can_delete, delete_button).clicked() {
+                if model.vessel_component(entity).timeline().last_event().unwrap().is_intercept() {
+                    // also cancel intercept
+                    events.push(Event::CancelLastTimelineEvent { entity });
+                }
                 events.push(Event::CancelLastTimelineEvent { entity });
                 view.selected = Selected::None;
             }

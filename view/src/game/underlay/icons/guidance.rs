@@ -18,7 +18,7 @@ impl Guidance {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::VesselComponent]) {
             for event in model.vessel_component(entity).timeline().events() {
-                if event.type_().is_enable_guidance() {
+                if event.is_enable_guidance() {
                     let icon = Self { entity, time: event.time() };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }

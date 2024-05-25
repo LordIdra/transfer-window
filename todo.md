@@ -91,12 +91,17 @@
 - [1|x] Actually determine whether guidance can be enabled at selected point
 - [1|x] Guidance icon
 - [1|x] Cancel guidance
-
+- [1|x] Fix closest point weirdness??
+- [1|x] Fix backward burn dragging
+- [1|x] Fix or remove burn scrolling?
+- [1|x] Preload images to fix weird loading delay in editor
 - [1|x] Better collision detection
-- [1| ] Collision event which yeets both vessels
-- [1| ] Draw orbit after guidance end only if miss
-- [1| ] Recompute guidance segment if collision no longer happening
-- [1| ] Yeet torpedo target when torpedo gets close enough
+- [1|x] Collision event which yeets both vessels
+- [1|x] Draw orbit after guidance end only if miss
+- [1|x] Recompute guidance segment if collision no longer happening
+
+- [1| ] Allow cancelling timeline events before collision event
+- [1| ] Fix being able to modify torpedo fire events when torpedo has events queued (or just delete torpedo lol)
 
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Show DV budget while adjusting burns
@@ -107,6 +112,9 @@
 - [1| ] More detail (eg in tooltips) about why buttons can't be pressed
 - [1| ] Close context menu on option selected
 - [1| ] Select new burn/guidance/etc created
+- [1| ] Disallow creating burns/guidances after dv zero
+
+- [1| ] Destroyed effect
 
 # Stuff to do later because other stuff needs to be in place first
 - [1| ] Dim P/A icons when moused over and don't count as hovered????
@@ -125,8 +133,4 @@
 
 # Boring shit that needs fixing
 - [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
-- [1|x] Fix closest point weirdness??
-- [1|x] Fix backward burn dragging
-- [1|x] Fix or remove burn scrolling?
-- [1|x] Preload images to fix weird loading delay in editor
 - [1| ] Add actual logging before prototype release

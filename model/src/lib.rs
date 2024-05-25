@@ -71,9 +71,10 @@ impl Model {
         let _span = tracy_client::span!("Model update");
         self.update_warp(dt);
         self.update_time(dt);
-        self.update_fuel();
         self.update_timeline();
-        self.update_trajectory(dt);
+        self.update_fuel();
+        self.update_guidance();
+        self.update_trajectory();
     }
 
     pub fn entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {

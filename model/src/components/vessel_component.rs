@@ -152,14 +152,14 @@ impl VesselComponent {
 
     pub fn can_create_timeline_event(&self, time: f64) -> bool {
         match self.timeline().last_event() {
-            Some(event) => event.time() < time,
+            Some(event) => time > event.time(),
             None => true,
         }
     }
 
     pub fn can_modify_timeline_event(&self, time: f64) -> bool {
-        match self.timeline().last_event() {
-            Some(event) => time == event.time(),
+        match self.timeline().last_modification_blocking_event() {
+            Some(event) => time >= event.time(),
             None => false,
         }
     }
@@ -177,5 +177,9 @@ impl VesselComponent {
         let depleted_torpedoes = self.timeline()
             .depleted_torpedoes(slot_location);
         initial_torpedoes - depleted_torpedoes
+    }
+
+    pub(crate) fn should_recompute_trajectory(&self) -> bool {
+        !(self.class.is_torpedo() && self.timeline.last_event().is_some_and(|event| event.is_intercept()))
     }
 }

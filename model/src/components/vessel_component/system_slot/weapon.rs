@@ -24,7 +24,6 @@ impl WeaponType {
     pub fn as_torpedo(&self) -> &Torpedo {
         match self {
             WeaponType::Torpedo(torpedo) => torpedo,
-            _ => panic!("Attempt to get non-torpedo weapon as torpedo"),
         }
     }
 
@@ -32,7 +31,6 @@ impl WeaponType {
     pub fn as_torpedo_mut(&mut self) -> &mut Torpedo {
         match self {
             WeaponType::Torpedo(torpedo) => torpedo,
-            _ => panic!("Attempt to get non-torpedo weapon as torpedo"),
         }
     }
 }

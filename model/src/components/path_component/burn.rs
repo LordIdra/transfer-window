@@ -116,10 +116,6 @@ impl Burn {
         self.rocket_equation_function_at_time(self.end_point().time())
     }
 
-    pub fn overshot_time(&self, time: f64) -> f64 {
-        time - self.end_point().time()
-    }
-
     pub fn rotation_matrix(&self) -> DMat2 {
         DMat2::new(
             self.tangent.x, -self.tangent.y, 
@@ -170,7 +166,8 @@ impl Burn {
         self.current_point = self.start_point().clone();
     }
 
-    pub fn next(&mut self, delta_time: f64) {
+    pub fn next(&mut self, time: f64) {
+        let delta_time = time - self.current_point.time();
         self.current_point = self.point_at_time(self.current_point.time() + delta_time);
     }
 }

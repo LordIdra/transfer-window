@@ -149,14 +149,6 @@ impl Segment {
         self.end_time() - self.start_time()
     }
 
-    pub fn overshot_time(&self, time: f64) -> f64 {
-        match self {
-            Segment::Burn(burn) => burn.overshot_time(time),
-            Segment::Orbit(orbit) => orbit.overshot_time(time),
-            Segment::Guidance(guidance) => guidance.overshot_time(time),
-        }
-    }
-
     pub fn as_orbit(&self) -> Option<&Orbit> {
         if let Segment::Orbit(orbit) = self {
             Some(orbit)
