@@ -116,7 +116,7 @@ fn main() {
 
     let options = NativeOptions {
         renderer: Renderer::Glow,
-        multisampling: 8,
+        // multisampling: 8,
         ..Default::default()
     };
 
