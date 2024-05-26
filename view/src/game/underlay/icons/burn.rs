@@ -18,7 +18,7 @@ impl Burn {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::VesselComponent]) {
             for event in model.vessel_component(entity).timeline().events() {
-                if event.is_burn() {
+                if event.is_start_burn() {
                     let icon = Self { entity, time: event.time() };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
@@ -30,7 +30,7 @@ impl Burn {
 
 impl Icon for Burn {
     fn texture(&self, _view: &Scene, model: &Model) -> String {
-        if model.can_modify_timeline_event(self.entity, self.time) {
+        if model.event_at_time(self.entity, self.time).can_adjust(model) {
             "burn".to_string()
         } else {
             "burn-locked".to_string()
@@ -88,7 +88,9 @@ impl Icon for Burn {
         }
         
         if let Selected::Burn { entity, time, state } = &mut view.selected {
-            if *entity == self.entity && *time == self.time && model.can_modify_timeline_event(self.entity, self.time) {
+            if *entity == self.entity 
+                    && *time == self.time 
+                    && model.event_at_time(self.entity, self.time).can_adjust(model) {
                 if state.is_selected() {
                     trace!("Burn icon clicked; switching Selected -> Adjusting");
                     *state = BurnState::Adjusting;

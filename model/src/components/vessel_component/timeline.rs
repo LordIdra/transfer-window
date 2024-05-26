@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::Model;
 
-use self::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::BurnEvent};
+use self::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent};
 
 use super::system_slot::SlotLocation;
 
@@ -19,7 +19,7 @@ pub mod fire_torpedo;
 pub enum TimelineEvent {
     Intercept(InterceptEvent),
     FireTorpedo(FireTorpedoEvent),
-    Burn(BurnEvent),
+    Burn(StartBurnEvent),
     EnableGuidance(EnableGuidanceEvent),
 }
 
@@ -51,11 +51,35 @@ impl TimelineEvent {
         }
     }
 
-    pub fn blocks_modifying_earlier_events(&self) -> bool {
-        !self.is_intercept()
+    pub fn can_delete(&self, model: &Model) -> bool {
+        match self {
+            TimelineEvent::Burn(event) => event.can_remove(model),
+            TimelineEvent::Intercept(event) => event.can_remove(),
+            TimelineEvent::EnableGuidance(event) => event.can_remove(model),
+            TimelineEvent::FireTorpedo(event) => event.can_remove(),
+        }
     }
 
-    pub fn is_burn(&self) -> bool {
+    pub fn can_adjust(&self, model: &Model) -> bool {
+        match self {
+            TimelineEvent::Burn(event) => event.can_remove(model),
+            TimelineEvent::Intercept(event) => event.can_remove(),
+            TimelineEvent::EnableGuidance(event) => event.can_remove(model),
+            TimelineEvent::FireTorpedo(event) => event.can_remove(),
+        }
+    }
+
+    /// Whether this event should prevent editing earlier events
+    pub fn is_blocking(&self) -> bool {
+        match self {
+            TimelineEvent::Burn(event) => event.is_blocking(),
+            TimelineEvent::Intercept(event) => event.is_blocking(),
+            TimelineEvent::EnableGuidance(event) => event.is_blocking(),
+            TimelineEvent::FireTorpedo(event) => event.is_blocking(),
+        }
+    }
+
+    pub fn is_start_burn(&self) -> bool {
         matches!(self, TimelineEvent::Burn(_))
     }
 
@@ -71,7 +95,7 @@ impl TimelineEvent {
         matches!(self, TimelineEvent::FireTorpedo(_))
     }
 
-    pub fn as_burn(&self) -> Option<BurnEvent> {
+    pub fn as_start_burn(&self) -> Option<StartBurnEvent> {
         if let TimelineEvent::Burn(event_type) = self {
             Some(event_type.clone())
         } else {
@@ -133,10 +157,10 @@ impl Timeline {
         self.events.back().cloned()
     }
 
-    pub fn last_modification_blocking_event(&self) -> Option<TimelineEvent> {
+    pub fn last_blocking_event(&self) -> Option<TimelineEvent> {
         self.events.iter()
             .rev()
-            .find(|event| event.blocks_modifying_earlier_events())
+            .find(|event| event.is_blocking())
             .cloned()
     }
 
@@ -144,6 +168,13 @@ impl Timeline {
         self.events.iter()
             .filter(|event| event.as_fire_torpedo().is_some_and(|fire_torpedo| fire_torpedo.slot_location() == slot_location))
             .count()
+    }
+
+    pub fn is_time_after_last_blocking_event(&self, time: f64) -> bool {
+        match self.last_blocking_event() {
+            Some(event) => event.time() <= time,
+            None => true,
+        }
     }
 
     /// Includes any event at `time`

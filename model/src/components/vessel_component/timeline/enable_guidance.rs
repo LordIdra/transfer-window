@@ -23,4 +23,25 @@ impl EnableGuidanceEvent {
     pub fn time(&self) -> f64 {
         self.time
     }
+    
+    pub fn is_blocking(&self) -> bool {
+        true
+    }
+
+    pub fn can_remove(&self, model: &Model) -> bool {
+        model.vessel_component(self.entity).timeline().is_time_after_last_blocking_event(self.time)
+    }
+
+    pub fn can_adjust(&self, model: &Model) -> bool {
+        model.vessel_component(self.entity).timeline().is_time_after_last_blocking_event(self.time)
+    }
+
+    pub fn can_create_ever(model: &Model, entity: Entity) -> bool {
+        model.vessel_component(entity).class().is_torpedo()
+    }
+
+    pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
+        model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time)
+            && model.vessel_component(entity).has_target()
+    }
 }

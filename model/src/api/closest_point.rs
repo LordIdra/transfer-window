@@ -54,7 +54,7 @@ impl Model {
             for orbit in self.path_component(entity).future_orbits() {
                 let parent_position = self.absolute_position(orbit.parent());
                 let point = point - parent_position;
-                let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {
+                let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance * 5.0) else {
                     continue;
                 };
 
@@ -81,6 +81,8 @@ impl Model {
                 }
             }
         }
+
+        println!("");
 
         closest_point
     }

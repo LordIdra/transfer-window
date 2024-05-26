@@ -43,13 +43,12 @@ impl Model {
             self.vessel_component_mut(entity)
                 .timeline_mut()
                 .add(event);
-        } else {
-            let parent_mass = self.mass(parent);
-            let orbit = Orbit::new(parent, end_point.mass(), parent_mass, end_point.position(), end_point.velocity(), end_point.time());
-
-            self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
-            self.recompute_trajectory(entity);
         }
+        
+        let parent_mass = self.mass(parent);
+        let orbit = Orbit::new(parent, end_point.mass(), parent_mass, end_point.position(), end_point.velocity(), end_point.time());
+        self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
+        self.recompute_trajectory(entity);
     }
 
     pub(crate) fn create_guidance(&mut self, entity: Entity, time: f64) {

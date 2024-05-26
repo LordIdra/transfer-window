@@ -150,20 +150,6 @@ impl VesselComponent {
         &mut self.timeline
     }
 
-    pub fn can_create_timeline_event(&self, time: f64) -> bool {
-        match self.timeline().last_event() {
-            Some(event) => time > event.time(),
-            None => true,
-        }
-    }
-
-    pub fn can_modify_timeline_event(&self, time: f64) -> bool {
-        match self.timeline().last_modification_blocking_event() {
-            Some(event) => time >= event.time(),
-            None => false,
-        }
-    }
-
     /// # Panics
     /// Panics if the slot does not exist or is not a torpedo
     pub fn final_torpedoes(&self, slot_location: SlotLocation) -> usize { 

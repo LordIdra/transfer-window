@@ -65,6 +65,23 @@ impl FireTorpedoEvent {
         self.time
     }
 
+    pub fn is_blocking(&self) -> bool {
+        true
+    }
+    
+    pub fn can_remove(&self) -> bool {
+        true
+    }
+
+    pub fn can_adjust(&self, model: &Model) -> bool {
+        model.vessel_component(self.ghost).timeline().last_blocking_event().is_none()
+    }
+
+    pub fn can_create(model: &Model, entity: Entity, time: f64, slot_location: SlotLocation) -> bool {
+        model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time) 
+            && model.vessel_component(entity).final_torpedoes(slot_location) != 0
+    }
+
     pub fn ghost(&self) -> Entity {
         self.ghost
     }

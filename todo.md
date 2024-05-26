@@ -99,21 +99,23 @@
 - [1|x] Collision event which yeets both vessels
 - [1|x] Draw orbit after guidance end only if miss
 - [1|x] Recompute guidance segment if collision no longer happening
+- [1|x] Allow cancelling timeline events before collision event
+- [1|x] Fix being able to MODIFY (not yeet) torpedo fire events when torpedo has events queued
+- [1|x] Select new burn/guidance/etc created
 
-- [1| ] Allow cancelling timeline events before collision event
-- [1| ] Fix being able to modify torpedo fire events when torpedo has events queued (or just delete torpedo lol)
+- [1| ] Intercept icon
+- [1| ] Allow cancelling burns/guidance midway through
+- [1| ] Allow selecting points on burns or guidance
+- [1| ] Better algorithm for prioritising selected point
+- [1| ] Allow selecting icons under overlaps
 
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
 - [1| ] General UI improvements (cross that bridge later)
-- [1| ] Allow selecting points on burns or guidance
-- [1| ] Allow cancelling burns/guidance midway through
 - [1| ] More detail (eg in tooltips) about why buttons can't be pressed
 - [1| ] Close context menu on option selected
-- [1| ] Select new burn/guidance/etc created
 - [1| ] Disallow creating burns/guidances after dv zero
-
 - [1| ] Destroyed effect
 
 # Stuff to do later because other stuff needs to be in place first

@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Button, Context, Ui, Window}, epaint};
-use transfer_window_model::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}}, storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::{underlay::selected::{util::BurnState, Selected}, util::format_time, Scene}};
 
@@ -33,20 +33,21 @@ fn draw_orbits(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui) {
 }
 
 fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Event>, time: f64, view: &mut Scene) {
-    let vessel_component = model.vessel_component(entity);
-    let can_create_burn = vessel_component.slots().engine().is_some() && model.can_create_timeline_event(entity, time);
-
-    let create_burn_button = Button::new("Create burn");
-    if ui.add_enabled(can_create_burn, create_burn_button).clicked() {
-        events.push(Event::CreateBurn { entity, time });
-        view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
+    if StartBurnEvent::can_create_ever() {
+        let button = Button::new("Create burn");
+        let enabled = StartBurnEvent::can_create(model, entity, time);
+        if ui.add_enabled(enabled, button).clicked() {
+            events.push(Event::CreateBurn { entity, time });
+            view.selected = Selected::Burn { entity, time, state: BurnState::Selected }
+        }
     }
 
-    if vessel_component.class().is_torpedo() {
+    if EnableGuidanceEvent::can_create_ever(model, entity) {
         let button = Button::new("Enable guidance");
-        let can_enable_guidance = model.can_torpedo_enable_guidance(entity) && model.can_create_timeline_event(entity, time);
-        if ui.add_enabled(can_enable_guidance, button).clicked() {
+        let enabled = EnableGuidanceEvent::can_create(model, entity, time);
+        if ui.add_enabled(enabled, button).clicked() {
             events.push(Event::CreateGuidance { entity, time });
+            view.selected = Selected::EnableGuidance { entity, time }
         }
     }
 
@@ -83,15 +84,14 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             }
         });
 
-    let vessel_component = model.vessel_component(entity);
-    let weapon_slots = vessel_component.slots().weapon_slots();
+    let weapon_slots = model.vessel_component(entity).slots().weapon_slots();
     if !weapon_slots.is_empty() {
         Window::new("Weapons")
             .title_bar(false)
             .resizable(false)
             .anchor(Align2::CENTER_BOTTOM, epaint::vec2(0.0, 0.0))
             .show(context, |ui| {
-                draw_weapons(view, ui, vessel_component, entity, &weapon_slots, time, events);
+                draw_weapons(view, model, ui, entity, &weapon_slots, time, events);
             });
     }
 }

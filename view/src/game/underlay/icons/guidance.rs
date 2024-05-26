@@ -30,7 +30,7 @@ impl Guidance {
 
 impl Icon for Guidance {
     fn texture(&self, _view: &Scene, model: &Model) -> String {
-        if model.can_modify_timeline_event(self.entity, self.time) {
+        if model.event_at_time(self.entity, self.time).can_adjust(model) {
             "guidance".to_string()
         } else {
             "guidance-locked".to_string()

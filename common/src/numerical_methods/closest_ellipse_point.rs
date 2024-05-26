@@ -9,8 +9,8 @@ pub fn solve_for_closest_point_on_ellipse(a: f64, b: f64, p: DVec2) -> DVec2 {
     let px = p.x;
     let py = p.y;
 
-    let mut tx = 0.707;
-    let mut ty = 0.707;
+    let mut tx = 0.707 * px;
+    let mut ty = 0.707 * py;
 
     for _ in 0..3 {
         let x = a*tx;

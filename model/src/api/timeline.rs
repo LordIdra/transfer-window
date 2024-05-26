@@ -24,12 +24,4 @@ impl Model {
             .event_at_time(time)
             .unwrap()
     }
-
-    pub fn can_modify_timeline_event(&self, entity: Entity, time: f64) -> bool {
-        self.vessel_component(entity).can_modify_timeline_event(time)
-    }
-
-    pub fn can_create_timeline_event(&self, entity: Entity, time: f64) -> bool {
-        self.vessel_component(entity).can_create_timeline_event(time)
-    }
 }

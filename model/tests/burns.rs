@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{start_burn::BurnEvent, TimelineEvent}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{start_burn::StartBurnEvent, TimelineEvent}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_burn_without_engine_or_fuel_tank() {
@@ -60,7 +60,7 @@ fn test_create_burn_with_zero_dv() {
     let position_before = model.position_at_time(vessel, time);
     let velocity_before = model.velocity_at_time(vessel, time);
 
-    let event = TimelineEvent::Burn(BurnEvent::new(&mut model, vessel, time));
+    let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, vessel, time));
     model.add_event(vessel, event);
 
     let mass_after = model.mass_at_time(vessel, time);
@@ -106,11 +106,11 @@ fn test_create_and_adjust_burn() {
     
     let burn_time = 100.0;
     let dv = vec2(150.0, 0.0);
-    let event = TimelineEvent::Burn(BurnEvent::new(&mut model, vessel, burn_time));
+    let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, vessel, burn_time));
     model.add_event(vessel, event);
     model.burn_starting_at_time(vessel, burn_time); // just to make sure empty burns can be acquired
     model.event_at_time(vessel, burn_time)
-        .as_burn()
+        .as_start_burn()
         .unwrap()
         .adjust(&mut model, dv);
 

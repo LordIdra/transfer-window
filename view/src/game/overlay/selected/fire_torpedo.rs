@@ -27,7 +27,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 events.push(Event::StartWarp { end_time: time });
             }
 
-            let can_delete = model.can_modify_timeline_event(entity, time);
+            let can_delete = model.event_at_time(entity, time).can_delete(model);
             let delete_button = Button::new("Cancel");
             if ui.add_enabled(can_delete, delete_button).clicked() {
                 events.push(Event::CancelLastTimelineEvent { entity });

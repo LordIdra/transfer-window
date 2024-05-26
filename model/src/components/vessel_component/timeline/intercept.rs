@@ -21,6 +21,18 @@ impl InterceptEvent {
 
     pub fn cancel(&self, _model: &mut Model) {}
 
+    pub fn is_blocking(&self) -> bool {
+        false
+    }
+
+    pub fn can_remove(&self) -> bool {
+        false
+    }
+
+    pub fn can_adjust(&self) -> bool {
+        false
+    }
+
     pub fn time(&self) -> f64 {
         self.time
     }
