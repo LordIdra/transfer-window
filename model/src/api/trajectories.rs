@@ -23,7 +23,7 @@ impl Model {
             return;
         }
         
-        let mut start_time = self.path_component(entity).last_segment().end_time();
+        let mut start_time = self.path_component(entity).final_segment().end_time();
         let mut segments = 0;
 
         // Special case: A spacecraft that is for example in LEO will never have any
@@ -47,7 +47,7 @@ impl Model {
         
         if segments < segment_count {
             self.path_component_mut(entity)
-                .last_segment_mut()
+                .final_segment_mut()
                 .as_orbit_mut()
                 .expect("Attempt to predict when the last segment is a burn!")
                 .end_at(end_time);

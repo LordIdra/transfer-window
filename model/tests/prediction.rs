@@ -95,7 +95,7 @@ fn test_prediction_with_burn() {
         
     assert_eq!(model.path_component(vessel).future_segments().len(), 1);
         
-    model.path_component_mut(vessel).last_segment_mut().as_orbit_mut().unwrap().end_at(0.0);
+    model.path_component_mut(vessel).final_segment_mut().as_orbit_mut().unwrap().end_at(0.0);
     let burn = Burn::new(earth, earth_mass, vessel_start_velocity.normalize(), vec2(1.0e3, 0.0), 0.0, rocket_equation_function, vessel_start_position, vessel_start_velocity);
     model.path_component_mut(vessel).add_segment(Segment::Burn(burn.clone()));
 

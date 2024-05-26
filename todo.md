@@ -102,13 +102,10 @@
 - [1|x] Allow cancelling timeline events before collision event
 - [1|x] Fix being able to MODIFY (not yeet) torpedo fire events when torpedo has events queued
 - [1|x] Select new burn/guidance/etc created
+- [1|x] Intercept icon
 
-- [1| ] Intercept icon
 - [1| ] Allow cancelling burns/guidance midway through
-- [1| ] Allow selecting points on burns or guidance
-- [1| ] Better algorithm for prioritising selected point
 - [1| ] Allow selecting icons under overlaps
-
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
@@ -124,6 +121,7 @@
 - [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
 - [1| ] Show upcoming segments including timeline events
 - [1| ] Show orbit/burn parameters
+- [1| ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
 
 # On TODO list
 - [1| ] Ballistic weaponry

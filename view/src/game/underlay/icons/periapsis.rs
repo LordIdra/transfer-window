@@ -6,7 +6,7 @@ use crate::game::Scene;
 
 use super::Icon;
 
-const RADIUS: f64 = 10.0;
+const RADIUS: f64 = 12.0;
 
 fn compute_time_of_next_periapsis(_model: &Model, orbit: &Orbit) -> Option<f64> {
     let periapsis_time = if orbit.is_ellipse() {
@@ -34,7 +34,8 @@ pub struct Periapsis {
 impl Periapsis {
     fn new(view: &Scene, model: &Model, entity: Entity, time: f64) -> Self {
         let orbit = model.orbit_at_time(entity, time);
-        let offset = vec2(0.0, RADIUS / view.camera.zoom());
+        // multiply RADIUS to bring the icon down slightly
+        let offset = vec2(0.0, RADIUS * 0.8 / view.camera.zoom());
         let position = model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position() + offset;
         Self { position }
     }

@@ -143,7 +143,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no end segment
-    pub fn last_segment(&self) -> &Segment {
+    pub fn final_segment(&self) -> &Segment {
         self.future_segments
             .back()
             .as_ref()
@@ -152,7 +152,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no start segment
-    pub fn last_segment_mut(&mut self) -> &mut Segment {
+    pub fn final_segment_mut(&mut self) -> &mut Segment {
         self.future_segments
             .back_mut()
             .unwrap()

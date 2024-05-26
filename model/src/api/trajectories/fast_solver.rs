@@ -7,16 +7,16 @@ pub mod solver;
 
 fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
     model.path_component_mut(entity)
-        .last_segment_mut()
+        .final_segment_mut()
         .as_orbit_mut()
         .expect("Attempt to do an exit encounter on a burn")
         .end_at(time);
 
-    let old_parent = model.path_component(entity).last_segment().parent();
+    let old_parent = model.path_component(entity).final_segment().parent();
     let new_parent_mass = model.mass_at_time(new_parent, time);
-    let mass = model.path_component(entity).last_segment().end_mass();
+    let mass = model.path_component(entity).final_segment().end_mass();
 
-    let entity_segment = model.path_component(entity).last_segment();
+    let entity_segment = model.path_component(entity).final_segment();
     let old_parent_point = &model.orbitable_component(old_parent).orbit().unwrap().point_at_time(time);
     let position = entity_segment.end_position() + old_parent_point.position();
     let velocity = entity_segment.end_velocity() + old_parent_point.velocity();
@@ -27,15 +27,15 @@ fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
 
 fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
     model.path_component_mut(entity)
-        .last_segment_mut()
+        .final_segment_mut()
         .as_orbit_mut()
         .expect("Attempt to do an exit encounter on a burn")
         .end_at(time);
 
     let new_parent_mass = model.mass_at_time(new_parent, time);
-    let mass = model.path_component(entity).last_segment().end_mass();
+    let mass = model.path_component(entity).final_segment().end_mass();
 
-    let entity_segment = model.path_component(entity).last_segment();
+    let entity_segment = model.path_component(entity).final_segment();
     let new_parent_point = &model.orbitable_component(new_parent).orbit().unwrap().point_at_time(time);
     let position = entity_segment.end_position() - new_parent_point.position();
     let velocity = entity_segment.end_velocity() - new_parent_point.velocity();
@@ -95,7 +95,7 @@ mod test {
 
             for entity in model.entities(vec![ComponentType::PathComponent]) {
                 model.path_component_mut(entity)
-                    .last_segment_mut()
+                    .final_segment_mut()
                     .as_orbit_mut()
                     .expect("Attempt to set end time of a segment that is not an orbit")
                     .end_at(encounter.time());

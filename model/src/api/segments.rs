@@ -15,7 +15,7 @@ impl Model {
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);
 
-        let last_segment = path_component.last_segment();
+        let last_segment = path_component.final_segment();
         let parent = last_segment.parent();
         let tangent = last_segment.end_velocity().normalize();
         let start_position = last_segment.end_position();
@@ -61,7 +61,7 @@ impl Model {
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);
 
-        let last_segment = path_component.last_segment();
+        let last_segment = path_component.final_segment();
         let parent = last_segment.parent();
         let start_position = last_segment.end_position();
         let start_velocity = last_segment.end_velocity();

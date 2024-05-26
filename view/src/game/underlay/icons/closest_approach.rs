@@ -56,7 +56,7 @@ impl Icon for ClosestApproach {
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        10.0
+        12.0
     }
 
     fn priorities(&self, _view: &Scene, _model: &Model) -> [u64; 4] {
@@ -71,7 +71,8 @@ impl Icon for ClosestApproach {
     fn position(&self, view: &Scene, model: &Model) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Closest approach position");
-        let offset = vec2(0.0, self.radius(view, model) / view.camera.zoom());
+        // Multiply by 0.8 to offset downwards slightly
+        let offset = vec2(0.0, 0.8 * self.radius(view, model) / view.camera.zoom());
         let orbit = model.orbit_at_time(self.entity, self.time);
         model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position() + offset
     }
