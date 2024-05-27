@@ -6,8 +6,6 @@ use nalgebra_glm::Mat3;
 
 use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}, texture::Texture};
 
-
-
 pub struct TextureRenderer {
     program: ShaderProgram,
     vertex_array_object: VertexArrayObject,
@@ -18,7 +16,7 @@ pub struct TextureRenderer {
 impl TextureRenderer {
     pub fn new(gl: Arc<Context>, texture: Texture) -> Self {
         let program = ShaderProgram::new(gl.clone(), include_str!("../../resources/shaders/icon.vert"), include_str!("../../resources/shaders/icon.frag"));
-        let vertex_array_object = VertexArrayObject::new(gl, vec![
+        let vertex_array_object = VertexArrayObject::new(gl.clone(), vec![
             VertexAttribute { index: 0, count: 2 }, // x
             VertexAttribute { index: 1, count: 2 }, // y
             VertexAttribute { index: 2, count: 1 }, // alpha

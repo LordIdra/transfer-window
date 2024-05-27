@@ -20,13 +20,13 @@ fn compute_celestial_object_vertices(absolute_position: DVec2, radius: f64) -> V
     vertices
 }
 
-pub fn draw(view: &Scene, model: &Model) {
+pub fn draw(view: &mut Scene, model: &Model) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw celestial objects");
     for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
         let position = model.absolute_position(entity);
         let radius = model.orbitable_component(entity).radius();
         let mut vertices = compute_celestial_object_vertices(position, radius);
-        view.object_renderer.lock().unwrap().add_vertices(&mut vertices);
+        view.renderers.add_object_vertices(&mut vertices);
     }
 }

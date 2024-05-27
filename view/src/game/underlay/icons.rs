@@ -2,7 +2,6 @@ use std::{cmp::Ordering, fmt::Debug};
 
 use eframe::egui::{Context, PointerState, Pos2, Rect, Vec2};
 use intercept::Intercept;
-use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::Model;
 
@@ -115,7 +114,7 @@ fn split_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon>
     (not_overlapped, overlapped)
 }
 
-fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, screen_size: Rect, icon: &dyn Icon, is_overlapped: bool) {
+fn draw_icon(view: &mut Scene, model: &Model, mouse_position_window: Option<Pos2>, screen_size: Rect, icon: &dyn Icon, is_overlapped: bool) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw icon");
 
@@ -137,12 +136,8 @@ fn draw_icon(view: &Scene, model: &Model, mouse_position_window: Option<Pos2>, s
     } else {
         add_textured_square(&mut vertices, icon.position(view, model), radius, alpha);
     }
-    
-    let Some(texture_renderer) = view.resources.renderer(&icon.texture(view, model)) else {
-        error!("Texture {} does not exist ", icon.texture(view, model));
-        return
-    };
-    texture_renderer.lock().unwrap().add_vertices(&mut vertices);
+
+    view.renderers.add_texture_vertices(&icon.texture(view, model), &mut vertices);
 }
 
 // 'rust is simple' said no one ever

@@ -40,7 +40,7 @@ fn draw_from_points(view: &mut Scene, points: &[DVec2], zoom: f64, color: Rgba) 
         }
         previous_point = Some(new_point);
     }
-    view.segment_renderer.lock().unwrap().add_vertices(&mut vertices);
+    view.renderers.add_segment_vertices(&mut vertices);
 }
 
 fn draw_path_segments(view: &mut Scene, model: &Model, entity: Entity, camera_centre: DVec2) {

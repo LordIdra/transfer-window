@@ -12,6 +12,7 @@ impl Shader {
     fn new(gl: Arc<Context>, shader_source: &str, shader_type: u32) -> Self {
         unsafe {
             let shader = gl.create_shader(shader_type).expect("Failed to create shader");
+            // gl.render
             gl.shader_source(shader, shader_source);
             gl.compile_shader(shader);
             assert!(gl.get_shader_compile_status(shader), "Failed to compile shader:\n{}", gl.get_shader_info_log(shader));

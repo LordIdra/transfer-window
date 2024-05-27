@@ -59,7 +59,7 @@ impl Controller {
         panic!("Unrecoverable error");
     }
 
-    fn handle_events(&mut self, mut events: Vec<Event>, frame: &mut Frame) {
+    fn handle_events(&mut self, mut events: Vec<Event>, context: &Context, frame: &mut Frame) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Event handling");
 
@@ -67,9 +67,9 @@ impl Controller {
             debug!("Handling event {:?}", event);
             match event {
                 Event::Quit => quit(frame),
-                Event::NewGame => new_game(self),
+                Event::NewGame => new_game(self, context),
                 Event::SaveGame { name } => save_game(self, name.as_str()),
-                Event::LoadGame { name } => load_game(self, name.as_str()),
+                Event::LoadGame { name } => load_game(self, context, name.as_str()),
                 Event::TogglePaused => toggle_paused(self),
                 Event::IncreaseTimeStepLevel => increase_time_step_level(self),
                 Event::DecreaseTimeStepLevel => decrease_time_step_level(self),
@@ -101,7 +101,7 @@ impl App for Controller {
             View::MenuScene(scene) => scene.update(context),
         };
 
-        self.handle_events(events, frame);
+        self.handle_events(events, context, frame);
 
         if let Some(model) = &mut self.model {
             model.update(dt);
@@ -116,7 +116,6 @@ fn main() {
 
     let options = NativeOptions {
         renderer: Renderer::Glow,
-        // multisampling: 8,
         ..Default::default()
     };
 

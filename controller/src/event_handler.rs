@@ -1,6 +1,6 @@
 use std::fs;
 
-use eframe::Frame;
+use eframe::{egui::Context, Frame};
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
 use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
@@ -15,7 +15,7 @@ pub fn quit(frame: &mut Frame) {
     frame.close();
 }
 
-pub fn new_game(controller: &mut Controller) {
+pub fn new_game(controller: &mut Controller, context: &Context) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("New game");
 
@@ -51,7 +51,7 @@ pub fn new_game(controller: &mut Controller) {
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
     controller.model = Some(model);
-    controller.view = View::GameScene(Scene::new(&controller.gl, controller.resources.clone(), Some(earth)));
+    controller.view = View::GameScene(Scene::new(&controller.gl, context, controller.resources.clone(), Some(earth)));
 }
 
 pub fn save_game(controller: &Controller, name: &str) {
@@ -71,7 +71,7 @@ pub fn save_game(controller: &Controller, name: &str) {
     }
 }
 
-pub fn load_game(controller: &mut Controller, name: &str) {
+pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Load game");
      let serialized = fs::read_to_string("saves/".to_string() + name + ".json");
@@ -87,7 +87,7 @@ pub fn load_game(controller: &mut Controller, name: &str) {
      };
 
      controller.model = Some(model);
-     controller.view = View::GameScene(Scene::new(&controller.gl, controller.resources.clone(), None));
+     controller.view = View::GameScene(Scene::new(&controller.gl, context, controller.resources.clone(), None));
 }
 
 pub fn toggle_paused(controller: &mut Controller) {

@@ -1,9 +1,10 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use eframe::{egui::Context, glow, Frame};
+use renderers::Renderers;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use crate::{events::Event, rendering::geometry_renderer::GeometryRenderer, resources::Resources};
+use crate::{events::Event, resources::Resources};
 
 use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, underlay::selected::Selected};
 
@@ -13,15 +14,14 @@ mod expiry;
 mod frame_history;
 mod misc;
 mod overlay;
-mod rendering;
+mod renderers;
 mod underlay;
 mod util;
 
 pub struct Scene {
     camera: Camera,
     resources: Arc<Resources>,
-    object_renderer: Arc<Mutex<GeometryRenderer>>,
-    segment_renderer: Arc<Mutex<GeometryRenderer>>,
+    renderers: Renderers,
     selected: Selected,
     right_click_menu: Option<Entity>,
     vessel_editor: Option<VesselEditor>,
@@ -32,11 +32,10 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(gl: &Arc<glow::Context>, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
+    pub fn new(gl: &Arc<glow::Context>, context: &Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
         let mut camera = Camera::new();
         camera.set_focus(focus);
-        let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
-        let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
+        let renderers = Renderers::new(&resources, gl.clone(), context.screen_rect());
         let selected = Selected::None;
         let right_click_menu = None;
         let vessel_editor = None;
@@ -44,7 +43,7 @@ impl Scene {
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::Overview;
         let icon_captured_scroll = false;
-        Self { camera, resources, object_renderer, segment_renderer, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll }
+        Self { camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll }
     }
 
     pub fn update(&mut self, model: &Model, context: &Context, frame: &Frame) -> Vec<Event> {
@@ -58,7 +57,7 @@ impl Scene {
         underlay::draw(self, model, context, &mut events);
         overlay::draw(self, model, context, &mut events);
         debug::draw(self, model, context);
-        rendering::update(self, model, context);
+        renderers::update(self, model, context);
 
         events
     }

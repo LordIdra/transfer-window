@@ -37,23 +37,9 @@ impl Texture {
     }
 }
 
-fn build_renderers(textures: &HashMap<String, Texture>, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
-    let mut texture_renderers = HashMap::new();
-    for texture_name in textures.keys() {
-        let texture = textures.get(texture_name)
-            .unwrap_or_else(|| panic!("Texture {texture_name} does not exist"))
-            .gl_texture
-            .clone();
-        let texture_renderer = TextureRenderer::new(gl.clone(), texture);
-        texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
-    }
-    texture_renderers
-}
-
 /// Loads all textures in the resources folder upon initialization
 pub struct Resources {
     textures: HashMap<String, Texture>,
-    renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
 }
 
 impl Resources {
@@ -63,8 +49,7 @@ impl Resources {
             .map(|entry| (entry_name(&entry), entry))
             .map(|entry| (entry.0, Texture::new(gl.clone(), context, &entry.1)))
             .collect();
-        let renderers = build_renderers(&textures, gl);
-        Resources { textures, renderers }
+        Resources { textures }
     }
 
     /// # Panics
@@ -76,12 +61,25 @@ impl Resources {
             .image
             .clone()
     }
-    
-    pub fn renderers(&self) -> &HashMap<String, Arc<Mutex<TextureRenderer>>> {
-        &self.renderers
-    }
 
-    pub fn renderer(&self, name: &str) -> Option<Arc<Mutex<TextureRenderer>>> {
-        self.renderers.get(name).cloned()
+    pub fn build_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
+        let mut texture_renderers = HashMap::new();
+        for texture_name in self.textures.keys() {
+            let texture = self.textures.get(texture_name)
+                .unwrap_or_else(|| panic!("Texture {texture_name} does not exist"))
+                .gl_texture
+                .clone();
+            let texture_renderer = TextureRenderer::new(gl.clone(), texture);
+            texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
+        }
+        texture_renderers
     }
+    
+    // pub fn renderers(&self) -> &HashMap<String, Arc<Mutex<TextureRenderer>>> {
+    //     &self.renderers
+    // }
+
+    // pub fn renderer(&self, name: &str) -> Option<Arc<Mutex<TextureRenderer>>> {
+    //     self.renderers.get(name).cloned()
+    // }
 }
