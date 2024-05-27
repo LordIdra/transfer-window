@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use eframe::glow::{self, LINEAR, LINEAR_MIPMAP_LINEAR, NEAREST};
+use eframe::glow::{self, LINEAR, LINEAR_MIPMAP_LINEAR};
 use glow::{Context, HasContext, TEXTURE_2D, RGBA, UNSIGNED_BYTE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER};
 
 pub struct Texture {

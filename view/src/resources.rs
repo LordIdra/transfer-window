@@ -64,10 +64,9 @@ impl Resources {
 
     pub fn build_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
         let mut texture_renderers = HashMap::new();
-        for texture_name in self.textures.keys() {
-            let texture = self.textures.get(texture_name).unwrap_or_else(|| panic!("Texture {texture_name} does not exist"));
+        for (texture_name, texture) in &self.textures {
             let gl_texture = texture::Texture::new(gl.clone(), texture.size, &texture.bytes);
-            let texture_renderer = TextureRenderer::new(gl.clone(), gl_texture);
+            let texture_renderer = TextureRenderer::new(gl, gl_texture);
             texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
         }
         texture_renderers

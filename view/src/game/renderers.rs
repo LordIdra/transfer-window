@@ -23,7 +23,7 @@ pub struct Renderers {
 }
 
 impl Renderers {
-    pub fn new(resources: &Resources, gl: Arc<glow::Context>, screen_rect: Rect) -> Self {
+    pub fn new(resources: &Resources, gl: &Arc<glow::Context>, screen_rect: Rect) -> Self {
         let framebuffer = Framebuffer::new(gl.clone());
         let color_buffer = ColorBufferMultisample::new(gl.clone(), screen_rect);
         color_buffer.attach_to_framebuffer(&framebuffer);
@@ -36,7 +36,7 @@ impl Renderers {
 
         let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
-        let texture_renderers = resources.build_renderers(&gl);
+        let texture_renderers = resources.build_renderers(gl);
         
         Self { screen_rect, intermediate_renderer, screen_renderer, object_renderer, segment_renderer, texture_renderers }
     }

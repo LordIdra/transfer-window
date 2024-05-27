@@ -35,7 +35,7 @@ impl Scene {
     pub fn new(gl: &Arc<glow::Context>, context: &Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
         let mut camera = Camera::new();
         camera.set_focus(focus);
-        let renderers = Renderers::new(&resources, gl.clone(), context.screen_rect());
+        let renderers = Renderers::new(&resources, gl, context.screen_rect());
         let selected = Selected::None;
         let right_click_menu = None;
         let vessel_editor = None;

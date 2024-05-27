@@ -26,6 +26,6 @@ impl IntermediateRenderer {
     }
 
     pub fn bind_to_read(&self) {
-        self.framebuffer.bind_to_read()
+        self.framebuffer.bind_to_read();
     }
 }
