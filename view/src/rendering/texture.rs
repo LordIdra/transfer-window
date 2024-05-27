@@ -3,7 +3,6 @@ use std::sync::Arc;
 use eframe::glow::{self, NEAREST};
 use glow::{Context, HasContext, TEXTURE_2D, RGBA, UNSIGNED_BYTE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER};
 
-#[derive(Clone)]
 pub struct Texture {
     gl: Arc<Context>,
     texture: glow::Texture,
@@ -18,7 +17,6 @@ impl Texture {
             gl.tex_parameter_i32(TEXTURE_2D, TEXTURE_MIN_FILTER, NEAREST as i32);
             gl.tex_parameter_i32(TEXTURE_2D, TEXTURE_MAG_FILTER, NEAREST as i32);
             gl.generate_mipmap(TEXTURE_2D);
-
             Texture { gl, texture }
         }
     }

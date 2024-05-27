@@ -36,7 +36,7 @@ impl Controller {
 
         egui_extras::install_image_loaders(&creation_context.egui_ctx);
         let gl = creation_context.gl.as_ref().unwrap().clone();
-        let resources = Arc::new(Resources::new(&gl, &creation_context.egui_ctx));
+        let resources = Arc::new(Resources::new(&creation_context.egui_ctx));
         let model = None;
         let view = View::MenuScene(Scene::default());
         let last_frame = Instant::now();

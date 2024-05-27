@@ -134,3 +134,5 @@
 # Boring shit that needs fixing
 - [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 - [1| ] Add actual logging before prototype release
+
+# Levels

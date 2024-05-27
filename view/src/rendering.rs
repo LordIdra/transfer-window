@@ -1,7 +1,9 @@
+pub mod color_buffer_multisample;
+pub mod color_buffer_normal;
 pub mod framebuffer;
 pub mod geometry_renderer;
 pub mod screen_renderer;
-mod color_buffer_texture;
+pub mod intermediate_renderer;
 mod shader_program;
 pub mod texture_renderer;
 pub mod texture;
