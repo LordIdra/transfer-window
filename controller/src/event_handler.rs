@@ -194,3 +194,11 @@ pub fn enable_torpedo_guidance(controller: &mut Controller, entity: Entity, time
     let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(model, entity, time));
     model.add_event(entity, event);
 }
+
+pub fn cancel_current_segment(controller: &mut Controller, entity: Entity) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Cancel current segment");
+    let model = controller.model_mut();
+
+    model.recompute_entire_trajectory(entity);
+}

@@ -20,4 +20,5 @@ pub enum Event {
     AdjustFireTorpedo { entity: Entity, time: f64, amount: DVec2 },
     CreateGuidance { entity: Entity, time: f64, },
     CancelLastTimelineEvent { entity: Entity },
+    CancelCurrentSegment { entity: Entity },
 }

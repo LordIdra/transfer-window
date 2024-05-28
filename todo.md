@@ -103,9 +103,8 @@
 - [1|x] Fix being able to MODIFY (not yeet) torpedo fire events when torpedo has events queued
 - [1|x] Select new burn/guidance/etc created
 - [1|x] Intercept icon
+- [1|x] Allow cancelling burns/guidance midway through
 
-- [1| ] Allow cancelling burns/guidance midway through
-- [1| ] Allow selecting icons under overlaps
 - [1| ] Burns cannot use more DV than ship has including previous burns
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
@@ -114,13 +113,13 @@
 - [1| ] Close context menu on option selected
 - [1| ] Disallow creating burns/guidances after dv zero
 - [1| ] Destroyed effect
+- [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
+- [1| ] Show upcoming segments including timeline events
+- [1| ] Show orbit/burn parameters
 
 # Stuff to do later because other stuff needs to be in place first
 - [1| ] Dim P/A icons when moused over and don't count as hovered????
 - [1| ] Hide all child icons and segments of object when zoomed out far enough
-- [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
-- [1| ] Show upcoming segments including timeline events
-- [1| ] Show orbit/burn parameters
 - [1| ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
 
 # On TODO list
@@ -130,9 +129,13 @@
 - [1| ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 - [1| ] PDC shells not affected by gravity?
 - [1| ] Collisions with planets (nearly forgot about that lmao)
+- [1| ] Factions
+- [1| ] Can't see future enemy movements
+- [1| ] Bloom
 
 # Boring shit that needs fixing
 - [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 - [1| ] Add actual logging before prototype release
+- [1| ] Allow selecting icons under overlaps
 
-# Levels
+# Campaign

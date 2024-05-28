@@ -1,6 +1,7 @@
 use std::{sync::Arc, time::Instant};
 
 use eframe::{egui::{Context, FontData, FontDefinitions, FontFamily}, glow, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
+use event_handler::cancel_current_segment;
 use log::{debug, error, info};
 use transfer_window_model::Model;
 use transfer_window_view::{events::Event, menu::Scene, resources::Resources, View};
@@ -83,6 +84,7 @@ impl Controller {
                 Event::AdjustFireTorpedo { entity, time, amount } => adjust_fire_torpedo(self, entity, time, amount),
                 Event::CancelLastTimelineEvent { entity } => cancel_last_event(self, entity),
                 Event::CreateGuidance { entity, time } => enable_torpedo_guidance(self, entity, time),
+                Event::CancelCurrentSegment { entity } => cancel_current_segment(self, entity),
             }
         }
     }
