@@ -1,143 +1,144 @@
 # Current tasks
-- [1|x] MVC split
-- [1|x] Rendering backend
-- [1|x] Primitive planet rendering as sphere
-- [1|x] Refocus selected object
-- [1|x] Drag to move focus
-- [1|x] Load/save games
-- [1|x] Display current time
-- [1|x] Speed up / slow down time
-- [1|x] Build default model
-- [1|x] Render icons (different types for different objects)
-- [1|x] Click icon to focus object
-- [1|x] Overlapping icons render with a priority system
-- [1|x] Intelligent conic rendering
-- [1|x] Update orbit state
-- [1|x] Select a point on orbit
-- [1|x] Display warp speed
-- [1|x] Show time of selected point
-- [1|x] Warp to point on orbit
-- [1|x] Can create burn
-- [1|x] Burn icons
-- [1|x] Select burns by default
-- [1|x] Prioritise currently selected icon
-- [1|x] Burn can be adjusted (at all)
-- [1|x] Better burn adjustment system
-- [1|x] Intelligent burn rendering
-- [1|x] Fast solver for burns
-- [1|x] Fix burn adjustment logic not triggering when over icon??
-- [1|x] Fix adjusting burn while spacecraft encounters it causing crash
-- [1|x] Fix only granular adjustments to burn
-- [1|x] Warp to burn button
-- [1|x] Add FPS counter
-- [1|x] Fix being able to create burns for orbitables
-- [1|x] Make segment point selection snap to nearest segment
-- [1|x] View N orbits into future on the selected orbit
-- [1|x] Fix freezes when focus enters burn
-- [1|x] Show scale somewhere (how long 1m, 1k, etc is)
-- [1|x] Fix clicking another burn point causes state change on selected one
-- [1|x] Visual indicator of how much DV burn will use
-- [1|x] Fix icons showing for burns that are underway
-- [1|x] The next segment should take precedence over orbits when rendering (ie render segments backwards)
-- [1|x] Allow deleting burns
-- [1|x] Fix selection breaking down on high eccentricity orbits
-- [1|x] More logical time step system
-- [1|x] Adjusting/deleting/creating a burn with subsequent burns cannot be done, other burns must be deleted first
-- [1|x] Better color scheme for orbits/burns
-- [1|x] Limit prediction by number of conics as well as time
-- [1|x] Periapsis/apoapsis indicators
-- [1|x] Fix current segment does not exist nonsense
-- [1|x] Just fade icons when overlapped instead of hiding completely 
-- [1|x] Completely deselect segment point when UI hovered
-- [1|x] Add logging to find/fix issues with solver, it keeps panicking
-- [1|x] Right clicking vessels brings up context menu
-- [1|x] Target option in the vessel menu selects vessel as 'target' relative to current vessel
-- [1|x] Target is highlighted/circled
-- [1|x] Show closest encounter for target and selected
-- [1|x] Allow vessels to be deleted without crashing everything (oh god)
-- [1|x] Add ship classes with system slot schema
-- [1|x] Add system slots for propulsion + fuel tanks
-- [1|x] Add light/heavy ships
-- [1|x] Add fuel tanks
-- [1|x] Add engines
-- [1|x] Create GUI for editing system slots and add ship layout texture
-- [1|x] Show current systems in system slots
-- [1|x] Allow editing current systems
-- [1|x] System tooltips
-- [1|x] Close button for vessel editor
-- [1|x] Show remaining DV + fuel bar in vessel top left GUI
-- [1|x] Disallow changing modules to change burns
-- [1|x] Vessel mass should account for remaining fuel
-- [1|x] Cannot create new burns if no engines or out of fuel
-- [1|x] Reduce DV/fuel while burning
-- [1|x] Add torpedo system
-- [1|x] Show active weapons at bottom of screen (simple for now)
-- [1|x] Click button to confirm fire
-- [1|x] Allow deselecting objects
-- [1|x] Show target on all selected objects
-- [1|x] Can adjust initial trajectory before firing
-- [1|x] Preview of initial trajectory
-- [1|x] Spawn new torpedo at ship location with trajectory
-- [1|x] Allow deleting and warping to fire torpedo events
-- [1|x] Update deletion logic for burns and launch events
-- [1|x] Disallow creating events before last event
-- [1|x] Torpedo stockpile
-- [1|x] Torpedoes have some velocity by default so they're not just buried under the ship icon
-- [1|x] Min/max zoom levels....
-- [1|x] Icons per vessel class
-- [1|x] Icons face vessel velocity
-- [1|x] Torpedo PN guidance system -> consider entire trajectory for now ie no fog or war
-- [1|x] Visualise guidance segment
-- [1|x] Actually determine whether guidance can be enabled at selected point
-- [1|x] Guidance icon
-- [1|x] Cancel guidance
-- [1|x] Fix closest point weirdness??
-- [1|x] Fix backward burn dragging
-- [1|x] Fix or remove burn scrolling?
-- [1|x] Preload images to fix weird loading delay in editor
-- [1|x] Better collision detection
-- [1|x] Collision event which yeets both vessels
-- [1|x] Draw orbit after guidance end only if miss
-- [1|x] Recompute guidance segment if collision no longer happening
-- [1|x] Allow cancelling timeline events before collision event
-- [1|x] Fix being able to MODIFY (not yeet) torpedo fire events when torpedo has events queued
-- [1|x] Select new burn/guidance/etc created
-- [1|x] Intercept icon
-- [1|x] Allow cancelling burns/guidance midway through
-- [1|x] Bloom
-- [1|x] Burns cannot use more DV than ship has including previous burns
-- [1|x] Disallow creating burns/guidances after dv zero
+[x] MVC split
+[x] Rendering backend
+[x] Primitive planet rendering as sphere
+[x] Refocus selected object
+[x] Drag to move focus
+[x] Load/save games
+[x] Display current time
+[x] Speed up / slow down time
+[x] Build default model
+[x] Render icons (different types for different objects)
+[x] Click icon to focus object
+[x] Overlapping icons render with a priority system
+[x] Intelligent conic rendering
+[x] Update orbit state
+[x] Select a point on orbit
+[x] Display warp speed
+[x] Show time of selected point
+[x] Warp to point on orbit
+[x] Can create burn
+[x] Burn icons
+[x] Select burns by default
+[x] Prioritise currently selected icon
+[x] Burn can be adjusted (at all)
+[x] Better burn adjustment system
+[x] Intelligent burn rendering
+[x] Fast solver for burns
+[x] Fix burn adjustment logic not triggering when over icon??
+[x] Fix adjusting burn while spacecraft encounters it causing crash
+[x] Fix only granular adjustments to burn
+[x] Warp to burn button
+[x] Add FPS counter
+[x] Fix being able to create burns for orbitables
+[x] Make segment point selection snap to nearest segment
+[x] View N orbits into future on the selected orbit
+[x] Fix freezes when focus enters burn
+[x] Show scale somewhere (how long 1m, 1k, etc is)
+[x] Fix clicking another burn point causes state change on selected one
+[x] Visual indicator of how much DV burn will use
+[x] Fix icons showing for burns that are underway
+[x] The next segment should take precedence over orbits when rendering (ie render segments backwards)
+[x] Allow deleting burns
+[x] Fix selection breaking down on high eccentricity orbits
+[x] More logical time step system
+[x] Adjusting/deleting/creating a burn with subsequent burns cannot be done, other burns must be deleted first
+[x] Better color scheme for orbits/burns
+[x] Limit prediction by number of conics as well as time
+[x] Periapsis/apoapsis indicators
+[x] Fix current segment does not exist nonsense
+[x] Just fade icons when overlapped instead of hiding completely 
+[x] Completely deselect segment point when UI hovered
+[x] Add logging to find/fix issues with solver, it keeps panicking
+[x] Right clicking vessels brings up context menu
+[x] Target option in the vessel menu selects vessel as 'target' relative to current vessel
+[x] Target is highlighted/circled
+[x] Show closest encounter for target and selected
+[x] Allow vessels to be deleted without crashing everything (oh god)
+[x] Add ship classes with system slot schema
+[x] Add system slots for propulsion + fuel tanks
+[x] Add light/heavy ships
+[x] Add fuel tanks
+[x] Add engines
+[x] Create GUI for editing system slots and add ship layout texture
+[x] Show current systems in system slots
+[x] Allow editing current systems
+[x] System tooltips
+[x] Close button for vessel editor
+[x] Show remaining DV + fuel bar in vessel top left GUI
+[x] Disallow changing modules to change burns
+[x] Vessel mass should account for remaining fuel
+[x] Cannot create new burns if no engines or out of fuel
+[x] Reduce DV/fuel while burning
+[x] Add torpedo system
+[x] Show active weapons at bottom of screen (simple for now)
+[x] Click button to confirm fire
+[x] Allow deselecting objects
+[x] Show target on all selected objects
+[x] Can adjust initial trajectory before firing
+[x] Preview of initial trajectory
+[x] Spawn new torpedo at ship location with trajectory
+[x] Allow deleting and warping to fire torpedo events
+[x] Update deletion logic for burns and launch events
+[x] Disallow creating events before last event
+[x] Torpedo stockpile
+[x] Torpedoes have some velocity by default so they're not just buried under the ship icon
+[x] Min/max zoom levels....
+[x] Icons per vessel class
+[x] Icons face vessel velocity
+[x] Torpedo PN guidance system -> consider entire trajectory for now ie no fog or war
+[x] Visualise guidance segment
+[x] Actually determine whether guidance can be enabled at selected point
+[x] Guidance icon
+[x] Cancel guidance
+[x] Fix closest point weirdness??
+[x] Fix backward burn dragging
+[x] Fix or remove burn scrolling?
+[x] Preload images to fix weird loading delay in editor
+[x] Better collision detection
+[x] Collision event which yeets both vessels
+[x] Draw orbit after guidance end only if miss
+[x] Recompute guidance segment if collision no longer happening
+[x] Allow cancelling timeline events before collision event
+[x] Fix being able to MODIFY (not yeet) torpedo fire events when torpedo has events queued
+[x] Select new burn/guidance/etc created
+[x] Intercept icon
+[x] Allow cancelling burns/guidance midway through
+[x] Bloom
+[x] Burns cannot use more DV than ship has including previous burns
+[x] Disallow creating burns/guidances after dv zero
 
-# Polish to do now
-- [1| ] Show DV budget while adjusting burns
-- [1| ] Replace most buttons with icons and add tooltips
-- [1| ] General UI improvements (cross that bridge later)
-- [1| ] More detail (eg in tooltips) about why buttons can't be pressed
-- [1| ] Close context menu on option selected
-- [1| ] Destroyed effect
-- [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
-- [1| ] Show upcoming segments including timeline events
-- [1| ] Show orbit/burn parameters
+# Polish stage 1
+[ ] Show DV budget while adjusting burns
+[ ] Tooltips to label buttons
+[ ] More detail in tooltips about why buttons can't be pressed
+[ ] Close context menu on option selected
+[ ] Dim P/A icons when moused over and don't count as hovered/clicked
 
-# Stuff to do later because other stuff needs to be in place first
-- [1| ] Dim P/A icons when moused over and don't count as hovered????
-- [1| ] Hide all child icons and segments of object when zoomed out far enough
-- [1| ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
-
-# On TODO list
-- [1| ] Ballistic weaponry
-- [1| ] Point defense
-- [1| ] PDC automatic targeting system
-- [1| ] PDC range or time dropoff after which they are deleted to prevent bullet lag
-- [1| ] PDC shells not affected by gravity?
-- [1| ] Collisions with planets (nearly forgot about that lmao)
-- [1| ] Factions
-- [1| ] Can't see future enemy movements
-- [1| ] Bloom
-
-# Boring shit that needs fixing
-- [1| ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
-- [1| ] Add actual logging before prototype release
-- [1| ] Allow selecting icons under overlaps
+# Polish stage 2
+[ ] Replace most buttons with icons and add tooltips
+[ ] Destroyed effect
+[ ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
+[ ] Show upcoming segments including timeline events
+[ ] Show orbit/burn parameters
+[ ] Hide all child icons and segments of object when zoomed out far enough
 
 # Campaign
+[ ] Factions (player, ally, enemy)
+[ ] Can't see future enemy movements
+[ ] Menu screen
+
+# Bigger picture
+[ ] Ballistic weaponry
+[ ] Point defense
+[ ] PDC automatic targeting system
+[ ] PDC range or time dropoff after which they are deleted to prevent bullet lag
+[ ] PDC shells not affected by gravity?
+[ ] Collisions with planets (nearly forgot about that lmao)
+[ ] Sandbox mode - EVENTUALLY as model versions may be a problem
+
+# Backburner
+[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
+[ ] Add actual logging before prototype release
+[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
+[ ] Allow selecting icons under overlaps?
