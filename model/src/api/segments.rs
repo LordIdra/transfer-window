@@ -2,6 +2,8 @@ use nalgebra_glm::{vec2, DVec2};
 
 use crate::{components::{path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, guidance::Guidance, orbit::Orbit, segment::Segment}, vessel_component::timeline::{intercept::InterceptEvent, TimelineEvent}}, storage::entity_allocator::Entity, Model};
 
+const MIN_DV_TO_ADJUST_BURN: f64 = 1.0e-2;
+
 impl Model {
     pub(crate) fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
         if let Some(rocket_equation_function) = self.path_component(entity).final_rocket_equation_function() {
@@ -160,5 +162,19 @@ impl Model {
         }
 
         panic!("There is no burn at the requested time")
+    }
+
+    pub fn calculate_burn_dv(&self, entity: Entity, time: f64, change: DVec2) -> Option<DVec2> {
+        let burn = self.burn_starting_at_time(entity, time);
+        let new_dv = (burn.delta_v() + change).magnitude();
+        if new_dv > burn.rocket_equation_function().remaining_dv() {
+            if burn.final_rocket_equation_function().remaining_dv() < MIN_DV_TO_ADJUST_BURN {
+                None
+            } else {
+                Some(change.normalize() * burn.final_rocket_equation_function().remaining_dv() * 0.999)
+            }
+        } else {
+            Some(change)
+        }
     }
 }

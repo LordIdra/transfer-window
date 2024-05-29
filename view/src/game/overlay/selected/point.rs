@@ -33,7 +33,7 @@ fn draw_orbits(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui) {
 }
 
 fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Event>, time: f64, view: &mut Scene) {
-    if StartBurnEvent::can_create_ever() {
+    if StartBurnEvent::can_create_ever(model, entity) {
         let button = Button::new("Create burn");
         let enabled = StartBurnEvent::can_create(model, entity, time);
         if ui.add_enabled(enabled, button).clicked() {

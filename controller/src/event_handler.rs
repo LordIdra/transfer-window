@@ -136,7 +136,7 @@ pub fn adjust_burn(controller: &mut Controller, entity: Entity, time: f64, amoun
     let _span = tracy_client::span!("Adjust burn");
     let model = controller.model_mut();
     
-    model.event_at_time(entity, time)
+    model.timeline_event_at_time(entity, time)
         .as_start_burn()
         .unwrap()
         .adjust(model, amount);
@@ -180,7 +180,7 @@ pub fn adjust_fire_torpedo(controller: &mut Controller, entity: Entity, time: f6
     let _span = tracy_client::span!("Adjust burn");
     let model = controller.model_mut();
     
-    model.event_at_time(entity, time)
+    model.timeline_event_at_time(entity, time)
         .as_fire_torpedo()
         .unwrap()
         .adjust(model, amount);

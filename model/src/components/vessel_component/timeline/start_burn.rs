@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{storage::entity_allocator::Entity, Model};
 
+const MIN_DV_TO_CREATE_BURN: f64 = 1.0;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct StartBurnEvent {
     entity: Entity,
@@ -42,13 +44,13 @@ impl StartBurnEvent {
         model.vessel_component(self.entity).timeline().is_time_after_last_blocking_event(self.time)
     }
 
-    pub fn can_create_ever() -> bool {
-        true
+    pub fn can_create_ever(model: &Model, entity: Entity) -> bool {
+        model.vessel_component(entity).slots().engine().is_some()
+            && !model.vessel_component(entity).slots().fuel_tanks().is_empty()
     }
 
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time)
-            && model.vessel_component(entity).slots().engine().is_some()
-            && !model.vessel_component(entity).slots().fuel_tanks().is_empty()
+            && model.final_dv(entity).unwrap() > MIN_DV_TO_CREATE_BURN
     }
 }

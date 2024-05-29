@@ -109,7 +109,7 @@ fn test_create_and_adjust_burn() {
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, vessel, burn_time));
     model.add_event(vessel, event);
     model.burn_starting_at_time(vessel, burn_time); // just to make sure empty burns can be acquired
-    model.event_at_time(vessel, burn_time)
+    model.timeline_event_at_time(vessel, burn_time)
         .as_start_burn()
         .unwrap()
         .adjust(&mut model, dv);

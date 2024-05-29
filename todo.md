@@ -104,14 +104,16 @@
 - [1|x] Select new burn/guidance/etc created
 - [1|x] Intercept icon
 - [1|x] Allow cancelling burns/guidance midway through
+- [1|x] Bloom
+- [1|x] Burns cannot use more DV than ship has including previous burns
+- [1|x] Disallow creating burns/guidances after dv zero
 
-- [1| ] Burns cannot use more DV than ship has including previous burns
+# Polish to do now
 - [1| ] Show DV budget while adjusting burns
 - [1| ] Replace most buttons with icons and add tooltips
 - [1| ] General UI improvements (cross that bridge later)
 - [1| ] More detail (eg in tooltips) about why buttons can't be pressed
 - [1| ] Close context menu on option selected
-- [1| ] Disallow creating burns/guidances after dv zero
 - [1| ] Destroyed effect
 - [1| ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
 - [1| ] Show upcoming segments including timeline events

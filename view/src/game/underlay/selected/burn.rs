@@ -30,8 +30,10 @@ pub fn update_adjustment(view: &mut Scene, model: &Model, context: &Context, eve
     // Do scroll adjustment
     if let Selected::Burn { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
         if let Some(mouse_position) = pointer.latest_pos() {
-            let amount = compute_drag_adjustment_amount(view, model, context, entity, time, direction, mouse_position);
-            events.push(Event::AdjustBurn { entity, time, amount });
+            let burn_time = model.timeline_event_at_time(entity, time).as_start_burn().unwrap().time();
+            if let Some(amount) = model.calculate_burn_dv(entity, burn_time, compute_drag_adjustment_amount(view, model, context, entity, time, direction, mouse_position)) {
+                events.push(Event::AdjustBurn { entity, time, amount });
+            }
         }
     }
 }

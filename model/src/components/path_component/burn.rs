@@ -68,6 +68,10 @@ impl Burn {
         self.delta_v.magnitude()
     }
 
+    pub fn delta_v(&self) -> DVec2 {
+        self.delta_v
+    }
+
     pub fn remaining_time(&self) -> f64 {
         self.end_point().time() - self.current_point().time()
     }

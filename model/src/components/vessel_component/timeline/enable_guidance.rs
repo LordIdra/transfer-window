@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{storage::entity_allocator::Entity, Model};
 
+const MIN_DV_TO_ENABLE_GUIDANCE: f64 = 1.0;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EnableGuidanceEvent {
     entity: Entity,
@@ -43,5 +45,6 @@ impl EnableGuidanceEvent {
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time)
             && model.vessel_component(entity).has_target()
+            && model.final_dv(entity).unwrap() > MIN_DV_TO_ENABLE_GUIDANCE
     }
 }
