@@ -32,7 +32,7 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(gl: &Arc<glow::Context>, context: &Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
+    pub fn new(gl: Arc<glow::Context>, context: &Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
         let mut camera = Camera::new();
         camera.set_focus(focus);
         let renderers = Renderers::new(&resources, gl, context.screen_rect());
