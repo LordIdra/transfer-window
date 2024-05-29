@@ -42,6 +42,7 @@ impl EnableGuidanceEvent {
         model.vessel_component(entity).class().is_torpedo()
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time)
             && model.vessel_component(entity).has_target()

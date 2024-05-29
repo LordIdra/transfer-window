@@ -49,6 +49,7 @@ impl StartBurnEvent {
             && !model.vessel_component(entity).slots().fuel_tanks().is_empty()
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time)
             && model.final_dv(entity).unwrap() > MIN_DV_TO_CREATE_BURN
