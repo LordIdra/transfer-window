@@ -3,6 +3,8 @@ use transfer_window_model::Model;
 
 use crate::{events::Event, game::{underlay::selected::Selected, util::format_time, Scene}};
 
+use super::burn::draw_dv;
+
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
     let Selected::FireTorpedo { entity, time, state: _ } = view.selected.clone() else { 
         return
@@ -18,12 +20,13 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
         .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(context, |ui| {
             let burn = model.burn_starting_at_time(fire_torpedo_event.ghost(), fire_torpedo_event.burn_time());
-            let dv = (burn.total_dv() * 10.0).round() / 10.0;
             ui.label(model.name_component(entity).name());
             ui.label("T-".to_string() + format_time(time - model.time()).as_str());
-            ui.label(dv.to_string() + " ΔV");
+            ui.label(format!("Duration {}", format_time(burn.duration())));
 
-            if ui.button("Warp to burn").clicked() {
+            draw_dv(ui, burn);
+
+            if ui.button("Warp here").clicked() {
                 events.push(Event::StartWarp { end_time: time });
             }
 

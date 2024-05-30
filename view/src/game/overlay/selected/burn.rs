@@ -3,7 +3,7 @@ use transfer_window_model::{components::path_component::{burn::Burn, segment::Se
 
 use crate::{events::Event, game::{overlay::widgets::{draw_filled_bar, FilledBar}, underlay::selected::Selected, util::format_time, Scene}};
 
-fn draw_dv(ui: &mut Ui, burn: &Burn) {
+pub fn draw_dv(ui: &mut Ui, burn: &Burn) {
     let max_dv = burn.rocket_equation_function().start().remaining_dv();
     let start_dv = burn.rocket_equation_function().remaining_dv();
     let end_dv = burn.final_rocket_equation_function().remaining_dv();
@@ -54,7 +54,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
 
             draw_dv(ui, burn);
 
-            if ui.button("Warp to burn").clicked() {
+            if ui.button("Warp here").clicked() {
                 events.push(Event::StartWarp { end_time: time });
             }
 
