@@ -20,16 +20,16 @@ pub fn draw_dv(ui: &mut Ui, burn: &Burn) {
     });
 
     Grid::new("DV grid").show(ui, |ui| {
-        ui.label(format!("ΔV Burnt"));
-        ui.label(format!("{:.1}", burnt_dv));
+        ui.label("ΔV Burnt");
+        ui.label(format!("{burnt_dv:.1}"));
         ui.end_row();
 
-        ui.label(format!("ΔV Start"));
-        ui.label(format!("{:.1}", start_dv));
+        ui.label("ΔV Start");
+        ui.label(format!("{start_dv:.1}"));
         ui.end_row();
 
-        ui.label(format!("ΔV End"));
-        ui.label(format!("{:.1}", end_dv));
+        ui.label("ΔV End");
+        ui.label(format!("{end_dv:.1}"));
         ui.end_row();
     });
 }

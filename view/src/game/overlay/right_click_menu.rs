@@ -8,10 +8,11 @@ fn draw_focus(view: &mut Scene, ui: &mut Ui, entity: Entity) {
     if ui.button("Focus").clicked() {
         view.camera.reset_panning();
         view.camera.set_focus(Some(entity));
+        view.right_click_menu = None;
     }
 }
 
-fn draw_set_target(model: &Model, ui: &mut Ui, right_clicked: Entity, selected: Entity, events: &mut Vec<Event>) {
+fn draw_set_target(view: &mut Scene, model: &Model, ui: &mut Ui, right_clicked: Entity, selected: Entity, events: &mut Vec<Event>) {
     let is_already_target = model.target(selected) == Some(right_clicked);
     if is_already_target {
         let button = Button::new("Unset target");
@@ -20,6 +21,7 @@ fn draw_set_target(model: &Model, ui: &mut Ui, right_clicked: Entity, selected: 
                 entity: selected, 
                 target: None,
             });
+            view.right_click_menu = None;
         }
     } else {
         let can_target = selected != right_clicked;
@@ -29,6 +31,7 @@ fn draw_set_target(model: &Model, ui: &mut Ui, right_clicked: Entity, selected: 
                 entity: selected, 
                 target: Some(right_clicked),
             });
+            view.right_click_menu = None;
         }
     }
 }
@@ -44,7 +47,7 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
             draw_focus(view, ui, right_clicked);
             if let Some(selected) = view.selected.entity(model) {
                 if model.try_vessel_component(selected).is_some() {
-                    draw_set_target(model, ui, right_clicked, selected, events);
+                    draw_set_target(view, model, ui, right_clicked, selected, events);
                 }
             }
         });

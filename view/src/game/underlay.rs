@@ -1,5 +1,3 @@
-//! The underlay constitutes everything that *does* move with the camera
-
 use eframe::egui::Context;
 use transfer_window_model::Model;
 
@@ -11,14 +9,13 @@ mod celestial_objects;
 mod icons;
 mod segments;
 pub mod selected;
-mod right_click_menu;
 
-pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) -> bool {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw underlay");
     celestial_objects::draw(view, model);
     segments::draw(view, model);
     let is_mouse_over_any_icon = icons::draw(view, model, context);
     selected::update(view, model, context, events, is_mouse_over_any_icon);
-    right_click_menu::update(view, model, context, events, is_mouse_over_any_icon);
+    is_mouse_over_any_icon
 }

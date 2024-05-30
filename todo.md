@@ -111,9 +111,9 @@
 # Polish stage 1
 [x] Show DV/fuel used by burn (+ numbers for start/end)
 [x] Show burn duration
+[x] Close right click menu on option selected
 [ ] Tooltips to label buttons
 [ ] More detail in tooltips about why buttons can't be pressed
-[ ] Close context menu on option selected
 [ ] Dim P/A icons when moused over and don't count as hovered/clicked
 [ ] Images instead of MDI icons in UI
 [ ] Explosion shaders

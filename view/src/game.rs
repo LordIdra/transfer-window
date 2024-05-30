@@ -54,8 +54,8 @@ impl Scene {
         self.frame_history.update(context.input(|i| i.time), frame.info().cpu_usage);
         misc::update(self, model, context, &mut events);
         expiry::update(self, model);
-        underlay::draw(self, model, context, &mut events);
-        overlay::draw(self, model, context, &mut events);
+        let is_mouse_over_any_icon = underlay::draw(self, model, context, &mut events);
+        overlay::draw(self, model, context, is_mouse_over_any_icon, &mut events);
         debug::draw(self, model, context);
         renderers::update(self, model, context);
 
