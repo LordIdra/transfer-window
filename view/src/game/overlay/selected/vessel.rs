@@ -1,14 +1,14 @@
 use eframe::{egui::{Align2, Button, Color32, Context, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::{path_component::segment::Segment, vessel_component::{system_slot::System, VesselComponent}}, Model};
 
-use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::draw_filled_bar}, underlay::selected::Selected, Scene}};
+use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::{draw_filled_bar, FilledBar}}, underlay::selected::Selected, Scene}};
 
 fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent) {
     let remaining_fuel = vessel_component.fuel_litres();
     let max_fuel = vessel_component.max_fuel_litres();
     let fuel_proportion = (remaining_fuel / max_fuel) as f32;
     ui.label("Fuel");
-    draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::WHITE, Color32::DARK_GRAY, fuel_proportion);
+    draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::DARK_GRAY, vec![FilledBar::new(Color32::WHITE, fuel_proportion)]);
     ui.label(format!("{} / {} L", remaining_fuel.round(), max_fuel));
     ui.end_row();
 }
@@ -24,7 +24,7 @@ fn draw_dv(ui: &mut Ui, vessel_component: &VesselComponent) {
 
     let dv_proportion = (remaining_dv / max_dv) as f32;
     ui.label("ΔV");
-    draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::WHITE, Color32::DARK_GRAY, dv_proportion);
+    draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::DARK_GRAY, vec![FilledBar::new(Color32::WHITE, dv_proportion)]);
     ui.label(format!("{} / {} m/s", remaining_dv.round(), max_dv.round()));
     ui.end_row();
 }
@@ -46,7 +46,7 @@ fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
 
     let dv_proportion = torpedoes as f32 / max_torpedoes as f32;
     ui.label("Torpedoes");
-    draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::WHITE, Color32::DARK_GRAY, dv_proportion);
+    draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::DARK_GRAY, vec![FilledBar::new(Color32::WHITE, dv_proportion)]);
     ui.label(format!("{torpedoes} / {max_torpedoes}"));
     ui.end_row();
 }

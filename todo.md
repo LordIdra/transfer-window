@@ -109,15 +109,17 @@
 [x] Disallow creating burns/guidances after dv zero
 
 # Polish stage 1
-[ ] Show DV budget while adjusting burns
+[x] Show DV/fuel used by burn (+ numbers for start/end)
+[x] Show burn duration
 [ ] Tooltips to label buttons
 [ ] More detail in tooltips about why buttons can't be pressed
 [ ] Close context menu on option selected
 [ ] Dim P/A icons when moused over and don't count as hovered/clicked
+[ ] Images instead of MDI icons in UI
+[ ] Explosion shaders
 
 # Polish stage 2
 [ ] Replace most buttons with icons and add tooltips
-[ ] Destroyed effect
 [ ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
 [ ] Show upcoming segments including timeline events
 [ ] Show orbit/burn parameters
@@ -139,6 +141,6 @@
 
 # Backburner
 [ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
-[ ] Add actual logging before prototype release
 [ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
-[ ] Allow selecting icons under overlaps?
+[ ] Add actual logging before prototype release
+[ ] Versioning before release

@@ -1,21 +1,34 @@
 use eframe::{egui::{vec2, Color32, Pos2, Rect, Rounding, Sense, Stroke, Ui}, emath::RectTransform, epaint};
 
+pub struct FilledBar {
+    color: Color32,
+    proportion: f32,
+}
+
+impl FilledBar {
+    pub fn new(color: Color32, proportion: f32) -> Self {
+        Self { color, proportion }
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
-pub fn draw_filled_bar(ui: &mut Ui, width: f32, height: f32, margin: f32, rounding: f32, filled_color: Color32, empty_color: Color32, proportion_filled: f32) {
+pub fn draw_filled_bar(ui: &mut Ui, width: f32, height: f32, margin: f32, rounding: f32, empty_color: Color32, bars: Vec<FilledBar>) {
     let (response, painter) = ui.allocate_painter(epaint::vec2(width, height), Sense::hover());
     let to_screen = RectTransform::from_to(
         Rect::from_min_size(Pos2::ZERO, response.rect.size()),
         response.rect,
     );
 
-    let filled_width = (width) * proportion_filled;
     let from = to_screen.transform_pos(Pos2::new(margin, margin));
     let to = to_screen.transform_pos(Pos2::new(width - margin, height - margin));
     painter.rect(Rect::from_min_max(from, to), Rounding::same(rounding), empty_color, Stroke::NONE);
 
-    let from = to_screen.transform_pos(Pos2::new(margin, margin));
-    let to = to_screen.transform_pos(Pos2::new(filled_width - margin, height - margin));
-    painter.rect(Rect::from_min_max(from, to), Rounding::same(rounding), filled_color, Stroke::NONE);
+    for bar in bars {
+        let width = (width) * bar.proportion;
+        let from = to_screen.transform_pos(Pos2::new(margin, margin));
+        let to = to_screen.transform_pos(Pos2::new(width - margin, height - margin));
+        painter.rect(Rect::from_min_max(from, to), Rounding::same(rounding), bar.color, Stroke::NONE);
+    }
 }
 
 pub fn draw_scale_bar(ui: &mut Ui, width: f32, height: f32, line_width: f32, color: Color32, scale: f32) {
