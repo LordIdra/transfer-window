@@ -299,7 +299,7 @@ mod test {
         let mut time = 0.0;
         for _ in 0..100 {
             time += 1.0;
-            path_component.current_segment_mut().next(1.0);
+            path_component.current_segment_mut().next(time);
             while path_component.current_segment().is_finished() {
                 path_component.on_segment_finished(time);
             }
