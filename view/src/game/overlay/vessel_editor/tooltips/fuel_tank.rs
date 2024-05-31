@@ -1,11 +1,12 @@
 use eframe::egui::{RichText, Ui};
 use transfer_window_model::components::vessel_component::system_slot::{fuel_tank::{FuelTank, FuelTankType}, System};
 
-use crate::icons::ICON_OIL_BARREL;
+use crate::game::Scene;
 
-pub fn show_tooltip(ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
+
+pub fn show_tooltip(view: &Scene, ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
     let Some(fuel_tank) = fuel_tank else {
-        ui.label("None");
+        ui.label(RichText::new("None").strong().monospace().size(20.0));
         return;
     };
 
@@ -17,6 +18,10 @@ pub fn show_tooltip(ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
         FuelTankType::Large => "Large Fuel Tank",
     };
 
-    ui.label(name);
-    ui.label(RichText::new(format!("{} Capacity: {} L", ICON_OIL_BARREL, type_.capacity_litres())));
+    ui.label(RichText::new(name).strong().monospace().size(20.0));
+    ui.horizontal(|ui| {
+        ui.image(view.resources.texture_image("fuel"));
+        ui.label(RichText::new("Capacity").monospace().strong());
+        ui.label(format!("{} L", type_.capacity_litres()));
+    });
 }

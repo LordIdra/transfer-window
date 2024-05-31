@@ -31,24 +31,24 @@ impl FireTorpedo {
 
 impl Icon for FireTorpedo {
     fn texture(&self, _view: &Scene, _model: &Model) -> String {
-        "torpedo-fire-event".to_string()
+        "torpedo".to_string()
     }
 
     fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
-            return 0.2;
+            return 0.4;
         }
         if is_selected {
             return 1.0;
         }
         if is_hovered {
-            return 0.7
+            return 0.8
         }
-        0.4
+        0.6
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        10.0
+        18.0
     }
 
     fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {

@@ -1,12 +1,10 @@
 use eframe::egui::PointerState;
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::DVec2;
 use transfer_window_model::{components::{vessel_component::timeline::TimelineEvent, ComponentType}, storage::entity_allocator::Entity, Model};
 
 use crate::game::Scene;
 
 use super::Icon;
-
-const RADIUS: f64 = 12.0;
 
 #[derive(Debug)]
 pub struct Intercept {
@@ -14,11 +12,9 @@ pub struct Intercept {
 }
 
 impl Intercept {
-    fn new(view: &Scene, model: &Model, entity: Entity, time: f64) -> Self {
+    fn new(_view: &Scene, model: &Model, entity: Entity, time: f64) -> Self {
         let parent = model.path_component(entity).future_segment_at_time(time).parent();
-        // multiply RADIUS to bring the icon down slightly
-        let offset = vec2(0.0, RADIUS * 0.8 / view.camera.zoom());
-        let position = model.absolute_position(parent) + model.position_at_time(entity, time) + offset;
+        let position = model.absolute_position(parent) + model.position_at_time(entity, time);
         Self { position }
     }
 
@@ -42,19 +38,19 @@ impl Icon for Intercept {
 
     fn alpha(&self, _view: &Scene, _model: &Model, _is_selected: bool, _is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
-            0.2
+            0.1
         } else {
             1.0
         }
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        10.0
+        8.0
     }
 
     fn priorities(&self, _view: &Scene, _model: &Model) -> [u64; 4] {
         [
-            0,
+            2,
             0,
             0,
             0,

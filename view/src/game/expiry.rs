@@ -36,6 +36,14 @@ pub fn update(view: &mut Scene, model: &Model) {
         }
     }
 
+    // Remove selected guidance event if expired
+    if let Selected::EnableGuidance { entity: _, time } = view.selected.clone() {
+        if time < model.time() {
+            trace!("Selected fire torpedo event expired at time={time}");
+            view.selected = Selected::None;
+        }
+    }
+
     // Delete selected if its entity no longer exists
     if let Some(entity) = view.selected.entity(model) {
         if !model.entity_exists(entity) {

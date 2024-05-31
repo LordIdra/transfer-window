@@ -10,11 +10,7 @@ fn draw_fire(view: &mut Scene, model: &Model, ui: &mut Ui, center: Pos2, entity:
     let lock_rect = Rect::from_center_size(lock_centre, lock_size);
     ui.allocate_ui_at_rect(lock_rect, |ui| {
         let can_create = FireTorpedoEvent::can_create(model, entity, time, slot_location);
-        let texture = if can_create {
-            "fire-possible"
-        } else {
-            "fire-disabled"
-        };
+        let texture = "fire-possible";
         let image_button = ImageButton::new(view.resources.texture_image(texture));
         if ui.add_enabled(can_create, image_button).clicked() {
             let event = Event::CreateFireTorpedo { entity, slot_location, time };

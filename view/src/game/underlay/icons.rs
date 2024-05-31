@@ -178,12 +178,12 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
             }
         }
 
-        for icon in not_overlapped {
-            draw_icon(view, model, input.pointer.latest_pos(), context.screen_rect(), &*icon, false);
-        }
-
         for icon in overlapped {
             draw_icon(view, model, input.pointer.latest_pos(), context.screen_rect(), &*icon, true);
+        }
+
+        for icon in not_overlapped {
+            draw_icon(view, model, input.pointer.latest_pos(), context.screen_rect(), &*icon, false);
         }
     });
 

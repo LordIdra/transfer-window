@@ -1,5 +1,5 @@
 use eframe::egui::PointerState;
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::DVec2;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::game::Scene;
@@ -49,14 +49,14 @@ impl Icon for ClosestApproach {
 
     fn alpha(&self, _view: &Scene, _model: &Model, _is_selected: bool, _is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
-            0.2
+            0.4
         } else {
             1.0
         }
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        12.0
+        8.0
     }
 
     fn priorities(&self, _view: &Scene, _model: &Model) -> [u64; 4] {
@@ -68,13 +68,12 @@ impl Icon for ClosestApproach {
         ]
     }
 
-    fn position(&self, view: &Scene, model: &Model) -> DVec2 {
+    fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Closest approach position");
         // Multiply by 0.8 to offset downwards slightly
-        let offset = vec2(0.0, 0.8 * self.radius(view, model) / view.camera.zoom());
         let orbit = model.orbit_at_time(self.entity, self.time);
-        model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position() + offset
+        model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()// + offset
     }
 
     fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {

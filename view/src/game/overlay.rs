@@ -22,7 +22,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, is_mouse_over_an
     
     fps::update(view, context);
     scale::update(view, context);
-    time::update(model, context);
+    time::update(view, model, context);
     selected::update(view, model, context, events);
     right_click_menu::update(view, model, context, events, is_mouse_over_any_icon);
 

@@ -85,11 +85,11 @@ impl Icon for AdjustBurn {
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        10.0
+        16.0
     }
 
     fn priorities(&self, _view: &Scene, _model: &Model) -> [u64; 4] {
-        [2, 0, 0, 0]
+        [3, 0, 0, 0]
     }
 
     fn position(&self, _view: &Scene, _model: &Model, ) -> DVec2 {

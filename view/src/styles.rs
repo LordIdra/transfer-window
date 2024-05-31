@@ -134,3 +134,36 @@ impl WeaponSlotButton {
         };
     }
 }
+
+pub struct SelectedMenuButton {}
+
+impl SelectedMenuButton {
+    pub fn apply(ui: &mut Ui) {
+        let default_color = Color32::from_rgba_unmultiplied(0, 0, 0, 0);
+        let hovered_color = Color32::from_rgba_unmultiplied(40, 40, 40, 220);
+        let selected_color = Color32::from_rgba_unmultiplied(60, 60, 60, 220);
+
+        let bg_stroke = Stroke::NONE;
+        let rounding = Rounding::same(20.0);
+        let fg_stroke = Stroke::NONE;
+        let expansion = 2.0;
+
+        ui.visuals_mut().widgets.inactive = WidgetVisuals {
+            bg_fill: default_color,
+            weak_bg_fill: default_color,
+            bg_stroke, rounding, fg_stroke, expansion,
+        };
+
+        ui.visuals_mut().widgets.hovered = WidgetVisuals {
+            bg_fill: hovered_color,
+            weak_bg_fill: hovered_color,
+            bg_stroke, rounding, fg_stroke, expansion,
+        };
+
+        ui.visuals_mut().widgets.active = WidgetVisuals {
+            bg_fill: selected_color,
+            weak_bg_fill: selected_color,
+            bg_stroke, rounding, fg_stroke, expansion,
+        };
+    }
+}

@@ -107,19 +107,21 @@
 [x] Bloom
 [x] Burns cannot use more DV than ship has including previous burns
 [x] Disallow creating burns/guidances after dv zero
-
-# Polish stage 1
 [x] Show DV/fuel used by burn (+ numbers for start/end)
 [x] Show burn duration
 [x] Close right click menu on option selected
-[ ] Tooltips to label buttons
+[x] Tooltips to label buttons
+[x] Images instead of MDI icons in UI
+[x] Replace most buttons with icons and add tooltips
+
+# Polish stage 1
+[ ] Disallow warp if within 5 seconds of the thing
 [ ] More detail in tooltips about why buttons can't be pressed
 [ ] Dim P/A icons when moused over and don't count as hovered/clicked
-[ ] Images instead of MDI icons in UI
 [ ] Explosion shaders
+[ ] Fix blending shader to prioritise top texture for eg overlapped ap/pe???
 
 # Polish stage 2
-[ ] Replace most buttons with icons and add tooltips
 [ ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
 [ ] Show upcoming segments including timeline events
 [ ] Show orbit/burn parameters
@@ -129,6 +131,12 @@
 [ ] Factions (player, ally, enemy)
 [ ] Can't see future enemy movements
 [ ] Menu screen
+[ ] Stations
+[ ] Can only change equipment at stations
+[ ] Satellite class
+[ ] Trainer class
+[ ] Scout class
+- Remember to upgrade ship and unlock new equipment
 
 # Bigger picture
 [ ] Ballistic weaponry
@@ -142,5 +150,11 @@
 # Backburner
 [ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 [ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
-[ ] Add actual logging before prototype release
-[ ] Versioning before release
+
+# Before release
+[ ] Add actual logging
+[ ] Versioning!
+[ ] Profiling + performance testing on different devices
+[ ] Test compatibility on different devices
+[ ] Website
+[ ] Add licenses

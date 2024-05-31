@@ -27,7 +27,7 @@ impl VesselEditor {
 fn draw_header(view: &mut Scene, model: &Model, ui: &mut Ui, entity: Entity) -> bool {
     let mut should_close = false;
     ui.with_layout(Layout::right_to_left(Align::Min), |ui| {
-        let button = ImageButton::new(view.resources.texture_image("close"));
+        let button = ImageButton::new(view.resources.texture_image("cancel"));
         if ui.add_sized(epaint::vec2(20.0, 20.0), button).clicked() {
             should_close = true;
         }

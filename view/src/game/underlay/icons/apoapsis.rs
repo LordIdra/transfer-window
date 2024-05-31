@@ -1,12 +1,10 @@
 use eframe::egui::PointerState;
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::DVec2;
 use transfer_window_model::{components::{path_component::orbit::Orbit, ComponentType}, storage::entity_allocator::Entity, Model};
 
 use crate::game::Scene;
 
 use super::Icon;
-
-const RADIUS: f64 = 12.0;
 
 fn compute_time_of_next_apoapsis(_model: &Model, orbit: &Orbit) -> Option<f64> {
     if !orbit.is_ellipse() {
@@ -30,11 +28,9 @@ pub struct Apoapsis {
 }
 
 impl Apoapsis {
-    fn new(view: &Scene, model: &Model, entity: Entity, time: f64) -> Self {
+    fn new(_view: &Scene, model: &Model, entity: Entity, time: f64) -> Self {
         let orbit = model.orbit_at_time(entity, time);
-        // multiply RADIUS to bring the icon down slightly
-        let offset = vec2(0.0, RADIUS * 0.8 / view.camera.zoom());
-        let position = model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position() + offset;
+        let position = model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
         Self { position }
     }
 
@@ -69,14 +65,14 @@ impl Icon for Apoapsis {
 
     fn alpha(&self, _view: &Scene, _model: &Model, _is_selected: bool, _is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
-            0.2
+            0.4
         } else {
             1.0
         }
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        RADIUS
+        8.0
     }
 
     fn priorities(&self, _view: &Scene, _model: &Model) -> [u64; 4] {

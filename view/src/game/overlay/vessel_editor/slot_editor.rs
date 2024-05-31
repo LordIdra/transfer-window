@@ -36,7 +36,7 @@ impl SlotSelector {
             let response = ui.add(image_button);
             let clicked = response.clicked();
             response.on_hover_ui(|ui| { 
-                show_tooltip(ui, &self.slot);
+                show_tooltip(view, ui, &self.slot);
             });
             clicked
         }).inner

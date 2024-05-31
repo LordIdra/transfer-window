@@ -1,10 +1,7 @@
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use crate::Model;
-
-use super::update_time::TimeStep;
-
+use crate::{api::time::TimeStep, Model};
 
 const STOP_BEFORE_TARGET_SECONDS: f64 = 5.0;
 const SLOW_DOWN_AFTER_PROPORTION: f64 = 0.95;
