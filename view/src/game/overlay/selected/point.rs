@@ -55,7 +55,8 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
         }
 
         let button = ImageButton::new(view.resources.texture_image("warp-here"));
-        if ui.add(button).on_hover_text("Warp here").clicked() {
+        let can_warp = model.can_warp_to(time);
+        if ui.add_enabled(can_warp, button).on_hover_text("Warp here").clicked() {
             events.push(Event::StartWarp { end_time: time });
         }
 

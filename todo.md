@@ -113,9 +113,9 @@
 [x] Tooltips to label buttons
 [x] Images instead of MDI icons in UI
 [x] Replace most buttons with icons and add tooltips
+[x] Disallow warp if within 5 seconds of the thing
 
 # Polish stage 1
-[ ] Disallow warp if within 5 seconds of the thing
 [ ] More detail in tooltips about why buttons can't be pressed
 [ ] Dim P/A icons when moused over and don't count as hovered/clicked
 [ ] Explosion shaders

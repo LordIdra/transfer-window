@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{systems::update_warp::TimeWarp, Model};
 
+pub const WARP_STOP_BEFORE_TARGET_SECONDS: f64 = 5.0;
+
 pub const TIME_STEP_LEVELS: [f64; 13] = [
     1.0, 5.0, 15.0,  // 1s, 5s, 15s
     60.0, 300.0, 900.0, // 1m, 5m, 15m
@@ -98,5 +100,9 @@ impl Model {
 
     pub fn time(&self) -> f64 {
         self.time
+    }
+
+    pub fn can_warp_to(&self, time: f64) -> bool {
+        (time - self.time()).abs() > WARP_STOP_BEFORE_TARGET_SECONDS
     }
 }

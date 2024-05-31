@@ -1,9 +1,9 @@
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use crate::{api::time::TimeStep, Model};
+use crate::{api::time::{TimeStep, WARP_STOP_BEFORE_TARGET_SECONDS}, Model};
 
-const STOP_BEFORE_TARGET_SECONDS: f64 = 5.0;
+
 const SLOW_DOWN_AFTER_PROPORTION: f64 = 0.95;
 const ADDITIONAL_MULTIPLER: f64 = 0.06;
 
@@ -15,7 +15,7 @@ pub struct TimeWarp {
 
 impl TimeWarp {
     pub fn new(start_time: f64, end_time: f64) -> Self {
-        Self { start_time, end_time: end_time - STOP_BEFORE_TARGET_SECONDS }
+        Self { start_time, end_time: end_time - WARP_STOP_BEFORE_TARGET_SECONDS }
     }
 
     fn compute_max_warp_speed(&self) -> f64 {
