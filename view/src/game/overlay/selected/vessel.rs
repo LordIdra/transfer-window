@@ -91,11 +91,11 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                     if add_cancel_guidance_button {
                         let button = ImageButton::new(view.resources.texture_image("cancel"));
                         if ui.add(button).on_hover_text("Cancel current guidance").clicked() {
-                            if model.vessel_component(entity).timeline().last_event().unwrap().is_intercept() {
+                            if model.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
                                 // also cancel intercept
                                 events.push(Event::CancelLastTimelineEvent { entity });
                             }
-                            events.push(Event::CancelLastTimelineEvent { entity });
+                            events.push(Event::CancelCurrentSegment { entity });
                         }
                     }
                 });

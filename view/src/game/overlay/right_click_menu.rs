@@ -27,7 +27,9 @@ fn draw_set_target(view: &mut Scene, model: &Model, ui: &mut Ui, right_clicked: 
     } else {
         let can_target = selected != right_clicked;
         let button = ImageButton::new(view.resources.texture_image("set-target"));
-        if ui.add_enabled(can_target, button).on_hover_text("Set target").clicked() {
+        if ui.add_enabled(can_target, button)
+                .on_hover_text("Set target")
+                .clicked() {
             events.push(Event::SetTarget { 
                 entity: selected, 
                 target: Some(right_clicked),

@@ -114,16 +114,14 @@
 [x] Images instead of MDI icons in UI
 [x] Replace most buttons with icons and add tooltips
 [x] Disallow warp if within 5 seconds of the thing
+[x] Overhaul vessel editor UI
 
 # Polish stage 1
-[ ] More detail in tooltips about why buttons can't be pressed
 [ ] Dim P/A icons when moused over and don't count as hovered/clicked
-[ ] Explosion shaders
-[ ] Fix blending shader to prioritise top texture for eg overlapped ap/pe???
-
-# Polish stage 2
-[ ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
+[ ] Encounter icons
+[ ] Sun + explosion shaders
 [ ] Show upcoming segments including timeline events
+[ ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
 [ ] Show orbit/burn parameters
 [ ] Hide all child icons and segments of object when zoomed out far enough
 

@@ -1,4 +1,4 @@
-use eframe::{egui::{Align, Align2, Context, ImageButton, Layout, Ui, Window}, epaint};
+use eframe::{egui::{Align, Align2, Context, ImageButton, Layout, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::system_slot::SlotLocation, storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::Scene};
@@ -32,7 +32,8 @@ fn draw_header(view: &mut Scene, model: &Model, ui: &mut Ui, entity: Entity) -> 
             should_close = true;
         }
         ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
-            ui.label(model.name_component(entity).name().to_uppercase());
+            let name = model.name_component(entity).name().to_uppercase();
+            ui.label(RichText::new(name).strong().size(32.0));
         });
     });
     should_close
@@ -56,7 +57,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             let should_close = draw_header(view, model, ui, vessel_editor.entity);
             let vessel_component = model.vessel_component(vessel_editor.entity);
             let vessel_class = vessel_component.class();
-            let rect = draw_vessel_editor(view, context, ui, vessel_class, vessel_component.slots());
+            let rect = draw_vessel_editor(view, context, ui, vessel_component);
             let center = rect.center();
             let scalar = rect.size().x;
 

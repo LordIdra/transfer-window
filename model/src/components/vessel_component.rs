@@ -26,6 +26,13 @@ impl VesselClass {
     pub fn is_torpedo(self) -> bool {
         matches!(self, Self::Torpedo)
     }
+
+    pub fn name(&self) -> &str {
+        match self {
+            VesselClass::Torpedo => "Torpedo",
+            VesselClass::Light => "Light",
+        }
+    }
 }
 
 /// Must have `MassComponent` and `PathComponent`
@@ -94,6 +101,10 @@ impl VesselComponent {
 
     pub fn dry_mass(&self) -> f64 {
         self.class.mass()
+    }
+
+    pub fn wet_mass(&self) -> f64 {
+        self.dry_mass() + self.max_fuel_kg() * FUEL_DENSITY
     }
 
     pub fn mass(&self) -> f64 {
