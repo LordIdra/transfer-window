@@ -112,7 +112,7 @@ pub fn draw(view: &mut Scene, model: &Model) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments");
     let camera_centre = view.camera.translation(model);
-    for entity in view.entities_should_render(model, vec![ComponentType::PathComponent]) {
+    for entity in model.entities(vec![ComponentType::PathComponent]) {
         draw_path_segments(view, model, entity, camera_centre);
     }
     for entity in view.entities_should_render(model, vec![ComponentType::OrbitableComponent]) {

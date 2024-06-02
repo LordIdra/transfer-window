@@ -189,4 +189,16 @@ impl Model {
 
         None
     }
+
+    pub fn parent_at_time(&self, entity: Entity, time: f64) -> Option<Entity> {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return orbitable_component.orbit().map(|orbit| orbit.parent());
+        }
+
+        if let Some(path_component) = self.try_path_component(entity) {
+            return Some(path_component.future_segment_at_time(time).parent());
+        }
+
+        None
+    }
 }

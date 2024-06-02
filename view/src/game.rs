@@ -3,7 +3,7 @@ use std::{collections::HashSet, sync::Arc};
 use eframe::{egui::Context, glow, Frame};
 use renderers::Renderers;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
-use util::should_render;
+use util::{should_render, should_render_at_time};
 
 use crate::{events::Event, resources::Resources};
 
@@ -88,6 +88,14 @@ impl Scene {
         model.entities(with_component_types)
             .iter()
             .filter(|entity| should_render(self, model, **entity))
+            .cloned()
+            .collect()
+    }
+
+    pub fn entities_should_render_at_time(&self, model: &Model, with_component_types: Vec<ComponentType>, time: f64) -> HashSet<Entity> {
+        model.entities(with_component_types)
+            .iter()
+            .filter(|entity| should_render_at_time(self, model, **entity, time))
             .cloned()
             .collect()
     }

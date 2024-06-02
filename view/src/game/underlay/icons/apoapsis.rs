@@ -2,7 +2,7 @@ use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::{path_component::orbit::Orbit, ComponentType}, storage::entity_allocator::Entity, Model};
 
-use crate::game::Scene;
+use crate::game::{util::should_render_at_time, Scene};
 
 use super::Icon;
 
@@ -36,20 +36,24 @@ impl Apoapsis {
 
     pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(model, vec![ComponentType::PathComponent]) {
+        for entity in model.entities(vec![ComponentType::PathComponent]) {
             for orbit in model.path_component(entity).future_orbits() {
                 if let Some(time) = compute_time_of_next_apoapsis(model, orbit) {
-                    let icon = Self::new(view, model, entity, time);
-                    icons.push(Box::new(icon) as Box<dyn Icon>);
+                    if should_render_at_time(view, model, entity, time) {
+                        let icon = Self::new(view, model, entity, time);
+                        icons.push(Box::new(icon) as Box<dyn Icon>);
+                    }
                 }
             }
         }
 
-        for entity in view.entities_should_render(model, vec![ComponentType::OrbitableComponent]) {
+        for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
             if let Some(orbit) = model.orbitable_component(entity).orbit() {
                 if let Some(time) = compute_time_of_next_apoapsis(model, orbit) {
-                    let icon = Self::new(view, model, entity, time);
-                    icons.push(Box::new(icon) as Box<dyn Icon>);
+                    if should_render_at_time(view, model, entity, time) {
+                        let icon = Self::new(view, model, entity, time);
+                        icons.push(Box::new(icon) as Box<dyn Icon>);
+                    }
                 }
             }
         }

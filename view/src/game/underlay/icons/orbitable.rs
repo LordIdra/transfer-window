@@ -1,6 +1,6 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, ComponentType}, storage::entity_allocator::Entity, Model};
 
 use crate::game::{underlay::selected::Selected, Scene};
 
@@ -24,14 +24,21 @@ impl Orbitable {
 
 impl Icon for Orbitable {
     fn texture(&self, view: &Scene, model: &Model) -> String {
+        let mut texture = match model.orbitable_component(self.entity).type_() {
+            OrbitableType::Star => "star",
+            OrbitableType::Planet => "planet",
+            OrbitableType::Moon => "moon",
+        }.to_string();
+
         if let Selected::Vessel(entity) = view.selected {
             if let Some(target) = model.vessel_component(entity).target() {
                 if target == self.entity {
-                    return "planet-target".to_string()
+                    texture += "-target";
                 }
             }
         }
-        "planet".to_string()
+        
+        texture
     }
 
     fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {

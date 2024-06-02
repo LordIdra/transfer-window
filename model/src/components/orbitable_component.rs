@@ -3,6 +3,13 @@ use serde::{Deserialize, Serialize};
 
 use super::path_component::orbit::Orbit;
 
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub enum OrbitableType {
+    Star,
+    Planet,
+    Moon,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub enum OrbitableComponentPhysics {
     Stationary(DVec2),
@@ -44,12 +51,13 @@ impl OrbitableComponentPhysics {
 pub struct OrbitableComponent {
     mass: f64,
     radius: f64,
+    type_: OrbitableType,
     physics: OrbitableComponentPhysics,
 }
 
 impl OrbitableComponent {
-    pub fn new(mass: f64, radius: f64, physics: OrbitableComponentPhysics) -> Self {
-        Self { mass, radius, physics }
+    pub fn new(mass: f64, radius: f64, type_: OrbitableType, physics: OrbitableComponentPhysics) -> Self {
+        Self { mass, radius, type_, physics }
     }
 
     pub fn mass(&self) -> f64 {
@@ -72,6 +80,10 @@ impl OrbitableComponent {
             OrbitableComponentPhysics::Stationary(_) => None,
             OrbitableComponentPhysics::Orbit(orbit) => Some(orbit),
         }
+    }
+
+    pub fn type_(&self) -> OrbitableType {
+        self.type_
     }
 
     pub fn physics(&self) -> &OrbitableComponentPhysics {

@@ -2,7 +2,7 @@ use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
-use crate::game::Scene;
+use crate::game::{util::should_render_at_time, Scene};
 
 use super::Icon;
 
@@ -27,7 +27,7 @@ impl Encounter {
 
     pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(model, vec![ComponentType::PathComponent]) {
+        for entity in model.entities(vec![ComponentType::PathComponent]) {
             let mut previous_parent = None;
             for orbit in model.path_component(entity).future_orbits() {
                 if let Some(previous_parent) = previous_parent {
@@ -42,8 +42,10 @@ impl Encounter {
                             EncounterType::Entrance
                         };
                         let time = orbit.start_point().time();
-                        let icon = Self::new(model, entity, time, encounter_type);
-                        icons.push(Box::new(icon) as Box<dyn Icon>);
+                        if should_render_at_time(view, model, entity, time) {
+                            let icon = Self::new(model, entity, time, encounter_type);
+                            icons.push(Box::new(icon) as Box<dyn Icon>);
+                        }
                     }
                 }
                 previous_parent = Some(orbit.parent());

@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::Selected, Scene};
+use crate::game::{underlay::selected::Selected, util::should_render_at_time, Scene};
 
 use super::Icon;
 
@@ -18,7 +18,7 @@ impl Guidance {
         let mut icons = vec![];
         for entity in view.entities_should_render(model, vec![ComponentType::VesselComponent]) {
             for event in model.vessel_component(entity).timeline().events() {
-                if event.is_enable_guidance() {
+                if event.is_enable_guidance() && should_render_at_time(view, model, entity, event.time()) {
                     let icon = Self { entity, time: event.time() };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }

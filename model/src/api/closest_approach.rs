@@ -124,21 +124,21 @@ impl Model {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::entity_builder::EntityBuilder, Model};
+    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::entity_builder::EntityBuilder, Model};
 
     #[test]
     fn test_find_same_parent_orbit_pairs() {
         let mut model = Model::default();
 
-        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)));
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)));
         let entity_builder = EntityBuilder::default();
         let entity_a = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
-        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableComponentPhysics::Stationary(vec2(1000.0, 0.0)));
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(1000.0, 0.0)));
         let entity_builder = EntityBuilder::default();
         let entity_b = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
-        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableComponentPhysics::Stationary(vec2(0.0, 1000.0)));
+        let orbitable = OrbitableComponent::new(1.0e23, 1.0e3, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 1000.0)));
         let entity_builder = EntityBuilder::default();
         let entity_c = model.allocate(entity_builder.with_orbitable_component(orbitable));
 
@@ -205,7 +205,7 @@ mod test {
     fn test_find_next_closest_approach() {
         let mut model = Model::default();
 
-        let orbitable = OrbitableComponent::new(5.9722e24, 6.371e3, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)));
+        let orbitable = OrbitableComponent::new(5.9722e24, 6.371e3, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)));
         let entity_builder = EntityBuilder::default();
         let earth = model.allocate(entity_builder.with_orbitable_component(orbitable));
 

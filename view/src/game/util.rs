@@ -124,3 +124,10 @@ pub fn should_render(view: &Scene, model: &Model, entity: Entity) -> bool {
     };
     should_render_parent(view, model, parent)
 }
+
+pub fn should_render_at_time(view: &Scene, model: &Model, entity: Entity, time: f64) -> bool {
+    let Some(parent) = model.parent_at_time(entity, time) else {
+        return true;
+    };
+    should_render_parent(view, model, parent)
+}

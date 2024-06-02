@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::{util::BurnState, Selected}, Scene};
+use crate::game::{underlay::selected::{util::BurnState, Selected}, util::should_render_at_time, Scene};
 
 use super::Icon;
 
@@ -16,9 +16,9 @@ pub struct Burn {
 impl Burn {
     pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(model, vec![ComponentType::VesselComponent]) {
+        for entity in model.entities(vec![ComponentType::VesselComponent]) {
             for event in model.vessel_component(entity).timeline().events() {
-                if event.is_start_burn() {
+                if event.is_start_burn() && should_render_at_time(view, model, entity, event.time()) {
                     let icon = Self { entity, time: event.time() };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }

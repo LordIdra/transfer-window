@@ -36,6 +36,18 @@ impl Selected {
         }
     }
 
+    pub fn time(&self) -> Option<f64> {
+        match self {
+            Selected::None
+                | Selected::Orbitable(_) 
+                | Selected::Vessel(_) => None,
+            Selected::FireTorpedo { entity: _, time, state: _ }
+                | Selected::Burn { entity: _, time, state: _ }
+                | Selected::Point { entity: _, time } 
+                | Selected::EnableGuidance { entity: _, time } => Some(*time),
+        }
+    }
+
     pub fn target(&self, model: &Model) -> Option<Entity> {
         if let Some(entity) = self.entity(model) {
             if let Some(vessel_component) = model.try_vessel_component(entity) {
