@@ -21,8 +21,7 @@ pub fn update(view: &Scene, model: &Model, context: &Context) {
             ui.horizontal(|ui| {
                 ui.set_height(19.0);
                 let paused =  match model.time_step() {
-                    TimeStep::Level { level: _, paused } => paused,
-                    TimeStep::Warp { speed: _, paused } => paused,
+                    TimeStep::Level { level: _, paused } | TimeStep::Warp { speed: _, paused } => paused,
                 };
 
                 for i in 0..TIME_STEP_LEVELS.len() {

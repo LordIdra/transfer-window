@@ -1,4 +1,4 @@
-use eframe::{egui::{Align, Align2, Context, ImageButton, Layout, RichText, Ui, Window}, epaint};
+use eframe::{egui::{Align, Align2, Context, Layout, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::system_slot::SlotLocation, storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::Scene};
@@ -24,19 +24,11 @@ impl VesselEditor {
 }
 
 /// Returns whether the close button was clicked
-fn draw_header(view: &mut Scene, model: &Model, ui: &mut Ui, entity: Entity) -> bool {
-    let mut should_close = false;
-    ui.with_layout(Layout::right_to_left(Align::Min), |ui| {
-        let button = ImageButton::new(view.resources.texture_image("cancel"));
-        if ui.add_sized(epaint::vec2(20.0, 20.0), button).clicked() {
-            should_close = true;
-        }
-        ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
-            let name = model.name_component(entity).name().to_uppercase();
-            ui.label(RichText::new(name).strong().size(32.0));
-        });
+fn draw_header(model: &Model, ui: &mut Ui, entity: Entity) {
+    ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
+        let name = model.name_component(entity).name().to_uppercase();
+        ui.label(RichText::new(name).strong().size(32.0));
     });
-    should_close
 }
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
@@ -49,25 +41,23 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
         return;
     }
 
-    Window::new("Vessel editor")
-        .title_bar(false)
-        .resizable(false)
-        .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
-        .show(context, |ui| {
-            let should_close = draw_header(view, model, ui, vessel_editor.entity);
-            let vessel_component = model.vessel_component(vessel_editor.entity);
-            let vessel_class = vessel_component.class();
-            let rect = draw_vessel_editor(view, context, ui, vessel_component);
-            let center = rect.center();
-            let scalar = rect.size().x;
+    let vessel_name = model.name_component(vessel_editor.entity).name();
+    
+    Window::new("Vessel editor - ".to_string() + &vessel_name)
+            .title_bar(false)
+            .resizable(false)
+            .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
+            .show(context, |ui| {
+        draw_header(model, ui, vessel_editor.entity);
+        let vessel_component = model.vessel_component(vessel_editor.entity);
+        let vessel_class = vessel_component.class();
+        let rect = draw_vessel_editor(view, context, ui, &vessel_name, vessel_component);
+        let center = rect.center();
+        let scalar = rect.size().x;
 
-            if let Some(location) = vessel_editor.slot_editor {
-                let slot = vessel_component.slots().get(location);
-                SlotEditor::new(vessel_editor.entity, vessel_class, location, slot).draw(view, ui, center, scalar, events);
-            }
-
-            if should_close {
-                view.vessel_editor = None;
-            }
-        });
+        if let Some(slot_location) = vessel_editor.slot_editor {
+            let slot = vessel_component.slots().get(slot_location);
+            SlotEditor::new(vessel_editor.entity, vessel_class, slot_location, slot).draw(view, context, &vessel_name, slot_location, center, scalar, events);
+        }
+    });
 }

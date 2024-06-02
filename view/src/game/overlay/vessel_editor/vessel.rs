@@ -59,11 +59,11 @@ fn draw_ship_underlay(view: &mut Scene, context: &Context, ui: &mut Ui, class: V
     ui.add(Image::new(texture).fit_to_exact_size(size))
 }
 
-fn draw_ship_stats(ui: &mut Ui, vessel_component: &VesselComponent) {
+fn draw_ship_stats(ui: &mut Ui, vessel_component: &VesselComponent, vessel_name: &str) {
     ui.vertical(|ui| {
         ui.set_width(200.0);
     
-        Grid::new("Ship stats").show(ui, |ui| {
+        Grid::new("Ship stats - ".to_string() + vessel_name).show(ui, |ui| {
             ui.label(RichText::new("Class").monospace().strong());
             ui.label(vessel_component.class().name());
             ui.end_row();
@@ -103,9 +103,9 @@ fn draw_ship_stats(ui: &mut Ui, vessel_component: &VesselComponent) {
     });
 }
 
-pub fn draw_vessel_editor(view: &mut Scene, context: &Context, ui: &mut Ui, vessel_component: &VesselComponent) -> Rect {
+pub fn draw_vessel_editor(view: &mut Scene, context: &Context, ui: &mut Ui, vessel_name: &str, vessel_component: &VesselComponent) -> Rect {
     ui.horizontal(|ui| {
-        draw_ship_stats(ui, vessel_component);
+        draw_ship_stats(ui, vessel_component, vessel_name);
         let response = draw_ship_underlay(view, context, ui, VesselClass::Light);
         let center = response.rect.center();
         let size = response.rect.size();

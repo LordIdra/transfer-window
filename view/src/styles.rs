@@ -36,6 +36,20 @@ impl VesselEditor {
     }
 }
 
+pub struct SlotSelectorWindow {}
+
+impl SlotSelectorWindow {
+    pub fn apply(context: &Context) {
+        context.set_visuals(Visuals {
+            window_fill: Color32::TRANSPARENT,
+            window_stroke: Stroke::NONE,
+            window_shadow: Shadow::NONE,
+            window_rounding: Rounding::ZERO,
+            ..Visuals::default()
+        });
+    }
+}
+
 pub struct SlotSelector {}
 
 impl SlotSelector {

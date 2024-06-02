@@ -168,12 +168,14 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
         
         let (not_overlapped, overlapped) = split_overlapping_icons(view, model, icons);
         if let Some(mouse_position_window) = input.pointer.latest_pos() {
-            if let Some(icon) = compute_mouse_over_icon(view, model, mouse_position_window, context.screen_rect(), &not_overlapped) {
-                any_icon_hovered = true;
-                icon.on_mouse_over(view, model, &input.pointer);
-                let scroll_delta = input.scroll_delta;
-                if (scroll_delta.y != 0.0 || scroll_delta.x != 0.0) && icon.on_scroll(view, model, scroll_delta) {
-                    view.icon_captured_scroll = true;
+            if !view.pointer_over_ui_last_frame {
+                if let Some(icon) = compute_mouse_over_icon(view, model, mouse_position_window, context.screen_rect(), &not_overlapped) {
+                    any_icon_hovered = true;
+                    icon.on_mouse_over(view, model, &input.pointer);
+                    let scroll_delta = input.scroll_delta;
+                    if (scroll_delta.y != 0.0 || scroll_delta.x != 0.0) && icon.on_scroll(view, model, scroll_delta) {
+                        view.icon_captured_scroll = true;
+                    }
                 }
             }
         }

@@ -29,6 +29,10 @@ fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui
 pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update camera");
+
+    if view.pointer_over_ui_last_frame {
+        return;
+    }
     
     context.input(|input| {
         if input.key_pressed(Key::R) {

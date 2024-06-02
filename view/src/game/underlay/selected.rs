@@ -49,7 +49,7 @@ impl Selected {
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, is_mouse_over_any_icon: bool) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update selected");
-    let is_mouse_over_ui_element = context.is_pointer_over_area() || is_mouse_over_any_icon;
+    let is_mouse_over_ui_element = view.pointer_over_ui_last_frame || is_mouse_over_any_icon;
 
     // IMPORTANT: the update functions may lock the context, so they
     // must not be called within an input closure, otherwise a

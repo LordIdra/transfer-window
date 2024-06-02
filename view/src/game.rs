@@ -29,6 +29,7 @@ pub struct Scene {
     debug_window_open: bool,
     debug_window_tab: DebugWindowTab,
     icon_captured_scroll: bool,
+    pointer_over_ui_last_frame: bool
 }
 
 impl Scene {
@@ -43,7 +44,8 @@ impl Scene {
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::Overview;
         let icon_captured_scroll = false;
-        Self { camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll }
+        let pointer_over_ui_last_frame = false;
+        Self { camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll, pointer_over_ui_last_frame }
     }
 
     pub fn update(&mut self, model: &Model, context: &Context, frame: &Frame) -> Vec<Event> {
@@ -57,6 +59,7 @@ impl Scene {
         let is_mouse_over_any_icon = underlay::draw(self, model, context, &mut events);
         overlay::draw(self, model, context, is_mouse_over_any_icon, &mut events);
         debug::draw(self, model, context);
+        self.pointer_over_ui_last_frame = context.is_pointer_over_area();
         renderers::update(self, model, context);
 
         events

@@ -115,6 +115,7 @@
 [x] Replace most buttons with icons and add tooltips
 [x] Disallow warp if within 5 seconds of the thing
 [x] Overhaul vessel editor UI
+[x] Fix E X P A N S I O N of editor UI
 
 # Polish stage 1
 [ ] Dim P/A icons when moused over and don't count as hovered/clicked
