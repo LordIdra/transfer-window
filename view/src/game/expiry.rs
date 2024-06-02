@@ -1,7 +1,7 @@
 use log::trace;
 use transfer_window_model::Model;
 
-use super::{underlay::selected::Selected, Scene};
+use super::{underlay::selected::Selected, util::should_render, Scene};
 
 
 pub fn update(view: &mut Scene, model: &Model) {
@@ -44,9 +44,9 @@ pub fn update(view: &mut Scene, model: &Model) {
         }
     }
 
-    // Delete selected if its entity no longer exists
+    // Delete selected if its entity no longer exists or should not be rendered
     if let Some(entity) = view.selected.entity(model) {
-        if !model.entity_exists(entity) {
+        if !model.entity_exists(entity) || !should_render(view, model, entity) {
             view.selected = Selected::None;
         }
     }

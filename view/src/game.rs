@@ -1,8 +1,9 @@
-use std::sync::Arc;
+use std::{collections::HashSet, sync::Arc};
 
 use eframe::{egui::Context, glow, Frame};
 use renderers::Renderers;
-use transfer_window_model::{storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
+use util::should_render;
 
 use crate::{events::Event, resources::Resources};
 
@@ -81,5 +82,13 @@ impl Scene {
             }
         }
         self.right_click_menu = Some(right_clicked);
+    }
+
+    pub fn entities_should_render(&self, model: &Model, with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
+        model.entities(with_component_types)
+            .iter()
+            .filter(|entity| should_render(self, model, **entity))
+            .cloned()
+            .collect()
     }
 }

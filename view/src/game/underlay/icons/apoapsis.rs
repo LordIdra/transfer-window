@@ -36,7 +36,7 @@ impl Apoapsis {
 
     pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in model.entities(vec![ComponentType::PathComponent]) {
+        for entity in view.entities_should_render(model, vec![ComponentType::PathComponent]) {
             for orbit in model.path_component(entity).future_orbits() {
                 if let Some(time) = compute_time_of_next_apoapsis(model, orbit) {
                     let icon = Self::new(view, model, entity, time);
@@ -45,7 +45,7 @@ impl Apoapsis {
             }
         }
 
-        for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
+        for entity in view.entities_should_render(model, vec![ComponentType::OrbitableComponent]) {
             if let Some(orbit) = model.orbitable_component(entity).orbit() {
                 if let Some(time) = compute_time_of_next_apoapsis(model, orbit) {
                     let icon = Self::new(view, model, entity, time);

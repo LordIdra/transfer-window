@@ -5,6 +5,7 @@ use transfer_window_model::{storage::entity_allocator::Entity, Model};
 use super::{underlay::selected::util::BurnAdjustDirection, Scene};
 
 pub const BURN_OFFSET: f64 = 40.0;
+const MIN_SOI_PIXELS: f64 = 30.0;
 
 pub fn add_triangle(vertices: &mut Vec<f32>, v1: DVec2, v2: DVec2, v3: DVec2, color: Rgba) {
     let v1 = dvec2_to_f32_tuple(v1);
@@ -107,4 +108,19 @@ pub fn compute_adjust_fire_torpedo_arrow_position(view: &Scene, model: &Model, e
     let burn_position = model.absolute_position(orbit.parent()) + model.position_at_time(entity, time);
     let burn_to_arrow_unit = model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * direction.vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
+}
+
+pub fn should_render_parent(view: &Scene, model: &Model, parent: Entity) -> bool {
+    let Some(orbit) = model.orbitable_component(parent).orbit() else {
+        return true;
+    };
+    let soi_pixels = orbit.sphere_of_influence() * view.camera.zoom();
+    soi_pixels >= MIN_SOI_PIXELS
+}
+
+pub fn should_render(view: &Scene, model: &Model, entity: Entity) -> bool {
+    let Some(parent) = model.parent(entity) else {
+        return true;
+    };
+    should_render_parent(view, model, parent)
 }

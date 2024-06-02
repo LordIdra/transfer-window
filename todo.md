@@ -118,14 +118,16 @@
 [x] Fix E X P A N S I O N of editor UI
 [x] Fix texture blending to bring main texture to the front
 [x] Encounter icons
+[x] Don't count some icons as hovered/clicked
 
 # Polish
-[ ] Dim P/A icons when moused over and don't count as hovered/clicked
-[ ] Hide all child icons and segments of object when zoomed out far enough
 [ ] Sun + explosion shaders
 [ ] Show upcoming segments including timeline events
 [ ] Some way to see distance/altitude and time at apoapsis/periapsis/encounters/approaches
 [ ] Show orbit/burn/guidance parameters
+[ ] Planet/moon/star enums + icons
+[ ] Celestial object UI
+[ ] Ignore child elements when zoomed out far enough
 
 # Campaign
 [ ] Factions (player, ally, enemy)

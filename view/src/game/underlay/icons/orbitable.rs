@@ -12,9 +12,9 @@ pub struct Orbitable {
 }
 
 impl Orbitable {
-    pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
+        for entity in view.entities_should_render(model, vec![ComponentType::OrbitableComponent]) {
             let icon = Self { entity };
             icons.push(Box::new(icon) as Box<dyn Icon>);
         }

@@ -20,7 +20,7 @@ impl Intercept {
 
     pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in model.entities(vec![ComponentType::VesselComponent]) {
+        for entity in view.entities_should_render(model, vec![ComponentType::VesselComponent]) {
             if let Some(TimelineEvent::Intercept(intercept)) = model.vessel_component(entity).timeline().last_event() {
                 let icon = Self::new(view, model, entity, intercept.time());
                 icons.push(Box::new(icon) as Box<dyn Icon>);

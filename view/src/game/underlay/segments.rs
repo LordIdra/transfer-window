@@ -2,7 +2,7 @@ use eframe::egui::Rgba;
 use nalgebra_glm::{vec2, DVec2};
 use transfer_window_model::{components::{orbitable_component::OrbitableComponentPhysics, path_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity, Model};
 
-use crate::game::{util::add_triangle, Scene};
+use crate::game::{util::{add_triangle, should_render_parent}, Scene};
 
 mod burn;
 mod guidance;
@@ -63,21 +63,27 @@ fn draw_path_segments(view: &mut Scene, model: &Model, entity: Entity, camera_ce
                 }
                 let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
                 let color = orbit::compute_color_vessel(view, model, entity, orbit_index);
-                segment_points_data.push((points, color));
+                if should_render_parent(view, model, orbit.parent()) {
+                    segment_points_data.push((points, color));
+                }
                 orbit_index += 1;
             },
 
             Segment::Burn(burn) => {
                 let points = burn::compute_points(burn, absolute_parent_position, camera_centre, zoom);
                 let color = burn::compute_color();
-                segment_points_data.push((points, color));
+                if should_render_parent(view, model, burn.parent()) {
+                    segment_points_data.push((points, color));
+                }
                 orbit_index = 0;
             }
 
             Segment::Guidance(guidance) => {
                 let points = guidance::compute_points(guidance, absolute_parent_position, camera_centre, zoom);
                 let color = guidance::compute_color();
-                segment_points_data.push((points, color));
+                if should_render_parent(view, model, guidance.parent()) {
+                    segment_points_data.push((points, color));
+                }
                 orbit_index = 0;
             }
         };
@@ -106,10 +112,10 @@ pub fn draw(view: &mut Scene, model: &Model) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments");
     let camera_centre = view.camera.translation(model);
-    for entity in model.entities(vec![ComponentType::PathComponent]) {
+    for entity in view.entities_should_render(model, vec![ComponentType::PathComponent]) {
         draw_path_segments(view, model, entity, camera_centre);
     }
-    for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
+    for entity in view.entities_should_render(model, vec![ComponentType::OrbitableComponent]) {
         draw_orbitable_segment(view, model, entity, camera_centre);
     }
 }

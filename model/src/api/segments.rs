@@ -177,4 +177,16 @@ impl Model {
             Some(change)
         }
     }
+
+    pub fn parent(&self, entity: Entity) -> Option<Entity> {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return orbitable_component.orbit().map(|orbit| orbit.parent());
+        }
+
+        if let Some(path_component) = self.try_path_component(entity) {
+            return Some(path_component.current_segment().parent());
+        }
+
+        None
+    }
 }

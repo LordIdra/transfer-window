@@ -14,9 +14,9 @@ pub struct Burn {
 }
 
 impl Burn {
-    pub fn generate(model: &Model) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in model.entities(vec![ComponentType::VesselComponent]) {
+        for entity in view.entities_should_render(model, vec![ComponentType::VesselComponent]) {
             for event in model.vessel_component(entity).timeline().events() {
                 if event.is_start_burn() {
                     let icon = Self { entity, time: event.time() };

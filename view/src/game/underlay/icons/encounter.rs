@@ -25,9 +25,9 @@ impl Encounter {
         Self { encounter_type, position }
     }
 
-    pub fn generate(_view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in model.entities(vec![ComponentType::PathComponent]) {
+        for entity in view.entities_should_render(model, vec![ComponentType::PathComponent]) {
             let mut previous_parent = None;
             for orbit in model.path_component(entity).future_orbits() {
                 if let Some(previous_parent) = previous_parent {

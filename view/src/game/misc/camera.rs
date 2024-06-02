@@ -4,7 +4,7 @@ use transfer_window_model::Model;
 
 use super::Scene;
 
-pub const MIN_ZOOM: f64 = 5.0e-7;
+pub const MIN_ZOOM: f64 = 1.0e-9;
 pub const MAX_ZOOM: f64 = 1.0;
 const ZOOM_SENSITIVITY: f64 = 0.003;
 

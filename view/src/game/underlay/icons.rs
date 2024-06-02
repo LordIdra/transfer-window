@@ -84,15 +84,15 @@ fn compute_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, sc
     icons.append(&mut AdjustBurn::generate(view, model, pointer, screen_rect));
     icons.append(&mut AdjustFireTorpedo::generate(view, model, pointer, screen_rect));
     icons.append(&mut Apoapsis::generate(view, model));
-    icons.append(&mut Burn::generate(model));
+    icons.append(&mut Burn::generate(view, model));
     icons.append(&mut ClosestApproach::generate(view, model));
     icons.append(&mut Encounter::generate(view, model));
-    icons.append(&mut FireTorpedo::generate(model));
-    icons.append(&mut Guidance::generate(model));
+    icons.append(&mut FireTorpedo::generate(view, model));
+    icons.append(&mut Guidance::generate(view, model));
     icons.append(&mut Intercept::generate(view, model));
-    icons.append(&mut Orbitable::generate(model));
+    icons.append(&mut Orbitable::generate(view, model));
     icons.append(&mut Periapsis::generate(view, model));
-    icons.append(&mut Vessel::generate(model));
+    icons.append(&mut Vessel::generate(view, model));
     icons
 }
 
