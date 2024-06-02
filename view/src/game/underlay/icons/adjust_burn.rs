@@ -118,4 +118,8 @@ impl Icon for AdjustBurn {
             }
         }
     }
+
+    fn selectable(&self) -> bool {
+        true
+    }
 }

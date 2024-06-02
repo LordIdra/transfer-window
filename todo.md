@@ -121,11 +121,11 @@
 
 # Polish
 [ ] Dim P/A icons when moused over and don't count as hovered/clicked
+[ ] Hide all child icons and segments of object when zoomed out far enough
 [ ] Sun + explosion shaders
 [ ] Show upcoming segments including timeline events
-[ ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
-[ ] Show orbit/burn parameters
-[ ] Hide all child icons and segments of object when zoomed out far enough
+[ ] Some way to see distance/altitude and time at apoapsis/periapsis/encounters/approaches
+[ ] Show orbit/burn/guidance parameters
 
 # Campaign
 [ ] Factions (player, ally, enemy)

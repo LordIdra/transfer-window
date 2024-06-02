@@ -103,4 +103,8 @@ impl Icon for FireTorpedo {
         trace!("Fire torpedo icon clicked; switching to Selected");
         view.selected = Selected::FireTorpedo { entity: self.entity, time: self.time, state: BurnState::Selected }
     }
+
+    fn selectable(&self) -> bool {
+        true
+    }
 }

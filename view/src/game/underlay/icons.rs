@@ -40,6 +40,7 @@ trait Icon: Debug {
     fn facing(&self, view: &Scene, model: &Model) -> Option<DVec2>;
     fn is_selected(&self, view: &Scene, model: &Model) -> bool;
     fn on_mouse_over(&self, view: &mut Scene, model: &Model, pointer: &PointerState);
+    fn selectable(&self) -> bool;
     
     fn on_scroll(&self, _view: &mut Scene, _model: &Model, _scroll_delta: Vec2) -> bool { false }
 
@@ -108,7 +109,9 @@ fn split_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon>
     let mut overlapped = vec![];
     for icon in icons {
         #[allow(clippy::borrowed_box)] // false positive
-        if not_overlapped.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, model, &*icon)) {
+        let overlaps_any_not_overlapped = not_overlapped.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, model, &*icon));
+        let overlaps_any_overlapped = overlapped.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, model, &*icon));
+        if overlaps_any_not_overlapped || overlaps_any_overlapped {
             overlapped.push(icon);
         } else {
             not_overlapped.push(icon);
@@ -151,7 +154,7 @@ fn compute_mouse_over_icon<'a>(view: &Scene, model: &Model, mouse_position: Pos2
     let focus = view.camera.window_space_to_world_space(model, mouse_position, screen_size);
     for icon in icons {
         let radius = icon.radius(view, model) / view.camera.zoom();
-        if (icon.position(view, model) - focus).magnitude() < radius {
+        if icon.selectable() && (icon.position(view, model) - focus).magnitude() < radius {
             return Some(&**icon)
         }
     }

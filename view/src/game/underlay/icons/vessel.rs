@@ -90,4 +90,8 @@ impl Icon for Vessel {
             view.toggle_right_click_menu(self.entity);
         }
     }
+
+    fn selectable(&self) -> bool {
+        true
+    }
 }

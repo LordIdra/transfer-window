@@ -85,4 +85,8 @@ impl Icon for Orbitable {
             view.toggle_right_click_menu(self.entity);
         }
     }
+
+    fn selectable(&self) -> bool {
+        true
+    }
 }

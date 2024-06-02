@@ -72,4 +72,8 @@ impl Icon for Intercept {
     }
 
     fn on_mouse_over(&self, _view: &mut Scene, _model: &Model, _pointer: &PointerState) {}
+
+    fn selectable(&self) -> bool {
+        false
+    }
 }

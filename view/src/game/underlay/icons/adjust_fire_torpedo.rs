@@ -118,4 +118,8 @@ impl Icon for AdjustFireTorpedo {
             }
         }
     }
+
+    fn selectable(&self) -> bool {
+        true
+    }
 }

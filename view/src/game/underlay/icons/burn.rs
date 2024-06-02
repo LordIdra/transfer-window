@@ -101,4 +101,8 @@ impl Icon for Burn {
         trace!("Burn icon clicked; switching to Selected");
         view.selected = Selected::Burn { entity: self.entity, time: self.time, state: BurnState::Selected }
     }
+
+    fn selectable(&self) -> bool {
+        true
+    }
 }

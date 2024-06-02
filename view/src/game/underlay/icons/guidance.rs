@@ -90,4 +90,8 @@ impl Icon for Guidance {
         trace!("Guidance icon clicked; switching to Selected");
         view.selected = Selected::EnableGuidance { entity: self.entity, time: self.time }
     }
+
+    fn selectable(&self) -> bool {
+        true
+    }
 }
