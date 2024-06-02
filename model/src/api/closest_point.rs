@@ -77,6 +77,15 @@ impl Model {
                     if time > orbit.current_point().time() && time < orbit.end_point().time() {
                         closest_point = Some((entity, time));
                         closest_distance = distance;
+                        continue;
+                    }
+
+                    // ffs
+                    let time = time + period;
+                    if time > orbit.current_point().time() && time < orbit.end_point().time() {
+                        closest_point = Some((entity, time));
+                        closest_distance = distance;
+                        continue;
                     }
                 }
             }
