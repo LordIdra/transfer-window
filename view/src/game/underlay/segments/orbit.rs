@@ -16,7 +16,7 @@ pub fn compute_color_vessel(view: &Scene, model: &Model, entity: Entity, index: 
     };
 
     let alphas = if view.is_selected(model, entity) {
-        [1.0, 0.67, 0.51, 0.39]
+        [1.0, 0.60, 0.45]
     } else {
         [0.24; SEGMENTS_TO_PREDICT]
     };

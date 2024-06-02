@@ -7,7 +7,7 @@ use systems::update_warp::TimeWarp;
 
 use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
-pub const SEGMENTS_TO_PREDICT: usize = 4;
+pub const SEGMENTS_TO_PREDICT: usize = 3;
 
 pub mod components;
 mod debug;

@@ -1,6 +1,7 @@
 use std::{cmp::Ordering, fmt::Debug};
 
 use eframe::egui::{Context, PointerState, Pos2, Rect, Vec2};
+use encounter::Encounter;
 use intercept::Intercept;
 use nalgebra_glm::DVec2;
 use transfer_window_model::Model;
@@ -14,6 +15,7 @@ mod adjust_fire_torpedo;
 mod apoapsis;
 mod burn;
 mod closest_approach;
+mod encounter;
 mod fire_torpedo;
 mod guidance;
 mod intercept;
@@ -83,6 +85,7 @@ fn compute_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, sc
     icons.append(&mut Apoapsis::generate(view, model));
     icons.append(&mut Burn::generate(model));
     icons.append(&mut ClosestApproach::generate(view, model));
+    icons.append(&mut Encounter::generate(view, model));
     icons.append(&mut FireTorpedo::generate(model));
     icons.append(&mut Guidance::generate(model));
     icons.append(&mut Intercept::generate(view, model));

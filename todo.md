@@ -116,10 +116,11 @@
 [x] Disallow warp if within 5 seconds of the thing
 [x] Overhaul vessel editor UI
 [x] Fix E X P A N S I O N of editor UI
+[x] Fix texture blending to bring main texture to the front
+[x] Encounter icons
 
-# Polish stage 1
+# Polish
 [ ] Dim P/A icons when moused over and don't count as hovered/clicked
-[ ] Encounter icons
 [ ] Sun + explosion shaders
 [ ] Show upcoming segments including timeline events
 [ ] Some way to see distance/altitude and time at apoapsis/periapsis and especially at closest encounters
@@ -136,6 +137,7 @@
 [ ] Trainer class
 [ ] Scout class
 - Remember to upgrade ship and unlock new equipment
+- Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
 # Bigger picture
 [ ] Ballistic weaponry
@@ -144,6 +146,7 @@
 [ ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 [ ] PDC shells not affected by gravity?
 [ ] Collisions with planets (nearly forgot about that lmao)
+[ ] Energy production/storage/consumption
 [ ] Sandbox mode - EVENTUALLY as model versions may be a problem
 
 # Backburner
