@@ -110,8 +110,7 @@ fn split_overlapping_icons(view: &Scene, model: &Model, icons: Vec<Box<dyn Icon>
     for icon in icons {
         #[allow(clippy::borrowed_box)] // false positive
         let overlaps_any_not_overlapped = not_overlapped.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, model, &*icon));
-        let overlaps_any_overlapped = overlapped.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, model, &*icon));
-        if overlaps_any_not_overlapped || overlaps_any_overlapped {
+        if overlaps_any_not_overlapped {
             overlapped.push(icon);
         } else {
             not_overlapped.push(icon);

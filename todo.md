@@ -119,6 +119,7 @@
 [x] Fix texture blending to bring main texture to the front
 [x] Encounter icons
 [x] Don't count some icons as hovered/clicked
+[x] Ignore child elements when zoomed out far enough
 
 # Polish
 [ ] Sun + explosion shaders
@@ -127,7 +128,6 @@
 [ ] Show orbit/burn/guidance parameters
 [ ] Planet/moon/star enums + icons
 [ ] Celestial object UI
-[ ] Ignore child elements when zoomed out far enough
 
 # Campaign
 [ ] Factions (player, ally, enemy)
