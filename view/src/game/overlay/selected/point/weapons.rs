@@ -1,7 +1,7 @@
 use eframe::egui::{vec2, Align, Color32, Frame, Image, ImageButton, Layout, Margin, Pos2, Rect, Stroke, Ui, Vec2};
 use transfer_window_model::{components::vessel_component::{system_slot::{weapon::Weapon, SlotLocation, System}, timeline::fire_torpedo::FireTorpedoEvent}, storage::entity_allocator::Entity, Model};
 
-use crate::{events::Event, game::{overlay::slot_textures::TexturedSlot, underlay::selected::{util::BurnState, Selected}, Scene}, styles};
+use crate::{events::Event, game::{overlay::slot_textures::TexturedSlot, selected::{util::BurnState, Selected}, Scene}, styles};
 
 #[allow(clippy::too_many_arguments)]
 fn draw_fire(view: &mut Scene, model: &Model, ui: &mut Ui, center: Pos2, entity: Entity, slot_location: SlotLocation, time: f64, events: &mut Vec<Event>) {

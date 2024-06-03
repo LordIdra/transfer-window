@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Context, ImageButton, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}}, storage::entity_allocator::Entity, Model};
 
-use crate::{events::Event, game::{underlay::selected::{util::BurnState, Selected}, util::format_time, Scene}, styles};
+use crate::{events::Event, game::{selected::{util::BurnState, Selected}, util::format_time, Scene}, styles};
 
 use self::weapons::draw_weapons;
 

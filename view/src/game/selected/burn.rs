@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use crate::{events::Event, game::{underlay::selected::Selected, util::compute_burn_arrow_position, Scene}};
+use crate::{events::Event, game::{selected::Selected, util::compute_burn_arrow_position, Scene}};
 
 use super::util::{burn_adjustment_amount, BurnAdjustDirection, BurnState};
 

@@ -1,7 +1,7 @@
 use log::trace;
 use transfer_window_model::Model;
 
-use super::{underlay::selected::Selected, util::{should_render, should_render_at_time}, Scene};
+use super::{selected::Selected, util::{should_render, should_render_at_time}, Scene};
 
 
 pub fn update(view: &mut Scene, model: &Model) {

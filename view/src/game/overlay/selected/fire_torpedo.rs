@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Context, ImageButton, RichText, Window}, epaint};
 use transfer_window_model::Model;
 
-use crate::{events::Event, game::{underlay::selected::Selected, util::format_time, Scene}, styles};
+use crate::{events::Event, game::{selected::Selected, util::format_time, Scene}, styles};
 
 use super::burn::draw_burn_info;
 

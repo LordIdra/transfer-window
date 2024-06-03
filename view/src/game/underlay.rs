@@ -8,7 +8,7 @@ use super::Scene;
 mod celestial_objects;
 mod icons;
 mod segments;
-pub mod selected;
+mod selected;
 
 pub fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) -> bool {
     #[cfg(feature = "profiling")]

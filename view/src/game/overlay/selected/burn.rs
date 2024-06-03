@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Color32, Context, Grid, ImageButton, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::path_component::segment::Segment, Model};
 
-use crate::{events::Event, game::{overlay::widgets::{draw_filled_bar, FilledBar}, underlay::selected::Selected, util::format_time, Scene}, styles};
+use crate::{events::Event, game::{overlay::widgets::{draw_filled_bar, FilledBar}, selected::Selected, util::format_time, Scene}, styles};
 
 pub fn draw_burn_info(view: &Scene, ui: &mut Ui, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
     let burnt_dv = start_dv - end_dv;

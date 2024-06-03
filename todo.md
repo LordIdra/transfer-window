@@ -125,9 +125,8 @@
 [x] Celestial object UI
 
 # Polish
-[ ] Allow selecting apoapsis, periapsis, closest approach, encounter, and warping to them
+[ ] Show distance/altitude and time at apoapsis/periapsis/encounters/approaches
 [ ] Show upcoming segments including timeline events
-[ ] Some way to see distance/altitude and time at apoapsis/periapsis/encounters/approaches
 [ ] Show orbit/burn/guidance parameters
 
 # Campaign
@@ -141,6 +140,15 @@
 [ ] Scout class
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
+
+## Optional Levels
+- Scientific notation
+- ISP
+- Kepler's equation
+- N-Body simulations
+- Rocket fuels overview
+- Proportional guidance
+- Euler integration
 
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?

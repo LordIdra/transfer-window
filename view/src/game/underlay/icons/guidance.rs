@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::Selected, util::should_render_at_time, Scene};
+use crate::game::{selected::Selected, util::should_render_at_time, Scene};
 
 use super::Icon;
 

@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Color32, Context, Grid, ImageButton, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::{system_slot::System, VesselComponent}, Model};
 
-use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::{draw_filled_bar, FilledBar}}, underlay::selected::Selected, Scene}, styles};
+use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::{draw_filled_bar, FilledBar}}, selected::Selected, Scene}, styles};
 
 fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent) {
     let remaining_fuel = vessel_component.fuel_litres();

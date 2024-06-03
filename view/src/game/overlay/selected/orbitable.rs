@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Context, Grid, RichText, Window}, epaint};
 use transfer_window_model::{components::orbitable_component::OrbitableComponentPhysics, Model};
 
-use crate::game::{underlay::selected::Selected, Scene};
+use crate::game::{selected::Selected, Scene};
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     let Selected::Orbitable(entity) = view.selected.clone() else { 

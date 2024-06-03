@@ -2,7 +2,7 @@ use eframe::egui::{Context, PointerState};
 use log::trace;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::Selected, util::add_textured_square, Scene};
+use crate::game::{selected::Selected, util::add_textured_square, Scene};
 
 const SELECT_DISTANCE: f64 = 24.0;
 const SELECT_RADIUS: f64 = 4.0;

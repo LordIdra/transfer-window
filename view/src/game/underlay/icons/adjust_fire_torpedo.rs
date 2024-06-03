@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_adjust_fire_torpedo_arrow_position, Scene};
+use crate::game::{selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_adjust_fire_torpedo_arrow_position, Scene};
 
 use super::Icon;
 

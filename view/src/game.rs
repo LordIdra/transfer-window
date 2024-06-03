@@ -7,7 +7,7 @@ use util::{should_render, should_render_at_time};
 
 use crate::{events::Event, resources::Resources};
 
-use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, underlay::selected::Selected};
+use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, selected::Selected};
 
 pub mod camera;
 mod debug;
@@ -15,7 +15,9 @@ mod expiry;
 mod frame_history;
 mod misc;
 mod overlay;
+mod pinned;
 mod renderers;
+mod selected;
 mod underlay;
 mod util;
 

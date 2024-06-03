@@ -2,7 +2,7 @@ use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::{vessel_component::VesselClass, ComponentType}, storage::entity_allocator::Entity, Model};
 
-use crate::game::{underlay::selected::Selected, Scene};
+use crate::game::{selected::Selected, Scene};
 
 use super::Icon;
 

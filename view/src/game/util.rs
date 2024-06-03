@@ -2,7 +2,7 @@ use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
-use super::{underlay::selected::util::BurnAdjustDirection, Scene};
+use super::{selected::util::BurnAdjustDirection, Scene};
 
 pub const BURN_OFFSET: f64 = 40.0;
 const MIN_SOI_PIXELS: f64 = 30.0;
