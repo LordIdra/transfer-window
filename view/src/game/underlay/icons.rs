@@ -44,7 +44,7 @@ trait Icon: Debug {
     
     fn on_scroll(&self, _view: &mut Scene, _model: &Model, _scroll_delta: Vec2) -> bool { false }
 
-    fn is_hovered(&self, view: &Scene, model: &Model, mouse_position_window: Pos2, screen_size: Rect) -> bool {
+    fn is_hovered(&self, view: &mut Scene, model: &Model, mouse_position_window: Pos2, screen_size: Rect) -> bool {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Is icon hovered");
         let mouse_position_world = view.camera.window_space_to_world_space(model, mouse_position_window, screen_size);
@@ -76,7 +76,7 @@ trait Icon: Debug {
     }
 }
 
-fn compute_initial_icons(view: &Scene, model: &Model, pointer: &PointerState, screen_rect: Rect) -> Vec<Box<dyn Icon>> {
+fn compute_initial_icons(view: &mut Scene, model: &Model, pointer: &PointerState, screen_rect: Rect) -> Vec<Box<dyn Icon>> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute initial icons");
 
@@ -146,7 +146,7 @@ fn draw_icon(view: &mut Scene, model: &Model, mouse_position_window: Option<Pos2
 }
 
 // 'rust is simple' said no one ever
-fn compute_mouse_over_icon<'a>(view: &Scene, model: &Model, mouse_position: Pos2, screen_size: Rect, icons: &'a Vec<Box<dyn Icon>>) -> Option<&'a dyn Icon> {
+fn compute_mouse_over_icon<'a>(view: &mut Scene, model: &Model, mouse_position: Pos2, screen_size: Rect, icons: &'a Vec<Box<dyn Icon>>) -> Option<&'a dyn Icon> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute mouse over icon");
 

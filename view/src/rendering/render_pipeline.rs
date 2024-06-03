@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use eframe::{egui::Rect, glow::{Context, Framebuffer, HasContext, Texture, CLAMP_TO_EDGE, COLOR_ATTACHMENT0, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE0, TEXTURE1, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T, UNSIGNED_BYTE}};
+use eframe::{egui::Rect, glow::{Context, Framebuffer, HasContext, Texture, CLAMP_TO_EDGE, COLOR_ATTACHMENT0, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE0, TEXTURE1, TEXTURE2, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T, UNSIGNED_BYTE}};
 
 use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 
@@ -51,6 +51,8 @@ pub struct RenderPipeline {
     bloom_framebuffer_2: Framebuffer,
     bloom_texture_2: Texture,
     bloom_program: ShaderProgram,
+    explosion_framebuffer: Framebuffer,
+    explosion_texture: Texture,
     screen_program: ShaderProgram,
     screen_vao: VertexArrayObject,
 }
@@ -69,6 +71,9 @@ impl RenderPipeline {
             
             let bloom_framebuffer_2 = gl.create_framebuffer().expect("Failed to create framebuffer");
             let bloom_texture_2 = create_normal_color_attachment(&gl, bloom_framebuffer_2, screen_rect);
+
+            let explosion_framebuffer = gl.create_framebuffer().expect("Failed to create framebuffer");
+            let explosion_texture = create_normal_color_attachment(&gl, explosion_framebuffer, screen_rect);
 
             gl.bind_framebuffer(FRAMEBUFFER, None);
 
@@ -90,7 +95,14 @@ impl RenderPipeline {
             ];
             screen_vao.data(&screen_vertices);
 
-            Self { gl, multisample_framebuffer, multisample_texture, intermediate_framebuffer, intermediate_texture, bloom_framebuffer_1, bloom_texture_1, bloom_framebuffer_2, bloom_texture_2, bloom_program, screen_program, screen_vao, }
+            Self { 
+                gl, 
+                multisample_framebuffer, multisample_texture, 
+                intermediate_framebuffer, intermediate_texture, 
+                bloom_framebuffer_1, bloom_texture_1, bloom_framebuffer_2, bloom_texture_2, bloom_program, 
+                explosion_framebuffer, explosion_texture,
+                screen_program, screen_vao, 
+            }
         }
     }
 
@@ -109,19 +121,28 @@ impl RenderPipeline {
             self.gl.tex_image_2d(TEXTURE_2D, 0, RGBA as i32,  screen_rect.width() as i32, screen_rect.height() as i32, 0, RGBA, UNSIGNED_BYTE, None);
             self.gl.bind_texture(TEXTURE_2D, Some(self.bloom_texture_2));
             self.gl.tex_image_2d(TEXTURE_2D, 0, RGBA as i32,  screen_rect.width() as i32, screen_rect.height() as i32, 0, RGBA, UNSIGNED_BYTE, None);
+
+            // Resize epxlosion texture
+            self.gl.bind_texture(TEXTURE_2D, Some(self.explosion_texture));
+            self.gl.tex_image_2d(TEXTURE_2D, 0, RGBA as i32,  screen_rect.width() as i32, screen_rect.height() as i32, 0, RGBA, UNSIGNED_BYTE, None);
         }
     }
 
-    pub fn render(&self, render_bloom: impl FnOnce(), render_normal: impl FnOnce(), screen_rect: Rect) {
+    pub fn render(&self, render_bloom: impl FnOnce(), render_normal: impl FnOnce(), render_explosion: impl FnOnce(), screen_rect: Rect) {
         let width = screen_rect.width() as i32;
         let height = screen_rect.height() as i32;
 
         unsafe {
-            // Clear multisample framebuffer
+            // Clear framebuffers
             clear_framebuffer(&self.gl, self.multisample_framebuffer);
             clear_framebuffer(&self.gl, self.intermediate_framebuffer);
             clear_framebuffer(&self.gl, self.bloom_framebuffer_1);
             clear_framebuffer(&self.gl, self.bloom_framebuffer_2);
+            clear_framebuffer(&self.gl, self.explosion_framebuffer);
+
+            // Render explosions
+            self.gl.bind_framebuffer(FRAMEBUFFER, Some(self.explosion_framebuffer));
+            render_explosion();
 
             // Render to multisample framebuffer
             self.gl.bind_framebuffer(FRAMEBUFFER, Some(self.multisample_framebuffer));
@@ -160,10 +181,13 @@ impl RenderPipeline {
             self.gl.active_texture(TEXTURE0);
             self.gl.bind_texture(TEXTURE_2D, Some(self.bloom_texture_1));
             self.gl.active_texture(TEXTURE1);
+            self.gl.bind_texture(TEXTURE_2D, Some(self.explosion_texture));
+            self.gl.active_texture(TEXTURE2);
             self.gl.bind_texture(TEXTURE_2D, Some(self.intermediate_texture));
             self.screen_program.use_program();
-            self.screen_program.uniform_int("texture_sampler_lower", 0);
-            self.screen_program.uniform_int("texture_sampler_upper", 1);
+            self.screen_program.uniform_int("texture_sampler_bloom", 0);
+            self.screen_program.uniform_int("texture_sampler_explosion", 1);
+            self.screen_program.uniform_int("texture_sampler_normal", 2);
             self.screen_vao.draw();
         }
     }

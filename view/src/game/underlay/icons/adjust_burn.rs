@@ -24,7 +24,7 @@ pub struct AdjustBurn {
 }
 
 impl AdjustBurn {
-    fn new(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
+    fn new(view: &mut Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState, screen_rect: Rect) -> Self {
         let burn = model.burn_starting_at_time(entity, time);
         let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
         let mut position = compute_burn_arrow_position(view, model, entity, time, direction);
@@ -43,7 +43,7 @@ impl AdjustBurn {
         Self { entity, time, position, direction }
     }
 
-    pub fn generate(view: &Scene, model: &Model, pointer: &PointerState, screen_rect: Rect) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &mut Scene, model: &Model, pointer: &PointerState, screen_rect: Rect) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         if let Selected::Burn { entity, time, state } = view.selected.clone() {
             if state.is_adjusting() || state.is_dragging() {

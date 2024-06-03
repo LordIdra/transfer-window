@@ -1,3 +1,4 @@
+pub mod explosion_renderer;
 pub mod geometry_renderer;
 pub mod render_pipeline;
 mod shader_program;

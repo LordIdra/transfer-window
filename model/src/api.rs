@@ -1,6 +1,7 @@
 pub mod closest_approach;
 pub mod closest_point;
 pub mod components;
+pub mod explosion;
 pub mod quantities;
 pub mod segments;
 pub mod vessels;

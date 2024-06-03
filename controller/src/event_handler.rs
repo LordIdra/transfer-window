@@ -38,7 +38,7 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(orbit))));
 
     let orbit = Orbit::circle(earth, VesselClass::Light.mass(), 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
-    let _spacecraft_1 = model.allocate(EntityBuilder::default()
+    let spacecraft_1 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Spacecraft 1".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light))
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
@@ -56,7 +56,7 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
     controller.model = Some(model);
-    controller.view = View::GameScene(Scene::new(controller.gl.clone(), context, controller.resources.clone(), Some(earth)));
+    controller.view = View::GameScene(Scene::new(controller.gl.clone(), context, controller.resources.clone(), Some(spacecraft_1)));
 }
 
 pub fn save_game(controller: &Controller, name: &str) {

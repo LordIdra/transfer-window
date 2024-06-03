@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use api::time::TimeStep;
+use api::{explosion::Explosion, time::TimeStep};
 use components::vessel_component::VesselComponent;
 use serde::{Deserialize, Serialize};
 use systems::update_warp::TimeWarp;
@@ -26,6 +26,7 @@ pub struct Model {
     time: f64,
     time_step: TimeStep,
     warp: Option<TimeWarp>,
+    explosions_started_this_frame: Vec<Explosion>,
 }
 
 impl Default for Model {
@@ -39,6 +40,7 @@ impl Default for Model {
             time: 0.0,
             time_step: TimeStep::Level{ level: 1, paused: false },
             warp: None,
+            explosions_started_this_frame: vec![],
         }
     }
 }
@@ -70,6 +72,7 @@ impl Model {
     pub fn update(&mut self, dt: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Model update");
+        self.explosions_started_this_frame.clear();
         self.update_warp(dt);
         self.update_time(dt);
         self.update_timeline();

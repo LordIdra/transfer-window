@@ -120,13 +120,13 @@
 [x] Encounter icons
 [x] Don't count some icons as hovered/clicked
 [x] Ignore child elements when zoomed out far enough
+[x] Planet/moon/star enums + icons
+[x] Explosion shaders
 
 # Polish
-[ ] Sun + explosion shaders
 [ ] Show upcoming segments including timeline events
 [ ] Some way to see distance/altitude and time at apoapsis/periapsis/encounters/approaches
 [ ] Show orbit/burn/guidance parameters
-[ ] Planet/moon/star enums + icons
 [ ] Celestial object UI
 
 # Campaign

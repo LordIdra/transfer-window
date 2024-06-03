@@ -4,7 +4,7 @@ use eframe::{egui::{CentralPanel, Context, PaintCallback, Rect}, egui_glow::Call
 use log::error;
 use transfer_window_model::Model;
 
-use crate::{rendering::{geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, texture_renderer::TextureRenderer}, resources::Resources};
+use crate::{rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, texture_renderer::TextureRenderer}, resources::Resources};
 
 use super::Scene;
 
@@ -14,11 +14,13 @@ use super::Scene;
 /// 3) The resulting texture is resolved onto a texture in `intermediate_framebuffer`
 /// 4) The texture is rendered to the default FBO
 pub struct Renderers {
+    gl: Arc<glow::Context>,
     screen_rect: Rect,
     render_pipeline: Arc<Mutex<RenderPipeline>>,
     object_renderer: Arc<Mutex<GeometryRenderer>>,
     segment_renderer: Arc<Mutex<GeometryRenderer>>,
     texture_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
+    explosion_renderers: Arc<Mutex<Vec<ExplosionRenderer>>>,
 }
 
 impl Renderers {
@@ -28,8 +30,9 @@ impl Renderers {
         let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let texture_renderers = resources.build_renderers(&gl);
+        let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
-        Self { screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers }
+        Self { gl, screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers, explosion_renderers }
     }
 
     pub fn add_object_vertices(&mut self, vertices: &mut Vec<f32>) {
@@ -53,11 +56,28 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update rendering");
 
+    // Start new explosion renderers
+    for explosion in model.explosions_started_this_frame() {
+        let renderer = ExplosionRenderer::new(view.renderers.gl.clone(), model.time(), explosion.parent(), explosion.offset(), explosion.combined_mass());
+        view.renderers.explosion_renderers.lock().unwrap().push(renderer);
+    }
+
+    // Delete expired explosion renderers
+    view.renderers.explosion_renderers.lock().unwrap()
+        .retain(|renderer| !renderer.is_finished(model.time()));
+
+    // Update explosion renderers
+    view.renderers.explosion_renderers.lock().unwrap()
+        .iter_mut().for_each(|renderer| renderer.update_position(&mut view.camera, model, context.screen_rect()));
+
     let screen_rect = context.screen_rect();
     let render_pipeline = view.renderers.render_pipeline.clone();
     let object_renderer = view.renderers.object_renderer.clone();
     let segment_renderer = view.renderers.segment_renderer.clone();
     let texture_renderers = view.renderers.texture_renderers.clone();
+    let explosion_renderers = view.renderers.explosion_renderers.clone();
+    let time = model.time();
+    let zoom = view.camera.zoom();
 
     // Make sure to regenerate framebuffer with new size if window resized
     if screen_rect != view.renderers.screen_rect {
@@ -81,7 +101,13 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
             }
         };
 
-        render_pipeline.lock().unwrap().render(render_bloom, render_normal, screen_rect);
+        let render_explosion = || {
+            for renderer in explosion_renderers.lock().unwrap().iter() {
+                renderer.render(time, screen_rect, zoom);
+            }
+        };
+
+        render_pipeline.lock().unwrap().render(render_bloom, render_normal, render_explosion, screen_rect);
     }));
 
     // At time of writing there is no way to do this without providing a callback (which must be send + sync)

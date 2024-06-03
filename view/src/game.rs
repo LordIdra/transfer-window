@@ -9,7 +9,7 @@ use crate::{events::Event, resources::Resources};
 
 use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, underlay::selected::Selected};
 
-mod camera;
+pub mod camera;
 mod debug;
 mod expiry;
 mod frame_history;
@@ -88,7 +88,7 @@ impl Scene {
         model.entities(with_component_types)
             .iter()
             .filter(|entity| should_render(self, model, **entity))
-            .cloned()
+            .copied()
             .collect()
     }
 
@@ -96,7 +96,7 @@ impl Scene {
         model.entities(with_component_types)
             .iter()
             .filter(|entity| should_render_at_time(self, model, **entity, time))
-            .cloned()
+            .copied()
             .collect()
     }
 }

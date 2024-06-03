@@ -4,12 +4,14 @@ out vec4 FragColor;
   
 in vec2 v_texture_coords;
 
-uniform sampler2D texture_sampler_lower;
-uniform sampler2D texture_sampler_upper;
+uniform sampler2D texture_sampler_bloom;
+uniform sampler2D texture_sampler_explosion;
+uniform sampler2D texture_sampler_normal;
 
 void main() {
-    vec4 lower_color = texture(texture_sampler_lower, v_texture_coords);
-    vec4 upper_color = texture(texture_sampler_upper, v_texture_coords);
-    float blend_amount = 1.0 - max(upper_color.r, max(upper_color.g, upper_color.b));
-    FragColor = upper_color + blend_amount * lower_color;
+    vec4 bloom_color = texture(texture_sampler_bloom, v_texture_coords);
+    vec4 explosion_color = texture(texture_sampler_explosion, v_texture_coords);
+    vec4 normal_color = texture(texture_sampler_normal, v_texture_coords);
+    float blend_amount = 1.0 - max(normal_color.r, max(normal_color.g, normal_color.b));
+    FragColor = normal_color + blend_amount * (bloom_color + explosion_color);
 }

@@ -180,7 +180,7 @@ impl Model {
 
     pub fn parent(&self, entity: Entity) -> Option<Entity> {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return orbitable_component.orbit().map(|orbit| orbit.parent());
+            return orbitable_component.orbit().map(Orbit::parent);
         }
 
         if let Some(path_component) = self.try_path_component(entity) {
@@ -192,7 +192,7 @@ impl Model {
 
     pub fn parent_at_time(&self, entity: Entity, time: f64) -> Option<Entity> {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return orbitable_component.orbit().map(|orbit| orbit.parent());
+            return orbitable_component.orbit().map(Orbit::parent);
         }
 
         if let Some(path_component) = self.try_path_component(entity) {

@@ -74,6 +74,16 @@ impl ShaderProgram {
         unsafe { self.gl.uniform_1_i32(Some(&Self::location(self, name)), v); } 
     }
 
+    pub fn uniform_float(&self, name: &str, v: f32) {
+        self.use_program();
+        unsafe { self.gl.uniform_1_f32(Some(&Self::location(self, name)), v); } 
+    }
+
+    pub fn uniform_vec2(&self, name: &str, x: f32, y: f32) {
+        self.use_program();
+        unsafe { self.gl.uniform_2_f32(Some(&Self::location(self, name)), x, y); } 
+    }
+
     pub fn uniform_mat3(&self, name: &str, v: &[f32]) {
         self.use_program();
         unsafe { self.gl.uniform_matrix_3_f32_slice(Some(&Self::location(self, name)), false, v); }
