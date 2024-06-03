@@ -3,6 +3,8 @@ use transfer_window_model::{components::vessel_component::{system_slot::System, 
 
 use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::{draw_filled_bar, FilledBar}}, selected::Selected, Scene}, styles};
 
+pub mod visual_timeline;
+
 fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent) {
     let remaining_fuel = vessel_component.fuel_litres();
     let max_fuel = vessel_component.max_fuel_litres();
@@ -100,7 +102,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                     }
                 });
             }
-                
+
             Grid::new("Vessel bars grid").show(ui, |ui| {
                 if !vessel_component.slots().fuel_tanks().is_empty() {
                     draw_fuel(ui, vessel_component);
@@ -108,5 +110,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 }
                 draw_torpedoes(ui, vessel_component);
             });
+
+            visual_timeline::update(view, model, context, ui, entity);
         });
 }

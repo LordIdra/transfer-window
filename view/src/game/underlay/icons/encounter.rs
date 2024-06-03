@@ -2,15 +2,9 @@ use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
-use crate::game::{util::should_render_at_time, Scene};
+use crate::game::{util::{should_render_at_time, EncounterType}, Scene};
 
 use super::Icon;
-
-#[derive(Debug)]
-enum EncounterType {
-    Entrance,
-    Exit,
-}
 
 #[derive(Debug)]
 pub struct Encounter {

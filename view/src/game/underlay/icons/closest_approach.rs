@@ -19,24 +19,23 @@ impl ClosestApproach {
         if let Some(entity) = view.selected.entity(model) {
             if let Some(vessel_component) = model.try_vessel_component(entity) {
                 if let Some(target) = vessel_component.target() {
-                    if let Some(time) = model.find_next_closest_approach(entity, target, model.time()) {
+                    let (approach_1, approach_2) = model.find_next_two_closest_approaches(entity, target);
+                    
+                    if let Some(time) = approach_1 {
                         if should_render_at_time(view, model, entity, time) {
-                            // 1st closest approach
                             let icon = Self { entity, time, approach_number: 1 };
                             icons.push(Box::new(icon) as Box<dyn Icon>);
                             let icon = Self { entity: target, time, approach_number: 1 };
                             icons.push(Box::new(icon) as Box<dyn Icon>);
                         }
+                    }
 
-                        // 2nd closest approach
-                        // Add 1.0 to make sure we don't find the same approach by accident
-                        if let Some(time) = model.find_next_closest_approach(entity, target, time + 1.0) {
-                            if should_render_at_time(view, model, entity, time) {
-                                let icon = Self { entity, time, approach_number: 2 };
-                                icons.push(Box::new(icon) as Box<dyn Icon>);
-                                let icon = Self { entity: target, time, approach_number: 2 };
-                                icons.push(Box::new(icon) as Box<dyn Icon>);
-                            }
+                    if let Some(time) = approach_2 {
+                        if should_render_at_time(view, model, entity, time) {
+                            let icon = Self { entity, time, approach_number: 2 };
+                            icons.push(Box::new(icon) as Box<dyn Icon>);
+                            let icon = Self { entity: target, time, approach_number: 2 };
+                            icons.push(Box::new(icon) as Box<dyn Icon>);
                         }
                     }
                 }

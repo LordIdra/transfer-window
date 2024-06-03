@@ -15,7 +15,6 @@ mod expiry;
 mod frame_history;
 mod misc;
 mod overlay;
-mod pinned;
 mod renderers;
 mod selected;
 mod underlay;

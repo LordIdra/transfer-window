@@ -118,6 +118,20 @@ impl Model {
 
         None
     }
+
+    pub fn find_next_two_closest_approaches(&self, entity_a: Entity, entity_b: Entity) -> (Option<f64>, Option<f64>) {
+        if let Some(time_1) = self.find_next_closest_approach(entity_a, entity_b, self.time) {
+
+            // Add 1.0 to make sure we don't find the same approach by accident
+            if let Some(time_2) = self.find_next_closest_approach(entity_a, entity_b, time_1 + 1.0) {
+                return (Some(time_1), Some(time_2));
+            }
+
+            return (Some(time_1), None);
+        }
+
+        return (None, None)
+    }
 }
 
 #[cfg(test)]

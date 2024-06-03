@@ -12,6 +12,7 @@ eframe = { version = "0.23", features = ["glow"] }
 image = { version = "0.25", features = ["jpeg", "png"] }
 tracy-client = { version = "0.17.0", optional = true }
 egui_extras = { version = "0.23", features = ["image", "file"] }
+thousands = "0.2.0"
 
 [features]
 profiling = ["dep:tracy-client"]

@@ -167,6 +167,42 @@ impl Orbit {
         self.start_point.time() - self.start_point.time_since_periapsis()
     }
 
+    pub fn next_periapsis_time(&self) -> Option<f64> {
+        let time = if let Some(period) = self.period() {
+            let first_periapsis_time = self.first_periapsis_time();
+            let time_since_first_periapsis = self.current_point.time() - first_periapsis_time;
+            let orbits = (time_since_first_periapsis / period) as i32 + 1;
+            self.first_periapsis_time() + orbits as f64 * period
+        } else {
+            self.first_periapsis_time()
+        };
+
+        if time > self.current_point.time() && time < self.end_point.time() {
+            Some(time)
+        } else {
+            None
+        }
+    }
+
+    pub fn next_apoapsis_time(&self) -> Option<f64> {
+        if let Some(period) = self.period() {
+            let mut first_apoapsis_time = self.first_periapsis_time() + period / 2.0;
+            if first_apoapsis_time > self.start_point.time() {
+                first_apoapsis_time -= period;
+            }
+            let time_since_first_apoapsis = self.current_point.time() - first_apoapsis_time;
+            let orbits = (time_since_first_apoapsis / period) as i32 + 1;
+            let time = first_apoapsis_time + orbits as f64 * period;
+            if time > self.current_point.time() && time < self.end_point.time() {
+                Some(time)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
     pub fn theta_from_time(&self, time: f64) -> f64 {
         let time_since_periapsis = time - self.first_periapsis_time();
         self.conic.theta_from_time_since_periapsis(time_since_periapsis)
