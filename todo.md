@@ -122,12 +122,13 @@
 [x] Ignore child elements when zoomed out far enough
 [x] Planet/moon/star enums + icons
 [x] Explosion shaders
+[x] Celestial object UI
 
 # Polish
+[ ] Allow selecting apoapsis, periapsis, closest approach, encounter, and warping to them
 [ ] Show upcoming segments including timeline events
 [ ] Some way to see distance/altitude and time at apoapsis/periapsis/encounters/approaches
 [ ] Show orbit/burn/guidance parameters
-[ ] Celestial object UI
 
 # Campaign
 [ ] Factions (player, ally, enemy)
@@ -142,6 +143,7 @@
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
 # Bigger picture
+[ ] Planet textures/generation, atmosphere shaders?
 [ ] Ballistic weaponry
 [ ] Point defense
 [ ] PDC automatic targeting system

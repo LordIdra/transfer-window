@@ -20,7 +20,7 @@ pub enum Selected {
     Point { entity: Entity, time: f64 },
     Burn { entity: Entity, time: f64, state: BurnState },
     FireTorpedo { entity: Entity, time: f64, state: BurnState },
-    EnableGuidance { entity: Entity, time: f64 }
+    EnableGuidance { entity: Entity, time: f64 },
 }
 
 impl Selected {
