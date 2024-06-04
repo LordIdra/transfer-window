@@ -21,6 +21,7 @@ mod underlay;
 mod util;
 
 pub struct Scene {
+    gl: Arc<glow::Context>,
     camera: Camera,
     resources: Arc<Resources>,
     renderers: Renderers,
@@ -38,7 +39,7 @@ impl Scene {
     pub fn new(gl: Arc<glow::Context>, context: &Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
         let mut camera = Camera::new();
         camera.set_focus(focus);
-        let renderers = Renderers::new(&resources, gl, context.screen_rect());
+        let renderers = Renderers::new(&resources, &gl, context.screen_rect());
         let selected = Selected::None;
         let right_click_menu = None;
         let vessel_editor = None;
@@ -47,14 +48,14 @@ impl Scene {
         let debug_window_tab = DebugWindowTab::Overview;
         let icon_captured_scroll = false;
         let pointer_over_ui_last_frame = false;
-        Self { camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll, pointer_over_ui_last_frame }
+        Self { gl, camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll, pointer_over_ui_last_frame }
     }
 
     pub fn update(&mut self, model: &Model, context: &Context, frame: &Frame) -> Vec<Event> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("View update");
         let mut events = vec![];
-        
+
         self.frame_history.update(context.input(|i| i.time), frame.info().cpu_usage);
         misc::update(self, model, context, &mut events);
         expiry::update(self, model);

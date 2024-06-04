@@ -1,4 +1,4 @@
-use eframe::egui::{vec2, Context, Grid, Image, ImageButton, RichText, Ui};
+use eframe::egui::{self, vec2, Context, Grid, Image, ImageButton, RichText, TextureOptions, Ui};
 use thousands::Separable;
 use transfer_window_model::{components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
 
@@ -44,7 +44,7 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::TimelineEvent(event) => match event {
                 TimelineEvent::Intercept(_) => "intercept",
                 TimelineEvent::FireTorpedo(_) => "torpedo",
-                TimelineEvent::Burn(_) => "burn",
+                TimelineEvent::Burn(_) => "timeline-burn",
                 TimelineEvent::EnableGuidance(_) => "enable-guidance",
             },
             VisualTimelineEvent::Periapsis { .. } => "periapsis",
@@ -132,7 +132,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, e
     Grid::new(format!("Visual timeline - {}", model.name_component(entity).name())).show(ui, |ui| {
         for event in events {
             ui.horizontal(|ui| {
-                ui.add(ImageButton::new(view.resources.texture_image(event.icon())));
+                let image = Image::new(egui::include_image!("../../../../../resources/textures/periapsis.png"));
+                ui.add_sized(vec2(16.0, 16.0), image);
                 ui.label(RichText::new(format!("T- {}", format_time((event.time().floor() - model.time()).floor()))).weak().size(16.0));
             });
             ui.label(RichText::new(event.name(model)));

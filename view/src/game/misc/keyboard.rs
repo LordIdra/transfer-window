@@ -14,7 +14,7 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
             events.push(Event::TogglePaused);
         }
 
-        if input.key_pressed(Key::PlusEquals) {
+        if input.key_pressed(Key::Equals) {
             events.push(Event::IncreaseTimeStepLevel);
         }
 
