@@ -47,14 +47,14 @@ impl Controller {
         panic!("Unrecoverable error");
     }
 
-    fn handle_events(&mut self, mut events: Vec<Event>, context: &Context, frame: &mut Frame) {
+    fn handle_events(&mut self, mut events: Vec<Event>, context: &Context) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Event handling");
 
         while let Some(event) = events.pop() {
             debug!("Handling event {:?}", event);
             match event {
-                Event::Quit => quit(frame),
+                Event::Quit => quit(context),
                 Event::NewGame => new_game(self, context),
                 Event::SaveGame { name } => save_game(self, name.as_str()),
                 Event::LoadGame { name } => load_game(self, context, name.as_str()),
@@ -90,7 +90,7 @@ impl App for Controller {
             View::MenuScene(scene) => scene.update(context),
         };
 
-        self.handle_events(events, context, frame);
+        self.handle_events(events, context);
 
         if let Some(model) = &mut self.model {
             model.update(dt);

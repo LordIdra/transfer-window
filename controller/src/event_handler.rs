@@ -1,6 +1,6 @@
 use std::fs;
 
-use eframe::{egui::Context, Frame};
+use eframe::egui::{Context, ViewportCommand};
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
 use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
@@ -8,11 +8,11 @@ use transfer_window_view::{game::Scene, View};
 
 use crate::Controller;
 
-pub fn quit(frame: &mut Frame) {
+pub fn quit(context: &Context) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Quit");
 
-    frame.close();
+    context.send_viewport_cmd(ViewportCommand::Close);
 }
 
 pub fn new_game(controller: &mut Controller, context: &Context) {

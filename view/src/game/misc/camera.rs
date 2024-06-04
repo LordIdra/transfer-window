@@ -33,6 +33,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     if view.pointer_over_ui_last_frame {
         return;
     }
+
+    let screen_rect = context.screen_rect();
     
     context.input(|input| {
         if input.key_pressed(Key::R) {
@@ -50,8 +52,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
         };
 
         if let Some(latest_mouse_position) = input.pointer.latest_pos() {
-            if input.scroll_delta.length() != 0.0 && !view.icon_captured_scroll {
-                update_zoom(view, latest_mouse_position, input.scroll_delta, context.screen_rect());
+            if input.smooth_scroll_delta.length() != 0.0 && !view.icon_captured_scroll {
+                update_zoom(view, latest_mouse_position, input.smooth_scroll_delta, screen_rect);
             }
         }
     });

@@ -4,7 +4,6 @@ use eframe::glow::{self, LINEAR, LINEAR_MIPMAP_LINEAR};
 use glow::{Context, HasContext, TEXTURE_2D, RGBA, UNSIGNED_BYTE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER};
 
 pub struct Texture {
-    gl: Arc<Context>,
     texture: glow::Texture,
 }
 
@@ -17,21 +16,19 @@ impl Texture {
             gl.tex_parameter_i32(TEXTURE_2D, TEXTURE_MIN_FILTER, LINEAR_MIPMAP_LINEAR as i32);
             gl.tex_parameter_i32(TEXTURE_2D, TEXTURE_MAG_FILTER, LINEAR as i32);
             gl.generate_mipmap(TEXTURE_2D);
-            Texture { gl, texture }
+            Texture { texture }
         }
     }
 
-    pub fn bind(&self) {
+    pub fn bind(&self, gl: &Arc<Context>) {
         unsafe {
-            self.gl.bind_texture(TEXTURE_2D, Some(self.texture));
+            gl.bind_texture(TEXTURE_2D, Some(self.texture));
         }
     }
-}
 
-impl Drop for Texture {
-    fn drop(&mut self) {
+    fn destroy(&mut self, gl: &Arc<Context>) {
         unsafe { 
-            self.gl.delete_texture(self.texture);
+            gl.delete_texture(self.texture);
         };
     }
 }
