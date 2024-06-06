@@ -123,6 +123,7 @@
 [x] Planet/moon/star enums + icons
 [x] Explosion shaders
 [x] Celestial object UI
+[x] Fix being unable to drag arrows???
 
 # Polish
 [ ] Finish encounter visual timeline events
@@ -146,9 +147,10 @@
 
 ## Optional Levels
 - Scientific notation
+- Orbital parameters
 - ISP
 - Kepler's equation
-- N-Body simulations
+- N-Body simulations (vs patched conics)
 - Rocket fuels overview
 - Proportional guidance
 - Euler integration

@@ -112,7 +112,7 @@ impl Icon for AdjustFireTorpedo {
 
     fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
         if let Selected::FireTorpedo { entity: _, time: _, state } = &mut view.selected {
-            if pointer.primary_clicked() {
+            if pointer.primary_down() {
                 trace!("Started dragging to adjust fire torpedo {:?}", self.direction);
                 *state = BurnState::Dragging(self.direction);
             }
