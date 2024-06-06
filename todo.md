@@ -125,8 +125,11 @@
 [x] Celestial object UI
 
 # Polish
-[ ] Show distance/altitude and time at apoapsis/periapsis/encounters/approaches
-[ ] Show upcoming segments including timeline events
+[ ] Finish encounter visual timeline events
+[ ] Allow selecting apoapsis, intercept, etc
+[ ] Select event when clicked in timeline
+[ ] Visual timeline for selected events + point
+[ ] Current burn/guidance finishes (exclude intercepts)
 [ ] Show orbit/burn/guidance parameters
 
 # Campaign

@@ -74,7 +74,6 @@ impl Model {
     }
 
     pub(crate) fn recalculate_current_guidance(&mut self, entity: Entity) {
-        assert!(self.path_component(entity).future_segments().len() == 1);
         assert!(self.path_component(entity).current_segment().is_guidance());
         assert!(self.path_component(entity).current_segment().as_guidance().unwrap().will_intercept());
 

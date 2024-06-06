@@ -1,4 +1,4 @@
-use eframe::egui::{Context, Grid, RichText, Ui};
+use eframe::egui::{Context, RichText, Ui};
 use thousands::Separable;
 use transfer_window_model::{components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
 
@@ -18,8 +18,8 @@ fn format_distance(distance: f64) -> String {
 
 enum VisualTimelineEvent {
     TimelineEvent(TimelineEvent),
-    Periapsis { time: f64, distance: f64, other_entity: Entity },
-    Apoapsis { time: f64, distance: f64, other_entity: Entity },
+    Periapsis { time: f64, distance: f64 },
+    Apoapsis { time: f64, distance: f64 },
     FirstApproach { time: f64, distance: f64 },
     SecondApproach { time: f64, distance: f64 },
     EntranceEncounter { time: f64, type_: EncounterType, other_entity: Entity },
@@ -56,6 +56,23 @@ impl VisualTimelineEvent {
         }
     }
 
+    pub fn padding(&self) -> f32 {
+        match self {
+            VisualTimelineEvent::TimelineEvent(event) => match event {
+                TimelineEvent::Intercept(_) => 3.0,
+                TimelineEvent::FireTorpedo(_) => 0.0,
+                TimelineEvent::Burn(_) => 0.0,
+                TimelineEvent::EnableGuidance(_) => 0.0,
+            },
+            VisualTimelineEvent::Periapsis { .. } => 3.0,
+            VisualTimelineEvent::Apoapsis { .. } => 3.0,
+            VisualTimelineEvent::FirstApproach { .. } => 3.0,
+            VisualTimelineEvent::SecondApproach { .. } => 3.0,
+            VisualTimelineEvent::EntranceEncounter { .. } => 3.0,
+            VisualTimelineEvent::ExitEncounter { .. } => 3.0,
+        }
+    }
+
     pub fn name(&self, model: &Model) -> String {
         match self {
             VisualTimelineEvent::TimelineEvent(event) => match event {
@@ -84,14 +101,12 @@ fn generate_apoapsis_periapsis(model: &Model, entity: Entity, events: &mut Vec<V
     for orbit in model.path_component(entity).future_orbits() {
         if let Some(time) = orbit.next_periapsis_time() {
             let distance = model.position_at_time(entity, time).magnitude();
-            let other_entity = model.parent_at_time(entity, time).unwrap();
-            events.push(VisualTimelineEvent::Periapsis { time, distance, other_entity });
+            events.push(VisualTimelineEvent::Periapsis { time, distance });
         }
 
         if let Some(time) = orbit.next_apoapsis_time() {
             let distance = model.position_at_time(entity, time).magnitude();
-            let other_entity = model.parent_at_time(entity, time).unwrap();
-            events.push(VisualTimelineEvent::Apoapsis { time: time, distance, other_entity });
+            events.push(VisualTimelineEvent::Apoapsis { time: time, distance });
         }
     }
 }
@@ -129,14 +144,21 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, e
         }
     }
 
-    Grid::new(format!("Visual timeline - {}", model.name_component(entity).name())).show(ui, |ui| {
-        for event in events {
-            ui.horizontal(|ui| {
-                ui.add(CustomImage::new(view.renderers.get_screen_texture_renderer(event.icon()), context.screen_rect(), 24.0));
-                ui.label(RichText::new(format!("T- {}", format_time((event.time().floor() - model.time()).floor()))).weak().size(16.0));
-            });
+    for event in events {
+        ui.horizontal(|ui| {
+            let image = CustomImage::new(view.renderers.get_screen_texture_renderer(event.icon()), context.screen_rect(), 24.0)
+                .with_padding(event.padding());
+            ui.add(image);
+            ui.label(RichText::new(format!("T- {}", format_time((event.time().floor() - model.time()).floor()))).weak().size(12.0));
+
+            let width = 150.0 - ui.cursor().left();
+            let mut rect = ui.cursor();
+            rect.set_width(width);
+            rect.set_height(0.0);
+            ui.advance_cursor_after_rect(rect);
+
             ui.label(RichText::new(event.name(model)));
             ui.end_row();
-        }
-    });
+        });
+    }
 }
