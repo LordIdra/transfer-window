@@ -161,7 +161,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, e
             let image = CustomImage::new(view.renderers.get_screen_texture_renderer(event.icon()), context.screen_rect(), 20.0)
                 .with_padding(event.padding());
             ui.add(image);
-            ui.label(RichText::new(format!("T- {}", format_time((event.time().floor() - model.time()).floor()))).weak().size(12.0));
+            ui.label(RichText::new(format!("T- {}", format_time((event.time().ceil() - model.time()).floor()))).weak().size(12.0));
 
             let width = 150.0 - ui.cursor().left();
             let mut rect = ui.cursor();
