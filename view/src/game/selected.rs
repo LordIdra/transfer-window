@@ -7,12 +7,15 @@ pub mod fire_torpedo;
 pub mod segment_point;
 pub mod util;
 
+
+
 #[derive(Debug, Clone)]
 pub enum Selected {
     None,
     Orbitable(Entity),
     Vessel(Entity),
     Point { entity: Entity, time: f64 },
+
     Burn { entity: Entity, time: f64, state: BurnState },
     FireTorpedo { entity: Entity, time: f64, state: BurnState },
     EnableGuidance { entity: Entity, time: f64 },

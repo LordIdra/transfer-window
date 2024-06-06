@@ -3,7 +3,7 @@ use eframe::egui::{Context, RichText, Ui};
 use thousands::Separable;
 use transfer_window_model::{api::encounters::EncounterType, components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
 
-use crate::game::{overlay::widgets::custom_image::CustomImage, util::format_time, Scene};
+use crate::game::{overlay::widgets::custom_image::CustomImage, util::{format_time, ApproachType, ApsisType}, Scene};
 
 fn format_distance(distance: f64) -> String {
     if distance < 1_000.0 {
@@ -19,24 +19,18 @@ fn format_distance(distance: f64) -> String {
 
 enum VisualTimelineEvent {
     TimelineEvent(TimelineEvent),
-    Periapsis { time: f64, distance: f64 },
-    Apoapsis { time: f64, distance: f64 },
-    FirstApproach { time: f64, distance: f64 },
-    SecondApproach { time: f64, distance: f64 },
-    EntranceEncounter { time: f64, other_entity: Entity },
-    ExitEncounter { time: f64, other_entity: Entity },
+    Apsis { type_: ApsisType, time: f64, distance: f64 },
+    Approach { type_: ApproachType, time: f64, distance: f64 },
+    Encounter { type_: EncounterType, time: f64, other_entity: Entity },
 }
 
 impl VisualTimelineEvent {
     pub fn time(&self) -> f64 {
         match self {
             VisualTimelineEvent::TimelineEvent(event) => event.time(),
-            VisualTimelineEvent::Periapsis { time, .. } 
-                | VisualTimelineEvent::Apoapsis { time, .. } 
-                | VisualTimelineEvent::FirstApproach { time, .. } 
-                | VisualTimelineEvent::SecondApproach { time, .. } 
-                | VisualTimelineEvent::EntranceEncounter { time, .. }
-                | VisualTimelineEvent::ExitEncounter { time, .. } => *time,
+            VisualTimelineEvent::Apsis { time, .. } 
+                | VisualTimelineEvent::Approach { time, .. } 
+                | VisualTimelineEvent::Encounter { time, .. } => *time,
         }
     }
 
@@ -47,13 +41,19 @@ impl VisualTimelineEvent {
                 TimelineEvent::FireTorpedo(_) => "torpedo",
                 TimelineEvent::Burn(_) => "burn",
                 TimelineEvent::EnableGuidance(_) => "enable-guidance",
-            },
-            VisualTimelineEvent::Periapsis { .. } => "periapsis",
-            VisualTimelineEvent::Apoapsis { .. } => "apoapsis",
-            VisualTimelineEvent::FirstApproach { .. } => "closest-approach-1",
-            VisualTimelineEvent::SecondApproach { .. } => "closest-approach-2",
-            VisualTimelineEvent::EntranceEncounter { .. } => "encounter-entrance",
-            VisualTimelineEvent::ExitEncounter { .. } => "encounter-exit",
+            }
+            VisualTimelineEvent::Apsis { type_, .. } => match type_ {
+                ApsisType::Periapsis => "periapsis",
+                ApsisType::Apoapsis => "apoapsis",
+            }
+            VisualTimelineEvent::Approach { type_, .. } => match type_ {
+                ApproachType::First => "closest-approach-1",
+                ApproachType::Second => "closest-approach-2",
+            }
+            VisualTimelineEvent::Encounter { type_, .. } => match type_ {
+                EncounterType::Entrance => "encounter-entrance",
+                EncounterType::Exit => "encounter-exit",
+            }
         }
     }
 
@@ -64,13 +64,10 @@ impl VisualTimelineEvent {
                 TimelineEvent::FireTorpedo(_) => 0.0,
                 TimelineEvent::Burn(_) => 0.0,
                 TimelineEvent::EnableGuidance(_) => 0.0,
-            },
-            VisualTimelineEvent::Periapsis { .. } => 3.0,
-            VisualTimelineEvent::Apoapsis { .. } => 3.0,
-            VisualTimelineEvent::FirstApproach { .. } => 3.0,
-            VisualTimelineEvent::SecondApproach { .. } => 3.0,
-            VisualTimelineEvent::EntranceEncounter { .. } => 3.0,
-            VisualTimelineEvent::ExitEncounter { .. } => 3.0,
+            }
+            VisualTimelineEvent::Apsis { .. } => 3.0,
+            VisualTimelineEvent::Approach { .. } => 3.0,
+            VisualTimelineEvent::Encounter { .. } => 3.0,
         }
     }
 
@@ -81,13 +78,16 @@ impl VisualTimelineEvent {
                 TimelineEvent::FireTorpedo(_) => "Torpedo Launch".to_string(),
                 TimelineEvent::Burn(_) => "Burn".to_string(),
                 TimelineEvent::EnableGuidance(_) => "Guidance Enabled".to_string(),
-            },
-            VisualTimelineEvent::Periapsis { distance, .. } => format!("Periapsis - {}", format_distance(*distance)),
-            VisualTimelineEvent::Apoapsis { distance, .. } => format!("Apoapsis - {}", format_distance(*distance)),
-            VisualTimelineEvent::FirstApproach { distance, .. } => format!("Closest Approach - {}", format_distance(*distance)),
-            VisualTimelineEvent::SecondApproach { distance, .. } => format!("Closest Approach - {}", format_distance(*distance)),
-            VisualTimelineEvent::EntranceEncounter { other_entity, .. } => format!("{} Entrance", model.name_component(*other_entity).name()),
-            VisualTimelineEvent::ExitEncounter { other_entity, .. } => format!("{} Exit", model.name_component(*other_entity).name()),
+            }
+            VisualTimelineEvent::Apsis { type_, distance, .. } => match type_ {
+                ApsisType::Periapsis => format!("Periapsis - {}", format_distance(*distance)),
+                ApsisType::Apoapsis => format!("Apoapsis - {}", format_distance(*distance)),
+            }
+            VisualTimelineEvent::Approach { distance, .. } => format!("Closest Approach - {}", format_distance(*distance)),
+            VisualTimelineEvent::Encounter { type_, other_entity, .. } => match type_ {
+                EncounterType::Entrance => format!("{} Entrance", model.name_component(*other_entity).name()),
+                EncounterType::Exit => format!("{} Exit", model.name_component(*other_entity).name()),
+            }
         }
     }
 }
@@ -102,12 +102,12 @@ fn generate_apoapsis_periapsis(model: &Model, entity: Entity, events: &mut Vec<V
     for orbit in model.path_component(entity).future_orbits() {
         if let Some(time) = orbit.next_periapsis_time() {
             let distance = model.position_at_time(entity, time).magnitude();
-            events.push(VisualTimelineEvent::Periapsis { time, distance });
+            events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Periapsis, time, distance });
         }
 
         if let Some(time) = orbit.next_apoapsis_time() {
             let distance = model.position_at_time(entity, time).magnitude();
-            events.push(VisualTimelineEvent::Apoapsis { time, distance });
+            events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Apoapsis, time, distance });
         }
     }
 }
@@ -121,12 +121,12 @@ fn generate_closest_approaches(model: &Model, entity: Entity, events: &mut Vec<V
 
     if let Some(time) = approach_1_time {
         let distance = model.distance_at_time(entity, target, time);
-        events.push(VisualTimelineEvent::FirstApproach { time, distance });
+        events.push(VisualTimelineEvent::Approach { type_: ApproachType::First, time, distance });
     }
 
     if let Some(time) = approach_2_time {
         let distance = model.distance_at_time(entity, target, time);
-        events.push(VisualTimelineEvent::SecondApproach { time, distance });
+        events.push(VisualTimelineEvent::Approach { type_: ApproachType::Second, time, distance });
     }
 }
 
@@ -134,8 +134,8 @@ fn generate_encounters(model: &Model, entity: Entity, events: &mut Vec<VisualTim
     for encounter in model.future_encounters(entity) {
         let time = encounter.time();
         match encounter.encounter_type() {
-            EncounterType::Entrance => events.push(VisualTimelineEvent::EntranceEncounter { time, other_entity: encounter.to() }),
-            EncounterType::Exit => events.push(VisualTimelineEvent::ExitEncounter { time, other_entity: encounter.from() }),
+            EncounterType::Entrance => events.push(VisualTimelineEvent::Encounter { type_: EncounterType::Exit, time, other_entity: encounter.to() }),
+            EncounterType::Exit => events.push(VisualTimelineEvent::Encounter { type_: EncounterType::Entrance, time, other_entity: encounter.from() }),
         }
     }
 }

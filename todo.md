@@ -143,6 +143,7 @@
 [ ] Satellite class
 [ ] Trainer class
 [ ] Scout class
+[ ] Dev mode compiles in save/load buttons
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
@@ -165,14 +166,13 @@
 [ ] PDC shells not affected by gravity?
 [ ] Collisions with planets (nearly forgot about that lmao)
 [ ] Energy production/storage/consumption
-[ ] Sandbox mode - EVENTUALLY as model versions may be a problem
 
 # Backburner
 [ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 [ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
 
 # Before release
-[ ] Add actual logging
+[ ] Add actual logging?
 [ ] Versioning!
 [ ] Profiling + performance testing on different devices
 [ ] Test compatibility on different devices
