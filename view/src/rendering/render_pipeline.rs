@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use eframe::{egui::Rect, glow::{Context, Framebuffer, HasContext, Texture, CLAMP_TO_EDGE, COLOR_ATTACHMENT0, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE0, TEXTURE1, TEXTURE2, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T, UNSIGNED_BYTE}};
+use eframe::{egui::Rect, glow::{self, Context, Framebuffer, HasContext, Texture, CLAMP_TO_EDGE, COLOR_ATTACHMENT0, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE0, TEXTURE1, TEXTURE2, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T, UNSIGNED_BYTE}};
 
 use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 
@@ -190,7 +190,8 @@ impl RenderPipeline {
         }
     }
 
-    fn destroy(&mut self, gl: Arc<Context>) {
+    pub fn destroy(&mut self, gl: &Arc<glow::Context>) {
+        self.bloom_program.destroy(gl);
         unsafe {
             gl.delete_framebuffer(self.multisample_framebuffer);
             gl.delete_texture(self.multisample_texture);

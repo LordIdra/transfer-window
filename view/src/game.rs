@@ -102,3 +102,9 @@ impl Scene {
             .collect()
     }
 }
+
+impl Drop for Scene {
+    fn drop(&mut self) {
+        self.renderers.destroy(&self.gl);
+    }
+}
