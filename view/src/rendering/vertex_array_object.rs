@@ -71,7 +71,7 @@ impl VertexArrayObject {
         }
     }
 
-    fn destroy(&mut self, gl: Arc<Context>) {
+    pub fn destroy(&mut self, gl: &Arc<Context>) {
         unsafe {
             gl.delete_vertex_array(self.vertex_array);
             gl.delete_buffer(self.vertex_buffer);

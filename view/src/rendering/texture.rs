@@ -26,7 +26,7 @@ impl Texture {
         }
     }
 
-    fn destroy(&mut self, gl: &Arc<Context>) {
+    pub fn destroy(&mut self, gl: &Arc<Context>) {
         unsafe { 
             gl.delete_texture(self.texture);
         };

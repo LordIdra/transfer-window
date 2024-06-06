@@ -68,4 +68,9 @@ impl ExplosionRenderer {
         self.program.uniform_float(gl, "speed", self.speed as f32);
         self.vertex_array_object.draw(gl);
     }
+
+    pub fn destroy(&mut self, gl: &Arc<Context>) {
+        self.program.destroy(gl);
+        self.vertex_array_object.destroy(gl);
+    }
 }

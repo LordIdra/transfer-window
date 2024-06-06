@@ -38,12 +38,15 @@ pub struct ShaderProgram {
 
 impl ShaderProgram {
     pub fn new(gl: &Arc<Context>, vertex_shader_source: &str, fragment_shader_source: &str) -> Self {
-        let vertex_shader = Shader::new(gl, vertex_shader_source, VERTEX_SHADER);
-        let fragment_shader = Shader::new(gl, fragment_shader_source, FRAGMENT_SHADER);
+        let mut vertex_shader = Shader::new(gl, vertex_shader_source, VERTEX_SHADER);
+        let mut fragment_shader = Shader::new(gl, fragment_shader_source, FRAGMENT_SHADER);
         let program = unsafe { gl.create_program().expect("Failed to create shader program") };
         vertex_shader.attach(gl, program);
         fragment_shader.attach(gl, program);
 
+        vertex_shader.destroy(gl);
+        fragment_shader.destroy(gl);
+        
         unsafe {
             gl.link_program(program);
             assert!(gl.get_program_link_status(program), "{}", gl.get_program_info_log(program));
@@ -85,7 +88,7 @@ impl ShaderProgram {
         unsafe { gl.uniform_matrix_3_f32_slice(Some(&Self::location(self, gl, name)), false, v); }
     }
 
-    fn destroy(&mut self, gl: Arc<Context>) {
+    pub fn destroy(&mut self, gl: &Arc<Context>) {
         unsafe { 
             gl.delete_program(self.program);
         };

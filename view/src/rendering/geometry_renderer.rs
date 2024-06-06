@@ -37,4 +37,9 @@ impl GeometryRenderer {
         self.vertex_array_object.draw(gl);
         self.vertices.clear();
     }
+
+    pub fn destroy(&mut self, gl: &Arc<Context>) {
+        self.program.destroy(gl);
+        self.vertex_array_object.destroy(gl);
+    }
 }

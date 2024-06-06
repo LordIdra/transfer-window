@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Instant};
 
-use eframe::{egui::Context, glow, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
+use eframe::{egui::{Context, ViewportBuilder}, glow, run_native, App, CreationContext, Frame, NativeOptions, Renderer, WindowBuilder};
 use event_handler::cancel_current_segment;
 use log::{debug, error, info};
 use transfer_window_model::Model;

@@ -55,6 +55,18 @@ impl Renderers {
     pub fn get_screen_texture_renderer(&self, name: &str) -> Arc<Mutex<ScreenTextureRenderer>> {
         self.screen_texture_renderers.get(name).unwrap().clone()
     }
+
+    pub fn destroy(&mut self, gl: &Arc<glow::Context>) {
+        self.render_pipeline.lock().unwrap().destroy(gl);
+        self.object_renderer.lock().unwrap().destroy(gl);
+        self.segment_renderer.lock().unwrap().destroy(gl);
+        for renderer in self.texture_renderers.values() {
+            renderer.lock().unwrap().destroy(gl);
+        }
+        for renderer in self.explosion_renderers.lock().unwrap().iter_mut() {
+            renderer.destroy(gl);
+        }
+    }
 }
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context) {
