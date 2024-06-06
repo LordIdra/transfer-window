@@ -4,6 +4,8 @@ use transfer_window_model::{components::orbitable_component::OrbitableComponentP
 use crate::game::{selected::Selected, Scene};
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update orbitable");
     let Selected::Orbitable(entity) = view.selected.clone() else { 
         return
     };

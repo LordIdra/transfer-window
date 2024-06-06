@@ -52,6 +52,8 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
 }
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update burn");
     let Selected::Burn { entity, time, state: _ } = view.selected.clone() else { 
         return
     };

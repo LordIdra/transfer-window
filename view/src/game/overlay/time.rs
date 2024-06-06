@@ -7,6 +7,8 @@ use eframe::{egui::{Align2, Context, RichText, Window}, epaint};
 use transfer_window_model::{api::time::{TimeStep, TIME_STEP_LEVELS}, Model};
 
 pub fn update(view: &Scene, model: &Model, context: &Context) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update time");
     Window::new("Time")
         .title_bar(false)
         .resizable(false)

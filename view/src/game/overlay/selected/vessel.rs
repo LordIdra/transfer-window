@@ -49,6 +49,8 @@ fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
 }
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update vessel");
     let Selected::Vessel(entity) = view.selected.clone() else { 
         return
     };

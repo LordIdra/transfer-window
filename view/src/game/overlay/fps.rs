@@ -3,6 +3,8 @@ use eframe::{egui::{Align2, Context, RichText, Window}, epaint};
 use crate::game::Scene;
 
 pub fn update(view: &Scene, context: &Context) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update FPS");
     Window::new("FPS")
         .title_bar(false)
         .resizable(false)

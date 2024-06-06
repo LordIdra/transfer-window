@@ -19,6 +19,8 @@ impl Default for FrameHistory {
 
 impl FrameHistory {
     pub fn update(&mut self, now: f64, previous_frame_time: Option<f32>) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Update frame history");
         let previous_frame_time = previous_frame_time.unwrap_or_default();
         if let Some(latest) = self.frame_times.latest_mut() {
             *latest = previous_frame_time; // rewrite history now that we know

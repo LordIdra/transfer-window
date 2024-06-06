@@ -11,6 +11,8 @@ mod point;
 mod vessel;
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update selected");
     point::update(view, model, context, events);
     burn::update(view, model, context, events);
     guidance::update(view, model, context, events);

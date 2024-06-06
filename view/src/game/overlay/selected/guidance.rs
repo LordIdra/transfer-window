@@ -6,6 +6,8 @@ use crate::{events::Event, game::{overlay::widgets::custom_image_button::CustomC
 use super::burn::draw_burn_info;
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update guidance");
     let Selected::EnableGuidance { entity, time } = view.selected.clone() else { 
         return
     };

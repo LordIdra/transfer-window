@@ -32,6 +32,8 @@ fn draw_header(model: &Model, ui: &mut Ui, entity: Entity) {
 }
 
 pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update vessel editor");
     let Some(vessel_editor) = view.vessel_editor.clone() else {
         return;
     };

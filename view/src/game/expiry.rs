@@ -5,6 +5,9 @@ use super::{selected::Selected, util::{should_render, should_render_at_time}, Sc
 
 
 pub fn update(view: &mut Scene, model: &Model) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update expiry");
+
     // Unfocus camera if focus no longer exists
     if let Some(entity) = view.camera.focus() {
         if !model.entity_exists(entity) {

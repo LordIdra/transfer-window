@@ -124,9 +124,9 @@
 [x] Explosion shaders
 [x] Celestial object UI
 [x] Fix being unable to drag arrows???
+[x] Finish encounter visual timeline events
 
 # Polish
-[ ] Finish encounter visual timeline events
 [ ] Allow selecting apoapsis, intercept, etc
 [ ] Select event when clicked in timeline
 [ ] Visual timeline for selected events + point

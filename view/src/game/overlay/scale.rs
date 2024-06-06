@@ -38,6 +38,8 @@ fn calculate_scale(pixels_per_metre: f32) -> (f32, String) {
 }
 
 pub fn update(view: &Scene, context: &Context) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Update scale");
     Window::new("Scale")
         .title_bar(false)
         .resizable(false)
