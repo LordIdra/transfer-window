@@ -1,44 +1,10 @@
 use std::sync::Arc;
 
-use eframe::{egui::Rect, glow::{Context, Framebuffer, HasContext, Texture, CLAMP_TO_EDGE, COLOR_ATTACHMENT0, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE0, TEXTURE1, TEXTURE2, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T, UNSIGNED_BYTE}};
+use eframe::{egui::Rect, glow::{Context, Framebuffer, HasContext, Texture, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE0, TEXTURE1, TEXTURE2, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, UNSIGNED_BYTE}};
 
-use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
+use super::{shader_program::ShaderProgram, util::{clear_framebuffer, create_multisample_color_attachment, create_normal_color_attachment, SAMPLES}, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 
-const SAMPLES: i32 = 16;
 const BLOOM_PASSES: i32 = 5;
-
-unsafe fn create_multisample_color_attachment(gl: &Arc<Context>, framebuffer: Framebuffer, screen_rect: Rect) -> Texture {
-    unsafe {
-        let texture = gl.create_texture().expect("Failed to create texture");
-        gl.bind_framebuffer(FRAMEBUFFER, Some(framebuffer));
-        gl.bind_texture(TEXTURE_2D_MULTISAMPLE, Some(texture));
-        gl.tex_image_2d_multisample(TEXTURE_2D_MULTISAMPLE, SAMPLES, RGBA as i32, screen_rect.width() as i32, screen_rect.height() as i32, true);
-        gl.framebuffer_texture_2d(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D_MULTISAMPLE, Some(texture), 0);
-        texture
-    }
-}
-
-unsafe fn create_normal_color_attachment(gl: &Arc<Context>, framebuffer: Framebuffer, screen_rect: Rect) -> Texture {
-    unsafe {
-        let texture = gl.create_texture().expect("Failed to create texture");
-        gl.bind_framebuffer(FRAMEBUFFER, Some(framebuffer));
-        gl.bind_texture(TEXTURE_2D, Some(texture));
-        gl.tex_image_2d(TEXTURE_2D, 0, RGBA as i32, screen_rect.width() as i32, screen_rect.height() as i32, 0, RGBA, UNSIGNED_BYTE, None);
-        gl.tex_parameter_i32(TEXTURE_2D, TEXTURE_MIN_FILTER, LINEAR as i32);
-        gl.tex_parameter_i32(TEXTURE_2D, TEXTURE_MAG_FILTER, LINEAR as i32);
-        gl.tex_parameter_i32(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE as i32);
-        gl.tex_parameter_i32(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE as i32);
-        gl.framebuffer_texture_2d(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, Some(texture), 0);
-        texture
-    }
-}
-
-unsafe fn clear_framebuffer(gl: &Arc<Context>, framebuffer: Framebuffer) {
-    gl.bind_framebuffer(FRAMEBUFFER, Some(framebuffer));
-    gl.clear_color(0.0, 0.0, 0.0, 1.0);
-    gl.clear(COLOR_BUFFER_BIT);
-
-}
 
 pub struct RenderPipeline {
     gl: Arc<Context>,

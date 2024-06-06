@@ -1,7 +1,7 @@
-use eframe::{egui::{Align2, Context, ImageButton, RichText, Window}, epaint};
+use eframe::{egui::{Align2, Context, RichText, Window}, epaint};
 use transfer_window_model::{components::path_component::segment::Segment, Model};
 
-use crate::{events::Event, game::{selected::Selected, util::format_time, Scene}, styles};
+use crate::{events::Event, game::{overlay::widgets::custom_image_button::CustomCircularImageButton, selected::Selected, util::format_time, Scene}, styles};
 
 use super::burn::draw_burn_info;
 
@@ -27,15 +27,19 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 styles::SelectedMenuButton::apply(ui);
                 ui.set_height(36.0);
 
-                let button = ImageButton::new(view.resources.texture_image("warp-here"));
-                let can_warp = model.can_warp_to(time);
-                if ui.add_enabled(can_warp, button).on_hover_text("Warp here").clicked() {
+                let enabled = model.can_warp_to(time);
+                let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("warp-here"), context.screen_rect(), 36.0)
+                    .with_enabled(enabled)
+                    .with_padding(8.0);
+                if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
                     events.push(Event::StartWarp { end_time: time });
                 }
 
-                let can_delete = model.timeline_event_at_time(entity, time).can_delete(model);
-                let button = ImageButton::new(view.resources.texture_image("cancel"));
-                if ui.add_enabled(can_delete, button).on_hover_text("Cancel").clicked() {
+                let enabled = model.timeline_event_at_time(entity, time).can_delete(model);
+                let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("cancel"), context.screen_rect(), 36.0)
+                    .with_enabled(enabled)
+                    .with_padding(8.0);
+                if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
                     if model.vessel_component(entity).timeline().last_event().unwrap().is_intercept() {
                         // also cancel intercept
                         events.push(Event::CancelLastTimelineEvent { entity });
@@ -49,6 +53,6 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             let start_dv = guidance.rocket_equation_function().remaining_dv();
             let end_dv = guidance.final_rocket_equation_function().remaining_dv();
             let duration = guidance.duration();
-            draw_burn_info(view, ui, max_dv, start_dv, end_dv, duration);
+            draw_burn_info(view, ui, context, max_dv, start_dv, end_dv, duration);
         });
 }

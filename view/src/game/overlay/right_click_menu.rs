@@ -1,11 +1,14 @@
-use eframe::egui::{Align2, Context, ImageButton, Ui, Window};
+use eframe::egui::{Align2, Context, Ui, Window};
 use nalgebra_glm::vec2;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use crate::{events::Event, game::Scene, styles};
 
-fn draw_focus(view: &mut Scene, ui: &mut Ui, entity: Entity) {
-    let button = ImageButton::new(view.resources.texture_image("focus"));
+use super::widgets::custom_image_button::CustomCircularImageButton;
+
+fn draw_focus(view: &mut Scene, ui: &mut Ui, context: &Context, entity: Entity) {
+    let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("focus"), context.screen_rect(), 30.0)
+        .with_padding(3.0);
     if ui.add(button).on_hover_text("Focus").clicked() {
         view.camera.reset_panning();
         view.camera.set_focus(Some(entity));
@@ -13,10 +16,11 @@ fn draw_focus(view: &mut Scene, ui: &mut Ui, entity: Entity) {
     }
 }
 
-fn draw_set_target(view: &mut Scene, model: &Model, ui: &mut Ui, right_clicked: Entity, selected: Entity, events: &mut Vec<Event>) {
+fn draw_set_target(view: &mut Scene, model: &Model, ui: &mut Ui, context: &Context, right_clicked: Entity, selected: Entity, events: &mut Vec<Event>) {
     let is_already_target = model.target(selected) == Some(right_clicked);
     if is_already_target {
-        let button = ImageButton::new(view.resources.texture_image("unset-target"));
+        let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("unset-target"), context.screen_rect(), 30.0)
+            .with_padding(4.0);
         if ui.add(button).on_hover_text("Unset target").clicked() {
             events.push(Event::SetTarget { 
                 entity: selected, 
@@ -25,9 +29,11 @@ fn draw_set_target(view: &mut Scene, model: &Model, ui: &mut Ui, right_clicked: 
             view.right_click_menu = None;
         }
     } else {
-        let can_target = selected != right_clicked;
-        let button = ImageButton::new(view.resources.texture_image("set-target"));
-        if ui.add_enabled(can_target, button)
+        let enabled = selected != right_clicked;
+        let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("set-target"), context.screen_rect(), 30.0)
+            .with_enabled(enabled)
+            .with_padding(4.0);
+        if ui.add_enabled(enabled, button)
                 .on_hover_text("Set target")
                 .clicked() {
             events.push(Event::SetTarget { 
@@ -50,10 +56,10 @@ fn draw(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Eve
             ui.horizontal(|ui| {
                 styles::SelectedMenuButton::apply(ui);
                 ui.set_height(30.0);
-                draw_focus(view, ui, right_clicked);
+                draw_focus(view, ui, context, right_clicked);
                 if let Some(selected) = view.selected.entity(model) {
                     if model.try_vessel_component(selected).is_some() {
-                        draw_set_target(view, model, ui, right_clicked, selected, events);
+                        draw_set_target(view, model, ui, context, right_clicked, selected, events);
                     }
                 }
             });

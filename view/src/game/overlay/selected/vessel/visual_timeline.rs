@@ -1,8 +1,8 @@
-use eframe::egui::{vec2, Context, Grid, Image, ImageButton, RichText, Ui};
+use eframe::egui::{Context, Grid, RichText, Ui};
 use thousands::Separable;
 use transfer_window_model::{components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
 
-use crate::game::{util::{format_time, EncounterType}, Scene};
+use crate::game::{overlay::widgets::custom_image::CustomImage, util::{format_time, EncounterType}, Scene};
 
 fn format_distance(distance: f64) -> String {
     if distance < 1000.0 {
@@ -132,7 +132,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, e
     Grid::new(format!("Visual timeline - {}", model.name_component(entity).name())).show(ui, |ui| {
         for event in events {
             ui.horizontal(|ui| {
-                ui.add(ImageButton::new(view.resources.texture_image(event.icon())));
+                ui.add(CustomImage::new(view.renderers.get_screen_texture_renderer(event.icon()), context.screen_rect(), 24.0));
                 ui.label(RichText::new(format!("T- {}", format_time((event.time().floor() - model.time()).floor()))).weak().size(16.0));
             });
             ui.label(RichText::new(event.name(model)));

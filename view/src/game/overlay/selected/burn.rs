@@ -1,9 +1,9 @@
-use eframe::{egui::{Align2, Color32, Context, Grid, ImageButton, RichText, Ui, Window}, epaint};
+use eframe::{egui::{Align2, Color32, Context, Grid, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::path_component::segment::Segment, Model};
 
-use crate::{events::Event, game::{overlay::widgets::{draw_filled_bar, FilledBar}, selected::Selected, util::format_time, Scene}, styles};
+use crate::{events::Event, game::{overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton}, selected::Selected, util::format_time, Scene}, styles};
 
-pub fn draw_burn_info(view: &Scene, ui: &mut Ui, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
+pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
     let burnt_dv = start_dv - end_dv;
 
     let start_dv_proportion = (start_dv / max_dv) as f32;
@@ -18,28 +18,32 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, max_dv: f64, start_dv: f64, end
 
     Grid::new("DV grid").show(ui, |ui| {
         ui.horizontal(|ui| {
-            ui.image(view.resources.texture_image("duration"));
+            let image = CustomImage::new(view.renderers.get_screen_texture_renderer("duration"), context.screen_rect(), 20.0);
+            ui.add(image);
             ui.label(RichText::new("Duration").strong().monospace());
         });
         ui.label(format_time(duration));
         ui.end_row();
 
         ui.horizontal(|ui| {
-            ui.image(view.resources.texture_image("burn-start"));
+            let image = CustomImage::new(view.renderers.get_screen_texture_renderer("burn-start"), context.screen_rect(), 20.0);
+            ui.add(image);
             ui.label(RichText::new("ΔV start").strong().monospace());
         });
         ui.label(format!("{start_dv:.1}"));
         ui.end_row();
 
         ui.horizontal(|ui| {
-            ui.image(view.resources.texture_image("burn-burnt"));
+            let image = CustomImage::new(view.renderers.get_screen_texture_renderer("burn-burnt"), context.screen_rect(), 20.0);
+            ui.add(image);
             ui.label(RichText::new("ΔV burnt").strong().monospace());
         });
         ui.label(format!("{burnt_dv:.1}"));
         ui.end_row();
 
         ui.horizontal(|ui| {
-            ui.image(view.resources.texture_image("burn-end"));
+            let image = CustomImage::new(view.renderers.get_screen_texture_renderer("burn-end"), context.screen_rect(), 20.0);
+            ui.add(image);
             ui.label(RichText::new("ΔV end").strong().monospace());
         });
         ui.label(format!("{end_dv:.1}"));
@@ -71,15 +75,19 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 styles::SelectedMenuButton::apply(ui);
                 ui.set_height(36.0);
 
-                let button = ImageButton::new(view.resources.texture_image("warp-here"));
-                let can_warp = model.can_warp_to(time);
-                if ui.add_enabled(can_warp, button).on_hover_text("Warp here").clicked() {
+                let enabled = model.can_warp_to(time);
+                let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("warp-here"), context.screen_rect(), 36.0)
+                    .with_enabled(enabled)
+                    .with_padding(8.0);
+                if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
                     events.push(Event::StartWarp { end_time: time });
                 }
 
-                let can_delete = model.timeline_event_at_time(entity, time).can_delete(model);
-                let button = ImageButton::new(view.resources.texture_image("cancel"));
-                if ui.add_enabled(can_delete, button).on_hover_text("Cancel").clicked() {
+                let enabled = model.timeline_event_at_time(entity, time).can_delete(model);
+                let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("cancel"), context.screen_rect(), 36.0)
+                    .with_enabled(enabled)
+                    .with_padding(8.0);
+                if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
                     events.push(Event::CancelLastTimelineEvent { entity });
                     view.selected = Selected::None;
                 }
@@ -89,6 +97,6 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             let start_dv = burn.rocket_equation_function().remaining_dv();
             let end_dv = burn.final_rocket_equation_function().remaining_dv();
             let duration = burn.duration();
-            draw_burn_info(view, ui, max_dv, start_dv, end_dv, duration);
+            draw_burn_info(view, ui, context, max_dv, start_dv, end_dv, duration);
         });
 }

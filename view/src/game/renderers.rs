@@ -1,10 +1,10 @@
 use std::{collections::HashMap, sync::{Arc, Mutex}};
 
-use eframe::{egui::{CentralPanel, Context, PaintCallback, Rect}, egui_glow::CallbackFn, glow};
+use eframe::{egui::{CentralPanel, Context, PaintCallback, Rect}, egui_glow::CallbackFn, glow::{self}};
 use log::error;
 use transfer_window_model::Model;
 
-use crate::{rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, texture_renderer::TextureRenderer}, resources::Resources};
+use crate::{rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, screen_texture_renderer::ScreenTextureRenderer, texture_renderer::TextureRenderer}, resources::Resources};
 
 use super::Scene;
 
@@ -20,6 +20,7 @@ pub struct Renderers {
     object_renderer: Arc<Mutex<GeometryRenderer>>,
     segment_renderer: Arc<Mutex<GeometryRenderer>>,
     texture_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
+    screen_texture_renderers: HashMap<String, Arc<Mutex<ScreenTextureRenderer>>>,
     explosion_renderers: Arc<Mutex<Vec<ExplosionRenderer>>>,
 }
 
@@ -30,9 +31,10 @@ impl Renderers {
         let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl.clone())));
         let texture_renderers = resources.build_renderers(&gl);
+        let screen_texture_renderers = resources.build_screen_renderers(&gl);
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
-        Self { gl, screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers, explosion_renderers }
+        Self { gl, screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers, screen_texture_renderers, explosion_renderers }
     }
 
     pub fn add_object_vertices(&mut self, vertices: &mut Vec<f32>) {
@@ -49,6 +51,10 @@ impl Renderers {
             return;
         };
         renderer.lock().unwrap().add_vertices(vertices);
+    }
+
+    pub fn get_screen_texture_renderer(&self, name: &str) -> Arc<Mutex<ScreenTextureRenderer>> {
+        self.screen_texture_renderers.get(name).unwrap().clone()
     }
 }
 

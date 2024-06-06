@@ -1,4 +1,4 @@
-use eframe::{egui::{style::{Spacing, WidgetVisuals}, Color32, Context, Margin, Rounding, Stroke, Style, Ui, Visuals}, epaint::Shadow};
+use eframe::{egui::{style::{Spacing, WidgetVisuals}, Color32, Context, Margin, Rounding, Stroke, Style, Ui, Vec2, Visuals}, epaint::Shadow};
 
 pub struct DefaultWindow {}
 
@@ -95,6 +95,8 @@ impl SlotEditor {
         let rounding = Rounding::ZERO;
         let fg_stroke = Stroke::NONE;
         let expansion = 0.0;
+
+        ui.spacing_mut().button_padding = Vec2::splat(0.12 * size);
 
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: default_color,

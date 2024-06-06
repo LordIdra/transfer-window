@@ -47,7 +47,7 @@ impl Icon for Burn {
     }
 
     fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
-        18.0
+        16.0
     }
 
     fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {

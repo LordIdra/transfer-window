@@ -183,4 +183,30 @@ impl Slots {
         }
         weapons
     }
+
+    pub fn max_torpedoes(&self) -> usize {
+        let mut max_torpedoes = 0;
+        for weapon in self.weapon_slots() {
+            if let Some(weapon) = weapon.1 {
+                #[allow(irrefutable_let_patterns)]
+                if let WeaponType::Torpedo(torpedo) = weapon.type_() {
+                    max_torpedoes += torpedo.max_stockpile();
+                }
+            }
+        }
+        max_torpedoes
+    }
+
+    pub fn torpedoes(&self) -> usize {
+        let mut torpedoes = 0;
+        for weapon in self.weapon_slots() {
+            if let Some(weapon) = weapon.1 {
+                #[allow(irrefutable_let_patterns)]
+                if let WeaponType::Torpedo(torpedo) = weapon.type_() {
+                    torpedoes += torpedo.stockpile();
+                }
+            }
+        }
+        torpedoes
+    }
 }
