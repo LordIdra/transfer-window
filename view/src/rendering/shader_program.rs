@@ -4,96 +4,90 @@ use eframe::glow;
 use glow::{Context, Program, HasContext, VERTEX_SHADER, FRAGMENT_SHADER, NativeUniformLocation};
 
 struct Shader {
-    gl: Arc<Context>,
     shader: glow::Shader,
 }
 
 impl Shader {
-    fn new(gl: Arc<Context>, shader_source: &str, shader_type: u32) -> Self {
+    fn new(gl: &Arc<Context>, shader_source: &str, shader_type: u32) -> Self {
         unsafe {
             let shader = gl.create_shader(shader_type).expect("Failed to create shader");
             // gl.render
             gl.shader_source(shader, shader_source);
             gl.compile_shader(shader);
             assert!(gl.get_shader_compile_status(shader), "Failed to compile shader:\n{}", gl.get_shader_info_log(shader));
-            Shader { gl, shader }
+            Shader { shader }
         }
     }
 
-    fn attach(&self, program: Program) {
+    fn attach(&self, gl: &Arc<Context>, program: Program) {
         unsafe {
-            self.gl.attach_shader(program, self.shader);
+            gl.attach_shader(program, self.shader);
         }
     }
-}
 
-impl Drop for Shader {
-    fn drop(&mut self) {
+    fn destroy(&mut self, gl: &Arc<Context>,) {
         unsafe { 
-            self.gl.delete_shader(self.shader);
+            gl.delete_shader(self.shader);
         };
     }
 }
 
 pub struct ShaderProgram {
-    gl: Arc<Context>, 
     program: Program,
 }
 
 impl ShaderProgram {
-    pub fn new(gl: Arc<Context>, vertex_shader_source: &str, fragment_shader_source: &str) -> Self {
-        let vertex_shader = Shader::new(gl.clone(), vertex_shader_source, VERTEX_SHADER);
-        let fragment_shader = Shader::new(gl.clone(), fragment_shader_source, FRAGMENT_SHADER);
+    pub fn new(gl: &Arc<Context>, vertex_shader_source: &str, fragment_shader_source: &str) -> Self {
+        let vertex_shader = Shader::new(gl, vertex_shader_source, VERTEX_SHADER);
+        let fragment_shader = Shader::new(gl, fragment_shader_source, FRAGMENT_SHADER);
         let program = unsafe { gl.create_program().expect("Failed to create shader program") };
-        vertex_shader.attach(program);
-        fragment_shader.attach(program);
+        vertex_shader.attach(gl, program);
+        fragment_shader.attach(gl, program);
 
         unsafe {
             gl.link_program(program);
             assert!(gl.get_program_link_status(program), "{}", gl.get_program_info_log(program));
         }
 
-        ShaderProgram { gl, program }
+        ShaderProgram { program }
     }
 
-    pub fn use_program(&self) {
-        unsafe { self.gl.use_program(Some(self.program)) };
+    pub fn use_program(&self, gl: &Arc<Context>) {
+        unsafe { gl.use_program(Some(self.program)) };
     }
 
-    fn location(&self, name: &str) -> NativeUniformLocation {
-        unsafe { self.gl.get_uniform_location(self.program, name).unwrap_or_else(|| panic!("Failed to find uniform location '{name}'")) }
+    fn location(&self, gl: &Arc<Context>, name: &str) -> NativeUniformLocation {
+        unsafe { gl.get_uniform_location(self.program, name).unwrap_or_else(|| panic!("Failed to find uniform location '{name}'")) }
     }
 
-    pub fn uniform_bool(&self, name: &str, v: bool) {
-        self.use_program();
-        unsafe { self.gl.uniform_1_i32(Some(&Self::location(self, name)), v as i32); } 
+    pub fn uniform_bool(&self, gl: &Arc<Context>, name: &str, v: bool) {
+        self.use_program(gl);
+        unsafe { gl.uniform_1_i32(Some(&Self::location(self, gl, name)), v as i32); } 
     }
 
-    pub fn uniform_int(&self, name: &str, v: i32) {
-        self.use_program();
-        unsafe { self.gl.uniform_1_i32(Some(&Self::location(self, name)), v); } 
+    pub fn uniform_int(&self, gl: &Arc<Context>,name: &str, v: i32) {
+        self.use_program(gl);
+        unsafe { gl.uniform_1_i32(Some(&Self::location(self, gl, name)), v); } 
     }
 
-    pub fn uniform_float(&self, name: &str, v: f32) {
-        self.use_program();
-        unsafe { self.gl.uniform_1_f32(Some(&Self::location(self, name)), v); } 
+    pub fn uniform_float(&self, gl: &Arc<Context>,name: &str, v: f32) {
+        self.use_program(gl);
+        unsafe { gl.uniform_1_f32(Some(&Self::location(self, gl, name)), v); } 
     }
 
-    pub fn uniform_vec2(&self, name: &str, x: f32, y: f32) {
-        self.use_program();
-        unsafe { self.gl.uniform_2_f32(Some(&Self::location(self, name)), x, y); } 
+    pub fn uniform_vec2(&self, gl: &Arc<Context>,name: &str, x: f32, y: f32) {
+        self.use_program(gl);
+        unsafe { gl.uniform_2_f32(Some(&Self::location(self, gl, name)), x, y); } 
     }
 
-    pub fn uniform_mat3(&self, name: &str, v: &[f32]) {
-        self.use_program();
-        unsafe { self.gl.uniform_matrix_3_f32_slice(Some(&Self::location(self, name)), false, v); }
+    pub fn uniform_mat3(&self, gl: &Arc<Context>,name: &str, v: &[f32]) {
+        self.use_program(gl);
+        unsafe { gl.uniform_matrix_3_f32_slice(Some(&Self::location(self, gl, name)), false, v); }
     }
-}
 
-impl Drop for ShaderProgram {
-    fn drop(&mut self) {
+    fn destroy(&mut self, gl: Arc<Context>) {
         unsafe { 
-            self.gl.delete_program(self.program);
+            gl.delete_program(self.program);
         };
     }
 }

@@ -44,7 +44,7 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::TimelineEvent(event) => match event {
                 TimelineEvent::Intercept(_) => "intercept",
                 TimelineEvent::FireTorpedo(_) => "torpedo",
-                TimelineEvent::Burn(_) => "burn",
+                TimelineEvent::Burn(_) => "timeline-burn",
                 TimelineEvent::EnableGuidance(_) => "enable-guidance",
             },
             VisualTimelineEvent::Periapsis { .. } => "periapsis",

@@ -61,8 +61,8 @@ impl Widget for CustomCircularImageButton {
         let to = Camera::window_space_to_screen_space(self.screen_rect, to_screen.transform_pos(Pos2::new(self.size - self.padding, self.size - self.padding)));
         let renderer = self.renderer.clone();
 
-        let callback = Arc::new(CallbackFn::new(move |_info, _painter| {
-            renderer.lock().unwrap().render(from, to, alpha);
+        let callback = Arc::new(CallbackFn::new(move |_info, painter| {
+            renderer.lock().unwrap().render(painter.gl(), from, to, alpha);
         }));
 
         painter.add(PaintCallback { rect: self.screen_rect, callback});

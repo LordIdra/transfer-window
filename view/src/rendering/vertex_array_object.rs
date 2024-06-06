@@ -15,7 +15,6 @@ impl VertexAttribute {
 }
 
 pub struct VertexArrayObject {
-    gl: Arc<Context>,
     vertices: i32,
     vertices_per_triangle: i32,
     vertex_array: VertexArray,
@@ -23,7 +22,7 @@ pub struct VertexArrayObject {
 }
 
 impl VertexArrayObject {
-    pub fn new(gl: Arc<Context>, vertex_attributes: Vec<VertexAttribute>) -> Self {
+    pub fn new(gl: &Arc<Context>, vertex_attributes: Vec<VertexAttribute>) -> Self {
         let vertex_array: VertexArray;
         let vertex_buffer: Buffer;
         let vertices_per_triangle = vertex_attributes.iter().map(|attribute| attribute.count).sum();
@@ -45,39 +44,37 @@ impl VertexArrayObject {
             offset += attribute.size();
         }
 
-        VertexArrayObject { gl, vertices: 0, vertices_per_triangle, vertex_array, vertex_buffer }
+        VertexArrayObject { vertices: 0, vertices_per_triangle, vertex_array, vertex_buffer }
     }
 
-    fn bind(&self) {
+    fn bind(&self, gl: &Arc<Context>) {
         unsafe {
-            self.gl.bind_vertex_array(Some(self.vertex_array));
-            self.gl.bind_buffer(ARRAY_BUFFER, Some(self.vertex_buffer));
+            gl.bind_vertex_array(Some(self.vertex_array));
+            gl.bind_buffer(ARRAY_BUFFER, Some(self.vertex_buffer));
         }
     }
 
-    pub fn data(&mut self, data: &[f32]) {
+    pub fn data(&mut self, gl: &Arc<Context>, data: &[f32]) {
         let byte_count = std::mem::size_of_val(data);
         self.vertices = data.len() as i32;
         unsafe {
             let bytes = std::slice::from_raw_parts(data.as_ptr().cast(), byte_count);
-            self.bind();
-            self.gl.buffer_data_u8_slice(ARRAY_BUFFER, bytes, DYNAMIC_DRAW);
+            self.bind(gl);
+            gl.buffer_data_u8_slice(ARRAY_BUFFER, bytes, DYNAMIC_DRAW);
         }
     }
 
-    pub fn draw(&self) {
+    pub fn draw(&self, gl: &Arc<Context>) {
         unsafe {
-            self.bind();
-            self.gl.draw_arrays(TRIANGLES, 0, self.vertices / self.vertices_per_triangle);
+            self.bind(gl);
+            gl.draw_arrays(TRIANGLES, 0, self.vertices / self.vertices_per_triangle);
         }
     }
-}
 
-impl Drop for VertexArrayObject {
-    fn drop(&mut self) {
+    fn destroy(&mut self, gl: Arc<Context>) {
         unsafe {
-            self.gl.delete_vertex_array(self.vertex_array);
-            self.gl.delete_buffer(self.vertex_buffer);
+            gl.delete_vertex_array(self.vertex_array);
+            gl.delete_buffer(self.vertex_buffer);
         }
     }
 }

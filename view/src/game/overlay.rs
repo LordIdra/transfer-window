@@ -19,7 +19,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context, is_mouse_over_an
     let _span = tracy_client::span!("Draw overlay");
 
     styles::DefaultWindow::apply(context);
-    
+
     fps::update(view, context);
     scale::update(view, context);
     time::update(view, model, context);

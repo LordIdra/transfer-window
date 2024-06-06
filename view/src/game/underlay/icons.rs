@@ -166,18 +166,19 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
     let _span = tracy_client::span!("Draw icons");
     let mut any_icon_hovered = false;
     view.icon_captured_scroll = false;
+    let screen_rect = context.screen_rect();
     context.input(|input| {
-        let mut icons = compute_initial_icons(view, model, &input.pointer, context.screen_rect());
+        let mut icons = compute_initial_icons(view, model, &input.pointer, screen_rect);
         icons.sort_by(|a, b| a.cmp(view, model, &**b));
         icons.reverse(); // sorted from HIGHEST to LOWEST priority
         
         let (not_overlapped, overlapped) = split_overlapping_icons(view, model, icons);
         if let Some(mouse_position_window) = input.pointer.latest_pos() {
             if !view.pointer_over_ui_last_frame {
-                if let Some(icon) = compute_mouse_over_icon(view, model, mouse_position_window, context.screen_rect(), &not_overlapped) {
+                if let Some(icon) = compute_mouse_over_icon(view, model, mouse_position_window, screen_rect, &not_overlapped) {
                     any_icon_hovered = true;
                     icon.on_mouse_over(view, model, &input.pointer);
-                    let scroll_delta = input.scroll_delta;
+                    let scroll_delta = input.smooth_scroll_delta;
                     if (scroll_delta.y != 0.0 || scroll_delta.x != 0.0) && icon.on_scroll(view, model, scroll_delta) {
                         view.icon_captured_scroll = true;
                     }
@@ -186,11 +187,11 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) -> bool {
         }
 
         for icon in overlapped {
-            draw_icon(view, model, input.pointer.latest_pos(), context.screen_rect(), &*icon, true);
+            draw_icon(view, model, input.pointer.latest_pos(), screen_rect, &*icon, true);
         }
 
         for icon in not_overlapped {
-            draw_icon(view, model, input.pointer.latest_pos(), context.screen_rect(), &*icon, false);
+            draw_icon(view, model, input.pointer.latest_pos(), screen_rect, &*icon, false);
         }
     });
 
