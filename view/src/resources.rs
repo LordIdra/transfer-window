@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fs::{self, DirEntry}, sync::{Arc, Mutex}};
 
-use eframe::{egui::{self, ImageSource}, glow};
+use eframe::{egui::{self, ImageSource, Rect}, glow};
 use image::GenericImageView;
 
 use crate::rendering::{screen_texture_renderer::ScreenTextureRenderer, texture};
@@ -72,11 +72,11 @@ impl Resources {
         texture_renderers
     }
 
-    pub fn build_screen_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<ScreenTextureRenderer>>> {
+    pub fn build_screen_renderers(&self, gl: &Arc<glow::Context>, screen_rect: Rect) -> HashMap<String, Arc<Mutex<ScreenTextureRenderer>>> {
         let mut texture_renderers = HashMap::new();
         for (texture_name, texture) in &self.textures {
             let gl_texture = texture::Texture::new(gl.clone(), texture.size, &texture.bytes);
-            let texture_renderer = ScreenTextureRenderer::new(gl, gl_texture);
+            let texture_renderer = ScreenTextureRenderer::new(gl, gl_texture, screen_rect);
             texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
         }
         texture_renderers

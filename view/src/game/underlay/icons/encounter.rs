@@ -1,8 +1,8 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{api::encounters::EncounterType, components::ComponentType, storage::entity_allocator::Entity, Model};
 
-use crate::game::{util::{should_render_at_time, EncounterType}, Scene};
+use crate::game::{util::should_render_at_time, Scene};
 
 use super::Icon;
 
@@ -22,27 +22,11 @@ impl Encounter {
     pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in model.entities(vec![ComponentType::PathComponent]) {
-            let mut previous_parent = None;
-            for orbit in model.path_component(entity).future_orbits() {
-                if let Some(previous_parent) = previous_parent {
-                    if orbit.parent() != previous_parent {
-                        let encounter_type = if let Some(previous_parent_orbit) = model.orbitable_component(previous_parent).orbit() {
-                            if previous_parent_orbit.parent() == orbit.parent() {
-                                EncounterType::Exit
-                            } else {
-                                EncounterType::Entrance
-                            }
-                        } else {
-                            EncounterType::Entrance
-                        };
-                        let time = orbit.start_point().time();
-                        if should_render_at_time(view, model, entity, time) {
-                            let icon = Self::new(model, entity, time, encounter_type);
-                            icons.push(Box::new(icon) as Box<dyn Icon>);
-                        }
-                    }
+            for encounter in model.future_encounters(entity) {
+                if should_render_at_time(view, model, entity, encounter.time()) {
+                    let icon = Self::new(model, entity, encounter.time(), encounter.encounter_type());
+                    icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
-                previous_parent = Some(orbit.parent());
             }
         }
 

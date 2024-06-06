@@ -38,6 +38,9 @@ impl CustomCircularImageButton {
 
 impl Widget for CustomCircularImageButton {
     fn ui(self, ui: &mut Ui) -> Response {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Draw custom image button");
+
         let (response, painter) = ui.allocate_painter(Vec2::splat(self.size), self.sense);
         let to_screen = RectTransform::from_to(
             Rect::from_min_size(Pos2::ZERO, response.rect.size()),
@@ -62,7 +65,7 @@ impl Widget for CustomCircularImageButton {
         let renderer = self.renderer.clone();
 
         let callback = Arc::new(CallbackFn::new(move |_info, painter| {
-            renderer.lock().unwrap().render(painter.gl(), from, to, alpha);
+            renderer.lock().unwrap().render(painter.gl(), self.screen_rect, from, to, alpha);
         }));
 
         painter.add(PaintCallback { rect: self.screen_rect, callback});

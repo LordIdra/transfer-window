@@ -132,8 +132,3 @@ pub fn should_render_at_time(view: &Scene, model: &Model, entity: Entity, time: 
     should_render_parent(view, model, parent)
 }
 
-#[derive(Debug)]
-pub enum EncounterType {
-    Entrance,
-    Exit,
-}

@@ -28,6 +28,9 @@ impl CustomImage {
 
 impl Widget for CustomImage {
     fn ui(self, ui: &mut Ui) -> Response {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Draw custom image");
+
         let (response, painter) = ui.allocate_painter(Vec2::splat(self.size), self.sense);
         let to_screen = RectTransform::from_to(
             Rect::from_min_size(Pos2::ZERO, response.rect.size()),
@@ -39,7 +42,7 @@ impl Widget for CustomImage {
         let renderer = self.renderer.clone();
 
         let callback = Arc::new(CallbackFn::new(move |_info, painter| {
-            renderer.lock().unwrap().render(painter.gl(), from, to, 1.0);
+            renderer.lock().unwrap().render(painter.gl(), self.screen_rect, from, to, 1.0);
         }));
 
         painter.add(PaintCallback { rect: self.screen_rect, callback});

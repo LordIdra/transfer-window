@@ -30,7 +30,7 @@ impl Renderers {
         let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
         let texture_renderers = resources.build_renderers(&gl);
-        let screen_texture_renderers = resources.build_screen_renderers(&gl);
+        let screen_texture_renderers = resources.build_screen_renderers(&gl, screen_rect);
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
         Self { screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers, screen_texture_renderers, explosion_renderers }
@@ -65,6 +65,9 @@ impl Renderers {
         }
         for renderer in self.explosion_renderers.lock().unwrap().iter_mut() {
             renderer.destroy(gl);
+        }
+        for renderer in self.screen_texture_renderers.values() {
+            renderer.lock().unwrap().destroy(gl);
         }
     }
 }
@@ -104,6 +107,9 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     if screen_rect != view.renderers.screen_rect {
         view.renderers.screen_rect = screen_rect;
         render_pipeline.lock().unwrap().resize(&view.gl, screen_rect);
+        for renderer in view.renderers.screen_texture_renderers.values() {
+            renderer.lock().unwrap().resize(&view.gl, screen_rect);
+        }
     }
 
     let callback = Arc::new(CallbackFn::new(move |_info, painter| {

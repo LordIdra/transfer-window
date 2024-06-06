@@ -8,5 +8,7 @@ uniform sampler2D texture_sampler;
 uniform float alpha;
 
 void main() {
-    FragColor = texture(texture_sampler, v_texture_coords) * alpha;
+    // do not question why setting a=0.0 works
+    // I have no idea
+    FragColor = vec4(texture(texture_sampler, v_texture_coords).rgb * alpha, 0.0);
 }

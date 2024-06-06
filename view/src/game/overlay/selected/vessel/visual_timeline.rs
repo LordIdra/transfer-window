@@ -1,8 +1,8 @@
 use eframe::egui::{Context, RichText, Ui};
 use thousands::Separable;
-use transfer_window_model::{components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{api::encounters::EncounterType, components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
 
-use crate::game::{overlay::widgets::custom_image::CustomImage, util::{format_time, EncounterType}, Scene};
+use crate::game::{overlay::widgets::custom_image::CustomImage, util::format_time, Scene};
 
 fn format_distance(distance: f64) -> String {
     if distance < 1000.0 {
@@ -22,8 +22,8 @@ enum VisualTimelineEvent {
     Apoapsis { time: f64, distance: f64 },
     FirstApproach { time: f64, distance: f64 },
     SecondApproach { time: f64, distance: f64 },
-    EntranceEncounter { time: f64, type_: EncounterType, other_entity: Entity },
-    ExitEncounter { time: f64, type_: EncounterType, other_entity: Entity },
+    EntranceEncounter { time: f64, other_entity: Entity },
+    ExitEncounter { time: f64, other_entity: Entity },
 }
 
 impl VisualTimelineEvent {
@@ -44,7 +44,7 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::TimelineEvent(event) => match event {
                 TimelineEvent::Intercept(_) => "intercept",
                 TimelineEvent::FireTorpedo(_) => "torpedo",
-                TimelineEvent::Burn(_) => "timeline-burn",
+                TimelineEvent::Burn(_) => "burn",
                 TimelineEvent::EnableGuidance(_) => "enable-guidance",
             },
             VisualTimelineEvent::Periapsis { .. } => "periapsis",
@@ -129,12 +129,23 @@ fn generate_closest_approaches(model: &Model, entity: Entity, events: &mut Vec<V
     }
 }
 
+fn generate_encounters(model: &Model, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
+    for encounter in model.future_encounters(entity) {
+        let time = encounter.time();
+        match encounter.encounter_type() {
+            EncounterType::Entrance => events.push(VisualTimelineEvent::EntranceEncounter { time, other_entity: encounter.to() }),
+            EncounterType::Exit => events.push(VisualTimelineEvent::ExitEncounter { time, other_entity: encounter.from() }),
+        }
+    }
+}
+
 pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, entity: Entity) {
     let mut events = vec![];
 
     generate_timeline_events(model, entity, &mut events);
     generate_apoapsis_periapsis(model, entity, &mut events);
     generate_closest_approaches(model, entity, &mut events);
+    generate_encounters(model, entity, &mut events);
 
     events.sort_by(|a, b| a.time().total_cmp(&b.time()));
 
@@ -146,7 +157,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, e
 
     for event in events {
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view.renderers.get_screen_texture_renderer(event.icon()), context.screen_rect(), 24.0)
+            let image = CustomImage::new(view.renderers.get_screen_texture_renderer(event.icon()), context.screen_rect(), 20.0)
                 .with_padding(event.padding());
             ui.add(image);
             ui.label(RichText::new(format!("T- {}", format_time((event.time().floor() - model.time()).floor()))).weak().size(12.0));
