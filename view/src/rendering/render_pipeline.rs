@@ -58,7 +58,7 @@ impl RenderPipeline {
                 1.0, 1.0, 1.0, 1.0,
                 -1.0, 1.0, 0.0, 1.0,
             ];
-            screen_vao.data(&gl, &screen_vertices);
+            screen_vao.data(gl, &screen_vertices);
 
             Self { 
                 multisample_framebuffer, multisample_texture, 

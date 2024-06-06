@@ -1,3 +1,4 @@
+#![allow(clippy::match_same_arms)]
 use eframe::egui::{Context, RichText, Ui};
 use thousands::Separable;
 use transfer_window_model::{api::encounters::EncounterType, components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
@@ -5,11 +6,11 @@ use transfer_window_model::{api::encounters::EncounterType, components::vessel_c
 use crate::game::{overlay::widgets::custom_image::CustomImage, util::format_time, Scene};
 
 fn format_distance(distance: f64) -> String {
-    if distance < 1000.0 {
+    if distance < 1_000.0 {
         format!("{} m", distance.round())
-    } else if distance < 10000.0 {
+    } else if distance < 10_000.0 {
         format!("{:.2} km", (distance / 1000.0))
-    } else if distance < 100000.0 {
+    } else if distance < 100_000.0 {
         format!("{:.1} km", (distance / 1000.0))
     } else {
         format!("{} km", (distance / 1000.0).round().separate_with_commas())
@@ -106,7 +107,7 @@ fn generate_apoapsis_periapsis(model: &Model, entity: Entity, events: &mut Vec<V
 
         if let Some(time) = orbit.next_apoapsis_time() {
             let distance = model.position_at_time(entity, time).magnitude();
-            events.push(VisualTimelineEvent::Apoapsis { time: time, distance });
+            events.push(VisualTimelineEvent::Apoapsis { time, distance });
         }
     }
 }

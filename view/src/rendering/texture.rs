@@ -8,7 +8,7 @@ pub struct Texture {
 }
 
 impl Texture {
-    pub fn new(gl: Arc<Context>, size: (i32, i32), bytes: &[u8]) -> Self {
+    pub fn new(gl: &Arc<Context>, size: (i32, i32), bytes: &[u8]) -> Self {
         unsafe {
             let texture = gl.create_texture().expect("Failed to create texture");
             gl.bind_texture(TEXTURE_2D, Some(texture));

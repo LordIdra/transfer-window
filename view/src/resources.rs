@@ -65,7 +65,7 @@ impl Resources {
     pub fn build_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
         let mut texture_renderers = HashMap::new();
         for (texture_name, texture) in &self.textures {
-            let gl_texture = texture::Texture::new(gl.clone(), texture.size, &texture.bytes);
+            let gl_texture = texture::Texture::new(gl, texture.size, &texture.bytes);
             let texture_renderer = TextureRenderer::new(gl, gl_texture);
             texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
         }
@@ -75,7 +75,7 @@ impl Resources {
     pub fn build_screen_renderers(&self, gl: &Arc<glow::Context>, screen_rect: Rect) -> HashMap<String, Arc<Mutex<ScreenTextureRenderer>>> {
         let mut texture_renderers = HashMap::new();
         for (texture_name, texture) in &self.textures {
-            let gl_texture = texture::Texture::new(gl.clone(), texture.size, &texture.bytes);
+            let gl_texture = texture::Texture::new(gl, texture.size, &texture.bytes);
             let texture_renderer = ScreenTextureRenderer::new(gl, gl_texture, screen_rect);
             texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
         }

@@ -45,6 +45,7 @@ fn draw_weapon(view: &mut Scene, model: &Model, ui: &mut Ui, context: &Context, 
         });
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn draw_weapons(view: &mut Scene, model: &Model, ui: &mut Ui, context: &Context, entity: Entity, weapon_slots: &[(SlotLocation, Option<&Weapon>)], time: f64, events: &mut Vec<Event>) {
     ui.with_layout(Layout::left_to_right(Align::TOP), |ui| {
         for pair in weapon_slots {

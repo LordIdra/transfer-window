@@ -14,7 +14,6 @@ pub struct CustomImage {
 
 impl CustomImage {
     pub fn new(renderer: Arc<Mutex<ScreenTextureRenderer>>, screen_rect: Rect, size: f32) -> Self {
-        let size = size;
         let sense = Sense::union(Sense::click(), Sense::hover());
         let padding = 0.0;
         Self { renderer, screen_rect, size, sense, padding }

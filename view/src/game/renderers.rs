@@ -29,8 +29,8 @@ impl Renderers {
         let render_pipeline = Arc::new(Mutex::new(RenderPipeline::new(gl, screen_rect)));
         let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
-        let texture_renderers = resources.build_renderers(&gl);
-        let screen_texture_renderers = resources.build_screen_renderers(&gl, screen_rect);
+        let texture_renderers = resources.build_renderers(gl);
+        let screen_texture_renderers = resources.build_screen_renderers(gl, screen_rect);
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
         Self { screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers, screen_texture_renderers, explosion_renderers }

@@ -43,14 +43,14 @@ impl Model {
             if let Some(previous_parent) = previous_parent {
                 let new_parent = orbit.parent();
                 if new_parent != previous_parent {
-                    let encounter_type = match self.orbitable_component(previous_parent).orbit() {
-                        Some(previous_parent_orbit) => {
-                            match previous_parent_orbit.parent() == new_parent {
-                                true => EncounterType::Exit,
-                                false => EncounterType::Entrance,
-                            }
+                    let encounter_type = if let Some(previous_parent_orbit) = self.orbitable_component(previous_parent).orbit() {
+                        if previous_parent_orbit.parent() == new_parent {
+                            EncounterType::Exit
+                        } else {
+                            EncounterType::Entrance
                         }
-                        None => EncounterType::Entrance,
+                    } else {
+                        EncounterType::Entrance
                     };
                     let time = orbit.start_point().time();
                     encounters.push(Encounter::new(time, encounter_type, previous_parent, new_parent));

@@ -39,7 +39,7 @@ impl ExplosionRenderer {
             1.0, 1.0,
             -1.0, 1.0,
         ];
-        vertex_array_object.data(&gl, &vertices);
+        vertex_array_object.data(gl, &vertices);
         let center = None;
         Self { program, vertex_array_object, explosion_time, duration, parent, offset, size, speed, center }
     }

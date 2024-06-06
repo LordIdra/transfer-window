@@ -132,6 +132,7 @@
 [ ] Visual timeline for selected events + point
 [ ] Current burn/guidance finishes (exclude intercepts)
 [ ] Show orbit/burn/guidance parameters
+[ ] Show velocity/altitude of vessel
 
 # Campaign
 [ ] Factions (player, ally, enemy)

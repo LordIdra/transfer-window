@@ -130,7 +130,7 @@ impl Model {
             return (Some(time_1), None);
         }
 
-        return (None, None)
+        (None, None)
     }
 }
 
