@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Color32, Context, Grid, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::VesselComponent, storage::entity_allocator::Entity, Model};
 
-use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, custom_image_button::CustomCircularImageButton}}, selected::Selected, util::{format_distance, format_speed}, Scene}, styles};
+use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel}}}, selected::Selected, util::{format_distance, format_speed}, Scene}, styles};
 
 pub mod visual_timeline;
 
@@ -86,27 +86,19 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                     ui.set_height(36.0);
 
                     if add_edit_button {
-                        let enabled = model.can_edit(entity);
-                        let button = CustomCircularImageButton::new(view, "edit", context.screen_rect(), 36.0)
-                            .with_padding(8.0)
-                            .with_enabled(enabled);
-                        if ui.add_enabled(enabled, button).on_hover_text("Edit").clicked() {
+                        if draw_edit_vessel(view, model, context, ui, entity) {
                             view.vessel_editor = Some(VesselEditor::new(entity));
                         }
                     }
 
                     if add_cancel_burn_button {
-                        let button = CustomCircularImageButton::new(view, "cancel", context.screen_rect(), 36.0)
-                            .with_padding(8.0);
-                        if ui.add(button).on_hover_text("Cancel current burn").clicked() {
+                        if draw_cancel_burn(view, context, ui) {
                             events.push(Event::CancelCurrentSegment { entity });
                         }
                     }
 
                     if add_cancel_guidance_button {
-                        let button = CustomCircularImageButton::new(view, "cancel", context.screen_rect(), 36.0)
-                            .with_padding(8.0);
-                        if ui.add(button).on_hover_text("Cancel current guidance").clicked() {
+                        if draw_cancel_guidance(view, context, ui) {
                             if model.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
                                 // also cancel intercept
                                 events.push(Event::CancelLastTimelineEvent { entity });

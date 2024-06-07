@@ -57,9 +57,8 @@ impl Burn {
         let index = (time_since_start / BURN_TIME_STEP) as usize;
         if let Some(closest_previous_point) = self.points.get(index) {
             let base_time = closest_previous_point.time();
-            let undershot_time = base_time - base_time;
-            let mass = self.rocket_equation_function_at_time(base_time).mass();
-            closest_previous_point.next(undershot_time, mass, self.absolute_acceleration(base_time))
+            let undershot_time = time - base_time;
+            closest_previous_point.next(undershot_time, closest_previous_point.mass(), self.absolute_acceleration(base_time))
         } else {
             self.end_point().clone()
         }

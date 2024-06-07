@@ -138,11 +138,7 @@ impl Guidance {
         let index = (time_since_start / GUIDANCE_TIME_STEP) as usize;
         if let Some(closest_previous_point) = self.points.get(index) {
             let undershot_time = time - closest_previous_point.time();
-            let mass = self.rocket_equation_function()
-                .step_by_dv(closest_previous_point.dv())
-                .unwrap()
-                .mass();
-            closest_previous_point.next(undershot_time, mass)
+            closest_previous_point.next(undershot_time, closest_previous_point.mass())
         } else {
             self.end_point().clone()
         }

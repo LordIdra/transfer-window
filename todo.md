@@ -130,10 +130,10 @@
 
 # Polish
 [ ] Select event when clicked in timeline
-[ ] Visual timeline for selected events + point
+[ ] Visual timeline for selected events + points
 [ ] Current burn/guidance finishes (exclude intercepts)
 [ ] Show orbit/burn/guidance parameters
-[ ] Show velocity/altitude of vessel
+[ ] Show velocity/altitude of vessel + points + celestial objects
 
 # Campaign
 [ ] Factions (player, ally, enemy)
