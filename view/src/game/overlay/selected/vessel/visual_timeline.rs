@@ -1,21 +1,8 @@
 #![allow(clippy::match_same_arms)]
 use eframe::egui::{Context, RichText, Ui};
-use thousands::Separable;
 use transfer_window_model::{api::encounters::EncounterType, components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
 
-use crate::game::{overlay::widgets::custom_image::CustomImage, util::{format_time, ApproachType, ApsisType}, Scene};
-
-fn format_distance(distance: f64) -> String {
-    if distance < 1_000.0 {
-        format!("{} m", distance.round())
-    } else if distance < 10_000.0 {
-        format!("{:.2} km", (distance / 1000.0))
-    } else if distance < 100_000.0 {
-        format!("{:.1} km", (distance / 1000.0))
-    } else {
-        format!("{} km", (distance / 1000.0).round().separate_with_commas())
-    }
-}
+use crate::game::{overlay::widgets::custom_image::CustomImage, util::{format_distance, format_time, ApproachType, ApsisType}, Scene};
 
 enum VisualTimelineEvent {
     TimelineEvent(TimelineEvent),

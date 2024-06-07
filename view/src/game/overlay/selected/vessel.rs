@@ -1,9 +1,21 @@
 use eframe::{egui::{Align2, Color32, Context, Grid, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::VesselComponent, Model};
+use transfer_window_model::{components::vessel_component::VesselComponent, storage::entity_allocator::Entity, Model};
 
-use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, custom_image_button::CustomCircularImageButton}}, selected::Selected, Scene}, styles};
+use crate::{events::Event, game::{overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, custom_image_button::CustomCircularImageButton}}, selected::Selected, util::{format_distance, format_speed}, Scene}, styles};
 
 pub mod visual_timeline;
+
+fn draw_altitude(model: &Model, ui: &mut Ui, entity: Entity) {
+    ui.label(RichText::new("Altitude").monospace().strong());
+    ui.label(format_distance(model.position(entity).magnitude()));
+    ui.end_row();
+}
+
+fn draw_speed(model: &Model, ui: &mut Ui, entity: Entity) {
+    ui.label(RichText::new("Speed").monospace().strong());
+    ui.label(format_speed(model.velocity(entity).magnitude()));
+    ui.end_row();
+}
 
 fn should_draw_fuel(vessel_component: &VesselComponent) -> bool {
     !vessel_component.slots().fuel_tanks().is_empty()
@@ -105,19 +117,19 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 });
             }
 
-            if should_draw_fuel(vessel_component) || should_draw_dv(vessel_component) || should_draw_torpedoes(vessel_component) {
-                Grid::new("Vessel bars grid").show(ui, |ui| {
-                    if should_draw_fuel(vessel_component) {
-                        draw_fuel(ui, vessel_component);
-                    }
-                    if should_draw_dv(vessel_component) {
-                        draw_dv(ui, vessel_component);
-                    }
-                    if should_draw_torpedoes(vessel_component) {
-                        draw_torpedoes(ui, vessel_component);
-                    }
-                });
-            }
+            Grid::new("Vessel info grid").show(ui, |ui| {
+                draw_altitude(model, ui, entity);
+                draw_speed(model, ui, entity);
+                if should_draw_fuel(vessel_component) {
+                    draw_fuel(ui, vessel_component);
+                }
+                if should_draw_dv(vessel_component) {
+                    draw_dv(ui, vessel_component);
+                }
+                if should_draw_torpedoes(vessel_component) {
+                    draw_torpedoes(ui, vessel_component);
+                }
+            });
 
             visual_timeline::update(view, model, context, ui, entity);
         });

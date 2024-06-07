@@ -1,5 +1,6 @@
 use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
+use thousands::Separable;
 use transfer_window_model::{storage::entity_allocator::Entity, Model};
 
 use super::{selected::util::BurnAdjustDirection, Scene};
@@ -100,6 +101,34 @@ pub fn format_time(time: f64) -> String {
     } else {
         start_string
             + seconds.to_string().as_str() + "s"
+    }
+}
+
+pub fn format_distance(distance: f64) -> String {
+    if distance < 1_000.0 {
+        format!("{} m", distance.round())
+    } else if distance < 10_000.0 {
+        format!("{:.3} km", (distance / 1000.0))
+    } else if distance < 100_000.0 {
+        format!("{:.2} km", (distance / 1000.0))
+    } else if distance < 1_000_000.0 {
+        format!("{:.1} km", (distance / 1000.0).round().separate_with_commas())
+    } else {
+        format!("{} km", (distance / 1000.0).round().separate_with_commas())
+    }
+}
+
+pub fn format_speed(speed: f64) -> String {
+    if speed < 1_000.0 {
+        format!("{} m/s", speed.round())
+    } else if speed < 10_000.0 {
+        format!("{:.3} km/s", (speed / 1000.0))
+    } else if speed < 100_000.0 {
+        format!("{:.2} km/s", (speed / 1000.0))
+    } else if speed < 1_000_000.0 {
+        format!("{:.1} km", (speed / 1000.0).round().separate_with_commas())
+    } else {
+        format!("{} km", (speed / 1000.0).round().separate_with_commas())
     }
 }
 
