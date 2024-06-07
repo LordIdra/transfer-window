@@ -125,7 +125,7 @@
 [x] Celestial object UI
 [x] Fix being unable to drag arrows???
 [x] Finish encounter visual timeline events
-[ ] Allow selecting apoapsis, intercept, approach, encounter
+[x] Allow selecting apoapsis, intercept, approach, encounter
 
 # Polish
 [ ] Select event when clicked in timeline
