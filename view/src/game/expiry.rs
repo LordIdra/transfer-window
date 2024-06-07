@@ -15,33 +15,17 @@ pub fn update(view: &mut Scene, model: &Model) {
         }
     }
 
-    // Remove selected point if expired
-    if let Selected::Point { entity: _, time } = view.selected.clone() {
+    // Remove selected if expired
+    if let Some(time) = view.selected.time() {
         if time < model.time() {
-            trace!("Selected segment point expired at time={time}");
+            trace!("Selected expired at time={time}");
             view.selected = Selected::None;
         }
     }
 
-    // Remove selected burn if expired
-    if let Selected::Burn { entity: _, time, state: _ } = view.selected.clone() {
-        if time < model.time() {
-            trace!("Selected burn expired at time={time}");
-            view.selected = Selected::None;
-        }
-    }
-
-    // Remove selected fire torpedo event if expired
+    // Remove selected fire torpedo event if no longer exists
     if let Selected::FireTorpedo { entity, time, state: _ } = view.selected.clone() {
-        if model.fire_torpedo_event_at_time(entity, time).is_none() || time < model.time() {
-            trace!("Selected fire torpedo event expired at time={time}");
-            view.selected = Selected::None;
-        }
-    }
-
-    // Remove selected guidance event if expired
-    if let Selected::EnableGuidance { entity: _, time } = view.selected.clone() {
-        if time < model.time() {
+        if model.fire_torpedo_event_at_time(entity, time).is_none() {
             trace!("Selected fire torpedo event expired at time={time}");
             view.selected = Selected::None;
         }

@@ -1,6 +1,8 @@
-use transfer_window_model::{storage::entity_allocator::Entity, Model};
+use transfer_window_model::{api::encounters::EncounterType, storage::entity_allocator::Entity, Model};
 
 use self::util::BurnState;
+
+use super::util::{ApproachType, ApsisType};
 
 pub mod burn;
 pub mod fire_torpedo;
@@ -15,7 +17,9 @@ pub enum Selected {
     Orbitable(Entity),
     Vessel(Entity),
     Point { entity: Entity, time: f64 },
-
+    Apsis { type_: ApsisType, entity: Entity, time: f64 },
+    Approach { type_: ApproachType, entity: Entity, time: f64 },
+    Encounter { type_: EncounterType, entity: Entity, time: f64 },
     Burn { entity: Entity, time: f64, state: BurnState },
     FireTorpedo { entity: Entity, time: f64, state: BurnState },
     EnableGuidance { entity: Entity, time: f64 },
@@ -30,6 +34,9 @@ impl Selected {
                 | Selected::Vessel(entity) 
                 | Selected::Burn { entity, time: _, state: _ }
                 | Selected::Point { entity, time: _ } 
+                | Selected::Apsis { type_: _, entity, time: _ }
+                | Selected::Approach { type_: _, entity, time: _ }
+                | Selected::Encounter { type_: _, entity, time: _ }
                 | Selected::EnableGuidance { entity, time: _ } => Some(*entity),
         }
     }
@@ -42,6 +49,9 @@ impl Selected {
             Selected::FireTorpedo { entity: _, time, state: _ }
                 | Selected::Burn { entity: _, time, state: _ }
                 | Selected::Point { entity: _, time } 
+                | Selected::Apsis { type_: _, entity: _, time }
+                | Selected::Approach { type_: _, entity: _, time }
+                | Selected::Encounter { type_: _, entity: _, time }
                 | Selected::EnableGuidance { entity: _, time } => Some(*time),
         }
     }

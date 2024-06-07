@@ -1,11 +1,12 @@
 use std::sync::{Arc, Mutex};
 
-use eframe::{egui::{PaintCallback, Pos2, Rect, Response, Sense, Ui, Vec2, Widget}, egui_glow::CallbackFn, emath::RectTransform};
+use eframe::{egui::{PaintCallback, Pos2, Rect, Response, Sense, Ui, Vec2, Widget}, egui_glow::CallbackFn, emath::RectTransform, glow};
 
-use crate::{game::camera::Camera, rendering::screen_texture_renderer::ScreenTextureRenderer};
+use crate::{game::{camera::Camera, Scene}, rendering::screen_texture_renderer::ScreenTextureRenderer};
 
 pub struct CustomImage {
     renderer: Arc<Mutex<ScreenTextureRenderer>>,
+    texture: glow::Texture,
     screen_rect: Rect,
     size: f32,
     sense: Sense,
@@ -13,10 +14,12 @@ pub struct CustomImage {
 }
 
 impl CustomImage {
-    pub fn new(renderer: Arc<Mutex<ScreenTextureRenderer>>, screen_rect: Rect, size: f32) -> Self {
+    pub fn new(view: &Scene, texture_name: &str, screen_rect: Rect, size: f32) -> Self {
+        let renderer = view.renderers.screen_texture_renderer();
+        let texture = view.resources.gl_texture(texture_name);
         let sense = Sense::union(Sense::click(), Sense::hover());
         let padding = 0.0;
-        Self { renderer, screen_rect, size, sense, padding }
+        Self { renderer, texture, screen_rect, size, sense, padding }
     }
 
     pub fn with_padding(mut self, padding: f32) -> Self {
@@ -41,7 +44,7 @@ impl Widget for CustomImage {
         let renderer = self.renderer.clone();
 
         let callback = Arc::new(CallbackFn::new(move |_info, painter| {
-            renderer.lock().unwrap().render(painter.gl(), self.screen_rect, from, to, 1.0);
+            renderer.lock().unwrap().render(painter.gl(), self.texture, self.screen_rect, from, to, 1.0);
         }));
 
         painter.add(PaintCallback { rect: self.screen_rect, callback});

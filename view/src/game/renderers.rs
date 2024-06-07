@@ -19,7 +19,7 @@ pub struct Renderers {
     object_renderer: Arc<Mutex<GeometryRenderer>>,
     segment_renderer: Arc<Mutex<GeometryRenderer>>,
     texture_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
-    screen_texture_renderers: HashMap<String, Arc<Mutex<ScreenTextureRenderer>>>,
+    screen_texture_renderer: Arc<Mutex<ScreenTextureRenderer>>,
     explosion_renderers: Arc<Mutex<Vec<ExplosionRenderer>>>,
 }
 
@@ -30,10 +30,10 @@ impl Renderers {
         let object_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
         let texture_renderers = resources.build_renderers(gl);
-        let screen_texture_renderers = resources.build_screen_renderers(gl, screen_rect);
+        let screen_texture_renderer = Arc::new(Mutex::new(ScreenTextureRenderer::new(gl, screen_rect)));
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
-        Self { screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers, screen_texture_renderers, explosion_renderers }
+        Self { screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers, screen_texture_renderer, explosion_renderers }
     }
 
     pub fn add_object_vertices(&mut self, vertices: &mut Vec<f32>) {
@@ -52,8 +52,8 @@ impl Renderers {
         renderer.lock().unwrap().add_vertices(vertices);
     }
 
-    pub fn get_screen_texture_renderer(&self, name: &str) -> Arc<Mutex<ScreenTextureRenderer>> {
-        self.screen_texture_renderers.get(name).unwrap().clone()
+    pub fn screen_texture_renderer(&self) -> Arc<Mutex<ScreenTextureRenderer>> {
+        self.screen_texture_renderer.clone()
     }
 
     pub fn destroy(&mut self, gl: &Arc<glow::Context>) {
@@ -66,9 +66,7 @@ impl Renderers {
         for renderer in self.explosion_renderers.lock().unwrap().iter_mut() {
             renderer.destroy(gl);
         }
-        for renderer in self.screen_texture_renderers.values() {
-            renderer.lock().unwrap().destroy(gl);
-        }
+        self.screen_texture_renderer.lock().unwrap().destroy(gl);
     }
 }
 
@@ -91,6 +89,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
 
     // Start new explosion renderers
     for explosion in model.explosions_started_this_frame() {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Start explosion renderer");
         let renderer = ExplosionRenderer::new(&view.gl, model.time(), explosion.parent(), explosion.offset(), explosion.combined_mass());
         view.renderers.explosion_renderers.lock().unwrap().push(renderer);
     }
@@ -105,19 +105,23 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
 
     // Make sure to regenerate framebuffer with new size if window resized
     if screen_rect != view.renderers.screen_rect {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Resize buffers");
         view.renderers.screen_rect = screen_rect;
         render_pipeline.lock().unwrap().resize(&view.gl, screen_rect);
-        for renderer in view.renderers.screen_texture_renderers.values() {
-            renderer.lock().unwrap().resize(&view.gl, screen_rect);
-        }
+        view.renderers.screen_texture_renderer.lock().unwrap().resize(&view.gl, screen_rect);
     }
 
     let callback = Arc::new(CallbackFn::new(move |_info, painter| {
         let render_bloom = || {
+            #[cfg(feature = "profiling")]
+            let _span = tracy_client::span!("Render bloom");
             segment_renderer.lock().unwrap().render(painter.gl(), zoom_matrix, translation_matrices);
         };
 
         let render_normal = || {
+            #[cfg(feature = "profiling")]
+            let _span = tracy_client::span!("Render normal");
             object_renderer.lock().unwrap().render(painter.gl(), zoom_matrix, translation_matrices);
             for renderer in texture_renderers.values() {
                 renderer.lock().unwrap().render(painter.gl(),zoom_matrix, translation_matrices);
@@ -125,11 +129,15 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
         };
 
         let render_explosion = || {
+            #[cfg(feature = "profiling")]
+            let _span = tracy_client::span!("Render explosion");
             for renderer in explosion_renderers.lock().unwrap().iter() {
                 renderer.render(painter.gl(), time, screen_rect, zoom);
             }
         };
 
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Render pipeline");
         render_pipeline.lock().unwrap().render(painter.gl(), render_bloom, render_normal, render_explosion, screen_rect);
     }));
 

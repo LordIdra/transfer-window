@@ -8,11 +8,11 @@ use transfer_window_model::Model;
 
 use crate::game::{util::{add_textured_square, add_textured_square_facing}, Scene};
 
-use self::{adjust_burn::AdjustBurn, adjust_fire_torpedo::AdjustFireTorpedo, apoapsis::Apoapsis, burn::Burn, closest_approach::ClosestApproach, fire_torpedo::FireTorpedo, guidance::Guidance, orbitable::Orbitable, periapsis::Periapsis, vessel::Vessel};
+use self::{adjust_burn::AdjustBurn, adjust_fire_torpedo::AdjustFireTorpedo, apsis::Apsis, burn::Burn, closest_approach::ClosestApproach, fire_torpedo::FireTorpedo, guidance::Guidance, orbitable::Orbitable, vessel::Vessel};
 
 mod adjust_burn;
 mod adjust_fire_torpedo;
-mod apoapsis;
+mod apsis;
 mod burn;
 mod closest_approach;
 mod encounter;
@@ -20,7 +20,6 @@ mod fire_torpedo;
 mod guidance;
 mod intercept;
 mod orbitable;
-mod periapsis;
 mod vessel;
 
 /// The icon trait represents a single 'type' of icon
@@ -83,7 +82,7 @@ fn compute_initial_icons(view: &mut Scene, model: &Model, pointer: &PointerState
     let mut icons: Vec<Box<dyn Icon>> = vec![];
     icons.append(&mut AdjustBurn::generate(view, model, pointer, screen_rect));
     icons.append(&mut AdjustFireTorpedo::generate(view, model, pointer, screen_rect));
-    icons.append(&mut Apoapsis::generate(view, model));
+    icons.append(&mut Apsis::generate(view, model));
     icons.append(&mut Burn::generate(view, model));
     icons.append(&mut ClosestApproach::generate(view, model));
     icons.append(&mut Encounter::generate(view, model));
@@ -91,7 +90,6 @@ fn compute_initial_icons(view: &mut Scene, model: &Model, pointer: &PointerState
     icons.append(&mut Guidance::generate(view, model));
     icons.append(&mut Intercept::generate(view, model));
     icons.append(&mut Orbitable::generate(view, model));
-    icons.append(&mut Periapsis::generate(view, model));
     icons.append(&mut Vessel::generate(view, model));
     icons
 }

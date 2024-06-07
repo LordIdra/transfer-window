@@ -3,7 +3,7 @@ use std::sync::Arc;
 use eframe::{egui::{Pos2, Rect}, glow::{self, Framebuffer, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, READ_FRAMEBUFFER, RGBA, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, UNSIGNED_BYTE}};
 use glow::{Context, HasContext};
 
-use super::{shader_program::ShaderProgram, texture::Texture, util::{clear_framebuffer, create_multisample_color_attachment, create_normal_color_attachment, SAMPLES}, vertex_array_object::{VertexArrayObject, VertexAttribute}};
+use super::{shader_program::ShaderProgram, util::{clear_framebuffer, create_multisample_color_attachment, create_normal_color_attachment, SAMPLES}, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 
 /// Problem: egui's inbuilt image widgets do not do antialiasing, so
 /// the textures look horrible at small scales. Solution: provide
@@ -12,7 +12,6 @@ use super::{shader_program::ShaderProgram, texture::Texture, util::{clear_frameb
 pub struct ScreenTextureRenderer {
     program: ShaderProgram,
     vertex_array_object: VertexArrayObject,
-    texture: Texture,
     multisample_framebuffer: Framebuffer,
     multisample_texture: glow::Texture,
     intermediate_framebuffer: Framebuffer,
@@ -20,7 +19,7 @@ pub struct ScreenTextureRenderer {
 }
 
 impl ScreenTextureRenderer {
-    pub fn new(gl: &Arc<Context>, texture: Texture, screen_rect: Rect) -> Self {
+    pub fn new(gl: &Arc<Context>, screen_rect: Rect) -> Self {
         let program = ShaderProgram::new(gl, include_str!("../../resources/shaders/screen_texture.vert"), include_str!("../../resources/shaders/screen_texture.frag"));
         let vertex_array_object = VertexArrayObject::new(gl, vec![
             VertexAttribute { index: 0, count: 2 }, // position
@@ -33,7 +32,7 @@ impl ScreenTextureRenderer {
             let intermediate_framebuffer = gl.create_framebuffer().expect("Failed to create framebuffer");
             let intermediate_texture = create_normal_color_attachment(gl, intermediate_framebuffer, screen_rect);
 
-            Self { program, vertex_array_object, texture, multisample_framebuffer, multisample_texture, intermediate_framebuffer, intermediate_texture }
+            Self { program, vertex_array_object, multisample_framebuffer, multisample_texture, intermediate_framebuffer, intermediate_texture }
         }
     }
 
@@ -47,7 +46,7 @@ impl ScreenTextureRenderer {
         }
     }
 
-    pub fn render(&mut self, gl: &Arc<Context>, screen_rect: Rect, from: Pos2, to: Pos2, alpha: f32) {
+    pub fn render(&mut self, gl: &Arc<Context>, texture: glow::Texture, screen_rect: Rect, from: Pos2, to: Pos2, alpha: f32) {
         unsafe {
             clear_framebuffer(gl, self.multisample_framebuffer);
             clear_framebuffer(gl, self.intermediate_framebuffer);
@@ -66,9 +65,9 @@ impl ScreenTextureRenderer {
 
         unsafe {
             gl.bind_framebuffer(FRAMEBUFFER, Some(self.multisample_framebuffer));
+            gl.bind_texture(TEXTURE_2D, Some(texture));
         }
 
-        self.texture.bind(gl);
         self.program.use_program(gl);
         self.program.uniform_float(gl, "alpha", alpha);
         self.vertex_array_object.draw(gl);

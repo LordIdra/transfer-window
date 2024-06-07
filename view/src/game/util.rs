@@ -132,13 +132,13 @@ pub fn should_render_at_time(view: &Scene, model: &Model, entity: Entity, time: 
     should_render_parent(view, model, parent)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ApsisType {
     Periapsis,
     Apoapsis,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ApproachType {
     First,
     Second,

@@ -33,7 +33,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 ui.set_height(36.0);
 
                 let enabled = model.can_warp_to(time);
-                let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("warp-here"), context.screen_rect(), 36.0)
+                let button = CustomCircularImageButton::new(view, "warp-here", context.screen_rect(), 36.0)
                     .with_enabled(enabled)
                     .with_padding(8.0);
                 if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
@@ -41,7 +41,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 }
 
                 let enabled = model.timeline_event_at_time(entity, time).can_delete(model);
-                let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("cancel"), context.screen_rect(), 36.0)
+                let button = CustomCircularImageButton::new(view, "cancel", context.screen_rect(), 36.0)
                     .with_enabled(enabled)
                     .with_padding(8.0);
                 if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {

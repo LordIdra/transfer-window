@@ -10,7 +10,7 @@ mod weapons;
 fn draw_previous(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui, view: &mut Scene, context: &Context, entity: Entity) {
     let time = time - period;
     let enabled = time > orbit.current_point().time();
-    let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("previous-orbit"), context.screen_rect(), 36.0)
+    let button = CustomCircularImageButton::new(view, "previous-orbit", context.screen_rect(), 36.0)
         .with_enabled(enabled)
         .with_padding(10.0);
     if ui.add_enabled(enabled, button).on_hover_text("Previous orbit").clicked() {
@@ -21,7 +21,7 @@ fn draw_previous(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui, view: &mut 
 fn draw_next(time: f64, period: f64, orbit: &Orbit, ui: &mut Ui, view: &mut Scene, context: &Context, entity: Entity) {
     let time = time + period;
     let enabled = time < orbit.end_point().time();
-    let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("next-orbit"), context.screen_rect(), 36.0)
+    let button = CustomCircularImageButton::new(view, "next-orbit", context.screen_rect(), 36.0)
         .with_enabled(enabled)
         .with_padding(10.0);
     if ui.add_enabled(enabled, button).on_hover_text("Next orbit").clicked() {
@@ -59,7 +59,7 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
         }
 
         let enabled = model.can_warp_to(time);
-        let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("warp-here"), context.screen_rect(), 36.0)
+        let button = CustomCircularImageButton::new(view, "warp-here", context.screen_rect(), 36.0)
             .with_enabled(enabled)
             .with_padding(8.0);
         if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
@@ -68,7 +68,7 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
 
         if StartBurnEvent::can_create_ever(model, entity) {
             let enabled = StartBurnEvent::can_create(model, entity, time);
-            let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("create-burn"), context.screen_rect(), 36.0)
+            let button = CustomCircularImageButton::new(view, "create-burn", context.screen_rect(), 36.0)
                 .with_enabled(enabled)
                 .with_padding(5.0);
             if ui.add_enabled(enabled, button).on_hover_text("Create burn").clicked() {
@@ -79,7 +79,7 @@ fn draw_vessel(model: &Model, entity: Entity, ui: &mut Ui, events: &mut Vec<Even
 
         if EnableGuidanceEvent::can_create_ever(model, entity) {
             let enabled = EnableGuidanceEvent::can_create(model, entity, time);
-            let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("enable-guidance"), context.screen_rect(), 36.0)
+            let button = CustomCircularImageButton::new(view, "enable-guidance", context.screen_rect(), 36.0)
                 .with_enabled(enabled)
                 .with_padding(5.0);
             if ui.add_enabled(enabled, button).on_hover_text("Enable guidance").clicked() {

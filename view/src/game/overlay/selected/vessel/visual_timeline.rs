@@ -158,7 +158,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, e
 
     for event in events {
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view.renderers.get_screen_texture_renderer(event.icon()), context.screen_rect(), 20.0)
+            let image = CustomImage::new(view, event.icon(), context.screen_rect(), 20.0)
                 .with_padding(event.padding());
             ui.add(image);
             ui.label(RichText::new(format!("T- {}", format_time((event.time().ceil() - model.time()).floor()))).weak().size(12.0));
