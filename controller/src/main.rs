@@ -24,7 +24,7 @@ impl Controller {
 
         egui_extras::install_image_loaders(&creation_context.egui_ctx);
         let gl = creation_context.gl.as_ref().unwrap().clone();
-        let resources = Arc::new(Resources::new(&creation_context.egui_ctx));
+        let resources = Arc::new(Resources::new(&creation_context.egui_ctx, creation_context.gl.as_ref().unwrap()));
         let model = None;
         let view = View::MenuScene(Scene::default());
         let last_frame = Instant::now();
@@ -97,6 +97,12 @@ impl App for Controller {
         }
 
         context.request_repaint(); // Without this, the context will only update when some input changes
+    }
+}
+
+impl Drop for Controller {
+    fn drop(&mut self) {
+        self.resources.destroy(&self.gl);
     }
 }
 

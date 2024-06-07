@@ -125,14 +125,15 @@
 [x] Celestial object UI
 [x] Fix being unable to drag arrows???
 [x] Finish encounter visual timeline events
+[ ] Allow selecting apoapsis, intercept, approach, encounter
 
 # Polish
-[ ] Allow selecting apoapsis, intercept, etc
 [ ] Select event when clicked in timeline
 [ ] Visual timeline for selected events + point
 [ ] Current burn/guidance finishes (exclude intercepts)
 [ ] Show orbit/burn/guidance parameters
 [ ] Show velocity/altitude of vessel
+[ ] Switch to GL_LINES for segment rendering (should be massive speedup)
 
 # Campaign
 [ ] Factions (player, ally, enemy)

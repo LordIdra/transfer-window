@@ -10,7 +10,7 @@ fn draw_fire(view: &mut Scene, model: &Model, ui: &mut Ui, context: &Context, ce
     let lock_rect = Rect::from_center_size(lock_centre, lock_size);
     ui.allocate_ui_at_rect(lock_rect, |ui| {
         let enabled = FireTorpedoEvent::can_create(model, entity, time, slot_location);
-        let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("fire-possible"), context.screen_rect(), 23.0)
+        let button = CustomCircularImageButton::new(view, "fire-possible", context.screen_rect(), 23.0)
             .with_enabled(enabled)
             .with_padding(3.0);
         if ui.add_enabled(enabled, button).clicked() {
@@ -34,7 +34,7 @@ fn draw_weapon(view: &mut Scene, model: &Model, ui: &mut Ui, context: &Context, 
         .rounding(Rounding::same(6.0))
         .outer_margin(Margin::same(3.0))
         .show(ui, |ui| {
-            let image = CustomImage::new(view.renderers.get_screen_texture_renderer(texture), context.screen_rect(), 80.0)
+            let image = CustomImage::new(view, texture, context.screen_rect(), 80.0)
                 .with_padding(8.0);
             let center = ui.add(image).rect.center();
 

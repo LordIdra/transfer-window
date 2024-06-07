@@ -18,7 +18,7 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
 
     Grid::new("DV grid").show(ui, |ui| {
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view.renderers.get_screen_texture_renderer("duration"), context.screen_rect(), 20.0);
+            let image = CustomImage::new(view, "duration", context.screen_rect(), 20.0);
             ui.add(image);
             ui.label(RichText::new("Duration").strong().monospace());
         });
@@ -26,7 +26,7 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view.renderers.get_screen_texture_renderer("burn-start"), context.screen_rect(), 20.0);
+            let image = CustomImage::new(view, "burn-start", context.screen_rect(), 20.0);
             ui.add(image);
             ui.label(RichText::new("ΔV start").strong().monospace());
         });
@@ -34,7 +34,7 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view.renderers.get_screen_texture_renderer("burn-burnt"), context.screen_rect(), 20.0);
+            let image = CustomImage::new(view, "burn-burnt", context.screen_rect(), 20.0);
             ui.add(image);
             ui.label(RichText::new("ΔV burnt").strong().monospace());
         });
@@ -42,7 +42,7 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view.renderers.get_screen_texture_renderer("burn-end"), context.screen_rect(), 20.0);
+            let image = CustomImage::new(view, "burn-end", context.screen_rect(), 20.0);
             ui.add(image);
             ui.label(RichText::new("ΔV end").strong().monospace());
         });
@@ -78,7 +78,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 ui.set_height(36.0);
 
                 let enabled = model.can_warp_to(time);
-                let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("warp-here"), context.screen_rect(), 36.0)
+                let button = CustomCircularImageButton::new(view, "warp-here", context.screen_rect(), 36.0)
                     .with_enabled(enabled)
                     .with_padding(8.0);
                 if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
@@ -86,7 +86,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
                 }
 
                 let enabled = model.timeline_event_at_time(entity, time).can_delete(model);
-                let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("cancel"), context.screen_rect(), 36.0)
+                let button = CustomCircularImageButton::new(view, "cancel", context.screen_rect(), 36.0)
                     .with_enabled(enabled)
                     .with_padding(8.0);
                 if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {

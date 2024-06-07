@@ -20,13 +20,18 @@ impl Texture {
         }
     }
 
+    #[allow(unused)]
     pub fn bind(&self, gl: &Arc<Context>) {
         unsafe {
             gl.bind_texture(TEXTURE_2D, Some(self.texture));
         }
     }
 
-    pub fn destroy(&mut self, gl: &Arc<Context>) {
+    pub fn texture(&self) -> glow::Texture {
+        self.texture
+    }
+
+    pub fn destroy(&self, gl: &Arc<Context>) {
         unsafe { 
             gl.delete_texture(self.texture);
         };

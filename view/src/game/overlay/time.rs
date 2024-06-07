@@ -16,7 +16,7 @@ pub fn update(view: &Scene, model: &Model, context: &Context) {
         .show(context, |ui| {
             ui.horizontal(|ui| {
                 ui.set_height(25.0);
-                ui.add(CustomImage::new(view.renderers.get_screen_texture_renderer("time"), context.screen_rect(), 25.0)
+                ui.add(CustomImage::new(view, "time", context.screen_rect(), 25.0)
                     .with_padding(2.0));
                 ui.label(RichText::new(format_time(model.time())).strong().size(20.0));
             });
@@ -44,7 +44,7 @@ pub fn update(view: &Scene, model: &Model, context: &Context) {
                             },
                         }
                     };
-                    ui.add(CustomImage::new(view.renderers.get_screen_texture_renderer(texture), context.screen_rect(), 24.0)
+                    ui.add(CustomImage::new(view, texture, context.screen_rect(), 24.0)
                         .with_padding(2.0));
                     ui.add_space(-9.0);
                 }

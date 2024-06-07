@@ -7,7 +7,7 @@ use crate::{events::Event, game::Scene, styles};
 use super::widgets::custom_image_button::CustomCircularImageButton;
 
 fn draw_focus(view: &mut Scene, ui: &mut Ui, context: &Context, entity: Entity) {
-    let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("focus"), context.screen_rect(), 30.0)
+    let button = CustomCircularImageButton::new(view, "focus", context.screen_rect(), 30.0)
         .with_padding(3.0);
     if ui.add(button).on_hover_text("Focus").clicked() {
         view.camera.reset_panning();
@@ -19,7 +19,7 @@ fn draw_focus(view: &mut Scene, ui: &mut Ui, context: &Context, entity: Entity) 
 fn draw_set_target(view: &mut Scene, model: &Model, ui: &mut Ui, context: &Context, right_clicked: Entity, selected: Entity, events: &mut Vec<Event>) {
     let is_already_target = model.target(selected) == Some(right_clicked);
     if is_already_target {
-        let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("unset-target"), context.screen_rect(), 30.0)
+        let button = CustomCircularImageButton::new(view, "unset-target", context.screen_rect(), 30.0)
             .with_padding(4.0);
         if ui.add(button).on_hover_text("Unset target").clicked() {
             events.push(Event::SetTarget { 
@@ -30,7 +30,7 @@ fn draw_set_target(view: &mut Scene, model: &Model, ui: &mut Ui, context: &Conte
         }
     } else {
         let enabled = selected != right_clicked;
-        let button = CustomCircularImageButton::new(view.renderers.get_screen_texture_renderer("set-target"), context.screen_rect(), 30.0)
+        let button = CustomCircularImageButton::new(view, "set-target", context.screen_rect(), 30.0)
             .with_enabled(enabled)
             .with_padding(4.0);
         if ui.add_enabled(enabled, button)

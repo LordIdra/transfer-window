@@ -31,10 +31,13 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
                 Selected::None 
                     | Selected::Orbitable(_)
                     | Selected::Vessel(_) 
-                    | Selected::Point { entity: _, time: _ } => (),
-                Selected::Burn { entity, time: _, state: _ }
-                    | Selected::FireTorpedo { entity, time: _, state: _ } 
-                    | Selected::EnableGuidance { entity, time: _ } => {
+                    | Selected::Apsis { .. }
+                    | Selected::Approach { .. }
+                    | Selected::Encounter { .. }
+                    | Selected::Point { .. } => (),
+                Selected::Burn { entity, .. }
+                    | Selected::FireTorpedo { entity, .. } 
+                    | Selected::EnableGuidance { entity, .. } => {
                         events.push(Event::CancelLastTimelineEvent { entity });
                         view.selected = Selected::None;
                 }
