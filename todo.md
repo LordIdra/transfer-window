@@ -126,6 +126,7 @@
 [x] Fix being unable to drag arrows???
 [x] Finish encounter visual timeline events
 [x] Allow selecting apoapsis, intercept, approach, encounter
+[x] Switch to GL_LINES for segment rendering (should be massive speedup)
 
 # Polish
 [ ] Select event when clicked in timeline
@@ -133,7 +134,6 @@
 [ ] Current burn/guidance finishes (exclude intercepts)
 [ ] Show orbit/burn/guidance parameters
 [ ] Show velocity/altitude of vessel
-[ ] Switch to GL_LINES for segment rendering (should be massive speedup)
 
 # Campaign
 [ ] Factions (player, ally, enemy)

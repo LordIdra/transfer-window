@@ -38,6 +38,16 @@ impl GeometryRenderer {
         self.vertices.clear();
     }
 
+    pub fn render_lines(&mut self, gl: &Arc<Context>, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
+        self.vertex_array_object.data(gl, &self.vertices);
+        self.program.use_program(gl);
+        self.program.uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
+        self.program.uniform_mat3(gl, "translation_matrix_upper", translation_matrices.0.as_slice());
+        self.program.uniform_mat3(gl, "translation_matrix_lower", translation_matrices.1.as_slice());
+        self.vertex_array_object.draw_lines(gl);
+        self.vertices.clear();
+    }
+
     pub fn destroy(&mut self, gl: &Arc<Context>) {
         self.program.destroy(gl);
         self.vertex_array_object.destroy(gl);

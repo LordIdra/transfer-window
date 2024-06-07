@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use eframe::glow;
+use eframe::glow::{self, LINES};
 use glow::{VertexArray, Buffer, Context, HasContext, ARRAY_BUFFER, FLOAT, DYNAMIC_DRAW, TRIANGLES};
 
 pub struct VertexAttribute {
@@ -16,7 +16,7 @@ impl VertexAttribute {
 
 pub struct VertexArrayObject {
     vertices: i32,
-    vertices_per_triangle: i32,
+    attributes_per_vertex: i32,
     vertex_array: VertexArray,
     vertex_buffer: Buffer,
 }
@@ -25,7 +25,7 @@ impl VertexArrayObject {
     pub fn new(gl: &Arc<Context>, vertex_attributes: Vec<VertexAttribute>) -> Self {
         let vertex_array: VertexArray;
         let vertex_buffer: Buffer;
-        let vertices_per_triangle = vertex_attributes.iter().map(|attribute| attribute.count).sum();
+        let attributes_per_vertex = vertex_attributes.iter().map(|attribute| attribute.count).sum();
         let stride = vertex_attributes.iter().map(VertexAttribute::size).sum();
 
         unsafe { 
@@ -44,7 +44,7 @@ impl VertexArrayObject {
             offset += attribute.size();
         }
 
-        VertexArrayObject { vertices: 0, vertices_per_triangle, vertex_array, vertex_buffer }
+        VertexArrayObject { vertices: 0, attributes_per_vertex, vertex_array, vertex_buffer }
     }
 
     fn bind(&self, gl: &Arc<Context>) {
@@ -67,7 +67,14 @@ impl VertexArrayObject {
     pub fn draw(&self, gl: &Arc<Context>) {
         unsafe {
             self.bind(gl);
-            gl.draw_arrays(TRIANGLES, 0, self.vertices / self.vertices_per_triangle);
+            gl.draw_arrays(TRIANGLES, 0, self.vertices / self.attributes_per_vertex);
+        }
+    }
+
+    pub fn draw_lines(&self, gl: &Arc<Context>) {
+        unsafe {
+            self.bind(gl);
+            gl.draw_arrays(LINES, 0, self.vertices / self.attributes_per_vertex);
         }
     }
 

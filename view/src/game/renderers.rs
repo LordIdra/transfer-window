@@ -116,7 +116,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
         let render_bloom = || {
             #[cfg(feature = "profiling")]
             let _span = tracy_client::span!("Render bloom");
-            segment_renderer.lock().unwrap().render(painter.gl(), zoom_matrix, translation_matrices);
+            segment_renderer.lock().unwrap().render_lines(painter.gl(), zoom_matrix, translation_matrices);
         };
 
         let render_normal = || {

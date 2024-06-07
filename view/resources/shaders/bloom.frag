@@ -6,7 +6,7 @@ in vec2 v_texture_coords;
 
 uniform sampler2D image;
 uniform bool is_horizontal;
-uniform float weight[5] = float[] (0.307027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+uniform float weight[5] = float[] (0.357027, 0.1945946, 0.1216216, 0.054054, 0.016216);
 
 void main() {
     vec2 offset = 1.0 / textureSize(image, 0); // gets size of single texel

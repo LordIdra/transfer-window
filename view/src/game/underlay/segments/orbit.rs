@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 use eframe::{egui::Rgba, emath::normalized_angle};
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::VesselClass}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::VesselClass}, storage::entity_allocator::Entity, Model};
 
 use crate::game::Scene;
 
@@ -9,27 +9,28 @@ const INITIAL_POINT_COUNT: usize = 50;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-4;
 const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
-pub fn compute_color_vessel(view: &Scene, model: &Model, entity: Entity, index: usize) -> Rgba {
+pub fn compute_color_vessel(view: &Scene, model: &Model, entity: Entity) -> Rgba {
     let rgb = match model.vessel_component(entity).class() {
         VesselClass::Torpedo => Rgba::from_rgb(1.0, 0.0, 0.0),
         VesselClass::Light => Rgba::from_rgb(0.0, 1.0, 1.0),
     };
 
-    let alphas = if view.is_selected(model, entity) {
-        [1.0, 0.60, 0.45]
+    let alpha = if view.is_selected(model, entity) {
+        1.0
     } else {
-        [0.24; SEGMENTS_TO_PREDICT]
+        0.5
     };
 
-    Rgba::from_rgba_unmultiplied(rgb.r(), rgb.g(), rgb.b(), alphas[index])
+    Rgba::from_rgba_unmultiplied(rgb.r(), rgb.g(), rgb.b(), alpha)
 }
 
 pub fn compute_color_orbitable(view: &Scene, model: &Model, entity: Entity) -> Rgba {
-    if view.is_selected(model, entity) {
-        Rgba::from_srgba_unmultiplied(255, 255, 255, 160)
+    let alpha = if view.is_selected(model, entity) {
+        255
     } else {
-        Rgba::from_srgba_unmultiplied(255, 255, 255, 50)
-    }
+        160
+    };
+    Rgba::from_srgba_unmultiplied(160, 160, 160, alpha)
 }
 
 /// Uses triangle heuristic as described in <https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation>
