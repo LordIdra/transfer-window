@@ -18,8 +18,9 @@ pub enum Selected {
     Vessel(Entity),
     Point { entity: Entity, time: f64 },
     Apsis { type_: ApsisType, entity: Entity, time: f64 },
-    Approach { type_: ApproachType, entity: Entity, time: f64 },
-    Encounter { type_: EncounterType, entity: Entity, time: f64 },
+    Approach { type_: ApproachType, entity: Entity, target: Entity, time: f64 },
+    Encounter { type_: EncounterType, entity: Entity, time: f64, from: Entity, to: Entity },
+    Intercept { entity: Entity, time: f64 },
     Burn { entity: Entity, time: f64, state: BurnState },
     FireTorpedo { entity: Entity, time: f64, state: BurnState },
     EnableGuidance { entity: Entity, time: f64 },
@@ -32,12 +33,13 @@ impl Selected {
             Selected::FireTorpedo { entity, time, state: _ } => Some(model.fire_torpedo_event_at_time(*entity, *time).expect("No fire torpedo event at time").ghost()),
             Selected::Orbitable(entity) 
                 | Selected::Vessel(entity) 
-                | Selected::Burn { entity, time: _, state: _ }
-                | Selected::Point { entity, time: _ } 
-                | Selected::Apsis { type_: _, entity, time: _ }
-                | Selected::Approach { type_: _, entity, time: _ }
-                | Selected::Encounter { type_: _, entity, time: _ }
-                | Selected::EnableGuidance { entity, time: _ } => Some(*entity),
+                | Selected::Burn { entity, .. }
+                | Selected::Point { entity, .. } 
+                | Selected::Apsis { entity, .. }
+                | Selected::Approach {  entity, .. }
+                | Selected::Encounter { entity, .. }
+                | Selected::Intercept { entity, .. }
+                | Selected::EnableGuidance { entity, .. } => Some(*entity),
         }
     }
 
@@ -46,13 +48,14 @@ impl Selected {
             Selected::None
                 | Selected::Orbitable(_) 
                 | Selected::Vessel(_) => None,
-            Selected::FireTorpedo { entity: _, time, state: _ }
-                | Selected::Burn { entity: _, time, state: _ }
-                | Selected::Point { entity: _, time } 
-                | Selected::Apsis { type_: _, entity: _, time }
-                | Selected::Approach { type_: _, entity: _, time }
-                | Selected::Encounter { type_: _, entity: _, time }
-                | Selected::EnableGuidance { entity: _, time } => Some(*time),
+            Selected::FireTorpedo { time, .. }
+                | Selected::Burn { time, .. }
+                | Selected::Point { time, .. } 
+                | Selected::Apsis { time, .. }
+                | Selected::Approach { time, .. }
+                | Selected::Encounter { time, .. }
+                | Selected::Intercept { time, .. }
+                | Selected::EnableGuidance { time, .. } => Some(*time),
         }
     }
 

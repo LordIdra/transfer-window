@@ -60,9 +60,9 @@ impl Icon for Orbitable {
 
     fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
         [
-            0,
             u64::from(self.is_selected(view, model)),
             2,
+            0,
             (model.mass(self.entity) / 1.0e20) as u64
         ]
     }

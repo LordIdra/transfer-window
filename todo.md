@@ -127,13 +127,13 @@
 [x] Finish encounter visual timeline events
 [x] Allow selecting apoapsis, intercept, approach, encounter
 [x] Switch to GL_LINES for segment rendering (should be massive speedup)
+[x] Show velocity/altitude of vessel + points + celestial objects
 
 # Polish
 [ ] Select event when clicked in timeline
 [ ] Visual timeline for selected events + points
 [ ] Current burn/guidance finishes (exclude intercepts)
-[ ] Show orbit/burn/guidance parameters
-[ ] Show velocity/altitude of vessel + points + celestial objects
+[ ] Show orbital parameters
 
 # Campaign
 [ ] Factions (player, ally, enemy)

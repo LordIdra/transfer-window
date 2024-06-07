@@ -112,7 +112,7 @@ impl Icon for Apsis {
         [
             u64::from(self.is_selected(view, model)),
             0,
-            0,
+            2,
             0,
         ]
     }

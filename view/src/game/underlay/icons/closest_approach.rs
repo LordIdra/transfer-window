@@ -11,7 +11,8 @@ use super::Icon;
 pub struct ClosestApproach {
     type_: ApproachType,
     vessel: Entity, // the vessel that is targeting another vessel
-    entity: Entity,
+    target: Entity,
+    entity: Entity, // which entity to draw this approach icon for
     time: f64,
 }
 
@@ -25,18 +26,18 @@ impl ClosestApproach {
                     
                     if let Some(time) = approach_1 {
                         if should_render_at_time(view, model, entity, time) {
-                            let icon = Self { type_: ApproachType::First, vessel: entity, entity, time };
+                            let icon = Self { type_: ApproachType::First, vessel: entity, target, entity, time };
                             icons.push(Box::new(icon) as Box<dyn Icon>);
-                            let icon = Self { type_: ApproachType::First, vessel: entity, entity: target, time };
+                            let icon = Self { type_: ApproachType::First, vessel: entity, target, entity: target, time };
                             icons.push(Box::new(icon) as Box<dyn Icon>);
                         }
                     }
 
                     if let Some(time) = approach_2 {
                         if should_render_at_time(view, model, entity, time) {
-                            let icon = Self { type_: ApproachType::Second, vessel: entity, entity, time };
+                            let icon = Self { type_: ApproachType::Second, vessel: entity, target, entity, time };
                             icons.push(Box::new(icon) as Box<dyn Icon>);
-                            let icon = Self { type_: ApproachType::Second, vessel: entity, entity: target, time };
+                            let icon = Self { type_: ApproachType::Second, vessel: entity, target, entity: target, time };
                             icons.push(Box::new(icon) as Box<dyn Icon>);
                         }
                     }
@@ -76,7 +77,7 @@ impl Icon for ClosestApproach {
         [
             u64::from(self.is_selected(view, model)),
             0,
-            0,
+            3,
             0,
         ]
     }
@@ -93,7 +94,7 @@ impl Icon for ClosestApproach {
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
-        if let Selected::Approach { type_, entity, time: _ } = &view.selected {
+        if let Selected::Approach { type_, entity, target: _, time: _ } = &view.selected {
             // time can very slightly change as approach is recalculated so not a reliable way to determine equality
             *type_ == self.type_ && *entity == self.vessel
         } else {
@@ -104,7 +105,7 @@ impl Icon for ClosestApproach {
     fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
         if pointer.primary_clicked() {
             trace!("Approach icon clicked; switching to Selected");
-            view.selected = Selected::Approach { type_: self.type_, entity: self.vessel, time: self.time };
+            view.selected = Selected::Approach { type_: self.type_, entity: self.vessel, target: self.target, time: self.time };
         }
     }
 

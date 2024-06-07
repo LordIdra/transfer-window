@@ -58,9 +58,9 @@ impl Icon for Vessel {
 
     fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
         [
-            0,
             u64::from(self.is_selected(view, model)),
             1,
+            0,
             model.mass(self.entity) as u64
         ]
     }

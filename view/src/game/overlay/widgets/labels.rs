@@ -19,6 +19,13 @@ pub fn draw_speed(model: &Model, ui: &mut Ui, entity: Entity, time: f64) {
     ui.end_row();
 }
 
+pub fn draw_distance(model: &Model, ui: &mut Ui, entity: Entity, time: f64) {
+    ui.label(RichText::new("Distance").monospace().strong());
+    let distance = model.distance_at_time(entity, model.vessel_component(entity).target().unwrap(), time);
+    ui.label(format_distance(distance));
+    ui.end_row();
+}
+
 pub fn draw_orbits(model: &Model, ui: &mut Ui, entity: Entity, time: f64) {
     let orbit = model.orbit_at_time(entity, time);
     let Some(period) = orbit.period() else {
@@ -35,4 +42,16 @@ pub fn draw_orbits(model: &Model, ui: &mut Ui, entity: Entity, time: f64) {
 pub fn draw_time_until(model: &Model, ui: &mut Ui, time: f64) {
     let text = format!("T-{}", format_time(time - model.time()));
     ui.label(RichText::new(text).weak());
+}
+
+pub fn draw_encounter_to(model: &Model, ui: &mut Ui, entity: Entity) {
+    ui.label(RichText::new("To").monospace().strong());
+    ui.label(model.name_component(entity).name());
+    ui.end_row();
+}
+
+pub fn draw_encounter_from(model: &Model, ui: &mut Ui, entity: Entity) {
+    ui.label(RichText::new("From").monospace().strong());
+    ui.label(model.name_component(entity).name());
+    ui.end_row();
 }

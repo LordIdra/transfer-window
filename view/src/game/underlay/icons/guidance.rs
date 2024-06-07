@@ -54,7 +54,7 @@ impl Icon for Guidance {
         [
             u64::from(self.is_selected(view, model)),
             0,
-            0,
+            5,
             model.mass(self.entity) as u64
         ]
     }

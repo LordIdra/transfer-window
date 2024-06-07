@@ -12,6 +12,8 @@ pub struct Encounter {
     type_: EncounterType,
     entity: Entity,
     time: f64,
+    from: Entity,
+    to: Entity,
 }
 
 impl Encounter {
@@ -20,7 +22,7 @@ impl Encounter {
         for entity in model.entities(vec![ComponentType::PathComponent]) {
             for encounter in model.future_encounters(entity) {
                 if should_render_at_time(view, model, entity, encounter.time()) {
-                    let icon = Self { type_: encounter.encounter_type(), entity, time: encounter.time() };
+                    let icon = Self { type_: encounter.encounter_type(), entity, time: encounter.time(), from: encounter.from(), to: encounter.to() };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
             }
@@ -59,7 +61,7 @@ impl Icon for Encounter {
         [
             u64::from(self.is_selected(view, model)),
             0,
-            0,
+            3,
             0,
         ]
     }
@@ -76,7 +78,7 @@ impl Icon for Encounter {
     }
 
     fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
-        if let Selected::Encounter { type_, entity, time } = &view.selected {
+        if let Selected::Encounter { type_, entity, time, from: _, to: _ } = &view.selected {
             *type_ == self.type_ && *entity == self.entity && *time == self.time
         } else {
             false
@@ -86,7 +88,7 @@ impl Icon for Encounter {
     fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
         if pointer.primary_clicked() {
             trace!("Encounter icon clicked; switching to Selected");
-            view.selected = Selected::Encounter { type_: self.type_, entity: self.entity, time: self.time };
+            view.selected = Selected::Encounter { type_: self.type_, entity: self.entity, time: self.time, from: self.from, to: self.to };
         }
     }
 

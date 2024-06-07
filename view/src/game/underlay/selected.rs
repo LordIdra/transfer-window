@@ -34,6 +34,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             | Selected::Apsis { .. }
             | Selected::Approach { .. }
             | Selected::Encounter { .. }
+            | Selected::Intercept { .. }
             | Selected::EnableGuidance { .. }=> (),
         Selected::Point { .. } => segment_point::draw_selected(view, model),
         Selected::Burn { .. } => burn::update_adjustment(view, model, context, events, &pointer),

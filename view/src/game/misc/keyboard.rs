@@ -34,6 +34,7 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
                     | Selected::Apsis { .. }
                     | Selected::Approach { .. }
                     | Selected::Encounter { .. }
+                    | Selected::Intercept { .. }
                     | Selected::Point { .. } => (),
                 Selected::Burn { entity, .. }
                     | Selected::FireTorpedo { entity, .. } 

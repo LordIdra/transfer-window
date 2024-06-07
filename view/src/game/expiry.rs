@@ -23,6 +23,14 @@ pub fn update(view: &mut Scene, model: &Model) {
         }
     }
 
+    // Remove selected approach if target is no longer targeted
+    if let Selected::Approach { type_: _, entity, target, time: _ } = view.selected.clone() {
+        if !model.vessel_component(entity).has_target() || model.vessel_component(entity).target().unwrap() != target {
+            trace!("Selected approach no longer has target");
+            view.selected = Selected::None;
+        }
+    }
+
     // Remove selected fire torpedo event if no longer exists
     if let Selected::FireTorpedo { entity, time, state: _ } = view.selected.clone() {
         if model.fire_torpedo_event_at_time(entity, time).is_none() {
