@@ -44,7 +44,7 @@ impl ExplosionRenderer {
         Self { program, vertex_array_object, explosion_time, duration, parent, offset, size, speed, center }
     }
 
-    pub fn update_position(&mut self, view: &mut View) {
+    pub fn update_position(&mut self, view: &View) {
         let world_coords = view.model.absolute_position(self.parent) + self.offset;
         self.center = Some(view.world_space_to_window_space(world_coords));
     }

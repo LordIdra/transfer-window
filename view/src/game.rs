@@ -47,7 +47,9 @@ impl View {
         let screen_rect = context.screen_rect();
         let events = vec![];
         let mut camera = Camera::new();
-        camera.set_focus(focus);
+        if let Some(focus) = focus {
+            camera.set_focus(focus, model.absolute_position(focus));
+        }
         let renderers = Renderers::new(&resources, &gl, context.screen_rect());
         let selected = Selected::None;
         let right_click_menu = None;
@@ -112,15 +114,24 @@ impl View {
             .collect()
     }
 
-    pub fn window_space_to_world_space(&mut self, window_coords: Pos2) -> DVec2 {
+    pub fn set_camera_focus(&mut self, focus: Entity) {
+        let focus_position = self.model.absolute_position(focus);
+        self.camera.set_focus(focus, focus_position);
+    }
+
+    pub fn unset_camera_focus(&mut self) {
+        self.camera.unset_focus();
+    }
+
+    pub fn window_space_to_world_space(&self, window_coords: Pos2) -> DVec2 {
         let offset_x = f64::from(window_coords.x - (self.screen_rect.width() / 2.0)) / self.camera.zoom();
         let offset_y = f64::from((self.screen_rect.height() / 2.0) - window_coords.y) / self.camera.zoom();
-        self.camera.translation(&self.model) + DVec2::new(offset_x, offset_y)
+        self.camera.translation() + DVec2::new(offset_x, offset_y)
     }
 
     #[allow(unused)]
-    pub fn world_space_to_window_space(&mut self, world_coords: DVec2) -> Pos2 {
-        let offset = world_coords - self.camera.translation(&self.model);
+    pub fn world_space_to_window_space(&self, world_coords: DVec2) -> Pos2 {
+        let offset = world_coords - self.camera.translation();
         let window_coords_x =  (offset.x * self.camera.zoom()) as f32 + 0.5 * self.screen_rect.width();
         let window_coords_y = -(offset.y * self.camera.zoom()) as f32 - 0.5 * self.screen_rect.height();
         Pos2::new(window_coords_x, window_coords_y)

@@ -94,7 +94,7 @@ fn draw_orbitable_segment(view: &mut View, entity: Entity, camera_centre: DVec2)
 pub fn draw(view: &mut View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments");
-    let camera_centre = view.camera.translation(&view.model);
+    let camera_centre = view.camera.translation();
     for entity in view.model.entities(vec![ComponentType::PathComponent]) {
         draw_path_segments(view, entity, camera_centre);
     }

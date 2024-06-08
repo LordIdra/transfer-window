@@ -78,12 +78,12 @@ fn draw_slot(ui: &mut Ui, vessel_component: &VesselComponent, location: SlotLoca
 
 fn draw_slots(ui: &mut Ui, vessel_component: &VesselComponent) {
     for location in vessel_component.slots().filled_slot_locations() {
-        ui.collapsing(format!("{:?}", location), |ui| draw_slot(ui, vessel_component, location));
+        ui.collapsing(format!("{location:?}"), |ui| draw_slot(ui, vessel_component, location));
     }
 }
 
 fn draw_timeline_event(ui: &mut Ui, timeline_event: &TimelineEvent) {
-    ui.label(format!("{:?}", timeline_event));
+    ui.label(format!("{timeline_event:?}"));
 }
 
 fn draw_timeline(ui: &mut Ui, vessel_component: &VesselComponent) {

@@ -94,7 +94,7 @@ pub fn update(view: &mut View) {
 
     // Matrices need model to calculate, which is not send/sync, so we have to calculate matrices *before* constructing a callback
     let zoom_matrix = view.camera.zoom_matrix(screen_rect);
-    let translation_matrices = view.camera.translation_matrices(&view.model);
+    let translation_matrices = view.camera.translation_matrices();
 
     // Start new explosion renderers
     for explosion in view.model.explosions_started_this_frame() {

@@ -10,7 +10,7 @@ pub fn update(view: &mut View) {
     // Unfocus camera if focus no longer exists
     if let Some(entity) = view.camera.focus() {
         if !view.model.entity_exists(entity) {
-            view.camera.set_focus(None);
+            view.unset_camera_focus();
         }
     }
 

@@ -1,7 +1,7 @@
 use eframe::{egui::Pos2, epaint::Rect};
 use log::trace;
 use nalgebra_glm::{scale2d, translate2d, vec2, DMat3, DVec2, Mat3, Vec2};
-use transfer_window_model::{storage::entity_allocator::Entity, Model};
+use transfer_window_model::storage::entity_allocator::Entity;
 
 pub fn f64_to_f32_pair(v: f64) -> (f32, f32) {
     let upper = v as f32;
@@ -39,9 +39,14 @@ impl Camera {
         self.zoom = zoom;
     }
 
-    pub fn set_focus(&mut self, focus: Option<Entity>) {
+    pub fn set_focus(&mut self, focus: Entity, focus_position: DVec2) {
         trace!("Camera focus switched to {:?}", focus);
-        self.focus = focus;
+        self.focus = Some(focus);
+        self.focus_position = focus_position;
+    }
+
+    pub fn unset_focus(&mut self,) {
+        self.focus = None;
     }
 
     pub fn focus(&self) -> Option<Entity> {
@@ -52,13 +57,8 @@ impl Camera {
         self.zoom
     }
 
-    pub fn translation(&mut self, model: &Model) -> DVec2 {
-        let focus_position = match self.focus {
-            Some(focus) => model.absolute_position(focus),
-            None => self.focus_position,
-        };
-        self.focus_position = focus_position;
-        focus_position + self.panning
+    pub fn translation(&self) -> DVec2 {
+        self.focus_position + self.panning
     }
 
     pub fn zoom_matrix(&self, screen_rect: Rect) -> Mat3 {
@@ -73,8 +73,8 @@ impl Camera {
         )
     }
 
-    pub fn translation_matrices(&mut self, model: &Model) -> (Mat3, Mat3) {
-        let translation = self.translation(model);
+    pub fn translation_matrices(&self) -> (Mat3, Mat3) {
+        let translation = self.translation();
         let translation_pair_x = f64_to_f32_pair(translation.x);
         let translation_pair_y = f64_to_f32_pair(translation.y);
         let mat1 = translate2d(&Mat3::identity(), &Vec2::new(-translation_pair_x.0, -translation_pair_y.0));

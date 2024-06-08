@@ -11,7 +11,7 @@ fn draw_focus(view: &mut View, ui: &mut Ui, entity: Entity) {
         .with_padding(3.0);
     if ui.add(button).on_hover_text("Focus").clicked() {
         view.camera.reset_panning();
-        view.camera.set_focus(Some(entity));
+        view.set_camera_focus(entity);
         view.right_click_menu = None;
     }
 }

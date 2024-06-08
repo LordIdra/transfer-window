@@ -42,7 +42,7 @@ pub fn update(view: &mut View) {
         
         if input.key_pressed(Key::F) {
             if let Some(entity) = view.selected.entity(&view.model) {
-                view.camera.set_focus(Some(entity));
+                view.set_camera_focus(entity);
             }
         }
         
