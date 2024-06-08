@@ -1,7 +1,4 @@
-use eframe::egui::Context;
-use transfer_window_model::Model;
-
-use crate::{events::Event, game::Scene};
+use crate::game::View;
 
 mod approach;
 mod apsis;
@@ -14,17 +11,17 @@ mod orbitable;
 mod point;
 mod vessel;
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+pub fn update(view: &mut View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update selected");
-    approach::update(view, model, context, events);
-    apsis::update(view, model, context, events);
-    point::update(view, model, context, events);
-    burn::update(view, model, context, events);
-    encounter::update(view, model, context, events);
-    guidance::update(view, model, context, events);
-    orbitable::update(view, model, context);
-    intercept::update(view, model, context, events);
-    fire_torpedo::update(view, model, context, events);
-    vessel::update(view, model, context, events);
+    approach::update(view);
+    apsis::update(view);
+    point::update(view);
+    burn::update(view);
+    encounter::update(view);
+    guidance::update(view);
+    orbitable::update(view);
+    intercept::update(view);
+    fire_torpedo::update(view);
+    vessel::update(view);
 }

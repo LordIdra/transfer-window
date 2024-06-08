@@ -1,8 +1,8 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::VesselClass, ComponentType}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{vessel_component::VesselClass, ComponentType}, storage::entity_allocator::Entity};
 
-use crate::game::{selected::Selected, Scene};
+use crate::game::{selected::Selected, View};
 
 use super::Icon;
 
@@ -13,10 +13,10 @@ pub struct Vessel {
 }
 
 impl Vessel {
-    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(model, vec![ComponentType::VesselComponent]) {
-            if !model.vessel_component(entity).is_ghost() {
+        for entity in view.entities_should_render(vec![ComponentType::VesselComponent]) {
+            if !view.model.vessel_component(entity).is_ghost() {
                 let icon = Self { entity };
                 icons.push(Box::new(icon) as Box<dyn Icon>);
             }
@@ -26,12 +26,12 @@ impl Vessel {
 }
 
 impl Icon for Vessel {
-    fn texture(&self, view: &Scene, model: &Model) -> String {
-        let mut base_name = match model.vessel_component(self.entity).class() {
+    fn texture(&self, view: &View) -> String {
+        let mut base_name = match view.model.vessel_component(self.entity).class() {
             VesselClass::Torpedo => "vessel-icon-torpedo",
             VesselClass::Light => "vessel-icon-light",
         }.to_string();
-        if let Some(target) = view.selected.target(model) {
+        if let Some(target) = view.selected.target(&view.model) {
             if target == self.entity {
                 base_name += "-target";
             }
@@ -39,7 +39,7 @@ impl Icon for Vessel {
         base_name
     }
 
-    fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+    fn alpha(&self, _view: &View, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
             return 0.4;
         }
@@ -52,30 +52,30 @@ impl Icon for Vessel {
         0.6
     }
 
-    fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
+    fn radius(&self, _view: &View) -> f64 {
         10.0
     }
 
-    fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
+    fn priorities(&self, view: &View) -> [u64; 4] {
         [
-            u64::from(self.is_selected(view, model)),
+            u64::from(self.is_selected(view)),
             1,
             0,
-            model.mass(self.entity) as u64
+            view.model.mass(self.entity) as u64
         ]
     }
 
-    fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
+    fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Vessel position");
-        model.absolute_position(self.entity)
+        view.model.absolute_position(self.entity)
     }
 
-    fn facing(&self, _view: &Scene, model: &Model) -> Option<DVec2> {
-        Some(model.velocity(self.entity).normalize())
+    fn facing(&self, view: &View) -> Option<DVec2> {
+        Some(view.model.velocity(self.entity).normalize())
     }
 
-    fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
+    fn is_selected(&self, view: &View) -> bool {
         if let Selected::Vessel(entity) = view.selected {
             entity == self.entity
         } else {
@@ -83,7 +83,7 @@ impl Icon for Vessel {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
         if pointer.primary_clicked() {
             view.selected = Selected::Vessel(self.entity);
         } else if pointer.secondary_clicked() {

@@ -1,9 +1,9 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity};
 
-use crate::game::{selected::{util::BurnState, Selected}, util::should_render_at_time, Scene};
+use crate::game::{selected::{util::BurnState, Selected}, util::should_render_at_time, View};
 
 use super::Icon;
 
@@ -14,11 +14,11 @@ pub struct FireTorpedo {
 }
 
 impl FireTorpedo {
-    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(model, vec![ComponentType::VesselComponent]) {
-            for event in model.vessel_component(entity).timeline().events() {
-                if event.is_fire_torpedo() && should_render_at_time(view, model, entity, event.time()) {
+        for entity in view.entities_should_render(vec![ComponentType::VesselComponent]) {
+            for event in view.model.vessel_component(entity).timeline().events() {
+                if event.is_fire_torpedo() && should_render_at_time(view, entity, event.time()) {
                     let icon = Self { entity, time: event.time() };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
@@ -29,11 +29,11 @@ impl FireTorpedo {
 }
 
 impl Icon for FireTorpedo {
-    fn texture(&self, _view: &Scene, _model: &Model) -> String {
+    fn texture(&self, _view: &View) -> String {
         "torpedo".to_string()
     }
 
-    fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+    fn alpha(&self, _view: &View, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
             return 0.4;
         }
@@ -46,31 +46,31 @@ impl Icon for FireTorpedo {
         0.6
     }
 
-    fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
+    fn radius(&self, _view: &View) -> f64 {
         18.0
     }
 
-    fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
+    fn priorities(&self, view: &View) -> [u64; 4] {
         [
-            u64::from(self.is_selected(view, model)),
+            u64::from(self.is_selected(view)),
             0,
             0,
-            model.mass(self.entity) as u64
+            view.model.mass(self.entity) as u64
         ]
     }
 
-    fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
+    fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Fire torpedo position");
-        let orbit = model.orbit_at_time(self.entity, self.time);
-        model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
+        let orbit = view.model.orbit_at_time(self.entity, self.time);
+        view.model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
     }
 
-    fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {
+    fn facing(&self, _view: &View) -> Option<DVec2> {
         None
     }
 
-    fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
+    fn is_selected(&self, view: &View) -> bool {
         if let Selected::FireTorpedo { entity, time, state: _ } = &view.selected {
             *entity == self.entity && *time == self.time
         } else {
@@ -78,7 +78,7 @@ impl Icon for FireTorpedo {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut Scene, model: &Model, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
         if !pointer.primary_clicked() {
             return;
         }
@@ -86,8 +86,8 @@ impl Icon for FireTorpedo {
         if let Selected::FireTorpedo { entity, time, state } = &mut view.selected {
             if *entity == self.entity 
                     && *time == self.time 
-                    && model.timeline_event_at_time(self.entity, self.time).can_adjust(model)
-                    && model.timeline_event_at_time(*entity, *time).as_fire_torpedo().unwrap().can_adjust(model) {
+                    && view.model.timeline_event_at_time(self.entity, self.time).can_adjust(&view.model)
+                    && view.model.timeline_event_at_time(*entity, *time).as_fire_torpedo().unwrap().can_adjust(&view.model) {
                 if state.is_selected() {
                     trace!("Fire torpedo icon clicked; switching Selected -> Adjusting");
                     *state = BurnState::Adjusting;

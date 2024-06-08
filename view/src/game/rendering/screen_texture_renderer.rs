@@ -20,7 +20,7 @@ pub struct ScreenTextureRenderer {
 
 impl ScreenTextureRenderer {
     pub fn new(gl: &Arc<Context>, screen_rect: Rect) -> Self {
-        let program = ShaderProgram::new(gl, include_str!("../../resources/shaders/screen_texture.vert"), include_str!("../../resources/shaders/screen_texture.frag"));
+        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/screen_texture.vert"), include_str!("../../../resources/shaders/screen_texture.frag"));
         let vertex_array_object = VertexArrayObject::new(gl, vec![
             VertexAttribute { index: 0, count: 2 }, // position
             VertexAttribute { index: 1, count: 2 }, // texture coordinates

@@ -3,9 +3,9 @@ use std::sync::Arc;
 use eframe::{egui::{Pos2, Rect}, glow};
 use glow::Context;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{storage::entity_allocator::Entity, Model};
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::camera::Camera;
+use crate::game::View;
 
 use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 
@@ -26,7 +26,7 @@ impl ExplosionRenderer {
         let size = combined_mass / 2.0e5; 
         let speed = 1.0e6 / combined_mass;
         let duration = 5.0e3 / speed;
-        let program = ShaderProgram::new(gl, include_str!("../../resources/shaders/explosion.vert"), include_str!("../../resources/shaders/explosion.frag"));
+        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/explosion.vert"), include_str!("../../../resources/shaders/explosion.frag"));
         let mut vertex_array_object = VertexArrayObject::new(gl, vec![
             VertexAttribute { index: 0, count: 2 },
         ]);
@@ -44,9 +44,9 @@ impl ExplosionRenderer {
         Self { program, vertex_array_object, explosion_time, duration, parent, offset, size, speed, center }
     }
 
-    pub fn update_position(&mut self, camera: &mut Camera, model: &Model, screen_rect: Rect) {
-        let world_coords = model.absolute_position(self.parent) + self.offset;
-        self.center = Some(camera.world_space_to_window_space(model, world_coords, screen_rect));
+    pub fn update_position(&mut self, view: &mut View) {
+        let world_coords = view.model.absolute_position(self.parent) + self.offset;
+        self.center = Some(view.world_space_to_window_space(world_coords));
     }
 
     pub fn is_finished(&self, time: f64) -> bool {

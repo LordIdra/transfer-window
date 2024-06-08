@@ -1,18 +1,17 @@
-use eframe::egui::{self, Context, Key, Pos2, Rect, Vec2};
+use eframe::egui::{self, Key, Pos2, Rect, Vec2};
 use nalgebra_glm::vec2;
-use transfer_window_model::Model;
 
-use super::Scene;
+use super::View;
 
 pub const MIN_ZOOM: f64 = 1.0e-9;
 pub const MAX_ZOOM: f64 = 1.0;
 const ZOOM_SENSITIVITY: f64 = 0.003;
 
-fn update_pan(view: &mut Scene, mouse_delta: Vec2) {
+fn update_pan(view: &mut View, mouse_delta: Vec2) {
     view.camera.pan(vec2(-mouse_delta.x as f64, mouse_delta.y as f64));
 }
 
-fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui::Vec2, screen_size: Rect) {
+fn update_zoom(view: &mut View, latest_mouse_position: Pos2, scroll_delta: egui::Vec2, screen_size: Rect) {
     let screen_size = vec2(screen_size.width() as f64, screen_size.height() as f64);
     let new_zoom = view.camera.zoom() * (1.0 + ZOOM_SENSITIVITY * scroll_delta.y as f64);
     let mouse_position = vec2(
@@ -26,23 +25,23 @@ fn update_zoom(view: &mut Scene, latest_mouse_position: Pos2, scroll_delta: egui
     view.camera.set_zoom(actual_new_zoom);
 }
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context) {
+pub fn update(view: &mut View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update camera");
 
-    if view.pointer_over_ui_last_frame {
+    if view.pointer_over_ui {
         return;
     }
 
-    let screen_rect = context.screen_rect();
+    let screen_rect = view.screen_rect;
     
-    context.input(|input| {
+    view.context.clone().input(|input| {
         if input.key_pressed(Key::R) {
             view.camera.reset_panning();
         }
         
         if input.key_pressed(Key::F) {
-            if let Some(entity) = view.selected.entity(model) {
+            if let Some(entity) = view.selected.entity(&view.model) {
                 view.camera.set_focus(Some(entity));
             }
         }

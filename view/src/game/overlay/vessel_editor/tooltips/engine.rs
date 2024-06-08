@@ -1,9 +1,9 @@
 use eframe::egui::{Grid, RichText, Ui};
 use transfer_window_model::components::vessel_component::system_slot::{engine::{Engine, EngineType}, System};
 
-use crate::game::Scene;
+use crate::game::View;
 
-pub fn show_tooltip(view: &Scene, ui: &mut Ui, engine: &Option<Engine>) {
+pub fn show_tooltip(view: &View, ui: &mut Ui, engine: &Option<Engine>) {
     let Some(engine) = engine else {
         ui.label(RichText::new("None").strong().monospace().size(20.0));
         return;

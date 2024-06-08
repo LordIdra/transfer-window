@@ -1,8 +1,8 @@
 #![allow(clippy::match_same_arms)]
-use eframe::egui::{Context, RichText, Ui};
-use transfer_window_model::{api::encounters::EncounterType, components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity, Model};
+use eframe::egui::{RichText, Ui};
+use transfer_window_model::{api::encounters::EncounterType, components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity};
 
-use crate::game::{overlay::widgets::custom_image::CustomImage, util::{format_distance, format_time, ApproachType, ApsisType}, Scene};
+use crate::game::{overlay::widgets::custom_image::CustomImage, util::{format_distance, format_time, ApproachType, ApsisType}, View};
 
 enum VisualTimelineEvent {
     TimelineEvent(TimelineEvent),
@@ -58,7 +58,7 @@ impl VisualTimelineEvent {
         }
     }
 
-    pub fn name(&self, model: &Model) -> String {
+    pub fn name(&self, view: &View) -> String {
         match self {
             VisualTimelineEvent::TimelineEvent(event) => match event {
                 TimelineEvent::Intercept(_) => "Intercept".to_string(),
@@ -72,53 +72,53 @@ impl VisualTimelineEvent {
             }
             VisualTimelineEvent::Approach { distance, .. } => format!("Closest Approach - {}", format_distance(*distance)),
             VisualTimelineEvent::Encounter { type_, other_entity, .. } => match type_ {
-                EncounterType::Entrance => format!("{} Entrance", model.name_component(*other_entity).name()),
-                EncounterType::Exit => format!("{} Exit", model.name_component(*other_entity).name()),
+                EncounterType::Entrance => format!("{} Entrance", view.model.name_component(*other_entity).name()),
+                EncounterType::Exit => format!("{} Exit", view.model.name_component(*other_entity).name()),
             }
         }
     }
 }
 
-fn generate_timeline_events(model: &Model, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for event in model.vessel_component(entity).timeline().events() {
+fn generate_timeline_events(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
+    for event in view.model.vessel_component(entity).timeline().events() {
         events.push(VisualTimelineEvent::TimelineEvent(event.clone()));
     }
 }
 
-fn generate_apoapsis_periapsis(model: &Model, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for orbit in model.path_component(entity).future_orbits() {
+fn generate_apoapsis_periapsis(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
+    for orbit in view.model.path_component(entity).future_orbits() {
         if let Some(time) = orbit.next_periapsis_time() {
-            let distance = model.position_at_time(entity, time).magnitude();
+            let distance = view.model.position_at_time(entity, time).magnitude();
             events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Periapsis, time, distance });
         }
 
         if let Some(time) = orbit.next_apoapsis_time() {
-            let distance = model.position_at_time(entity, time).magnitude();
+            let distance = view.model.position_at_time(entity, time).magnitude();
             events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Apoapsis, time, distance });
         }
     }
 }
 
-fn generate_closest_approaches(model: &Model, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    let Some(target) = model.vessel_component(entity).target() else { 
+fn generate_closest_approaches(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
+    let Some(target) = view.model.vessel_component(entity).target() else { 
         return;
     };
 
-    let (approach_1_time, approach_2_time) = model.find_next_two_closest_approaches(entity, target);
+    let (approach_1_time, approach_2_time) = view.model.find_next_two_closest_approaches(entity, target);
 
     if let Some(time) = approach_1_time {
-        let distance = model.distance_at_time(entity, target, time);
+        let distance = view.model.distance_at_time(entity, target, time);
         events.push(VisualTimelineEvent::Approach { type_: ApproachType::First, time, distance });
     }
 
     if let Some(time) = approach_2_time {
-        let distance = model.distance_at_time(entity, target, time);
+        let distance = view.model.distance_at_time(entity, target, time);
         events.push(VisualTimelineEvent::Approach { type_: ApproachType::Second, time, distance });
     }
 }
 
-fn generate_encounters(model: &Model, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for encounter in model.future_encounters(entity) {
+fn generate_encounters(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
+    for encounter in view.model.future_encounters(entity) {
         let time = encounter.time();
         match encounter.encounter_type() {
             EncounterType::Entrance => events.push(VisualTimelineEvent::Encounter { type_: EncounterType::Exit, time, other_entity: encounter.to() }),
@@ -127,17 +127,17 @@ fn generate_encounters(model: &Model, entity: Entity, events: &mut Vec<VisualTim
     }
 }
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, entity: Entity) {
+pub fn update(view: &mut View, ui: &mut Ui, entity: Entity) {
     let mut events = vec![];
 
-    generate_timeline_events(model, entity, &mut events);
-    generate_apoapsis_periapsis(model, entity, &mut events);
-    generate_closest_approaches(model, entity, &mut events);
-    generate_encounters(model, entity, &mut events);
+    generate_timeline_events(view, entity, &mut events);
+    generate_apoapsis_periapsis(view, entity, &mut events);
+    generate_closest_approaches(view, entity, &mut events);
+    generate_encounters(view, entity, &mut events);
 
     events.sort_by(|a, b| a.time().total_cmp(&b.time()));
 
-    if let Some(last_event) = model.vessel_component(entity).timeline().last_event() {
+    if let Some(last_event) = view.model.vessel_component(entity).timeline().last_event() {
         if last_event.is_intercept() {
             events.retain(|event| event.time() <= last_event.time());
         }
@@ -145,10 +145,10 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, e
 
     for event in events {
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, event.icon(), context.screen_rect(), 20.0)
+            let image = CustomImage::new(view, event.icon(), 20.0)
                 .with_padding(event.padding());
             ui.add(image);
-            ui.label(RichText::new(format!("T- {}", format_time((event.time().ceil() - model.time()).floor()))).weak().size(12.0));
+            ui.label(RichText::new(format!("T- {}", format_time((event.time().ceil() - view.model.time()).floor()))).weak().size(12.0));
 
             let width = 150.0 - ui.cursor().left();
             let mut rect = ui.cursor();
@@ -156,7 +156,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, ui: &mut Ui, e
             rect.set_height(0.0);
             ui.advance_cursor_after_rect(rect);
 
-            ui.label(RichText::new(event.name(model)));
+            ui.label(RichText::new(event.name(view)));
             ui.end_row();
         });
     }

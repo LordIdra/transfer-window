@@ -14,7 +14,7 @@ pub struct GeometryRenderer {
 
 impl GeometryRenderer {
     pub fn new(gl: &Arc<Context>) -> Self {
-        let program = ShaderProgram::new(gl, include_str!("../../resources/shaders/geometry.vert"), include_str!("../../resources/shaders/geometry.frag"));
+        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/geometry.vert"), include_str!("../../../resources/shaders/geometry.frag"));
         let vertex_array_object = VertexArrayObject::new(gl, vec![
             VertexAttribute { index: 0, count: 2 }, // x
             VertexAttribute { index: 1, count: 2 }, // y

@@ -42,8 +42,8 @@ impl RenderPipeline {
 
             gl.bind_framebuffer(FRAMEBUFFER, None);
 
-            let bloom_program = ShaderProgram::new(gl, include_str!("../../resources/shaders/bloom.vert"), include_str!("../../resources/shaders/bloom.frag"));
-            let screen_program = ShaderProgram::new(gl, include_str!("../../resources/shaders/screen.vert"), include_str!("../../resources/shaders/screen.frag"));
+            let bloom_program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/bloom.vert"), include_str!("../../../resources/shaders/bloom.frag"));
+            let screen_program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/screen.vert"), include_str!("../../../resources/shaders/screen.frag"));
 
             let mut screen_vao = VertexArrayObject::new(gl, vec![
                 VertexAttribute { index: 0, count: 2 }, // x

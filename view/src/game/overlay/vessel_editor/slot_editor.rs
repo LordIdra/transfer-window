@@ -1,7 +1,7 @@
-use eframe::{egui::{Align2, Context, Id, ImageButton, LayerId, Order, Pos2, Ui, Window}, epaint};
+use eframe::{egui::{Align2, Id, ImageButton, LayerId, Order, Pos2, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, Slot, SlotLocation}, VesselClass}, storage::entity_allocator::Entity};
 
-use crate::{events::Event, game::{overlay::slot_textures::TexturedSlot, Scene}, styles};
+use crate::{game::{events::Event, overlay::slot_textures::TexturedSlot, View}, styles};
 
 use super::{tooltips::show_tooltip, util::{compute_slot_locations, compute_slot_size}};
 
@@ -22,16 +22,16 @@ impl SlotSelector {
         Self { texture, slot }
     }
 
-    pub fn draw(&self, view: &Scene, context: &Context, ui: &mut Ui) -> bool {
+    pub fn draw(&self, view: &View, ui: &mut Ui) -> bool {
         let slot_selector_size = epaint::Vec2::splat(SLOT_SELECTOR_SIZE);        
         let image_button = ImageButton::new(view.resources.texture_image(self.texture.as_str()));
         let response = ui.add_sized(slot_selector_size, image_button);
         let clicked = response.clicked();
-        styles::DefaultWindow::apply(context);
+        styles::DefaultWindow::apply(&view.context);
         response.on_hover_ui(|ui| { 
             show_tooltip(view, ui, &self.slot);
         });
-        styles::SlotSelectorWindow::apply(context);
+        styles::SlotSelectorWindow::apply(&view.context);
         clicked
     }
 }
@@ -80,7 +80,7 @@ impl SlotEditor {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn draw(&self, view: &mut Scene, context: &Context, vessel_name: &str, slot_location: SlotLocation, slot_center: Pos2, scalar: f32, events: &mut Vec<Event>) {
+    pub fn draw(&self, view: &mut View, vessel_name: &str, slot_location: SlotLocation, slot_center: Pos2, scalar: f32) {
         let slot_translation = scalar * compute_slot_locations(self.vessel_class)
             .get(&self.location)
             .expect("Slot editor location does not exist");
@@ -91,7 +91,7 @@ impl SlotEditor {
         let name = format!("Slot selector - {vessel_name} - {slot_location:?}");
         let id = Id::new(name.clone());
         
-        styles::SlotSelectorWindow::apply(context);
+        styles::SlotSelectorWindow::apply(&view.context);
         Window::new(name)
                 .title_bar(false)
                 .resizable(false)
@@ -99,13 +99,13 @@ impl SlotEditor {
                 .current_pos(slot_selector_center)
                 .movable(false)
                 .id(id)
-                .show(context, |ui| {
+                .show(&view.context.clone(), |ui| {
             styles::SlotSelector::apply(ui);
 
             ui.horizontal(|ui| {
                 for selector in &self.selectors {
-                    if selector.draw(view, context, ui) {
-                        events.push(Event::SetSlot { entity: self.entity, slot_location: self.location, slot: selector.slot.clone() });
+                    if selector.draw(view, ui) {
+                        view.events.push(Event::SetSlot { entity: self.entity, slot_location: self.location, slot: selector.slot.clone() });
                         should_close = true;
                     }
                 }
@@ -115,7 +115,7 @@ impl SlotEditor {
         // Bring window to top
         // https://github.com/emilk/egui/discussions/3493
         let layer_id = LayerId::new(Order::Middle, id);
-        context.move_to_top(layer_id);
+        view.context.move_to_top(layer_id);
 
         if should_close {
             view.vessel_editor.as_mut().unwrap().slot_editor = None;

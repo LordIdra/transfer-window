@@ -1,18 +1,16 @@
-use eframe::egui::Context;
 use log::trace;
-use transfer_window_model::Model;
 
-use crate::{events::Event, game::{selected::{burn, fire_torpedo, segment_point, Selected}, Scene}};
+use crate::game::{selected::{burn, fire_torpedo, segment_point, Selected}, View};
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>, is_mouse_over_any_icon: bool) {
+pub fn update(view: &mut View, is_mouse_over_any_icon: bool) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update selected");
-    let is_mouse_over_ui_element = view.pointer_over_ui_last_frame || is_mouse_over_any_icon;
+    let is_mouse_over_ui_element = view.pointer_over_ui || is_mouse_over_any_icon;
 
     // IMPORTANT: the update functions may lock the context, so they
     // must not be called within an input closure, otherwise a
     // deadlock will occur!!
-    let pointer = context.input(|input| {
+    let pointer = view.context.input(|input| {
         input.pointer.clone()
     });
 
@@ -24,7 +22,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
 
     // Draw hover circle
     if !matches!(view.selected, Selected::Point { .. }) {
-        segment_point::draw_hover(view, model, context, &pointer, is_mouse_over_ui_element);
+        segment_point::draw_hover(view, &pointer, is_mouse_over_ui_element);
     }
 
     match view.selected.clone() {
@@ -36,8 +34,8 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut V
             | Selected::Encounter { .. }
             | Selected::Intercept { .. }
             | Selected::EnableGuidance { .. }=> (),
-        Selected::Point { .. } => segment_point::draw_selected(view, model),
-        Selected::Burn { .. } => burn::update_adjustment(view, model, context, events, &pointer),
-        Selected::FireTorpedo { .. } => fire_torpedo::update_adjustment(view, model, context, events, &pointer),
+        Selected::Point { .. } => segment_point::draw_selected(view),
+        Selected::Burn { .. } => burn::update_adjustment(view, &pointer),
+        Selected::FireTorpedo { .. } => fire_torpedo::update_adjustment(view, &pointer),
     }
 }

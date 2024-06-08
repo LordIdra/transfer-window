@@ -1,11 +1,10 @@
-pub mod events;
+pub mod controller_events;
 pub mod game;
 pub mod menu;
-mod rendering;
 pub mod resources;
 mod styles;
 
-pub enum View {
-    GameScene(game::Scene),
-    MenuScene(menu::Scene),
+pub enum Scene {
+    Game(game::View),
+    Menu(menu::View),
 }

@@ -1,7 +1,6 @@
-use eframe::egui::{Context, Window};
-use transfer_window_model::Model;
+use eframe::egui::Window;
 
-use super::Scene;
+use super::View;
 
 mod overview;
 mod entities;
@@ -12,7 +11,7 @@ pub enum DebugWindowTab {
     Entities,
 }
 
-pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
+pub fn draw(view: &mut View) {
     if !view.debug_window_open {
         return;
     }
@@ -21,7 +20,7 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
     let _span = tracy_client::span!("Draw debug");
     
     Window::new("Debug")
-        .show(context, |ui| {
+        .show(&view.context.clone(), |ui| {
 
             ui.horizontal(|ui| {
                 ui.selectable_value(&mut view.debug_window_tab, DebugWindowTab::Overview, "Overview");
@@ -29,8 +28,8 @@ pub fn draw(view: &mut Scene, model: &Model, context: &Context) {
             });
 
             match view.debug_window_tab {
-                DebugWindowTab::Overview => overview::draw(model, ui),
-                DebugWindowTab::Entities => entities::draw(model, ui),
+                DebugWindowTab::Overview => overview::draw(&view.model, ui),
+                DebugWindowTab::Entities => entities::draw(&view.model, ui),
             }
     });
 }

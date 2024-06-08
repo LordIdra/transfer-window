@@ -1,25 +1,24 @@
-use eframe::egui::{Context, Key};
+use eframe::egui::Key;
 
-use crate::events::Event;
-use crate::game::selected::Selected;
+use crate::game::{events::Event, selected::Selected};
 
-use super::Scene;
+use super::View;
 
-pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
+pub fn update(view: &mut View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update keyboard");
 
-    context.input(|input| {
+    view.context.input(|input| {
         if input.key_pressed(Key::Space) {
-            events.push(Event::TogglePaused);
+            view.events.push(Event::TogglePaused);
         }
 
         if input.key_pressed(Key::Equals) {
-            events.push(Event::IncreaseTimeStepLevel);
+            view.events.push(Event::IncreaseTimeStepLevel);
         }
 
         if input.key_pressed(Key::Minus) {
-            events.push(Event::DecreaseTimeStepLevel);
+            view.events.push(Event::DecreaseTimeStepLevel);
         }
 
         if input.key_pressed(Key::F12) {
@@ -39,7 +38,7 @@ pub fn update(view: &mut Scene, context: &Context, events: &mut Vec<Event>) {
                 Selected::Burn { entity, .. }
                     | Selected::FireTorpedo { entity, .. } 
                     | Selected::EnableGuidance { entity, .. } => {
-                        events.push(Event::CancelLastTimelineEvent { entity });
+                        view.events.push(Event::CancelLastTimelineEvent { entity });
                         view.selected = Selected::None;
                 }
             }

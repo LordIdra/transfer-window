@@ -1,12 +1,21 @@
+pub mod explosion_renderer;
+pub mod geometry_renderer;
+pub mod render_pipeline;
+pub mod screen_texture_renderer;
+mod shader_program;
+pub mod texture_renderer;
+pub mod texture;
+mod util;
+mod vertex_array_object;
+
 use std::{collections::HashMap, sync::{Arc, Mutex}};
 
-use eframe::{egui::{CentralPanel, Context, PaintCallback, Rect}, egui_glow::CallbackFn, glow::{self}};
+use eframe::{egui::{CentralPanel, PaintCallback, Rect}, egui_glow::CallbackFn, glow::{self}};
 use log::error;
-use transfer_window_model::Model;
 
-use crate::{rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, screen_texture_renderer::ScreenTextureRenderer, texture_renderer::TextureRenderer}, resources::Resources};
+use crate::{game::rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, screen_texture_renderer::ScreenTextureRenderer, texture_renderer::TextureRenderer}, resources::Resources};
 
-use super::Scene;
+use super::View;
 
 /// Rendering pipeline overview
 /// 1) View adds all necessary vertices to various renderers
@@ -70,38 +79,38 @@ impl Renderers {
     }
 }
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context) {
+pub fn update(view: &mut View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update rendering");
 
-    let screen_rect = context.screen_rect();
+    let screen_rect = view.screen_rect;
     let render_pipeline = view.renderers.render_pipeline.clone();
     let object_renderer = view.renderers.object_renderer.clone();
     let segment_renderer = view.renderers.segment_renderer.clone();
     let texture_renderers = view.renderers.texture_renderers.clone();
     let explosion_renderers = view.renderers.explosion_renderers.clone();
-    let time = model.time();
+    let time = view.model.time();
     let zoom = view.camera.zoom();
 
     // Matrices need model to calculate, which is not send/sync, so we have to calculate matrices *before* constructing a callback
     let zoom_matrix = view.camera.zoom_matrix(screen_rect);
-    let translation_matrices = view.camera.translation_matrices(model);
+    let translation_matrices = view.camera.translation_matrices(&view.model);
 
     // Start new explosion renderers
-    for explosion in model.explosions_started_this_frame() {
+    for explosion in view.model.explosions_started_this_frame() {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Start explosion renderer");
-        let renderer = ExplosionRenderer::new(&view.gl, model.time(), explosion.parent(), explosion.offset(), explosion.combined_mass());
+        let renderer = ExplosionRenderer::new(&view.gl, view.model.time(), explosion.parent(), explosion.offset(), explosion.combined_mass());
         view.renderers.explosion_renderers.lock().unwrap().push(renderer);
     }
 
     // Delete expired explosion renderers
     view.renderers.explosion_renderers.lock().unwrap()
-        .retain(|renderer| !renderer.is_finished(model.time()));
+        .retain(|renderer| !renderer.is_finished(view.model.time()));
 
     // Update explosion renderers
-    view.renderers.explosion_renderers.lock().unwrap()
-        .iter_mut().for_each(|renderer| renderer.update_position(&mut view.camera, model, context.screen_rect()));
+    view.renderers.explosion_renderers.clone().lock().unwrap()
+        .iter_mut().for_each(|renderer| renderer.update_position(view));
 
     // Make sure to regenerate framebuffer with new size if window resized
     if screen_rect != view.renderers.screen_rect {
@@ -142,7 +151,7 @@ pub fn update(view: &mut Scene, model: &Model, context: &Context) {
     }));
 
     // At time of writing there is no way to do this without providing a callback (which must be send + sync)
-    CentralPanel::default().show(context, |ui| {
+    CentralPanel::default().show(&view.context.clone(), |ui| {
         ui.painter().add(PaintCallback { rect: screen_rect, callback });
     });
 }

@@ -1,8 +1,8 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, ComponentType}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, ComponentType}, storage::entity_allocator::Entity};
 
-use crate::game::{selected::Selected, Scene};
+use crate::game::{selected::Selected, View};
 
 use super::Icon;
 
@@ -12,9 +12,9 @@ pub struct Orbitable {
 }
 
 impl Orbitable {
-    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(model, vec![ComponentType::OrbitableComponent]) {
+        for entity in view.entities_should_render(vec![ComponentType::OrbitableComponent]) {
             let icon = Self { entity };
             icons.push(Box::new(icon) as Box<dyn Icon>);
         }
@@ -23,15 +23,15 @@ impl Orbitable {
 }
 
 impl Icon for Orbitable {
-    fn texture(&self, view: &Scene, model: &Model) -> String {
-        let mut texture = match model.orbitable_component(self.entity).type_() {
+    fn texture(&self, view: &View) -> String {
+        let mut texture = match view.model.orbitable_component(self.entity).type_() {
             OrbitableType::Star => "star",
             OrbitableType::Planet => "planet",
             OrbitableType::Moon => "moon",
         }.to_string();
 
         if let Selected::Vessel(entity) = view.selected {
-            if let Some(target) = model.vessel_component(entity).target() {
+            if let Some(target) = view.model.vessel_component(entity).target() {
                 if target == self.entity {
                     texture += "-target";
                 }
@@ -41,7 +41,7 @@ impl Icon for Orbitable {
         texture
     }
 
-    fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+    fn alpha(&self, _view: &View, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
             return 0.4;
         }
@@ -54,30 +54,30 @@ impl Icon for Orbitable {
         0.6
     }
 
-    fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
+    fn radius(&self, _view: &View) -> f64 {
         16.0
     }
 
-    fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
+    fn priorities(&self, view: &View) -> [u64; 4] {
         [
-            u64::from(self.is_selected(view, model)),
+            u64::from(self.is_selected(view)),
             2,
             0,
-            (model.mass(self.entity) / 1.0e20) as u64
+            (view.model.mass(self.entity) / 1.0e20) as u64
         ]
     }
 
-    fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
+    fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("orbitable position");
-        model.absolute_position(self.entity)
+        view.model.absolute_position(self.entity)
     }
 
-    fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {
+    fn facing(&self, _view: &View) -> Option<DVec2> {
         None
     }
 
-    fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
+    fn is_selected(&self, view: &View) -> bool {
         if let Selected::Orbitable(entity) = view.selected {
             entity == self.entity
         } else {
@@ -85,7 +85,7 @@ impl Icon for Orbitable {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
         if pointer.primary_clicked() {
             view.selected = Selected::Orbitable(self.entity);
         } else if pointer.secondary_clicked() {

@@ -1,32 +1,32 @@
-use eframe::egui::{Context, PointerState};
+use eframe::egui::PointerState;
 use log::trace;
-use transfer_window_model::{storage::entity_allocator::Entity, Model};
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::{selected::Selected, util::add_textured_square, Scene};
+use crate::game::{selected::Selected, util::add_textured_square, View};
 
 const SELECT_DISTANCE: f64 = 24.0;
 const SELECT_RADIUS: f64 = 4.0;
 const HOVERED_ALPHA: f32 = 0.8;
 const SELECTED_ALPHA: f32 = 1.0;
 
-fn draw_selected_circle(view: &mut Scene, model: &Model, entity: Entity, time: f64, alpha: f32) {
+fn draw_selected_circle(view: &mut View, entity: Entity, time: f64, alpha: f32) {
     let select_radius = SELECT_RADIUS / view.camera.zoom();
     let mut vertices = vec![];
-    let path_component = model.path_component(entity);
+    let path_component = view.model.path_component(entity);
     let segment = path_component.future_segment_at_time(time);
-    let point = model.absolute_position(segment.parent()) + segment.position_at_time(time);
+    let point = view.model.absolute_position(segment.parent()) + segment.position_at_time(time);
     add_textured_square(&mut vertices, point, select_radius, alpha);
     view.renderers.add_texture_vertices("circle", &mut vertices);
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn draw_selected(view: &mut Scene, model: &Model) {
+pub fn draw_selected(view: &mut View) {
     if let Selected::Point { entity, time } = view.selected.clone() {
-        draw_selected_circle(view, model, entity, time, SELECTED_ALPHA);
+        draw_selected_circle(view, entity, time, SELECTED_ALPHA);
     }
 }
 
-pub fn draw_hover(view: &mut Scene, model: &Model, context: &Context, pointer: &PointerState, is_mouse_over_ui_element: bool) {
+pub fn draw_hover(view: &mut View, pointer: &PointerState, is_mouse_over_ui_element: bool) {
     if is_mouse_over_ui_element {
         return;
     }
@@ -36,13 +36,13 @@ pub fn draw_hover(view: &mut Scene, model: &Model, context: &Context, pointer: &
     };
     
     let select_distance = SELECT_DISTANCE / view.camera.zoom();
-    let latest_world = view.camera.window_space_to_world_space(model, latest_window, context.screen_rect());
-    if let Some((entity, time)) = model.closest_point_on_trajectory(latest_world, select_distance) {
+    let latest_world = view.window_space_to_world_space(latest_window);
+    if let Some((entity, time)) = view.model.closest_point_on_trajectory(latest_world, select_distance) {
         if !is_mouse_over_ui_element && pointer.primary_clicked() {
             trace!("Selected segment point at time={}", time);
             view.selected = Selected::Point { entity, time };
         } else {
-            draw_selected_circle(view, model, entity, time, HOVERED_ALPHA);
+            draw_selected_circle(view, entity, time, HOVERED_ALPHA);
         }
     }
 }

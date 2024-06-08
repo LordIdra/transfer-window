@@ -1,9 +1,9 @@
 use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
 use thousands::Separable;
-use transfer_window_model::{storage::entity_allocator::Entity, Model};
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use super::{selected::util::BurnAdjustDirection, Scene};
+use super::{selected::util::BurnAdjustDirection, View};
 
 pub const BURN_OFFSET: f64 = 40.0;
 const MIN_SOI_PIXELS: f64 = 30.0;
@@ -132,41 +132,41 @@ pub fn format_speed(speed: f64) -> String {
     }
 }
 
-pub fn compute_burn_arrow_position(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
-    let burn = model.burn_starting_at_time(entity, time);
-    let burn_position = model.absolute_position(burn.parent()) + burn.start_point().position();
+pub fn compute_burn_arrow_position(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
+    let burn = view.model.burn_starting_at_time(entity, time);
+    let burn_position = view.model.absolute_position(burn.parent()) + burn.start_point().position();
     let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
 }
 
-pub fn compute_adjust_fire_torpedo_arrow_position(view: &Scene, model: &Model, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
-    let event = model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
-    let orbit = model.orbit_at_time(entity, time);
-    let burn_position = model.absolute_position(orbit.parent()) + model.position_at_time(entity, time);
-    let burn_to_arrow_unit = model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * direction.vector();
+pub fn compute_adjust_fire_torpedo_arrow_position(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
+    let event = view.model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
+    let orbit = view.model.orbit_at_time(entity, time);
+    let burn_position = view.model.absolute_position(orbit.parent()) + view.model.position_at_time(entity, time);
+    let burn_to_arrow_unit = view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * direction.vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
 }
 
-pub fn should_render_parent(view: &Scene, model: &Model, parent: Entity) -> bool {
-    let Some(orbit) = model.orbitable_component(parent).orbit() else {
+pub fn should_render_parent(view: &View, parent: Entity) -> bool {
+    let Some(orbit) = view.model.orbitable_component(parent).orbit() else {
         return true;
     };
     let soi_pixels = orbit.sphere_of_influence() * view.camera.zoom();
     soi_pixels >= MIN_SOI_PIXELS
 }
 
-pub fn should_render(view: &Scene, model: &Model, entity: Entity) -> bool {
-    let Some(parent) = model.parent(entity) else {
+pub fn should_render(view: &View, entity: Entity) -> bool {
+    let Some(parent) = view.model.parent(entity) else {
         return true;
     };
-    should_render_parent(view, model, parent)
+    should_render_parent(view, parent)
 }
 
-pub fn should_render_at_time(view: &Scene, model: &Model, entity: Entity, time: f64) -> bool {
-    let Some(parent) = model.parent_at_time(entity, time) else {
+pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
+    let Some(parent) = view.model.parent_at_time(entity, time) else {
         return true;
     };
-    should_render_parent(view, model, parent)
+    should_render_parent(view, parent)
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

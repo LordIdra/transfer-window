@@ -2,9 +2,9 @@ use std::f64::consts::PI;
 
 use eframe::egui::Rgba;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::ComponentType, Model};
+use transfer_window_model::components::ComponentType;
 
-use crate::game::{util::add_triangle, Scene};
+use crate::game::{util::add_triangle, View};
 
 fn compute_celestial_object_vertices(absolute_position: DVec2, radius: f64) -> Vec<f32> {
     let scaled_radius = radius;
@@ -20,12 +20,12 @@ fn compute_celestial_object_vertices(absolute_position: DVec2, radius: f64) -> V
     vertices
 }
 
-pub fn draw(view: &mut Scene, model: &Model) {
+pub fn draw(view: &mut View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw celestial objects");
-    for entity in view.entities_should_render(model, vec![ComponentType::OrbitableComponent]) {
-        let position = model.absolute_position(entity);
-        let radius = model.orbitable_component(entity).radius();
+    for entity in view.entities_should_render(vec![ComponentType::OrbitableComponent]) {
+        let position = view.model.absolute_position(entity);
+        let radius = view.model.orbitable_component(entity).radius();
         let mut vertices = compute_celestial_object_vertices(position, radius);
         view.renderers.add_object_vertices(&mut vertices);
     }

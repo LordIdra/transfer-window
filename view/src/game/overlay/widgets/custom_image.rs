@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use eframe::{egui::{PaintCallback, Pos2, Rect, Response, Sense, Ui, Vec2, Widget}, egui_glow::CallbackFn, emath::RectTransform, glow};
 
-use crate::{game::{camera::Camera, Scene}, rendering::screen_texture_renderer::ScreenTextureRenderer};
+use crate::game::{camera::Camera, rendering::screen_texture_renderer::ScreenTextureRenderer, View};
 
 pub struct CustomImage {
     renderer: Arc<Mutex<ScreenTextureRenderer>>,
@@ -14,9 +14,10 @@ pub struct CustomImage {
 }
 
 impl CustomImage {
-    pub fn new(view: &Scene, texture_name: &str, screen_rect: Rect, size: f32) -> Self {
+    pub fn new(view: &View, texture_name: &str, size: f32) -> Self {
         let renderer = view.renderers.screen_texture_renderer();
         let texture = view.resources.gl_texture(texture_name);
+        let screen_rect = view.screen_rect;
         let sense = Sense::union(Sense::click(), Sense::hover());
         let padding = 0.0;
         Self { renderer, texture, screen_rect, size, sense, padding }

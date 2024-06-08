@@ -82,20 +82,6 @@ impl Camera {
         (mat1, mat2)
     }
 
-    pub fn window_space_to_world_space(&mut self, model: &Model, window_coords: Pos2, screen_rect: Rect) -> DVec2 {
-        let offset_x = f64::from(window_coords.x - (screen_rect.width() / 2.0)) / self.zoom;
-        let offset_y = f64::from((screen_rect.height() / 2.0) - window_coords.y) / self.zoom;
-        self.translation(model) + DVec2::new(offset_x, offset_y)
-    }
-
-    #[allow(unused)]
-    pub fn world_space_to_window_space(&mut self, model: &Model, world_coords: DVec2, screen_rect: Rect) -> Pos2 {
-        let offset = world_coords - self.translation(model);
-        let window_coords_x =  (offset.x * self.zoom) as f32 + 0.5 * screen_rect.width();
-        let window_coords_y = -(offset.y * self.zoom) as f32 - 0.5 * screen_rect.height();
-        Pos2::new(window_coords_x, window_coords_y)
-    }
-
     pub fn window_space_to_screen_space(screen_rect: Rect, window_coords: Pos2) -> Pos2 {
         Pos2::new(
             (window_coords.x * 2.0) / screen_rect.width() - 1.0, 

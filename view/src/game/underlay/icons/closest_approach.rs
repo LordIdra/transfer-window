@@ -1,9 +1,9 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{storage::entity_allocator::Entity, Model};
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::{selected::Selected, util::{should_render_at_time, ApproachType}, Scene};
+use crate::game::{selected::Selected, util::{should_render_at_time, ApproachType}, View};
 
 use super::Icon;
 
@@ -17,15 +17,15 @@ pub struct ClosestApproach {
 }
 
 impl ClosestApproach {
-    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        if let Some(entity) = view.selected.entity(model) {
-            if let Some(vessel_component) = model.try_vessel_component(entity) {
+        if let Some(entity) = view.selected.entity(&view.model) {
+            if let Some(vessel_component) = view.model.try_vessel_component(entity) {
                 if let Some(target) = vessel_component.target() {
-                    let (approach_1, approach_2) = model.find_next_two_closest_approaches(entity, target);
+                    let (approach_1, approach_2) = view.model.find_next_two_closest_approaches(entity, target);
                     
                     if let Some(time) = approach_1 {
-                        if should_render_at_time(view, model, entity, time) {
+                        if should_render_at_time(view, entity, time) {
                             let icon = Self { type_: ApproachType::First, vessel: entity, target, entity, time };
                             icons.push(Box::new(icon) as Box<dyn Icon>);
                             let icon = Self { type_: ApproachType::First, vessel: entity, target, entity: target, time };
@@ -34,7 +34,7 @@ impl ClosestApproach {
                     }
 
                     if let Some(time) = approach_2 {
-                        if should_render_at_time(view, model, entity, time) {
+                        if should_render_at_time(view, entity, time) {
                             let icon = Self { type_: ApproachType::Second, vessel: entity, target, entity, time };
                             icons.push(Box::new(icon) as Box<dyn Icon>);
                             let icon = Self { type_: ApproachType::Second, vessel: entity, target, entity: target, time };
@@ -49,14 +49,14 @@ impl ClosestApproach {
 }
 
 impl Icon for ClosestApproach {
-    fn texture(&self, _view: &Scene, _model: &Model) -> String {
+    fn texture(&self, _view: &View) -> String {
         match self.type_ {
             ApproachType::First => "closest-approach-1",
             ApproachType::Second => "closest-approach-2",
         }.to_string()
     }
 
-    fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+    fn alpha(&self, _view: &View, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
             return 0.4;
         }
@@ -69,31 +69,31 @@ impl Icon for ClosestApproach {
         0.6
     }
 
-    fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
+    fn radius(&self, _view: &View) -> f64 {
         8.0
     }
 
-    fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
+    fn priorities(&self, view: &View) -> [u64; 4] {
         [
-            u64::from(self.is_selected(view, model)),
+            u64::from(self.is_selected(view)),
             0,
             3,
             0,
         ]
     }
 
-    fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
+    fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Closest approach position");
-        let orbit = model.orbit_at_time(self.entity, self.time);
-        model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
+        let orbit = view.model.orbit_at_time(self.entity, self.time);
+        view.model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
     }
 
-    fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {
+    fn facing(&self, _view: &View) -> Option<DVec2> {
         None
     }
 
-    fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
+    fn is_selected(&self, view: &View) -> bool {
         if let Selected::Approach { type_, entity, target: _, time: _ } = &view.selected {
             // time can very slightly change as approach is recalculated so not a reliable way to determine equality
             *type_ == self.type_ && *entity == self.vessel
@@ -102,7 +102,7 @@ impl Icon for ClosestApproach {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
         if pointer.primary_clicked() {
             trace!("Approach icon clicked; switching to Selected");
             view.selected = Selected::Approach { type_: self.type_, entity: self.vessel, target: self.target, time: self.time };

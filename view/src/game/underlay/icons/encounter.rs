@@ -1,9 +1,9 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{api::encounters::EncounterType, components::ComponentType, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{api::encounters::EncounterType, components::ComponentType, storage::entity_allocator::Entity};
 
-use crate::game::{selected::Selected, util::should_render_at_time, Scene};
+use crate::game::{selected::Selected, util::should_render_at_time, View};
 
 use super::Icon;
 
@@ -17,11 +17,11 @@ pub struct Encounter {
 }
 
 impl Encounter {
-    pub fn generate(view: &Scene, model: &Model) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in model.entities(vec![ComponentType::PathComponent]) {
-            for encounter in model.future_encounters(entity) {
-                if should_render_at_time(view, model, entity, encounter.time()) {
+        for entity in view.model.entities(vec![ComponentType::PathComponent]) {
+            for encounter in view.model.future_encounters(entity) {
+                if should_render_at_time(view, entity, encounter.time()) {
                     let icon = Self { type_: encounter.encounter_type(), entity, time: encounter.time(), from: encounter.from(), to: encounter.to() };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
@@ -33,14 +33,14 @@ impl Encounter {
 }
 
 impl Icon for Encounter {
-    fn texture(&self, _view: &Scene, _model: &Model) -> String {
+    fn texture(&self, _view: &View) -> String {
         match self.type_ {
             EncounterType::Entrance => "encounter-entrance",
             EncounterType::Exit => "encounter-exit",
         }.to_string()
     }
 
-    fn alpha(&self, _view: &Scene, _model: &Model, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+    fn alpha(&self, _view: &View, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
             return 0.4;
         }
@@ -53,31 +53,31 @@ impl Icon for Encounter {
         0.6
     }
 
-    fn radius(&self, _view: &Scene, _model: &Model) -> f64 {
+    fn radius(&self, _view: &View) -> f64 {
         8.0
     }
 
-    fn priorities(&self, view: &Scene, model: &Model) -> [u64; 4] {
+    fn priorities(&self, view: &View) -> [u64; 4] {
         [
-            u64::from(self.is_selected(view, model)),
+            u64::from(self.is_selected(view)),
             0,
             3,
             0,
         ]
     }
 
-    fn position(&self, _view: &Scene, model: &Model) -> DVec2 {
+    fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Encounter position");
-        let orbit = model.orbit_at_time(self.entity, self.time);
-        model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
+        let orbit = view.model.orbit_at_time(self.entity, self.time);
+        view.model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
     }
 
-    fn facing(&self, _view: &Scene, _model: &Model) -> Option<DVec2> {
+    fn facing(&self, _view: &View) -> Option<DVec2> {
         None
     }
 
-    fn is_selected(&self, view: &Scene, _model: &Model) -> bool {
+    fn is_selected(&self, view: &View) -> bool {
         if let Selected::Encounter { type_, entity, time, from: _, to: _ } = &view.selected {
             *type_ == self.type_ && *entity == self.entity && *time == self.time
         } else {
@@ -85,7 +85,7 @@ impl Icon for Encounter {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut Scene, _model: &Model, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
         if pointer.primary_clicked() {
             trace!("Encounter icon clicked; switching to Selected");
             view.selected = Selected::Encounter { type_: self.type_, entity: self.entity, time: self.time, from: self.from, to: self.to };

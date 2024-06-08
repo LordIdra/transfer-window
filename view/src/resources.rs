@@ -3,9 +3,7 @@ use std::{collections::HashMap, fs::{self, DirEntry}, sync::{Arc, Mutex}};
 use eframe::{egui::{self, ImageSource}, glow};
 use image::GenericImageView;
 
-use crate::rendering::texture;
-
-use super::rendering::texture_renderer::TextureRenderer;
+use crate::game::rendering::{texture, texture_renderer::TextureRenderer};
 
 fn directory_entries(directory: String) -> Vec<DirEntry> {
     fs::read_dir(directory)

@@ -15,7 +15,7 @@ pub struct TextureRenderer {
 
 impl TextureRenderer {
     pub fn new(gl: &Arc<Context>, texture: glow::Texture) -> Self {
-        let program = ShaderProgram::new(gl, include_str!("../../resources/shaders/icon.vert"), include_str!("../../resources/shaders/icon.frag"));
+        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/icon.vert"), include_str!("../../../resources/shaders/icon.frag"));
         let vertex_array_object = VertexArrayObject::new(gl, vec![
             VertexAttribute { index: 0, count: 2 }, // x
             VertexAttribute { index: 1, count: 2 }, // y

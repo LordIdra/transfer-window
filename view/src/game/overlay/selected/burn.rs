@@ -1,9 +1,8 @@
-use eframe::{egui::{Align2, Color32, Context, Grid, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::path_component::segment::Segment, Model};
+use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
 
-use crate::{events::Event, game::{overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton}, selected::Selected, util::format_time, Scene}, styles};
+use crate::{game::{events::Event, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton}, selected::Selected, util::format_time, View}, styles};
 
-pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
+pub fn draw_burn_info(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
     let burnt_dv = start_dv - end_dv;
 
     let start_dv_proportion = (start_dv / max_dv) as f32;
@@ -18,7 +17,7 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
 
     Grid::new("DV grid").show(ui, |ui| {
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, "duration", context.screen_rect(), 20.0);
+            let image = CustomImage::new(view, "duration", 20.0);
             ui.add(image);
             ui.label(RichText::new("Duration").strong().monospace());
         });
@@ -26,7 +25,7 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, "burn-start", context.screen_rect(), 20.0);
+            let image = CustomImage::new(view, "burn-start", 20.0);
             ui.add(image);
             ui.label(RichText::new("ΔV start").strong().monospace());
         });
@@ -34,7 +33,7 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, "burn-burnt", context.screen_rect(), 20.0);
+            let image = CustomImage::new(view, "burn-burnt", 20.0);
             ui.add(image);
             ui.label(RichText::new("ΔV burnt").strong().monospace());
         });
@@ -42,7 +41,7 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, "burn-end", context.screen_rect(), 20.0);
+            let image = CustomImage::new(view, "burn-end", 20.0);
             ui.add(image);
             ui.label(RichText::new("ΔV end").strong().monospace());
         });
@@ -51,54 +50,58 @@ pub fn draw_burn_info(view: &Scene, ui: &mut Ui, context: &Context, max_dv: f64,
     });
 }
 
-pub fn update(view: &mut Scene, model: &Model, context: &Context, events: &mut Vec<Event>) {
+pub fn update(view: &mut View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update burn");
     let Selected::Burn { entity, time, state: _ } = view.selected.clone() else { 
         return
     };
 
-    let Some(Segment::Burn(burn)) = model.path_component(entity).future_segment_starting_at_time(time) else {
+    let Some(segment) = view.model.path_component(entity).future_segment_starting_at_time(time) else {
         return;
     };
 
-    let vessel_component = model.vessel_component(entity);
+    if !segment.is_burn() {
+        return;
+    }
     
     Window::new("Selected burn")
-    .title_bar(false)
-        .resizable(false)
-        .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
-        .show(context, |ui| {
-            ui.label(RichText::new("Burn").size(20.0).monospace().strong());
-            let text = format!("T-{}", format_time(time - model.time()));
-            ui.label(RichText::new(text).weak());
+            .title_bar(false)
+            .resizable(false)
+            .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
+            .show(&view.context.clone(), |ui| {
+        ui.label(RichText::new("Burn").size(20.0).monospace().strong());
+        let text = format!("T-{}", format_time(time - view.model.time()));
+        ui.label(RichText::new(text).weak());
 
-            ui.horizontal(|ui| {
-                styles::SelectedMenuButton::apply(ui);
-                ui.set_height(36.0);
+        ui.horizontal(|ui| {
+            styles::SelectedMenuButton::apply(ui);
+            ui.set_height(36.0);
 
-                let enabled = model.can_warp_to(time);
-                let button = CustomCircularImageButton::new(view, "warp-here", context.screen_rect(), 36.0)
-                    .with_enabled(enabled)
-                    .with_padding(8.0);
-                if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
-                    events.push(Event::StartWarp { end_time: time });
-                }
+            let enabled = view.model.can_warp_to(time);
+            let button = CustomCircularImageButton::new(view, "warp-here", 36.0)
+                .with_enabled(enabled)
+                .with_padding(8.0);
+            if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
+                view.events.push(Event::StartWarp { end_time: time });
+            }
 
-                let enabled = model.timeline_event_at_time(entity, time).can_delete(model);
-                let button = CustomCircularImageButton::new(view, "cancel", context.screen_rect(), 36.0)
-                    .with_enabled(enabled)
-                    .with_padding(8.0);
-                if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
-                    events.push(Event::CancelLastTimelineEvent { entity });
-                    view.selected = Selected::None;
-                }
-            });
-
-            let max_dv = vessel_component.max_dv().unwrap();
-            let start_dv = burn.rocket_equation_function().remaining_dv();
-            let end_dv = burn.final_rocket_equation_function().remaining_dv();
-            let duration = burn.duration();
-            draw_burn_info(view, ui, context, max_dv, start_dv, end_dv, duration);
+            let enabled = view.model.timeline_event_at_time(entity, time).can_delete(&view.model);
+            let button = CustomCircularImageButton::new(view, "cancel", 36.0)
+                .with_enabled(enabled)
+                .with_padding(8.0);
+            if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
+                view.events.push(Event::CancelLastTimelineEvent { entity });
+                view.selected = Selected::None;
+            }
         });
+
+        let vessel_component = view.model.vessel_component(entity);
+        let burn = view.model.path_component(entity).future_segment_starting_at_time(time).unwrap().as_burn().unwrap();
+        let max_dv = vessel_component.max_dv().unwrap();
+        let start_dv = burn.rocket_equation_function().remaining_dv();
+        let end_dv = burn.final_rocket_equation_function().remaining_dv();
+        let duration = burn.duration();
+        draw_burn_info(view, ui, max_dv, start_dv, end_dv, duration);
+    });
 }

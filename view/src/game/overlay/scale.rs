@@ -1,6 +1,6 @@
-use eframe::{egui::{Align, Align2, Color32, Context, Layout, Window}, epaint};
+use eframe::{egui::{Align, Align2, Color32, Layout, Window}, epaint};
 
-use crate::game::Scene;
+use crate::game::View;
 
 use super::widgets::bars::draw_scale_bar;
 
@@ -37,7 +37,7 @@ fn calculate_scale(pixels_per_metre: f32) -> (f32, String) {
     (width, scale.to_string() + suffix)
 }
 
-pub fn update(view: &Scene, context: &Context) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update scale");
     Window::new("Scale")
@@ -45,7 +45,7 @@ pub fn update(view: &Scene, context: &Context) {
         .resizable(false)
         .default_width(120.0)
         .anchor(Align2::RIGHT_BOTTOM, epaint::vec2(0.0, 0.0))
-        .show(context, |ui| {
+        .show(&view.context.clone(), |ui| {
             let (width, scale) = calculate_scale(view.camera.zoom() as f32);
             ui.with_layout(Layout::default().with_cross_align(Align::Center), |ui| {
                 ui.label(scale);
