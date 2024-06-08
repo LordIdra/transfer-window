@@ -121,6 +121,10 @@ impl Model {
     pub fn entity_exists(&self, entity: Entity) -> bool {
         self.entity_allocator.entities().contains(&entity)
     }
+    
+    pub fn warp(&self) -> Option<&TimeWarp> {
+        self.warp.as_ref()
+    }
 }
 
 #[cfg(test)]

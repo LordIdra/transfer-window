@@ -54,7 +54,7 @@ impl View {
         let vessel_editor = None;
         let frame_history = FrameHistory::default();
         let debug_window_open = false;
-        let debug_window_tab = DebugWindowTab::Overview;
+        let debug_window_tab = DebugWindowTab::System;
         let icon_captured_scroll = false;
         let pointer_over_ui = false;
         Self { gl, model, context, screen_rect, events, camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll, pointer_over_ui }

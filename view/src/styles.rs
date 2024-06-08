@@ -1,6 +1,6 @@
 use eframe::{egui::{style::{Spacing, WidgetVisuals}, Color32, Context, Margin, Rounding, Stroke, Style, Ui, Vec2, Visuals}, epaint::Shadow};
 
-pub struct DefaultWindow {}
+pub struct DefaultWindow;
 
 impl DefaultWindow {
     pub fn apply(context: &Context) {
@@ -14,7 +14,7 @@ impl DefaultWindow {
     }
 }
 
-pub struct VesselEditor {}
+pub struct VesselEditor;
 
 impl VesselEditor {
     pub fn apply(context: &Context) {
@@ -36,7 +36,7 @@ impl VesselEditor {
     }
 }
 
-pub struct SlotSelectorWindow {}
+pub struct SlotSelectorWindow;
 
 impl SlotSelectorWindow {
     pub fn apply(context: &Context) {
@@ -50,7 +50,7 @@ impl SlotSelectorWindow {
     }
 }
 
-pub struct SlotSelector {}
+pub struct SlotSelector;
 
 impl SlotSelector {
     pub fn apply(ui: &mut Ui) {
@@ -83,7 +83,7 @@ impl SlotSelector {
     }
 }
 
-pub struct SlotEditor {}
+pub struct SlotEditor;
 
 impl SlotEditor {
     pub fn apply(ui: &mut Ui, size: f32, color: Color32) {
@@ -118,7 +118,7 @@ impl SlotEditor {
     }
 }
 
-pub struct WeaponSlotButton {}
+pub struct WeaponSlotButton;
 
 impl WeaponSlotButton {
     pub fn apply(ui: &mut Ui) {
@@ -151,7 +151,7 @@ impl WeaponSlotButton {
     }
 }
 
-pub struct SelectedMenuButton {}
+pub struct SelectedMenuButton;
 
 impl SelectedMenuButton {
     pub fn apply(ui: &mut Ui) {
