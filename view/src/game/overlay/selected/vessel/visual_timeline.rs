@@ -127,7 +127,7 @@ fn generate_encounters(view: &View, entity: Entity, events: &mut Vec<VisualTimel
     }
 }
 
-pub fn update(view: &mut View, ui: &mut Ui, entity: Entity) {
+pub fn update(view: &View, ui: &mut Ui, entity: Entity) {
     let mut events = vec![];
 
     generate_timeline_events(view, entity, &mut events);

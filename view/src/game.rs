@@ -1,7 +1,7 @@
-use std::{collections::HashSet, sync::Arc};
+use std::{collections::HashSet, sync::{Arc, Mutex}};
 
 use eframe::{egui::{Context, Pos2, Rect}, glow, Frame};
-use events::Event;
+use events::{ModelEvent, ViewEvent};
 use nalgebra_glm::DVec2;
 use rendering::Renderers;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
@@ -27,8 +27,10 @@ pub struct View {
     gl: Arc<glow::Context>,
     model: Model,
     context: Context,
+    previous_screen_rect: Rect,
     screen_rect: Rect,
-    events: Vec<Event>,
+    model_events: Arc<Mutex<Vec<ModelEvent>>>,
+    view_events: Arc<Mutex<Vec<ViewEvent>>>,
     camera: Camera,
     resources: Arc<Resources>,
     renderers: Renderers,
@@ -38,14 +40,16 @@ pub struct View {
     frame_history: FrameHistory,
     debug_window_open: bool,
     debug_window_tab: DebugWindowTab,
-    icon_captured_scroll: bool,
-    pointer_over_ui: bool
+    pointer_over_ui: bool,
+    pointer_over_icon: bool,
 }
 
 impl View {
     pub fn new(gl: Arc<glow::Context>, model: Model, context: Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
+        let previous_screen_rect = context.screen_rect();
         let screen_rect = context.screen_rect();
-        let events = vec![];
+        let model_events = Arc::new(Mutex::new(vec![]));
+        let view_events = Arc::new(Mutex::new(vec![]));
         let mut camera = Camera::new();
         if let Some(focus) = focus {
             camera.set_focus(focus, model.absolute_position(focus));
@@ -57,27 +61,56 @@ impl View {
         let frame_history = FrameHistory::default();
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::System;
-        let icon_captured_scroll = false;
         let pointer_over_ui = false;
-        Self { gl, model, context, screen_rect, events, camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, icon_captured_scroll, pointer_over_ui }
+        let pointer_over_icon = false;
+        Self { gl, model, context, previous_screen_rect, screen_rect, model_events, view_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon }
+    }
+
+    fn update_camera_focus_position(&mut self) {
+        if let Some(focus) = self.camera.focus() {
+            self.set_camera_focus(focus);
+        }
+    }
+
+    fn draw_ui(&self) {
+        misc::update(self);
+        underlay::draw(self);
+        overlay::draw(self);
+        debug::draw(self);
+    }
+
+    fn post_draw_ui(&mut self) {
+        self.pointer_over_ui = self.context.is_pointer_over_area();
+        self.pointer_over_icon = false;
+    }
+    
+    fn draw_underlay(&self) {
+        rendering::update(self);
     }
 
     pub fn update(&mut self, context: &Context, frame: &Frame, dt: f64) -> Vec<ControllerEvent> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("View update");
         self.context = context.clone();
+        self.previous_screen_rect = self.screen_rect;
         self.screen_rect = self.context.screen_rect();
         self.frame_history.update(self.context.input(|i| i.time), frame.info().cpu_usage);
-        misc::update(self);
-        expiry::update(self);
-        let is_mouse_over_any_icon = underlay::draw(self);
-        overlay::draw(self, is_mouse_over_any_icon);
-        debug::draw(self);
-        self.pointer_over_ui = context.is_pointer_over_area();
-        rendering::update(self);
-        events::update(self);
+        self.update_camera_focus_position();
+        self.draw_ui();
+        self.post_draw_ui();
+        self.draw_underlay();
+        self.handle_events();
         self.model.update(dt);
+        expiry::update(self);
         vec![]
+    }
+    
+    pub(crate) fn add_model_event(&self, event: ModelEvent) {
+        self.model_events.lock().unwrap().push(event);
+    }
+
+    pub(crate) fn add_view_event(&self, event: ViewEvent) {
+        self.view_events.lock().unwrap().push(event);
     }
 
     fn is_selected(&self, entity: Entity) -> bool {
@@ -98,7 +131,7 @@ impl View {
         self.right_click_menu = Some(right_clicked);
     }
 
-    pub fn entities_should_render(&self, with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
+    pub(crate) fn entities_should_render(&self, with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
         self.model.entities(with_component_types)
             .iter()
             .filter(|entity| should_render(self, **entity))
@@ -106,7 +139,8 @@ impl View {
             .collect()
     }
 
-    pub fn entities_should_render_at_time(&self, with_component_types: Vec<ComponentType>, time: f64) -> HashSet<Entity> {
+    #[allow(unused)]
+    pub(crate) fn entities_should_render_at_time(&self, with_component_types: Vec<ComponentType>, time: f64) -> HashSet<Entity> {
         self.model.entities(with_component_types)
             .iter()
             .filter(|entity| should_render_at_time(self, **entity, time))
@@ -114,23 +148,18 @@ impl View {
             .collect()
     }
 
-    pub fn set_camera_focus(&mut self, focus: Entity) {
+    pub(crate) fn set_camera_focus(&mut self, focus: Entity) {
         let focus_position = self.model.absolute_position(focus);
         self.camera.set_focus(focus, focus_position);
     }
 
-    pub fn unset_camera_focus(&mut self) {
-        self.camera.unset_focus();
-    }
-
-    pub fn window_space_to_world_space(&self, window_coords: Pos2) -> DVec2 {
+    pub(crate) fn window_space_to_world_space(&self, window_coords: Pos2) -> DVec2 {
         let offset_x = f64::from(window_coords.x - (self.screen_rect.width() / 2.0)) / self.camera.zoom();
         let offset_y = f64::from((self.screen_rect.height() / 2.0) - window_coords.y) / self.camera.zoom();
         self.camera.translation() + DVec2::new(offset_x, offset_y)
     }
 
-    #[allow(unused)]
-    pub fn world_space_to_window_space(&self, world_coords: DVec2) -> Pos2 {
+    pub(crate) fn world_space_to_window_space(&self, world_coords: DVec2) -> Pos2 {
         let offset = world_coords - self.camera.translation();
         let window_coords_x =  (offset.x * self.camera.zoom()) as f32 + 0.5 * self.screen_rect.width();
         let window_coords_y = -(offset.y * self.camera.zoom()) as f32 - 0.5 * self.screen_rect.height();

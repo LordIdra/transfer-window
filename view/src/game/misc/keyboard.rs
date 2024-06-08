@@ -1,28 +1,28 @@
 use eframe::egui::Key;
 
-use crate::game::{events::Event, selected::Selected};
+use crate::game::{events::{ModelEvent, ViewEvent}, selected::Selected};
 
 use super::View;
 
-pub fn update(view: &mut View) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update keyboard");
 
     view.context.input(|input| {
         if input.key_pressed(Key::Space) {
-            view.events.push(Event::TogglePaused);
+            view.add_model_event(ModelEvent::TogglePaused);
         }
 
         if input.key_pressed(Key::Equals) {
-            view.events.push(Event::IncreaseTimeStepLevel);
+            view.add_model_event(ModelEvent::IncreaseTimeStepLevel);
         }
 
         if input.key_pressed(Key::Minus) {
-            view.events.push(Event::DecreaseTimeStepLevel);
+            view.add_model_event(ModelEvent::DecreaseTimeStepLevel);
         }
 
         if input.key_pressed(Key::F12) {
-            view.debug_window_open = !view.debug_window_open;
+            view.add_view_event(ViewEvent::SetDebugWindowOpen(!view.debug_window_open));
         }
 
         if input.key_pressed(Key::Delete) {
@@ -38,17 +38,17 @@ pub fn update(view: &mut View) {
                 Selected::Burn { entity, .. }
                     | Selected::FireTorpedo { entity, .. } 
                     | Selected::EnableGuidance { entity, .. } => {
-                        view.events.push(Event::CancelLastTimelineEvent { entity });
-                        view.selected = Selected::None;
+                        view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
+                        view.add_view_event(ViewEvent::SetSelected(Selected::None));
                 }
             }
         }
 
         if input.key_pressed(Key::Escape) {
             if view.vessel_editor.is_some() {
-                view.vessel_editor = None;
+                view.add_view_event(ViewEvent::SetVesselEditor(None));
             } else {
-                view.selected = Selected::None;
+                view.add_view_event(ViewEvent::SetSelected(Selected::None));
             }
         }
     });

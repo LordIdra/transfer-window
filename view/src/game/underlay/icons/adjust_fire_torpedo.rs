@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::{selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_adjust_fire_torpedo_arrow_position, View};
+use crate::game::{events::ViewEvent, selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_adjust_fire_torpedo_arrow_position, View};
 
 use super::Icon;
 
@@ -24,7 +24,7 @@ pub struct AdjustFireTorpedo {
 }
 
 impl AdjustFireTorpedo {
-    fn new(view: &mut View, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState) -> Self {
+    fn new(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState) -> Self {
         let event = view.model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
         let event_to_arrow_unit = view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * direction.vector();
         let mut position = compute_adjust_fire_torpedo_arrow_position(view, entity, time, direction);
@@ -43,7 +43,7 @@ impl AdjustFireTorpedo {
         Self { entity, time, position, direction }
     }
 
-    pub fn generate(view: &mut View, pointer: &PointerState) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &View, pointer: &PointerState) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         if let Selected::FireTorpedo { entity, time, state } = view.selected.clone() {
             if state.is_adjusting() || state.is_dragging() {
@@ -110,11 +110,13 @@ impl Icon for AdjustFireTorpedo {
         false
     }
 
-    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
-        if let Selected::FireTorpedo { entity: _, time: _, state } = &mut view.selected {
+    fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
+        if let Selected::FireTorpedo { entity, time, state: _ } = &view.selected {
             if pointer.primary_down() {
                 trace!("Started dragging to adjust fire torpedo {:?}", self.direction);
-                *state = BurnState::Dragging(self.direction);
+                let state = BurnState::Dragging(self.direction);
+                let selected = Selected::FireTorpedo { entity: *entity, time: *time, state };
+                view.add_view_event(ViewEvent::SetSelected(selected));
             }
         }
     }

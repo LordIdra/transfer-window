@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity};
 
-use crate::game::{selected::{util::BurnState, Selected}, util::should_render_at_time, View};
+use crate::game::{events::ViewEvent, selected::{util::BurnState, Selected}, util::should_render_at_time, View};
 
 use super::Icon;
 
@@ -78,29 +78,35 @@ impl Icon for FireTorpedo {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
         if !pointer.primary_clicked() {
             return;
         }
         
-        if let Selected::FireTorpedo { entity, time, state } = &mut view.selected {
+        if let Selected::FireTorpedo { entity, time, state } = &view.selected {
             if *entity == self.entity 
                     && *time == self.time 
                     && view.model.timeline_event_at_time(self.entity, self.time).can_adjust(&view.model)
                     && view.model.timeline_event_at_time(*entity, *time).as_fire_torpedo().unwrap().can_adjust(&view.model) {
-                if state.is_selected() {
-                    trace!("Fire torpedo icon clicked; switching Selected -> Adjusting");
-                    *state = BurnState::Adjusting;
+                let state = if state.is_selected() {
+                    trace!("Burn icon clicked; switching Selected -> Adjusting");
+                    BurnState::Adjusting
                 } else if state.is_adjusting() {
-                    trace!("Fire torpedo icon clicked; switching Adjusting -> Selected");
-                    *state = BurnState::Selected;
-                }
+                    trace!("Burn icon clicked; switching Adjusting -> Selected");
+                    BurnState::Selected
+                } else {
+                    // theoretically unreachable
+                    state.clone()
+                };
+                let selected = Selected::FireTorpedo { entity: *entity, time: *time, state };
+                view.add_view_event(ViewEvent::SetSelected(selected));
                 return;
             }
         }
 
         trace!("Fire torpedo icon clicked; switching to Selected");
-        view.selected = Selected::FireTorpedo { entity: self.entity, time: self.time, state: BurnState::Selected }
+        let selected = Selected::FireTorpedo { entity: self.entity, time: self.time, state: BurnState::Selected };
+        view.add_view_event(ViewEvent::SetSelected(selected));
     }
 
     fn selectable(&self) -> bool {

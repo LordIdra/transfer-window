@@ -1,8 +1,8 @@
 use eframe::{egui::{Align2, Grid, Window}, epaint};
 
-use crate::{game::{events::Event, overlay::widgets::{buttons::{draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_orbits, draw_speed, draw_time_until, draw_title}}, selected::Selected, util::ApsisType, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_orbits, draw_speed, draw_time_until, draw_title}}, selected::Selected, util::ApsisType, View}, styles};
 
-pub fn update(view: &mut View) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update apsis");
     let Selected::Apsis { type_, entity, time } = view.selected.clone() else {
@@ -25,15 +25,17 @@ pub fn update(view: &mut View) {
             styles::SelectedMenuButton::apply(ui);
 
             if let Some(time) = draw_previous(view, ui, time, entity) {
-                view.selected = Selected::Apsis { type_, entity, time };
+                let selected = Selected::Apsis { type_, entity, time };
+                view.add_view_event(ViewEvent::SetSelected(selected));
             }
 
             if let Some(time) = draw_next(view, ui, time, entity) {
-                view.selected = Selected::Apsis { type_, entity, time };
+                let selected = Selected::Apsis { type_, entity, time };
+                view.add_view_event(ViewEvent::SetSelected(selected));
             }
 
             if draw_warp_to(view, ui, time) {
-                view.events.push(Event::StartWarp { end_time: time });
+                view.add_model_event(ModelEvent::StartWarp { end_time: time });
             }
         });
 

@@ -5,7 +5,7 @@ use encounter::Encounter;
 use intercept::Intercept;
 use nalgebra_glm::DVec2;
 
-use crate::game::{util::{add_textured_square, add_textured_square_facing}, View};
+use crate::game::{events::ViewEvent, util::{add_textured_square, add_textured_square_facing}, View};
 
 use self::{adjust_burn::AdjustBurn, adjust_fire_torpedo::AdjustFireTorpedo, apsis::Apsis, burn::Burn, closest_approach::ClosestApproach, fire_torpedo::FireTorpedo, guidance::Guidance, orbitable::Orbitable, vessel::Vessel};
 
@@ -37,12 +37,12 @@ trait Icon: Debug {
     fn position(&self, view: &View) -> DVec2;
     fn facing(&self, view: &View) -> Option<DVec2>;
     fn is_selected(&self, view: &View) -> bool;
-    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState);
+    fn on_mouse_over(&self, view: &View, pointer: &PointerState);
     fn selectable(&self) -> bool;
     
-    fn on_scroll(&self, _view: &mut View, _scroll_delta: Vec2) -> bool { false }
+    fn on_scroll(&self, _view: &View, _scroll_delta: Vec2) -> bool { false }
 
-    fn is_hovered(&self, view: &mut View, mouse_position_window: Pos2) -> bool {
+    fn is_hovered(&self, view: &View, mouse_position_window: Pos2) -> bool {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Is icon hovered");
         let mouse_position_world = view.window_space_to_world_space(mouse_position_window);
@@ -74,7 +74,7 @@ trait Icon: Debug {
     }
 }
 
-fn compute_initial_icons(view: &mut View, pointer: &PointerState) -> Vec<Box<dyn Icon>> {
+fn compute_initial_icons(view: &View, pointer: &PointerState) -> Vec<Box<dyn Icon>> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute initial icons");
 
@@ -116,7 +116,7 @@ fn split_overlapping_icons(view: &View, icons: Vec<Box<dyn Icon>>) -> (Vec<Box<d
     (not_overlapped, overlapped)
 }
 
-fn draw_icon(view: &mut View, mouse_position_window: Option<Pos2>, icon: &dyn Icon, is_overlapped: bool) {
+fn draw_icon(view: &View, mouse_position_window: Option<Pos2>, icon: &dyn Icon, is_overlapped: bool) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw icon");
 
@@ -143,7 +143,7 @@ fn draw_icon(view: &mut View, mouse_position_window: Option<Pos2>, icon: &dyn Ic
 }
 
 // 'rust is simple' said no one ever
-fn compute_mouse_over_icon<'a>(view: &mut View, mouse_position: Pos2, icons: &'a Vec<Box<dyn Icon>>) -> Option<&'a dyn Icon> {
+fn compute_mouse_over_icon<'a>(view: &View, mouse_position: Pos2, icons: &'a Vec<Box<dyn Icon>>) -> Option<&'a dyn Icon> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute mouse over icon");
 
@@ -158,11 +158,9 @@ fn compute_mouse_over_icon<'a>(view: &mut View, mouse_position: Pos2, icons: &'a
 }
 
 /// Returns true if any icon is hovered over
-pub fn draw(view: &mut View) -> bool {
+pub fn draw(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw icons");
-    let mut any_icon_hovered = false;
-    view.icon_captured_scroll = false;
     view.context.clone().input(|input| {
         let mut icons = compute_initial_icons(view, &input.pointer);
         icons.sort_by(|a, b| a.cmp(view, &**b));
@@ -172,12 +170,12 @@ pub fn draw(view: &mut View) -> bool {
         if let Some(mouse_position_window) = input.pointer.latest_pos() {
             if !view.pointer_over_ui {
                 if let Some(icon) = compute_mouse_over_icon(view, mouse_position_window, &not_overlapped) {
-                    any_icon_hovered = true;
                     icon.on_mouse_over(view, &input.pointer);
                     let scroll_delta = input.smooth_scroll_delta;
-                    if (scroll_delta.y != 0.0 || scroll_delta.x != 0.0) && icon.on_scroll(view, scroll_delta) {
-                        view.icon_captured_scroll = true;
+                    if scroll_delta.y != 0.0 || scroll_delta.x != 0.0 {
+                        icon.on_scroll(view, scroll_delta);
                     }
+                    view.add_view_event(ViewEvent::IconHovered);
                 }
             }
         }
@@ -190,6 +188,4 @@ pub fn draw(view: &mut View) -> bool {
             draw_icon(view, input.pointer.latest_pos(), &*icon, false);
         }
     });
-
-    any_icon_hovered
 }

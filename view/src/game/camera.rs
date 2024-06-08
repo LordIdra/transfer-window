@@ -1,5 +1,5 @@
 use eframe::{egui::Pos2, epaint::Rect};
-use log::trace;
+
 use nalgebra_glm::{scale2d, translate2d, vec2, DMat3, DVec2, Mat3, Vec2};
 use transfer_window_model::storage::entity_allocator::Entity;
 
@@ -40,7 +40,6 @@ impl Camera {
     }
 
     pub fn set_focus(&mut self, focus: Entity, focus_position: DVec2) {
-        trace!("Camera focus switched to {:?}", focus);
         self.focus = Some(focus);
         self.focus_position = focus_position;
     }

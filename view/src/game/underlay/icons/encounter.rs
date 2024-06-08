@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{api::encounters::EncounterType, components::ComponentType, storage::entity_allocator::Entity};
 
-use crate::game::{selected::Selected, util::should_render_at_time, View};
+use crate::game::{events::ViewEvent, selected::Selected, util::should_render_at_time, View};
 
 use super::Icon;
 
@@ -85,10 +85,11 @@ impl Icon for Encounter {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
         if pointer.primary_clicked() {
             trace!("Encounter icon clicked; switching to Selected");
-            view.selected = Selected::Encounter { type_: self.type_, entity: self.entity, time: self.time, from: self.from, to: self.to };
+            let selected = Selected::Encounter { type_: self.type_, entity: self.entity, time: self.time, from: self.from, to: self.to };
+            view.add_view_event(ViewEvent::SetSelected(selected));
         }
     }
 

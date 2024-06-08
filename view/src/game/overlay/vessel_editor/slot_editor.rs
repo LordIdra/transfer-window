@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Id, ImageButton, LayerId, Order, Pos2, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, Slot, SlotLocation}, VesselClass}, storage::entity_allocator::Entity};
 
-use crate::{game::{events::Event, overlay::slot_textures::TexturedSlot, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::slot_textures::TexturedSlot, View}, styles};
 
 use super::{tooltips::show_tooltip, util::{compute_slot_locations, compute_slot_size}};
 
@@ -80,7 +80,7 @@ impl SlotEditor {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn draw(&self, view: &mut View, vessel_name: &str, slot_location: SlotLocation, slot_center: Pos2, scalar: f32) {
+    pub fn draw(&self, view: &View, vessel_name: &str, slot_location: SlotLocation, slot_center: Pos2, scalar: f32) {
         let slot_translation = scalar * compute_slot_locations(self.vessel_class)
             .get(&self.location)
             .expect("Slot editor location does not exist");
@@ -105,7 +105,7 @@ impl SlotEditor {
             ui.horizontal(|ui| {
                 for selector in &self.selectors {
                     if selector.draw(view, ui) {
-                        view.events.push(Event::SetSlot { entity: self.entity, slot_location: self.location, slot: selector.slot.clone() });
+                        view.add_model_event(ModelEvent::SetSlot { entity: self.entity, slot_location: self.location, slot: selector.slot.clone() });
                         should_close = true;
                     }
                 }
@@ -118,8 +118,9 @@ impl SlotEditor {
         view.context.move_to_top(layer_id);
 
         if should_close {
-            view.vessel_editor.as_mut().unwrap().slot_editor = None;
+            let mut vessel_editor = view.vessel_editor.as_ref().unwrap().clone();
+            vessel_editor.slot_editor = None;
+            view.add_view_event(ViewEvent::SetVesselEditor(Some(vessel_editor)));
         }
-
     }
 }

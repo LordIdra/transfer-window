@@ -13,7 +13,7 @@ mod time;
 pub mod vessel_editor;
 pub mod widgets;
 
-pub fn draw(view: &mut View, is_mouse_over_any_icon: bool) {
+pub fn draw(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw overlay");
 
@@ -23,7 +23,7 @@ pub fn draw(view: &mut View, is_mouse_over_any_icon: bool) {
     scale::update(view);
     time::update(view);
     selected::update(view);
-    right_click_menu::update(view, is_mouse_over_any_icon);
+    right_click_menu::update(view);
 
     styles::VesselEditor::apply(&view.context);
 

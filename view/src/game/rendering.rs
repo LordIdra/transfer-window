@@ -23,7 +23,6 @@ use super::View;
 /// 3) The resulting texture is resolved onto a texture in `intermediate_framebuffer`
 /// 4) The texture is rendered to the default FBO
 pub struct Renderers {
-    screen_rect: Rect,
     render_pipeline: Arc<Mutex<RenderPipeline>>,
     object_renderer: Arc<Mutex<GeometryRenderer>>,
     segment_renderer: Arc<Mutex<GeometryRenderer>>,
@@ -42,18 +41,18 @@ impl Renderers {
         let screen_texture_renderer = Arc::new(Mutex::new(ScreenTextureRenderer::new(gl, screen_rect)));
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
-        Self { screen_rect, render_pipeline, object_renderer, segment_renderer, texture_renderers, screen_texture_renderer, explosion_renderers }
+        Self { render_pipeline, object_renderer, segment_renderer, texture_renderers, screen_texture_renderer, explosion_renderers }
     }
 
-    pub fn add_object_vertices(&mut self, vertices: &mut Vec<f32>) {
+    pub fn add_object_vertices(&self, vertices: &mut Vec<f32>) {
         self.object_renderer.lock().unwrap().add_vertices(vertices);
     }
 
-    pub fn add_segment_vertices(&mut self, vertices: &mut Vec<f32>) {
+    pub fn add_segment_vertices(&self, vertices: &mut Vec<f32>) {
         self.segment_renderer.lock().unwrap().add_vertices(vertices);
     }
 
-    pub fn add_texture_vertices(&mut self, texture: &str, vertices: &mut Vec<f32>) {
+    pub fn add_texture_vertices(&self, texture: &str, vertices: &mut Vec<f32>) {
         let Some(renderer) = self.texture_renderers.get(texture) else {
             error!("Texture {} does not exist", texture);
             return;
@@ -79,7 +78,7 @@ impl Renderers {
     }
 }
 
-pub fn update(view: &mut View) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update rendering");
 
@@ -113,10 +112,9 @@ pub fn update(view: &mut View) {
         .iter_mut().for_each(|renderer| renderer.update_position(view));
 
     // Make sure to regenerate framebuffer with new size if window resized
-    if screen_rect != view.renderers.screen_rect {
+    if screen_rect != view.previous_screen_rect {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Resize buffers");
-        view.renderers.screen_rect = screen_rect;
         render_pipeline.lock().unwrap().resize(&view.gl, screen_rect);
         view.renderers.screen_texture_renderer.lock().unwrap().resize(&view.gl, screen_rect);
     }

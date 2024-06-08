@@ -2,7 +2,7 @@ use eframe::{egui::Ui, glow::{HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VE
 
 use crate::game::View;
 
-pub fn draw(view: &mut View, ui: &mut Ui) {
+pub fn draw(view: &View, ui: &mut Ui) {
     ui.label(format!("Operating System: {:?}", view.context.os()));
     ui.label(format!("Pixels/point: {:?}", view.context.pixels_per_point()));
     ui.label(format!("Native pixels/point: {:?}", view.context.native_pixels_per_point()));

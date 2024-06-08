@@ -1,7 +1,7 @@
 use eframe::egui::{self, Color32, Grid, Image, ImageButton, Pos2, Rect, Response, RichText, Ui};
 use transfer_window_model::{components::{path_component::burn::rocket_equation_function::RocketEquationFunction, vessel_component::{system_slot::{Slot, SlotLocation, System}, VesselClass, VesselComponent}}, storage::entity_allocator::Entity};
 
-use crate::{game::{overlay::slot_textures::TexturedSlot, View}, styles};
+use crate::{game::{events::ViewEvent, overlay::slot_textures::TexturedSlot, View}, styles};
 
 use super::util::{compute_slot_locations, compute_slot_size};
 
@@ -17,18 +17,22 @@ fn compute_texture_ship_underlay(class: &VesselClass) -> &str {
     }
 }
 
-fn on_slot_clicked(view: &mut View, location: SlotLocation) {
-    if let Some(vessel_editor) = &mut view.vessel_editor {
-        if vessel_editor.slot_editor == Some(location) {
-            vessel_editor.slot_editor = None;
+fn on_slot_clicked(view: &View, location: SlotLocation) {
+    if let Some(vessel_editor) = &view.vessel_editor {
+        let slot_editor = if vessel_editor.slot_editor == Some(location) {
+            None
         } else {
-            vessel_editor.slot_editor = Some(location);
-        }
+            Some(location)
+        };
+
+        let mut vessel_editor = view.vessel_editor.as_ref().unwrap().clone();
+        vessel_editor.slot_editor = slot_editor;
+        view.add_view_event(ViewEvent::SetVesselEditor(Some(vessel_editor)));
     }
 }
 
 #[allow(clippy::too_many_arguments)]
-fn draw_slot_from_texture(view: &mut View, ui: &mut Ui, texture: &str, color: Color32, location: SlotLocation, center: Pos2, size: f32, translation: f32) {
+fn draw_slot_from_texture(view: &View, ui: &mut Ui, texture: &str, color: Color32, location: SlotLocation, center: Pos2, size: f32, translation: f32) {
     let slot_position = center + egui::vec2(translation, 0.0);
     let slot_size = egui::Vec2::splat(size);
     let slot_rect = Rect::from_center_size(slot_position, slot_size);
@@ -42,7 +46,7 @@ fn draw_slot_from_texture(view: &mut View, ui: &mut Ui, texture: &str, color: Co
 });
 }
 
-fn draw_slot(view: &mut View, ui: &mut Ui, slot: &Slot, location: SlotLocation, center: Pos2, size: f32, translation: f32) {
+fn draw_slot(view: &View, ui: &mut Ui, slot: &Slot, location: SlotLocation, center: Pos2, size: f32, translation: f32) {
     let texture = slot.texture();
     let color = match slot {
         Slot::Engine(_) => ENGINE_SLOT_COLOR,
@@ -103,7 +107,7 @@ fn draw_ship_stats(ui: &mut Ui, vessel_component: &VesselComponent, vessel_name:
     });
 }
 
-pub fn draw_vessel_editor(view: &mut View, ui: &mut Ui, vessel_name: &str, entity: Entity) -> Rect {
+pub fn draw_vessel_editor(view: &View, ui: &mut Ui, vessel_name: &str, entity: Entity) -> Rect {
     ui.horizontal(|ui| {
         let vessel_component = view.model.vessel_component(entity);
         draw_ship_stats(ui, vessel_component, vessel_name);

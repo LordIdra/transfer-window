@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity};
 
-use crate::game::{selected::{util::BurnState, Selected}, util::should_render_at_time, View};
+use crate::game::{events::ViewEvent, selected::{util::BurnState, Selected}, util::should_render_at_time, View};
 
 use super::Icon;
 
@@ -78,28 +78,32 @@ impl Icon for Burn {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
         if !pointer.primary_clicked() {
             return;
         }
         
-        if let Selected::Burn { entity, time, state } = &mut view.selected {
-            if *entity == self.entity 
-                    && *time == self.time 
-                    && view.model.timeline_event_at_time(self.entity, self.time).can_adjust(&view.model) {
-                if state.is_selected() {
+        if let Selected::Burn { entity, time, state } = &view.selected {
+            if *entity == self.entity && *time == self.time && view.model.timeline_event_at_time(self.entity, self.time).can_adjust(&view.model) {
+                let state = if state.is_selected() {
                     trace!("Burn icon clicked; switching Selected -> Adjusting");
-                    *state = BurnState::Adjusting;
+                    BurnState::Adjusting
                 } else if state.is_adjusting() {
                     trace!("Burn icon clicked; switching Adjusting -> Selected");
-                    *state = BurnState::Selected;
-                }
+                    BurnState::Selected
+                } else {
+                    // theoretically unreachable
+                    state.clone()
+                };
+                let selected = Selected::Burn { entity: *entity, time: *time, state };
+                view.add_view_event(ViewEvent::SetSelected(selected));
                 return;
             }
         }
 
         trace!("Burn icon clicked; switching to Selected");
-        view.selected = Selected::Burn { entity: self.entity, time: self.time, state: BurnState::Selected }
+        let selected = Selected::Burn { entity: self.entity, time: self.time, state: BurnState::Selected };
+        view.add_view_event(ViewEvent::SetSelected(selected));
     }
 
     fn selectable(&self) -> bool {

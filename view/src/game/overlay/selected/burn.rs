@@ -1,6 +1,6 @@
 use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
 
-use crate::{game::{events::Event, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton}, selected::Selected, util::format_time, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton}, selected::Selected, util::format_time, View}, styles};
 
 pub fn draw_burn_info(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
     let burnt_dv = start_dv - end_dv;
@@ -50,7 +50,7 @@ pub fn draw_burn_info(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_
     });
 }
 
-pub fn update(view: &mut View) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update burn");
     let Selected::Burn { entity, time, state: _ } = view.selected.clone() else { 
@@ -83,7 +83,7 @@ pub fn update(view: &mut View) {
                 .with_enabled(enabled)
                 .with_padding(8.0);
             if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
-                view.events.push(Event::StartWarp { end_time: time });
+                view.add_model_event(ModelEvent::StartWarp { end_time: time });
             }
 
             let enabled = view.model.timeline_event_at_time(entity, time).can_delete(&view.model);
@@ -91,8 +91,8 @@ pub fn update(view: &mut View) {
                 .with_enabled(enabled)
                 .with_padding(8.0);
             if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
-                view.events.push(Event::CancelLastTimelineEvent { entity });
-                view.selected = Selected::None;
+                view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
+                view.add_view_event(ViewEvent::SetSelected(Selected::None));
             }
         });
 

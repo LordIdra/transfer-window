@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::VesselComponent, storage::entity_allocator::Entity};
 
-use crate::{game::{events::Event, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel}, labels::{draw_subtitle, draw_title}}}, selected::Selected, util::{format_distance, format_speed}, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel}, labels::{draw_subtitle, draw_title}}}, selected::Selected, util::{format_distance, format_speed}, View}, styles};
 
 pub mod visual_timeline;
 
@@ -60,7 +60,7 @@ fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
     ui.end_row();
 }
 
-pub fn update(view: &mut View) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update vessel");
     let Selected::Vessel(entity) = view.selected.clone() else { 
@@ -86,19 +86,20 @@ pub fn update(view: &mut View) {
                     styles::SelectedMenuButton::apply(ui);
 
                     if add_edit_button && draw_edit_vessel(view, ui, entity) {
-                        view.vessel_editor = Some(VesselEditor::new(entity));
+                        let vessel_editor = Some(VesselEditor::new(entity));
+                        view.add_view_event(ViewEvent::SetVesselEditor(vessel_editor));
                     }
 
                     if add_cancel_burn_button && draw_cancel_burn(view, ui) {
-                        view.events.push(Event::CancelCurrentSegment { entity });
+                        view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
                     }
 
                     if add_cancel_guidance_button && draw_cancel_guidance(view, ui) {
                         if view.model.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
                             // also cancel intercept
-                            view.events.push(Event::CancelLastTimelineEvent { entity });
+                            view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
                         }
-                        view.events.push(Event::CancelCurrentSegment { entity });
+                        view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
                     }
                 });
             }

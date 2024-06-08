@@ -1,11 +1,10 @@
 use log::trace;
 
-use crate::game::{selected::{burn, fire_torpedo, segment_point, Selected}, View};
+use crate::game::{events::ViewEvent, selected::{burn, fire_torpedo, segment_point::{self, SELECT_DISTANCE}, Selected}, View};
 
-pub fn update(view: &mut View, is_mouse_over_any_icon: bool) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update selected");
-    let is_mouse_over_ui_element = view.pointer_over_ui || is_mouse_over_any_icon;
 
     // IMPORTANT: the update functions may lock the context, so they
     // must not be called within an input closure, otherwise a
@@ -15,14 +14,27 @@ pub fn update(view: &mut View, is_mouse_over_any_icon: bool) {
     });
 
     // Selected item deselected by clicking elsewhere
-    if !is_mouse_over_ui_element && pointer.primary_clicked() {
+    if !(view.pointer_over_ui || view.pointer_over_icon) && pointer.primary_clicked() {
         trace!("Selected item deselected");
-        view.selected = Selected::None;
+        view.add_view_event(ViewEvent::SetSelected(Selected::None));
     }
 
     // Draw hover circle
     if !matches!(view.selected, Selected::Point { .. }) {
-        segment_point::draw_hover(view, &pointer, is_mouse_over_ui_element);
+        segment_point::draw_hover(view, &pointer);
+    }
+
+    // Select hover
+    if pointer.primary_clicked() && !view.pointer_over_ui && !view.pointer_over_icon {
+        let select_distance = SELECT_DISTANCE / view.camera.zoom();
+        if let Some(latest_window) = pointer.latest_pos() { 
+            let latest_world = view.window_space_to_world_space(latest_window);
+            if let Some((entity, time)) = view.model.closest_point_on_trajectory(latest_world, select_distance) {
+                trace!("Selected segment point at time={}", time);
+                let selected = Selected::Point { entity, time };
+                view.add_view_event(ViewEvent::SetSelected(selected));
+            }
+        }
     }
 
     match view.selected.clone() {

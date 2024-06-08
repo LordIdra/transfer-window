@@ -3,7 +3,7 @@ use super::View;
 mod camera;
 mod keyboard;
 
-pub fn update(view: &mut View) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update misc");
     camera::update(view);

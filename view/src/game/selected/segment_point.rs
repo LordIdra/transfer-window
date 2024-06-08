@@ -1,15 +1,14 @@
 use eframe::egui::PointerState;
-use log::trace;
 use transfer_window_model::storage::entity_allocator::Entity;
 
 use crate::game::{selected::Selected, util::add_textured_square, View};
 
-const SELECT_DISTANCE: f64 = 24.0;
+pub const SELECT_DISTANCE: f64 = 24.0;
 const SELECT_RADIUS: f64 = 4.0;
 const HOVERED_ALPHA: f32 = 0.8;
 const SELECTED_ALPHA: f32 = 1.0;
 
-fn draw_selected_circle(view: &mut View, entity: Entity, time: f64, alpha: f32) {
+fn draw_selected_circle(view: &View, entity: Entity, time: f64, alpha: f32) {
     let select_radius = SELECT_RADIUS / view.camera.zoom();
     let mut vertices = vec![];
     let path_component = view.model.path_component(entity);
@@ -20,14 +19,14 @@ fn draw_selected_circle(view: &mut View, entity: Entity, time: f64, alpha: f32) 
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn draw_selected(view: &mut View) {
+pub fn draw_selected(view: &View) {
     if let Selected::Point { entity, time } = view.selected.clone() {
         draw_selected_circle(view, entity, time, SELECTED_ALPHA);
     }
 }
 
-pub fn draw_hover(view: &mut View, pointer: &PointerState, is_mouse_over_ui_element: bool) {
-    if is_mouse_over_ui_element {
+pub fn draw_hover(view: &View, pointer: &PointerState) {
+    if view.pointer_over_ui || view.pointer_over_icon {
         return;
     }
 
@@ -38,11 +37,6 @@ pub fn draw_hover(view: &mut View, pointer: &PointerState, is_mouse_over_ui_elem
     let select_distance = SELECT_DISTANCE / view.camera.zoom();
     let latest_world = view.window_space_to_world_space(latest_window);
     if let Some((entity, time)) = view.model.closest_point_on_trajectory(latest_world, select_distance) {
-        if !is_mouse_over_ui_element && pointer.primary_clicked() {
-            trace!("Selected segment point at time={}", time);
-            view.selected = Selected::Point { entity, time };
-        } else {
-            draw_selected_circle(view, entity, time, HOVERED_ALPHA);
-        }
+        draw_selected_circle(view, entity, time, HOVERED_ALPHA);
     }
 }

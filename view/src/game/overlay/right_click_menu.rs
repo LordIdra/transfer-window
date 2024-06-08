@@ -2,31 +2,31 @@ use eframe::egui::{Align2, Ui, Window};
 use nalgebra_glm::vec2;
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::Event, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, View}, styles};
 
 use super::widgets::custom_image_button::CustomCircularImageButton;
 
-fn draw_focus(view: &mut View, ui: &mut Ui, entity: Entity) {
+fn draw_focus(view: &View, ui: &mut Ui, entity: Entity) {
     let button = CustomCircularImageButton::new(view, "focus", 30.0)
         .with_padding(3.0);
     if ui.add(button).on_hover_text("Focus").clicked() {
-        view.camera.reset_panning();
-        view.set_camera_focus(entity);
-        view.right_click_menu = None;
+        view.add_view_event(ViewEvent::ResetCameraPanning);
+        view.add_view_event(ViewEvent::SetCameraFocus(entity));
+        view.add_view_event(ViewEvent::HideRightClickMenu);
     }
 }
 
-fn draw_set_target(view: &mut View, ui: &mut Ui, right_clicked: Entity, selected: Entity) {
+fn draw_set_target(view: &View, ui: &mut Ui, right_clicked: Entity, selected: Entity) {
     let is_already_target = view.model.target(selected) == Some(right_clicked);
     if is_already_target {
         let button = CustomCircularImageButton::new(view, "unset-target", 30.0)
             .with_padding(4.0);
         if ui.add(button).on_hover_text("Unset target").clicked() {
-            view.events.push(Event::SetTarget { 
+            view.add_model_event(ModelEvent::SetTarget { 
                 entity: selected, 
                 target: None,
             });
-            view.right_click_menu = None;
+            view.add_view_event(ViewEvent::HideRightClickMenu);
         }
     } else {
         let enabled = selected != right_clicked;
@@ -36,16 +36,16 @@ fn draw_set_target(view: &mut View, ui: &mut Ui, right_clicked: Entity, selected
         if ui.add_enabled(enabled, button)
                 .on_hover_text("Set target")
                 .clicked() {
-            view.events.push(Event::SetTarget { 
+            view.add_model_event(ModelEvent::SetTarget { 
             entity: selected, 
             target: Some(right_clicked),
         });
-            view.right_click_menu = None;
+        view.add_view_event(ViewEvent::HideRightClickMenu);
         }
     }
 }
 
-fn draw(view: &mut View, right_clicked: Entity) {
+fn draw(view: &View, right_clicked: Entity) {
     let world_position = view.model.absolute_position(right_clicked) + vec2(50.0, 0.0);
     let window_position = view.world_space_to_window_space(world_position);
     Window::new("Right click menu")
@@ -66,17 +66,17 @@ fn draw(view: &mut View, right_clicked: Entity) {
         });
 }
 
-pub fn update(view: &mut View, is_mouse_over_any_icon: bool) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update right click menu");
 
-    let is_mouse_over_ui_element = view.pointer_over_ui || is_mouse_over_any_icon;
+    let is_mouse_over_ui_element = view.pointer_over_ui || view.pointer_over_icon;
     if !is_mouse_over_ui_element {
         let pointer = view.context.input(|input| {
             input.pointer.clone()
         });
         if view.right_click_menu.is_some() && pointer.primary_clicked() {
-            view.right_click_menu = None;
+            view.add_view_event(ViewEvent::HideRightClickMenu);
         }
     }
 

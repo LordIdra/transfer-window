@@ -1,7 +1,7 @@
 use eframe::{egui::{Align, Align2, Layout, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::system_slot::SlotLocation, storage::entity_allocator::Entity};
 
-use crate::game::View;
+use crate::game::{events::ViewEvent, View};
 
 use self::{slot_editor::SlotEditor, vessel::draw_vessel_editor};
 
@@ -31,7 +31,7 @@ fn draw_header(view: &View, ui: &mut Ui, entity: Entity) {
     });
 }
 
-pub fn update(view: &mut View) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update vessel editor");
     let Some(vessel_editor) = view.vessel_editor.clone() else {
@@ -39,7 +39,7 @@ pub fn update(view: &mut View) {
     };
 
     if !view.model.can_edit(vessel_editor.entity) {
-        view.vessel_editor = None;
+        view.add_view_event(ViewEvent::SetVesselEditor(None));
         return;
     }
 

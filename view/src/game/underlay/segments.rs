@@ -17,7 +17,7 @@ fn add_orbit_line(vertices: &mut Vec<f32>, previous_point: &DVec2, new_point: &D
     add_line(vertices, *previous_point, *new_point, color);
 }
 
-fn draw_from_points(view: &mut View, points: &[DVec2], color: Rgba) {
+fn draw_from_points(view: &View, points: &[DVec2], color: Rgba) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw from points");
     let mut vertices = vec![];
@@ -31,7 +31,7 @@ fn draw_from_points(view: &mut View, points: &[DVec2], color: Rgba) {
     view.renderers.add_segment_vertices(&mut vertices);
 }
 
-fn draw_path_segments(view: &mut View, entity: Entity, camera_centre: DVec2) {
+fn draw_path_segments(view: &View, entity: Entity, camera_centre: DVec2) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.zoom();
@@ -81,7 +81,7 @@ fn draw_path_segments(view: &mut View, entity: Entity, camera_centre: DVec2) {
     }
 }
 
-fn draw_orbitable_segment(view: &mut View, entity: Entity, camera_centre: DVec2) {
+fn draw_orbitable_segment(view: &View, entity: Entity, camera_centre: DVec2) {
     let orbitable_component = view.model.orbitable_component(entity);
     if let OrbitableComponentPhysics::Orbit(orbit) = orbitable_component.physics() {
         let absolute_parent_position = view.model.absolute_position(orbit.parent());
@@ -91,7 +91,7 @@ fn draw_orbitable_segment(view: &mut View, entity: Entity, camera_centre: DVec2)
     }
 }
 
-pub fn draw(view: &mut View) {
+pub fn draw(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments");
     let camera_centre = view.camera.translation();

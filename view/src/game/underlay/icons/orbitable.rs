@@ -2,7 +2,7 @@ use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::{orbitable_component::OrbitableType, ComponentType}, storage::entity_allocator::Entity};
 
-use crate::game::{selected::Selected, View};
+use crate::game::{events::ViewEvent, selected::Selected, View};
 
 use super::Icon;
 
@@ -85,11 +85,12 @@ impl Icon for Orbitable {
         }
     }
 
-    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
+    fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
         if pointer.primary_clicked() {
-            view.selected = Selected::Orbitable(self.entity);
+            let selected = Selected::Orbitable(self.entity);
+            view.add_view_event(ViewEvent::SetSelected(selected));
         } else if pointer.secondary_clicked() {
-            view.toggle_right_click_menu(self.entity);
+            view.add_view_event(ViewEvent::ToggleRightClickMenu(self.entity));
         }
     }
 

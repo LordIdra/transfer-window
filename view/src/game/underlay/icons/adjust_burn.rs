@@ -3,7 +3,7 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::{selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_burn_arrow_position, View};
+use crate::game::{events::ViewEvent, selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_burn_arrow_position, View};
 
 use super::Icon;
 
@@ -24,7 +24,7 @@ pub struct AdjustBurn {
 }
 
 impl AdjustBurn {
-    fn new(view: &mut View, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState) -> Self {
+    fn new(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState) -> Self {
         let burn = view.model.burn_starting_at_time(entity, time);
         let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
         let mut position = compute_burn_arrow_position(view, entity, time, direction);
@@ -43,7 +43,7 @@ impl AdjustBurn {
         Self { entity, time, position, direction }
     }
 
-    pub fn generate(view: &mut View, pointer: &PointerState) -> Vec<Box<dyn Icon>> {
+    pub fn generate(view: &View, pointer: &PointerState) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         if let Selected::Burn { entity, time, state } = view.selected.clone() {
             if state.is_adjusting() || state.is_dragging() {
@@ -110,11 +110,13 @@ impl Icon for AdjustBurn {
         false
     }
 
-    fn on_mouse_over(&self, view: &mut View, pointer: &PointerState) {
-        if let Selected::Burn { entity: _, time: _, state } = &mut view.selected {
+    fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
+        if let Selected::Burn { entity, time, state: _} = &view.selected {
             if pointer.primary_down() {
                 trace!("Started dragging to adjust burn {:?}", self.direction);
-                *state = BurnState::Dragging(self.direction);
+                let state = BurnState::Dragging(self.direction);
+                let selected = Selected::Burn { entity: *entity, time: *time, state };
+                view.add_view_event(ViewEvent::SetSelected(selected));
             }
         }
     }

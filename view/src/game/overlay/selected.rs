@@ -11,7 +11,7 @@ mod orbitable;
 mod point;
 mod vessel;
 
-pub fn update(view: &mut View) {
+pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update selected");
     approach::update(view);
