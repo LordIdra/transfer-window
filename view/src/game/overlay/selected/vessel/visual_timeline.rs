@@ -1,7 +1,7 @@
 #![allow(clippy::match_same_arms)]
 
 use eframe::egui::{Color32, Frame, RichText, Ui};
-use transfer_window_model::{api::encounters::EncounterType, components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity};
+use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::timeline::TimelineEvent}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImage, labels::draw_value}, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
 
@@ -11,6 +11,8 @@ enum VisualTimelineEvent {
     Approach { type_: ApproachType, target: Entity, time: f64, distance: f64 },
     Encounter { type_: EncounterType, time: f64, from: Entity, to: Entity },
     Point { time: f64 },
+    BurnEnd { time: f64 },
+    GuidanceEnd { time: f64 },
 }
 
 impl VisualTimelineEvent {
@@ -20,7 +22,9 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::Apsis { time, .. } 
                 | VisualTimelineEvent::Approach { time, .. } 
                 | VisualTimelineEvent::Point { time }
-                | VisualTimelineEvent::Encounter { time, .. } => *time,
+                | VisualTimelineEvent::Encounter { time, .. } 
+                | VisualTimelineEvent::BurnEnd { time } 
+                | VisualTimelineEvent::GuidanceEnd { time } => *time,
         }
     }
 
@@ -45,6 +49,8 @@ impl VisualTimelineEvent {
                 EncounterType::Exit => "encounter-exit",
             }
             VisualTimelineEvent::Point { .. } => "circle",
+            VisualTimelineEvent::BurnEnd { .. } => "timeline-burn-end",
+            VisualTimelineEvent::GuidanceEnd { .. } => "timeline-guidance-end",
         }
     }
 
@@ -60,6 +66,8 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::Approach { .. } => 3.0,
             VisualTimelineEvent::Encounter { .. } => 3.0,
             VisualTimelineEvent::Point { .. } => 5.0,
+            VisualTimelineEvent::BurnEnd { .. } => 0.0,
+            VisualTimelineEvent::GuidanceEnd { .. } => 0.0,
         }
     }
 
@@ -68,8 +76,8 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::TimelineEvent(event) => match event {
                 TimelineEvent::Intercept(_) => "Intercept".to_string(),
                 TimelineEvent::FireTorpedo(_) => "Torpedo Launch".to_string(),
-                TimelineEvent::Burn(_) => "Burn".to_string(),
-                TimelineEvent::EnableGuidance(_) => "Guidance Enabled".to_string(),
+                TimelineEvent::Burn(_) => "Burn Start".to_string(),
+                TimelineEvent::EnableGuidance(_) => "Guidance Start".to_string(),
             }
             VisualTimelineEvent::Apsis { type_, distance, .. } => match type_ {
                 ApsisType::Periapsis => format!("Periapsis - {}", format_distance(*distance)),
@@ -81,6 +89,8 @@ impl VisualTimelineEvent {
                 EncounterType::Exit => format!("{} Exit", view.model.name_component(*from).name()),
             }
             VisualTimelineEvent::Point { .. } => "Selected point".to_string(),
+            VisualTimelineEvent::BurnEnd { .. } => "Burn end".to_string(),
+            VisualTimelineEvent::GuidanceEnd { .. } => "Guidance end".to_string(),
         }
     }
 
@@ -96,6 +106,8 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::Approach { type_, target, time, distance: _ } => Some(Selected::Approach { type_: *type_, entity, target: *target, time: *time }),
             VisualTimelineEvent::Encounter { type_, time, from, to } => Some(Selected::Encounter { type_: *type_, entity, time: *time, from: *from, to: *to }),
             VisualTimelineEvent::Point { .. } => None,
+            VisualTimelineEvent::BurnEnd { .. } => None,
+            VisualTimelineEvent::GuidanceEnd { .. } => None,
         }
     }
 
@@ -212,6 +224,15 @@ fn generate_encounters(view: &View, entity: Entity, events: &mut Vec<VisualTimel
     }
 }
 
+fn generate_burn_guidance_end(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
+    if let Segment::Burn(burn) = view.model.path_component(entity).current_segment() {
+        events.push(VisualTimelineEvent::BurnEnd { time: burn.end_point().time() });
+    }
+    if let Segment::Guidance(guidance) = view.model.path_component(entity).current_segment() {
+        events.push(VisualTimelineEvent::GuidanceEnd { time: guidance.end_point().time() });
+    }
+}
+
 fn advance_cursor_to(ui: &mut Ui, x: f32) {
     let width = x - ui.cursor().left();
     let mut rect = ui.cursor();
@@ -227,6 +248,7 @@ pub fn draw(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_cen
     generate_apoapsis_periapsis(view, entity, &mut events);
     generate_closest_approaches(view, entity, &mut events);
     generate_encounters(view, entity, &mut events);
+    generate_burn_guidance_end(view, entity, &mut events);
 
     if draw_center_time_point {
         events.push(VisualTimelineEvent::Point { time: center_time });
