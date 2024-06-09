@@ -3,7 +3,7 @@
 use eframe::egui::{Color32, Frame, RichText, Ui};
 use transfer_window_model::{api::encounters::EncounterType, components::vessel_component::timeline::TimelineEvent, storage::entity_allocator::Entity};
 
-use crate::game::{events::ViewEvent, overlay::widgets::custom_image_button::CustomCircularImageButton, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
+use crate::game::{events::ViewEvent, overlay::widgets::custom_image::CustomImage, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
 
 enum VisualTimelineEvent {
     TimelineEvent(TimelineEvent),
@@ -247,41 +247,49 @@ pub fn draw(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_cen
 
 fn draw_event(view: &View, ui: &mut Ui, event: VisualTimelineEvent, entity: Entity, center_time: f64) {
     let time_until = (event.time().ceil() - center_time).floor();
+
+    let mut frame = Frame::default().begin(ui);
+
+    frame.content_ui.horizontal(|ui| {
+        ui.style_mut().visuals.panel_fill = Color32::RED;
+        let image = CustomImage::new(view, event.icon(), 20.0)
+            .with_padding(event.padding());
+        ui.add(image);
+
+        let time_text = if event.is_selected(view, entity) {
+            "now".to_string()
+        } else if time_until.is_sign_positive() {
+            format!("T-{}", format_time(time_until))
+        } else {
+            format!("T+{}", format_time(-time_until))
+        };
+        ui.label(RichText::new(time_text).weak().size(12.0));
+
+        advance_cursor_to(ui, 150.0);
+
+        ui.label(RichText::new(event.name(view)));
+        advance_cursor_to(ui, 320.0);
+        ui.end_row();
+    });
+
+    let response = frame.allocate_space(ui);
+    let alpha = if response.hovered() { 255 } else { 180 };
     let fill = if event.is_selected(view, entity) {
-        Color32::from_rgba_premultiplied(35, 35, 60, 200)
+        Color32::from_rgba_unmultiplied(35, 35, 60, alpha)
     } else if time_until.is_sign_positive() {
-        Color32::from_rgba_premultiplied(30, 30, 30, 200)
+        Color32::from_rgba_unmultiplied(30, 30, 30, alpha)
     } else {
-        Color32::from_rgba_premultiplied(20, 20, 20, 200)
+        Color32::from_rgba_unmultiplied(20, 20, 20, alpha)
     };
 
-    Frame::default()
-            .fill(fill)
-            .show(ui, |ui| {
-        ui.horizontal(|ui| {
-            ui.style_mut().visuals.panel_fill = Color32::RED;
-            let image = CustomCircularImageButton::new(view, event.icon(), 20.0)
-                .with_padding(event.padding());
-            if ui.add(image).clicked() {
-                if let Some(selected) = event.selected(entity) {
-                    view.add_view_event(ViewEvent::SetSelected(selected))
-                }
-            }
+    // Annoying workaround because allocate_space only uses hover sense for some reason
+    if response.contains_pointer() && view.context.input(|input| input.pointer.primary_clicked()) {
+        if let Some(selected) = event.selected(entity) {
+            view.add_view_event(ViewEvent::SetSelected(selected))
+        }
+    }
+    
+    frame.frame.fill = fill;
 
-            let time_text = if event.is_selected(view, entity) {
-                "now".to_string()
-            } else if time_until.is_sign_positive() {
-                format!("T-{}", format_time(time_until))
-            } else {
-                format!("T+{}", format_time(-time_until))
-            };
-            ui.label(RichText::new(time_text).weak().size(12.0));
-
-            advance_cursor_to(ui, 150.0);
-
-            ui.label(RichText::new(event.name(view)));
-            advance_cursor_to(ui, 320.0);
-            ui.end_row();
-        });
-    });
+    frame.paint(ui);
 }

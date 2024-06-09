@@ -131,9 +131,9 @@
 [x] Add actual logging
 [x] Log to external file
 [x] Select event when clicked in timeline
+[x] Visual timeline for selected events + points
 
 # Polish
-[ ] Visual timeline for selected events + points
 [ ] Current burn/guidance finishes (exclude intercepts)
 [ ] Show orbital parameters
 
