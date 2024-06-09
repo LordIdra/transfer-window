@@ -2,7 +2,7 @@ use eframe::{egui::{Align2, RichText, Window}, epaint};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::custom_image_button::CustomCircularImageButton, selected::Selected, util::format_time, View}, styles};
 
-use super::burn::draw_burn_info;
+use super::{burn::draw_burn_info, vessel::visual_timeline};
 
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
@@ -60,5 +60,7 @@ pub fn update(view: &View) {
         let end_dv = guidance.final_rocket_equation_function().remaining_dv();
         let duration = guidance.duration();
         draw_burn_info(view, ui, max_dv, start_dv, end_dv, duration);
+
+        visual_timeline::draw(view, ui, entity, time, false);
     });
 }

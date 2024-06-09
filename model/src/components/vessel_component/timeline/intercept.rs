@@ -38,7 +38,16 @@ impl InterceptEvent {
         false
     }
 
+    pub fn entity(&self) -> Entity {
+        self.entity
+    }
+
+    pub fn traget(&self) -> Entity {
+        self.target
+    }
+
     pub fn time(&self) -> f64 {
         self.time
     }
+
 }

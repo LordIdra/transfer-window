@@ -130,9 +130,9 @@
 [x] Show velocity/altitude of vessel + points + celestial objects
 [x] Add actual logging
 [x] Log to external file
+[x] Select event when clicked in timeline
 
 # Polish
-[ ] Select event when clicked in timeline
 [ ] Visual timeline for selected events + points
 [ ] Current burn/guidance finishes (exclude intercepts)
 [ ] Show orbital parameters
@@ -146,7 +146,6 @@
 [ ] Satellite class
 [ ] Trainer class
 [ ] Scout class
-[ ] Dev mode compiles in save/load buttons
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
@@ -173,9 +172,12 @@
 # Backburner
 [ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 [ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
+[ ] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
+[ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
 
 # Before release
 [ ] Versioning!
+[ ] Dev mode compiles in save/load buttons
 [ ] Profiling + performance testing on different devices
 [ ] Test compatibility on different devices
 [ ] Website

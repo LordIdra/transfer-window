@@ -5,6 +5,8 @@ use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::
 
 use self::weapons::draw_weapons;
 
+use super::vessel::visual_timeline;
+
 mod weapons;
 
 fn draw_vessel(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
@@ -61,6 +63,7 @@ pub fn update(view: &View) {
         .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(&view.context.clone(), |ui| {
             draw_vessel(view, entity, ui, time);
+            visual_timeline::draw(view, ui, entity, time, true);
         });
 
     if !view.model.vessel_component(entity).slots().weapon_slots().is_empty() {

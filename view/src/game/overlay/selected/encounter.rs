@@ -2,10 +2,12 @@ use eframe::{egui::{Align2, Grid, Window}, epaint};
 
 use crate::{game::{events::ModelEvent, overlay::widgets::{buttons::draw_warp_to, labels::{draw_encounter_from, draw_encounter_to, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
+use super::vessel::visual_timeline;
+
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update encounter");
-    let Selected::Encounter { type_: _, entity: _, time, from, to } = view.selected.clone() else {
+    let Selected::Encounter { type_: _, entity, time, from, to } = view.selected.clone() else {
         return;
     };
 
@@ -29,5 +31,7 @@ pub fn update(view: &View) {
             draw_encounter_from(view, ui, from);
             draw_encounter_to(view, ui, to);
         });
+
+        visual_timeline::draw(view, ui, entity, time, false);
     });
 }

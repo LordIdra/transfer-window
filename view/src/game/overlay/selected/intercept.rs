@@ -2,10 +2,12 @@ use eframe::{egui::{Align2, Window}, epaint};
 
 use crate::{game::{events::ModelEvent, overlay::widgets::{buttons::draw_warp_to, labels::{draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
+use super::vessel::visual_timeline;
+
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update intercept");
-    let Selected::Intercept { entity: _, time } = view.selected.clone() else {
+    let Selected::Intercept { entity, time } = view.selected.clone() else {
         return;
     };
 
@@ -24,5 +26,7 @@ pub fn update(view: &View) {
                 view.add_model_event(ModelEvent::StartWarp { end_time: time });
             }
         });
+
+        visual_timeline::draw(view, ui, entity, time, false);
     });
 }

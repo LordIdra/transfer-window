@@ -2,6 +2,8 @@ use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton}, selected::Selected, util::format_time, View}, styles};
 
+use super::vessel::visual_timeline;
+
 pub fn draw_burn_info(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
     let burnt_dv = start_dv - end_dv;
 
@@ -103,5 +105,7 @@ pub fn update(view: &View) {
         let end_dv = burn.final_rocket_equation_function().remaining_dv();
         let duration = burn.duration();
         draw_burn_info(view, ui, max_dv, start_dv, end_dv, duration);
+        
+        visual_timeline::draw(view, ui, entity, time, false);
     });
 }

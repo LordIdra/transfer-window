@@ -2,6 +2,8 @@ use eframe::{egui::{Align2, Grid, Window}, epaint};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_orbits, draw_speed, draw_time_until, draw_title}}, selected::Selected, util::ApsisType, View}, styles};
 
+use super::vessel::visual_timeline;
+
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update apsis");
@@ -44,5 +46,7 @@ pub fn update(view: &View) {
             draw_speed(view, ui, entity, time);
             draw_orbits(view, ui, entity, time);
         });
+
+        visual_timeline::draw(view, ui, entity, time, false);
     });
 }

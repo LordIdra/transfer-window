@@ -54,7 +54,7 @@ pub fn update(view: &View) {
         };
 
         if let Some(latest_mouse_position) = input.pointer.latest_pos() {
-            if input.smooth_scroll_delta.length() != 0.0 && !view.pointer_over_icon && !view.pointer_over_ui {
+            if input.smooth_scroll_delta.length() != 0.0 && !view.pointer_over_ui {
                 update_zoom(view, latest_mouse_position, input.smooth_scroll_delta, screen_rect);
             }
         }

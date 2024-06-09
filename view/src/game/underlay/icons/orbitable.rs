@@ -30,11 +30,9 @@ impl Icon for Orbitable {
             OrbitableType::Moon => "moon",
         }.to_string();
 
-        if let Selected::Vessel(entity) = view.selected {
-            if let Some(target) = view.model.vessel_component(entity).target() {
-                if target == self.entity {
-                    texture += "-target";
-                }
+        if let Some(target) = view.selected.target(&view.model) {
+            if target == self.entity {
+                texture += "-target";
             }
         }
         
