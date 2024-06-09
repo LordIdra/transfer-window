@@ -1,6 +1,6 @@
-use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
+use eframe::{egui::{Align2, Color32, Grid, Ui, Window}, epaint};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton}, selected::Selected, util::format_time, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton, labels::{draw_key, draw_time_until, draw_title, draw_value}}, selected::Selected, util::format_time, View}, styles};
 
 use super::vessel::visual_timeline;
 
@@ -21,33 +21,33 @@ pub fn draw_burn_info(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_
         ui.horizontal(|ui| {
             let image = CustomImage::new(view, "duration", 20.0);
             ui.add(image);
-            ui.label(RichText::new("Duration").strong().monospace());
+            draw_key(ui, "Duration");
         });
-        ui.label(format_time(duration));
+        draw_value(ui, &format_time(duration));
         ui.end_row();
 
         ui.horizontal(|ui| {
             let image = CustomImage::new(view, "burn-start", 20.0);
             ui.add(image);
-            ui.label(RichText::new("ΔV start").strong().monospace());
+            draw_key(ui, "ΔV start");
         });
-        ui.label(format!("{start_dv:.1}"));
+        draw_value(ui, &format!("{start_dv:.1}"));
         ui.end_row();
 
         ui.horizontal(|ui| {
             let image = CustomImage::new(view, "burn-burnt", 20.0);
             ui.add(image);
-            ui.label(RichText::new("ΔV burnt").strong().monospace());
+            draw_key(ui, "ΔV burnt");
         });
-        ui.label(format!("{burnt_dv:.1}"));
+        draw_value(ui, &format!("{burnt_dv:.1}"));
         ui.end_row();
 
         ui.horizontal(|ui| {
             let image = CustomImage::new(view, "burn-end", 20.0);
             ui.add(image);
-            ui.label(RichText::new("ΔV end").strong().monospace());
+            draw_key(ui, "ΔV end");
         });
-        ui.label(format!("{end_dv:.1}"));
+        draw_value(ui, &format!("{end_dv:.1}"));
         ui.end_row();
     });
 }
@@ -72,9 +72,8 @@ pub fn update(view: &View) {
             .resizable(false)
             .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
             .show(&view.context.clone(), |ui| {
-        ui.label(RichText::new("Burn").size(20.0).monospace().strong());
-        let text = format!("T-{}", format_time(time - view.model.time()));
-        ui.label(RichText::new(text).weak());
+        draw_title(ui, "Burn");
+        draw_time_until(view, ui, time);
 
         ui.horizontal(|ui| {
             styles::SelectedMenuButton::apply(ui);

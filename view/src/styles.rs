@@ -1,15 +1,22 @@
-use eframe::{egui::{style::{Spacing, WidgetVisuals}, Color32, Context, Margin, Rounding, Stroke, Style, Ui, Vec2, Visuals}, epaint::Shadow};
+use eframe::{egui::{style::{Interaction, Spacing, WidgetVisuals}, Color32, Context, Margin, Rounding, Stroke, Style, Ui, Vec2, Visuals}, epaint::Shadow};
 
 pub struct DefaultWindow;
 
 impl DefaultWindow {
     pub fn apply(context: &Context) {
-        context.set_visuals(Visuals {
-            window_fill: Color32::from_rgba_unmultiplied(0, 0, 0, 100),
-            window_stroke: Stroke::NONE,
-            window_shadow: Shadow::NONE,
-            window_rounding: Rounding::ZERO,
-            ..Visuals::default()
+        context.set_style(Style {
+            visuals: Visuals {
+                window_fill: Color32::from_rgba_unmultiplied(0, 0, 0, 100),
+                window_stroke: Stroke::NONE,
+                window_shadow: Shadow::NONE,
+                window_rounding: Rounding::ZERO,
+                ..Default::default()
+            },
+            interaction: Interaction {
+                selectable_labels: false,
+                ..Default::default()
+            },
+            ..Default::default()
         });
     }
 }
@@ -27,6 +34,10 @@ impl VesselEditor {
         });
 
         context.set_style(Style {
+            interaction: Interaction {
+                selectable_labels: false,
+                ..Interaction::default()
+            },
             spacing: Spacing {
                 window_margin: Margin::same(20.0),
                 ..Spacing::default()

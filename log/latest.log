@@ -1,208 +1,1157 @@
-2024-06-09T18:48:42.346097Z  INFO transfer_window_controller: Starting application    
-2024-06-09T18:48:42.511556Z  INFO transfer_window_controller: Memory: 16670826496 B    
-2024-06-09T18:48:42.511592Z  INFO transfer_window_controller: Swap: 17179865088 B    
-2024-06-09T18:48:42.511631Z  INFO transfer_window_controller: OS: Some("Linux 22.04 Ubuntu")    
-2024-06-09T18:48:42.511661Z  INFO transfer_window_controller: Kernel version: Some("6.5.0-35-generic")    
-2024-06-09T18:48:42.511671Z  INFO transfer_window_controller: CPU architecture: Some("x86_64")    
-2024-06-09T18:48:42.511679Z  INFO transfer_window_controller: CPU #0: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4071 MHz    
-2024-06-09T18:48:42.511689Z  INFO transfer_window_controller: CPU #1: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4099 MHz    
-2024-06-09T18:48:42.511696Z  INFO transfer_window_controller: CPU #2: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4029 MHz    
-2024-06-09T18:48:42.511702Z  INFO transfer_window_controller: CPU #3: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4068 MHz    
-2024-06-09T18:48:42.511709Z  INFO transfer_window_controller: CPU #4: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4097 MHz    
-2024-06-09T18:48:42.511715Z  INFO transfer_window_controller: CPU #5: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4099 MHz    
-2024-06-09T18:48:42.511722Z  INFO transfer_window_controller: CPU #6: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4085 MHz    
-2024-06-09T18:48:42.511728Z  INFO transfer_window_controller: CPU #7: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4099 MHz    
-2024-06-09T18:48:42.511735Z  INFO transfer_window_controller: CPU #8: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 800 MHz    
-2024-06-09T18:48:42.511741Z  INFO transfer_window_controller: CPU #9: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4099 MHz    
-2024-06-09T18:48:42.511747Z  INFO transfer_window_controller: CPU #10: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4099 MHz    
-2024-06-09T18:48:42.511754Z  INFO transfer_window_controller: CPU #11: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4094 MHz    
-2024-06-09T18:48:42.515354Z DEBUG eframe: Using the glow renderer    
-2024-06-09T18:48:42.522659Z DEBUG eframe::native::glow_integration: Event::Resumed    
-2024-06-09T18:48:42.522862Z DEBUG eframe::native::glow_integration: trying to create glutin Display with config: ConfigTemplateBuilder { template: ConfigTemplate { color_buffer_type: Rgb { r_size: 8, g_size: 8, b_size: 8 }, alpha_size: 8, depth_size: 0, stencil_size: 0, num_samples: None, min_swap_interval: None, max_swap_interval: None, config_surface_types: ConfigSurfaceTypes(WINDOW), api: None, transparency: false, single_buffering: false, stereoscopy: None, float_pixels: false, max_pbuffer_width: None, hardware_accelerated: None, max_pbuffer_height: None, native_window: None } }    
-2024-06-09T18:48:42.534407Z DEBUG eframe::native::glow_integration: using the first config from config picker closure. config: Glx(Config { inner: Config { raw: GlxConfig(0x580f36e70900), display: GlxDisplay(0x580f36d040c0) } })    
-2024-06-09T18:48:42.534711Z  INFO winit::platform_impl::platform::x11::window: Guessed window scale factor: 1    
-2024-06-09T18:48:42.534736Z DEBUG winit::platform_impl::platform::x11::window: Calculated physical dimensions: 800x600    
-2024-06-09T18:48:42.536443Z DEBUG winit::platform_impl::platform::x11::ime: failed to create IME context without preedit support.    
-2024-06-09T18:48:42.536530Z DEBUG eframe::native::glow_integration: successfully created GL Display with version: GLX 1.4 and supported features: DisplayFeatures(CONTEXT_ROBUSTNESS | CONTEXT_NO_ERROR | FLOAT_PIXEL_FORMAT | SWAP_CONTROL | CONTEXT_RELEASE_BEHAVIOR | CREATE_ES_CONTEXT | MULTISAMPLING_PIXEL_FORMATS | SRGB_FRAMEBUFFERS)    
-2024-06-09T18:48:42.536550Z DEBUG eframe::native::glow_integration: creating gl context using raw window handle: Some(Xlib(XlibWindowHandle { window: 104857605, visual_id: 40 }))    
-2024-06-09T18:48:42.544147Z DEBUG eframe::native::glow_integration: Initializing egui_winit for viewport "FFFF"    
-2024-06-09T18:48:42.544796Z DEBUG egui_winit::clipboard: Cannot init smithay clipboard without a Wayland display handle    
-2024-06-09T18:48:42.544842Z DEBUG eframe::native::glow_integration: Creating a gl_surface for viewport "FFFF"    
-2024-06-09T18:48:42.786126Z DEBUG egui_glow::painter: 
+2024-06-09T20:00:17.814263Z  INFO transfer_window_controller: Starting application    
+2024-06-09T20:00:18.033787Z  INFO transfer_window_controller: Memory: 16670826496 B    
+2024-06-09T20:00:18.033827Z  INFO transfer_window_controller: Swap: 17179865088 B    
+2024-06-09T20:00:18.033871Z  INFO transfer_window_controller: OS: Some("Linux 22.04 Ubuntu")    
+2024-06-09T20:00:18.033902Z  INFO transfer_window_controller: Kernel version: Some("6.5.0-35-generic")    
+2024-06-09T20:00:18.033915Z  INFO transfer_window_controller: CPU architecture: Some("x86_64")    
+2024-06-09T20:00:18.033926Z  INFO transfer_window_controller: CPU #0: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4068 MHz    
+2024-06-09T20:00:18.033939Z  INFO transfer_window_controller: CPU #1: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4098 MHz    
+2024-06-09T20:00:18.033949Z  INFO transfer_window_controller: CPU #2: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 800 MHz    
+2024-06-09T20:00:18.033957Z  INFO transfer_window_controller: CPU #3: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4097 MHz    
+2024-06-09T20:00:18.033966Z  INFO transfer_window_controller: CPU #4: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 800 MHz    
+2024-06-09T20:00:18.033974Z  INFO transfer_window_controller: CPU #5: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4089 MHz    
+2024-06-09T20:00:18.033983Z  INFO transfer_window_controller: CPU #6: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4090 MHz    
+2024-06-09T20:00:18.033991Z  INFO transfer_window_controller: CPU #7: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4099 MHz    
+2024-06-09T20:00:18.034000Z  INFO transfer_window_controller: CPU #8: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4002 MHz    
+2024-06-09T20:00:18.034008Z  INFO transfer_window_controller: CPU #9: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4098 MHz    
+2024-06-09T20:00:18.034017Z  INFO transfer_window_controller: CPU #10: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4071 MHz    
+2024-06-09T20:00:18.034025Z  INFO transfer_window_controller: CPU #11: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4085 MHz    
+2024-06-09T20:00:18.037711Z DEBUG eframe: Using the glow renderer    
+2024-06-09T20:00:18.045606Z DEBUG eframe::native::glow_integration: Event::Resumed    
+2024-06-09T20:00:18.045803Z DEBUG eframe::native::glow_integration: trying to create glutin Display with config: ConfigTemplateBuilder { template: ConfigTemplate { color_buffer_type: Rgb { r_size: 8, g_size: 8, b_size: 8 }, alpha_size: 8, depth_size: 0, stencil_size: 0, num_samples: None, min_swap_interval: None, max_swap_interval: None, config_surface_types: ConfigSurfaceTypes(WINDOW), api: None, transparency: false, single_buffering: false, stereoscopy: None, float_pixels: false, max_pbuffer_width: None, hardware_accelerated: None, max_pbuffer_height: None, native_window: None } }    
+2024-06-09T20:00:18.056550Z DEBUG eframe::native::glow_integration: using the first config from config picker closure. config: Glx(Config { inner: Config { raw: GlxConfig(0x5d14d81e4110), display: GlxDisplay(0x5d14d80780c0) } })    
+2024-06-09T20:00:18.056813Z  INFO winit::platform_impl::platform::x11::window: Guessed window scale factor: 1    
+2024-06-09T20:00:18.056836Z DEBUG winit::platform_impl::platform::x11::window: Calculated physical dimensions: 800x600    
+2024-06-09T20:00:18.058517Z DEBUG winit::platform_impl::platform::x11::ime: failed to create IME context without preedit support.    
+2024-06-09T20:00:18.058660Z DEBUG eframe::native::glow_integration: successfully created GL Display with version: GLX 1.4 and supported features: DisplayFeatures(CONTEXT_ROBUSTNESS | CONTEXT_NO_ERROR | FLOAT_PIXEL_FORMAT | SWAP_CONTROL | CONTEXT_RELEASE_BEHAVIOR | CREATE_ES_CONTEXT | MULTISAMPLING_PIXEL_FORMATS | SRGB_FRAMEBUFFERS)    
+2024-06-09T20:00:18.058682Z DEBUG eframe::native::glow_integration: creating gl context using raw window handle: Some(Xlib(XlibWindowHandle { window: 104857605, visual_id: 40 }))    
+2024-06-09T20:00:18.066920Z DEBUG eframe::native::glow_integration: Initializing egui_winit for viewport "FFFF"    
+2024-06-09T20:00:18.067451Z DEBUG egui_winit::clipboard: Cannot init smithay clipboard without a Wayland display handle    
+2024-06-09T20:00:18.067476Z DEBUG eframe::native::glow_integration: Creating a gl_surface for viewport "FFFF"    
+2024-06-09T20:00:18.101137Z DEBUG egui_glow::painter: 
 opengl version: 3.3.0 NVIDIA 550.67
 opengl renderer: NVIDIA GeForce RTX 2060/PCIe/SSE2
 opengl vendor: NVIDIA Corporation    
-2024-06-09T18:48:42.786210Z DEBUG egui_glow::shader_version: Shader version: Gl140 ("3.30 NVIDIA via Cg compiler").    
-2024-06-09T18:48:42.786223Z DEBUG egui_glow::painter: Shader header: "#version 140\n".    
-2024-06-09T18:48:42.786262Z DEBUG egui_glow::painter: SRGB texture Support: true    
-2024-06-09T18:48:42.786284Z DEBUG egui_glow::painter: SRGB framebuffer Support: true    
-2024-06-09T18:48:42.787753Z DEBUG egui_glow::vao: GL version: "3.3.0 NVIDIA 550.67".    
-2024-06-09T18:48:42.801064Z  INFO transfer_window_controller: Initialising controller    
-2024-06-09T18:48:42.801095Z  INFO transfer_window_controller: OpenGL version: 3.3.0 NVIDIA 550.67    
-2024-06-09T18:48:42.801106Z  INFO transfer_window_controller: OpenGL renderer: NVIDIA GeForce RTX 2060/PCIe/SSE2    
-2024-06-09T18:48:42.801114Z  INFO transfer_window_controller: GLSL version: 3.30 NVIDIA via Cg compiler    
-2024-06-09T18:48:42.801144Z  INFO transfer_window_view::resources: Loading resources    
-2024-06-09T18:48:42.801232Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/warp-here.png    
-2024-06-09T18:48:42.802968Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-light.png    
-2024-06-09T18:48:42.805998Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/planet-target.drawio.png    
-2024-06-09T18:48:42.807844Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-start.png    
-2024-06-09T18:48:42.827360Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/next-orbit.png    
-2024-06-09T18:48:42.828038Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/periapsis.png    
-2024-06-09T18:48:42.834379Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/set-target.png    
-2024-06-09T18:48:42.837614Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-false.png    
-2024-06-09T18:48:42.839161Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/encounter-exit.png    
-2024-06-09T18:48:42.840676Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/encounter-entrance.png    
-2024-06-09T18:48:42.842186Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/star-target.png    
-2024-06-09T18:48:42.849965Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-paused.png    
-2024-06-09T18:48:42.851490Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-torpedo-target.png    
-2024-06-09T18:48:42.858338Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/guidance.png    
-2024-06-09T18:48:42.862655Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/create-burn.png    
-2024-06-09T18:48:42.867437Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-medium.png    
-2024-06-09T18:48:42.876698Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-large.png    
-2024-06-09T18:48:42.884115Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-small.png    
-2024-06-09T18:48:42.890724Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/isp.png    
-2024-06-09T18:48:42.892180Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/blank-slot.png    
-2024-06-09T18:48:42.892398Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/adjust-burn-arrow.png    
-2024-06-09T18:48:42.894493Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/clear-slot.png    
-2024-06-09T18:48:42.896210Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn.png    
-2024-06-09T18:48:42.900005Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/planet.png    
-2024-06-09T18:48:42.902264Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-light-target.png    
-2024-06-09T18:48:42.908466Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/edit.png    
-2024-06-09T18:48:42.909739Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/engine-high-thrust.png    
-2024-06-09T18:48:42.918204Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/torpedo.png    
-2024-06-09T18:48:42.922301Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/moon-target.png    
-2024-06-09T18:48:42.928503Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/intercept.png    
-2024-06-09T18:48:42.932958Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/enable-guidance.png    
-2024-06-09T18:48:42.937389Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/focus.png    
-2024-06-09T18:48:42.939170Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/closest-approach-1.png    
-2024-06-09T18:48:42.943704Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/moon.png    
-2024-06-09T18:48:42.945957Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/previous-orbit.png    
-2024-06-09T18:48:42.946690Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/star.png    
-2024-06-09T18:48:42.948587Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/circle.png    
-2024-06-09T18:48:42.950130Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/fuel.png    
-2024-06-09T18:48:42.951353Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time.png    
-2024-06-09T18:48:42.953026Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/cancel.png    
-2024-06-09T18:48:42.954876Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/unset-target.png    
-2024-06-09T18:48:42.970354Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-warp.png    
-2024-06-09T18:48:42.971966Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/fire-possible.png    
-2024-06-09T18:48:42.985907Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-burnt.png    
-2024-06-09T18:48:43.002153Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/thrust.png    
-2024-06-09T18:48:43.004570Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/ship-light.png    
-2024-06-09T18:48:43.119913Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-end.png    
-2024-06-09T18:48:43.138859Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-true.png    
-2024-06-09T18:48:43.140465Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/duration.png    
-2024-06-09T18:48:43.142148Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/engine-efficient.png    
-2024-06-09T18:48:43.146903Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/apoapsis.png    
-2024-06-09T18:48:43.152824Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-torpedo.png    
-2024-06-09T18:48:43.154616Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/closest-approach-2.png    
-2024-06-09T18:48:44.322891Z DEBUG transfer_window_controller: Handling controller event NewGame    
-2024-06-09T18:48:44.327150Z  INFO transfer_window_view::resources: Building renderers    
-2024-06-09T18:48:44.327173Z TRACE transfer_window_view::resources: Building renderer for thrust    
-2024-06-09T18:48:44.327278Z TRACE transfer_window_view::resources: Building renderer for closest-approach-2    
-2024-06-09T18:48:44.327381Z TRACE transfer_window_view::resources: Building renderer for closest-approach-1    
-2024-06-09T18:48:44.327481Z TRACE transfer_window_view::resources: Building renderer for fire-possible    
-2024-06-09T18:48:44.327583Z TRACE transfer_window_view::resources: Building renderer for burn-start    
-2024-06-09T18:48:44.327682Z TRACE transfer_window_view::resources: Building renderer for moon    
-2024-06-09T18:48:44.327779Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-torpedo    
-2024-06-09T18:48:44.327877Z TRACE transfer_window_view::resources: Building renderer for time-step-paused    
-2024-06-09T18:48:44.328031Z TRACE transfer_window_view::resources: Building renderer for tank-large    
-2024-06-09T18:48:44.328132Z TRACE transfer_window_view::resources: Building renderer for time-step-false    
-2024-06-09T18:48:44.328231Z TRACE transfer_window_view::resources: Building renderer for circle    
-2024-06-09T18:48:44.328330Z TRACE transfer_window_view::resources: Building renderer for burn-end    
-2024-06-09T18:48:44.328429Z TRACE transfer_window_view::resources: Building renderer for warp-here    
-2024-06-09T18:48:44.328528Z TRACE transfer_window_view::resources: Building renderer for star    
-2024-06-09T18:48:44.328640Z TRACE transfer_window_view::resources: Building renderer for planet-target    
-2024-06-09T18:48:44.328769Z TRACE transfer_window_view::resources: Building renderer for adjust-burn-arrow    
-2024-06-09T18:48:44.328892Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-light-target    
-2024-06-09T18:48:44.329012Z TRACE transfer_window_view::resources: Building renderer for time    
-2024-06-09T18:48:44.329133Z TRACE transfer_window_view::resources: Building renderer for time-step-warp    
-2024-06-09T18:48:44.329253Z TRACE transfer_window_view::resources: Building renderer for ship-light    
-2024-06-09T18:48:44.329371Z TRACE transfer_window_view::resources: Building renderer for time-step-true    
-2024-06-09T18:48:44.329490Z TRACE transfer_window_view::resources: Building renderer for create-burn    
-2024-06-09T18:48:44.329609Z TRACE transfer_window_view::resources: Building renderer for cancel    
-2024-06-09T18:48:44.329727Z TRACE transfer_window_view::resources: Building renderer for isp    
-2024-06-09T18:48:44.329845Z TRACE transfer_window_view::resources: Building renderer for duration    
-2024-06-09T18:48:44.329965Z TRACE transfer_window_view::resources: Building renderer for star-target    
-2024-06-09T18:48:44.330082Z TRACE transfer_window_view::resources: Building renderer for next-orbit    
-2024-06-09T18:48:44.330210Z TRACE transfer_window_view::resources: Building renderer for periapsis    
-2024-06-09T18:48:44.330337Z TRACE transfer_window_view::resources: Building renderer for encounter-exit    
-2024-06-09T18:48:44.330480Z TRACE transfer_window_view::resources: Building renderer for clear-slot    
-2024-06-09T18:48:44.330598Z TRACE transfer_window_view::resources: Building renderer for enable-guidance    
-2024-06-09T18:48:44.330722Z TRACE transfer_window_view::resources: Building renderer for planet    
-2024-06-09T18:48:44.330851Z TRACE transfer_window_view::resources: Building renderer for fuel    
-2024-06-09T18:48:44.330987Z TRACE transfer_window_view::resources: Building renderer for burn    
-2024-06-09T18:48:44.331106Z TRACE transfer_window_view::resources: Building renderer for guidance    
-2024-06-09T18:48:44.331233Z TRACE transfer_window_view::resources: Building renderer for tank-medium    
-2024-06-09T18:48:44.331361Z TRACE transfer_window_view::resources: Building renderer for edit    
-2024-06-09T18:48:44.331500Z TRACE transfer_window_view::resources: Building renderer for engine-high-thrust    
-2024-06-09T18:48:44.331619Z TRACE transfer_window_view::resources: Building renderer for unset-target    
-2024-06-09T18:48:44.331744Z TRACE transfer_window_view::resources: Building renderer for engine-efficient    
-2024-06-09T18:48:44.331871Z TRACE transfer_window_view::resources: Building renderer for burn-burnt    
-2024-06-09T18:48:44.332007Z TRACE transfer_window_view::resources: Building renderer for encounter-entrance    
-2024-06-09T18:48:44.332125Z TRACE transfer_window_view::resources: Building renderer for previous-orbit    
-2024-06-09T18:48:44.332249Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-light    
-2024-06-09T18:48:44.332376Z TRACE transfer_window_view::resources: Building renderer for focus    
-2024-06-09T18:48:44.332515Z TRACE transfer_window_view::resources: Building renderer for torpedo    
-2024-06-09T18:48:44.332643Z TRACE transfer_window_view::resources: Building renderer for apoapsis    
-2024-06-09T18:48:44.332767Z TRACE transfer_window_view::resources: Building renderer for set-target    
-2024-06-09T18:48:44.332897Z TRACE transfer_window_view::resources: Building renderer for blank-slot    
-2024-06-09T18:48:44.333035Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-torpedo-target    
-2024-06-09T18:48:44.333153Z TRACE transfer_window_view::resources: Building renderer for tank-small    
-2024-06-09T18:48:44.333273Z TRACE transfer_window_view::resources: Building renderer for intercept    
-2024-06-09T18:48:44.333398Z TRACE transfer_window_view::resources: Building renderer for moon-target    
-2024-06-09T18:48:44.824300Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.841005Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.857661Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.874387Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.890940Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.907752Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.924192Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.940833Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.957276Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.974347Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:44.991115Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.007902Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.024197Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.041565Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.057576Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.074480Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.091073Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.107645Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.124243Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.140793Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.157427Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.174293Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Vessel(Entity { index: 3, generation: 0 }))    
-2024-06-09T18:48:45.174322Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.193135Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.208714Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:45.925623Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Apsis { type_: Periapsis, entity: Entity { index: 3, generation: 0 }, time: 157354.74110878492 })    
-2024-06-09T18:48:47.047265Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Apsis { type_: Apoapsis, entity: Entity { index: 3, generation: 0 }, time: 314709.48221756984 })    
-2024-06-09T18:48:48.142073Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.158916Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.175858Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.192112Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.208844Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.225704Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.242233Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.258578Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.275603Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.292198Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.309014Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.325386Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.342023Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.357217Z TRACE transfer_window_view::game::underlay::icons::apsis: Apsis icon clicked; switching to Selected    
-2024-06-09T18:48:48.358756Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Apsis { type_: Apoapsis, entity: Entity { index: 3, generation: 0 }, time: 314709.48221756984 })    
-2024-06-09T18:48:48.358779Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.375567Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.392360Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.409012Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.425522Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:48.441990Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
-2024-06-09T18:48:49.675416Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Apsis { type_: Periapsis, entity: Entity { index: 3, generation: 0 }, time: 157354.74110878492 })    
-2024-06-09T18:48:52.775497Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Apsis { type_: Periapsis, entity: Entity { index: 3, generation: 0 }, time: 157354.74110878492 })    
-2024-06-09T18:48:53.819117Z DEBUG eframe::native::glow_integration: Received WindowEvent::CloseRequested for viewport Some("FFFF")    
-2024-06-09T18:48:53.825833Z DEBUG eframe::native::epi_integration: Closing root viewport (ViewportCommand::CancelClose was not sent)    
-2024-06-09T18:48:53.835645Z DEBUG eframe::native::run: Asking to exit event loop…    
-2024-06-09T18:48:53.852157Z  INFO transfer_window_view::resources: Destroying textures    
-2024-06-09T18:48:53.854439Z DEBUG eframe::native::run: Received Event::LoopExiting - saving app state…    
-2024-06-09T18:48:53.869000Z DEBUG eframe::native::run: eframe window closed    
+2024-06-09T20:00:18.101178Z DEBUG egui_glow::shader_version: Shader version: Gl140 ("3.30 NVIDIA via Cg compiler").    
+2024-06-09T20:00:18.101189Z DEBUG egui_glow::painter: Shader header: "#version 140\n".    
+2024-06-09T20:00:18.101217Z DEBUG egui_glow::painter: SRGB texture Support: true    
+2024-06-09T20:00:18.101241Z DEBUG egui_glow::painter: SRGB framebuffer Support: true    
+2024-06-09T20:00:18.102673Z DEBUG egui_glow::vao: GL version: "3.3.0 NVIDIA 550.67".    
+2024-06-09T20:00:18.116162Z  INFO transfer_window_controller: Initialising controller    
+2024-06-09T20:00:18.116256Z  INFO transfer_window_controller: OpenGL version: 3.3.0 NVIDIA 550.67    
+2024-06-09T20:00:18.116268Z  INFO transfer_window_controller: OpenGL renderer: NVIDIA GeForce RTX 2060/PCIe/SSE2    
+2024-06-09T20:00:18.116276Z  INFO transfer_window_controller: GLSL version: 3.30 NVIDIA via Cg compiler    
+2024-06-09T20:00:18.116306Z  INFO transfer_window_view::resources: Loading resources    
+2024-06-09T20:00:18.116387Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/warp-here.png    
+2024-06-09T20:00:18.118182Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-light.png    
+2024-06-09T20:00:18.121163Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/planet-target.drawio.png    
+2024-06-09T20:00:18.123024Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-start.png    
+2024-06-09T20:00:18.191599Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/next-orbit.png    
+2024-06-09T20:00:18.192381Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/periapsis.png    
+2024-06-09T20:00:18.198874Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/set-target.png    
+2024-06-09T20:00:18.202132Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-false.png    
+2024-06-09T20:00:18.203719Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/encounter-exit.png    
+2024-06-09T20:00:18.205272Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/encounter-entrance.png    
+2024-06-09T20:00:18.206850Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/star-target.png    
+2024-06-09T20:00:18.214839Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-paused.png    
+2024-06-09T20:00:18.216407Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-torpedo-target.png    
+2024-06-09T20:00:18.223396Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/guidance.png    
+2024-06-09T20:00:18.227778Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/create-burn.png    
+2024-06-09T20:00:18.232560Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-medium.png    
+2024-06-09T20:00:18.242043Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-large.png    
+2024-06-09T20:00:18.249648Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-small.png    
+2024-06-09T20:00:18.256284Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/isp.png    
+2024-06-09T20:00:18.257748Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/blank-slot.png    
+2024-06-09T20:00:18.257987Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/adjust-burn-arrow.png    
+2024-06-09T20:00:18.260089Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/clear-slot.png    
+2024-06-09T20:00:18.261657Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn.png    
+2024-06-09T20:00:18.265425Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/planet.png    
+2024-06-09T20:00:18.267636Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-light-target.png    
+2024-06-09T20:00:18.273774Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/edit.png    
+2024-06-09T20:00:18.274988Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/engine-high-thrust.png    
+2024-06-09T20:00:18.283439Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/torpedo.png    
+2024-06-09T20:00:18.287615Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/moon-target.png    
+2024-06-09T20:00:18.293780Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/intercept.png    
+2024-06-09T20:00:18.298115Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/enable-guidance.png    
+2024-06-09T20:00:18.302523Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/focus.png    
+2024-06-09T20:00:18.304300Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/closest-approach-1.png    
+2024-06-09T20:00:18.308728Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/moon.png    
+2024-06-09T20:00:18.310898Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/previous-orbit.png    
+2024-06-09T20:00:18.311552Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/star.png    
+2024-06-09T20:00:18.313330Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/circle.png    
+2024-06-09T20:00:18.314815Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/fuel.png    
+2024-06-09T20:00:18.316033Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time.png    
+2024-06-09T20:00:18.317650Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/cancel.png    
+2024-06-09T20:00:18.319501Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/unset-target.png    
+2024-06-09T20:00:18.334721Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-warp.png    
+2024-06-09T20:00:18.336283Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/fire-possible.png    
+2024-06-09T20:00:18.349941Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-burnt.png    
+2024-06-09T20:00:18.365743Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/thrust.png    
+2024-06-09T20:00:18.368080Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/ship-light.png    
+2024-06-09T20:00:18.481976Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-end.png    
+2024-06-09T20:00:18.500444Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-true.png    
+2024-06-09T20:00:18.502048Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/duration.png    
+2024-06-09T20:00:18.503774Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/engine-efficient.png    
+2024-06-09T20:00:18.508425Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/apoapsis.png    
+2024-06-09T20:00:18.514103Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-torpedo.png    
+2024-06-09T20:00:18.515816Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/closest-approach-2.png    
+2024-06-09T20:00:26.596062Z DEBUG transfer_window_controller: Handling controller event NewGame    
+2024-06-09T20:00:26.601153Z  INFO transfer_window_view::resources: Building renderers    
+2024-06-09T20:00:26.601253Z TRACE transfer_window_view::resources: Building renderer for set-target    
+2024-06-09T20:00:26.601801Z TRACE transfer_window_view::resources: Building renderer for encounter-entrance    
+2024-06-09T20:00:26.602357Z TRACE transfer_window_view::resources: Building renderer for planet    
+2024-06-09T20:00:26.602897Z TRACE transfer_window_view::resources: Building renderer for closest-approach-1    
+2024-06-09T20:00:26.603440Z TRACE transfer_window_view::resources: Building renderer for burn    
+2024-06-09T20:00:26.603979Z TRACE transfer_window_view::resources: Building renderer for engine-high-thrust    
+2024-06-09T20:00:26.604511Z TRACE transfer_window_view::resources: Building renderer for tank-medium    
+2024-06-09T20:00:26.605073Z TRACE transfer_window_view::resources: Building renderer for isp    
+2024-06-09T20:00:26.605618Z TRACE transfer_window_view::resources: Building renderer for duration    
+2024-06-09T20:00:26.606143Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-torpedo-target    
+2024-06-09T20:00:26.606666Z TRACE transfer_window_view::resources: Building renderer for thrust    
+2024-06-09T20:00:26.607197Z TRACE transfer_window_view::resources: Building renderer for tank-large    
+2024-06-09T20:00:26.607725Z TRACE transfer_window_view::resources: Building renderer for moon    
+2024-06-09T20:00:26.608249Z TRACE transfer_window_view::resources: Building renderer for warp-here    
+2024-06-09T20:00:26.608806Z TRACE transfer_window_view::resources: Building renderer for tank-small    
+2024-06-09T20:00:26.609363Z TRACE transfer_window_view::resources: Building renderer for enable-guidance    
+2024-06-09T20:00:26.609924Z TRACE transfer_window_view::resources: Building renderer for adjust-burn-arrow    
+2024-06-09T20:00:26.610488Z TRACE transfer_window_view::resources: Building renderer for burn-burnt    
+2024-06-09T20:00:26.611058Z TRACE transfer_window_view::resources: Building renderer for burn-end    
+2024-06-09T20:00:26.611623Z TRACE transfer_window_view::resources: Building renderer for ship-light    
+2024-06-09T20:00:26.612184Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-light-target    
+2024-06-09T20:00:26.612814Z TRACE transfer_window_view::resources: Building renderer for time-step-false    
+2024-06-09T20:00:26.613438Z TRACE transfer_window_view::resources: Building renderer for torpedo    
+2024-06-09T20:00:26.613975Z TRACE transfer_window_view::resources: Building renderer for circle    
+2024-06-09T20:00:26.614525Z TRACE transfer_window_view::resources: Building renderer for previous-orbit    
+2024-06-09T20:00:26.615103Z TRACE transfer_window_view::resources: Building renderer for cancel    
+2024-06-09T20:00:26.615730Z TRACE transfer_window_view::resources: Building renderer for unset-target    
+2024-06-09T20:00:26.616260Z TRACE transfer_window_view::resources: Building renderer for focus    
+2024-06-09T20:00:26.616828Z TRACE transfer_window_view::resources: Building renderer for create-burn    
+2024-06-09T20:00:26.617439Z TRACE transfer_window_view::resources: Building renderer for time-step-warp    
+2024-06-09T20:00:26.618059Z TRACE transfer_window_view::resources: Building renderer for planet-target    
+2024-06-09T20:00:26.618586Z TRACE transfer_window_view::resources: Building renderer for fire-possible    
+2024-06-09T20:00:26.619136Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-torpedo    
+2024-06-09T20:00:26.619704Z TRACE transfer_window_view::resources: Building renderer for burn-start    
+2024-06-09T20:00:26.620284Z TRACE transfer_window_view::resources: Building renderer for star-target    
+2024-06-09T20:00:26.620943Z TRACE transfer_window_view::resources: Building renderer for time-step-true    
+2024-06-09T20:00:26.621368Z TRACE transfer_window_view::resources: Building renderer for guidance    
+2024-06-09T20:00:26.621842Z TRACE transfer_window_view::resources: Building renderer for encounter-exit    
+2024-06-09T20:00:26.622228Z TRACE transfer_window_view::resources: Building renderer for engine-efficient    
+2024-06-09T20:00:26.622597Z TRACE transfer_window_view::resources: Building renderer for apoapsis    
+2024-06-09T20:00:26.622982Z TRACE transfer_window_view::resources: Building renderer for closest-approach-2    
+2024-06-09T20:00:26.623348Z TRACE transfer_window_view::resources: Building renderer for clear-slot    
+2024-06-09T20:00:26.623720Z TRACE transfer_window_view::resources: Building renderer for fuel    
+2024-06-09T20:00:26.624121Z TRACE transfer_window_view::resources: Building renderer for moon-target    
+2024-06-09T20:00:26.624464Z TRACE transfer_window_view::resources: Building renderer for time-step-paused    
+2024-06-09T20:00:26.624849Z TRACE transfer_window_view::resources: Building renderer for time    
+2024-06-09T20:00:26.625238Z TRACE transfer_window_view::resources: Building renderer for next-orbit    
+2024-06-09T20:00:26.625611Z TRACE transfer_window_view::resources: Building renderer for periapsis    
+2024-06-09T20:00:26.625984Z TRACE transfer_window_view::resources: Building renderer for intercept    
+2024-06-09T20:00:26.626335Z TRACE transfer_window_view::resources: Building renderer for star    
+2024-06-09T20:00:26.626588Z TRACE transfer_window_view::resources: Building renderer for edit    
+2024-06-09T20:00:26.626843Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-light    
+2024-06-09T20:00:26.627127Z TRACE transfer_window_view::resources: Building renderer for blank-slot    
+2024-06-09T20:00:27.548267Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.564801Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.581337Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.598540Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.615043Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.631959Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.648427Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.665428Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.681595Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.698258Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.715056Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.731568Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.748180Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.764679Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.781388Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.798191Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.814905Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.831499Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.848125Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.864672Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.881479Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.898205Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.915070Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.931608Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Vessel(Entity { index: 3, generation: 0 }))    
+2024-06-09T20:00:27.931636Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.949856Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.965020Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.981745Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:27.998544Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:28.015455Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:28.032188Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:28.850845Z DEBUG transfer_window_view::game::events: Handling view event SetVesselEditor(Some(VesselEditor { entity: Entity { index: 3, generation: 0 }, slot_editor: None }))    
+2024-06-09T20:00:29.598990Z DEBUG transfer_window_view::game::events: Handling view event SetVesselEditor(Some(VesselEditor { entity: Entity { index: 3, generation: 0 }, slot_editor: Some(Middle) }))    
+2024-06-09T20:00:29.899552Z DEBUG transfer_window_view::game::events: Handling view event SetVesselEditor(Some(VesselEditor { entity: Entity { index: 3, generation: 0 }, slot_editor: None }))    
+2024-06-09T20:00:29.899588Z DEBUG transfer_window_view::game::events: Handling model event SetSlot { entity: Entity { index: 3, generation: 0 }, slot_location: Middle, slot: FuelTank(Some(FuelTank { type_: Medium, remaining_litres: 15000.0 })) }    
+2024-06-09T20:00:30.216153Z DEBUG transfer_window_view::game::events: Handling view event SetVesselEditor(Some(VesselEditor { entity: Entity { index: 3, generation: 0 }, slot_editor: Some(Back) }))    
+2024-06-09T20:00:30.665803Z DEBUG transfer_window_view::game::events: Handling view event SetVesselEditor(Some(VesselEditor { entity: Entity { index: 3, generation: 0 }, slot_editor: None }))    
+2024-06-09T20:00:30.665840Z DEBUG transfer_window_view::game::events: Handling model event SetSlot { entity: Entity { index: 3, generation: 0 }, slot_location: Back, slot: Engine(Some(Engine { type_: Efficient })) }    
+2024-06-09T20:00:31.349422Z DEBUG transfer_window_view::game::events: Handling view event SetVesselEditor(Some(VesselEditor { entity: Entity { index: 3, generation: 0 }, slot_editor: Some(Front) }))    
+2024-06-09T20:00:32.166363Z DEBUG transfer_window_view::game::events: Handling view event SetVesselEditor(None)    
+2024-06-09T20:00:32.849230Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:33.298687Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T20:00:33.298777Z TRACE transfer_window_view::game::underlay::selected: Selected segment point at time=5945.082073130034    
+2024-06-09T20:00:33.299858Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T20:00:33.299878Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Point { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034 })    
+2024-06-09T20:00:34.015892Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Selected })    
+2024-06-09T20:00:34.015930Z DEBUG transfer_window_view::game::events: Handling model event CreateBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034 }    
+2024-06-09T20:00:34.016078Z DEBUG transfer_window_model::api::timeline: Adding event Burn(StartBurnEvent { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034 })    
+2024-06-09T20:00:34.016103Z TRACE transfer_window_model::components::vessel_component::timeline: Adding new timeline event Burn(StartBurnEvent { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034 }) at index 0    
+2024-06-09T20:00:34.149375Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.166881Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.416295Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.432665Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.449432Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.465951Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.482697Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.499471Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.515772Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.532747Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.549195Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.565958Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.582293Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.598505Z TRACE transfer_window_view::game::underlay::icons::burn: Burn icon clicked; switching Selected -> Adjusting    
+2024-06-09T20:00:34.599594Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Adjusting })    
+2024-06-09T20:00:34.599613Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.616240Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.632956Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.649315Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.665948Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.682561Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.699580Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.716757Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.733323Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.799791Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.816583Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.832937Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.849315Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.865874Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.882530Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.899650Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.916659Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.933077Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.949332Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.966152Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.981606Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:34.982758Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:34.982778Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.998597Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:34.999694Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:34.999714Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:34.999723Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[0.008058471471388072, -0.0]] }    
+2024-06-09T20:00:35.015346Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:35.016507Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:35.016526Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:35.016536Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[0.007410143451642719, -0.0]] }    
+2024-06-09T20:00:35.031844Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:35.033024Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:35.033044Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:35.033053Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[0.0034439410499246103, -0.0]] }    
+2024-06-09T20:00:35.048446Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:35.049614Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:35.049634Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:35.049644Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-9.73880662816923e-6, 0.0]] }    
+2024-06-09T20:00:35.065317Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:35.066454Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:35.066473Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:35.066482Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.0017086429847008224, 0.0]] }    
+2024-06-09T20:00:35.083012Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.005714715714128158, 0.0]] }    
+2024-06-09T20:00:35.099887Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.019405549554085997, 0.0]] }    
+2024-06-09T20:00:35.116588Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.05701063809580412, 0.0]] }    
+2024-06-09T20:00:35.133301Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:35.133331Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.142560345018874, 0.0]] }    
+2024-06-09T20:00:35.149685Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.28251444272519216, 0.0]] }    
+2024-06-09T20:00:35.166680Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.5673849691125674, 0.0]] }    
+2024-06-09T20:00:35.182968Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-1.1770027109263843, 0.0]] }    
+2024-06-09T20:00:35.199938Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-1.9362962611751173, 0.0]] }    
+2024-06-09T20:00:35.216739Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-2.821284524803773, 0.0]] }    
+2024-06-09T20:00:35.233155Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.7753211807773055, 0.0]] }    
+2024-06-09T20:00:35.249562Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.586328285730964, 0.0]] }    
+2024-06-09T20:00:35.266479Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.986533027329768, 0.0]] }    
+2024-06-09T20:00:35.283253Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.160167851958981, 0.0]] }    
+2024-06-09T20:00:35.300038Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.334590251183652, 0.0]] }    
+2024-06-09T20:00:35.316198Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.377448276159662, 0.0]] }    
+2024-06-09T20:00:35.332861Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.463797775095457, 0.0]] }    
+2024-06-09T20:00:35.349659Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.601648509118707, 0.0]] }    
+2024-06-09T20:00:35.366151Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.795067929188313, 0.0]] }    
+2024-06-09T20:00:35.382844Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.9378498228616206, 0.0]] }    
+2024-06-09T20:00:35.399637Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.0756093093536325, 0.0]] }    
+2024-06-09T20:00:35.416253Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.121940490179272, 0.0]] }    
+2024-06-09T20:00:35.432757Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.121925088816986, 0.0]] }    
+2024-06-09T20:00:35.449338Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.121909775682928, 0.0]] }    
+2024-06-09T20:00:35.466263Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.12189444335508, 0.0]] }    
+2024-06-09T20:00:35.482738Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.121878747753671, 0.0]] }    
+2024-06-09T20:00:35.499361Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.121863609689267, 0.0]] }    
+2024-06-09T20:00:35.516002Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.156581501589918, 0.0]] }    
+2024-06-09T20:00:35.532485Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.156566035175263, 0.0]] }    
+2024-06-09T20:00:35.549597Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.265126865122737, 0.0]] }    
+2024-06-09T20:00:35.566269Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.414120920883902, 0.0]] }    
+2024-06-09T20:00:35.582787Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.675523188597486, 0.0]] }    
+2024-06-09T20:00:35.599491Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.151538332856889, 0.0]] }    
+2024-06-09T20:00:35.616249Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.692311969583618, 0.0]] }    
+2024-06-09T20:00:35.633194Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-8.80677211553148, 0.0]] }    
+2024-06-09T20:00:35.650175Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-10.49023639849391, 0.0]] }    
+2024-06-09T20:00:35.666980Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-12.61842880124091, 0.0]] }    
+2024-06-09T20:00:35.684444Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-14.40793036473111, 0.0]] }    
+2024-06-09T20:00:35.702567Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.268298702387899, 0.0]] }    
+2024-06-09T20:00:35.721204Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.520230188475436, 0.0]] }    
+2024-06-09T20:00:35.740182Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.683056448559375, 0.0]] }    
+2024-06-09T20:00:35.759907Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774607624394896, 0.0]] }    
+2024-06-09T20:00:35.780086Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774575521131574, 0.0]] }    
+2024-06-09T20:00:35.800448Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774542296498883, 0.0]] }    
+2024-06-09T20:00:35.821536Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774508992120197, 0.0]] }    
+2024-06-09T20:00:35.843349Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774474493121872, 0.0]] }    
+2024-06-09T20:00:35.865976Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774439016085346, 0.0]] }    
+2024-06-09T20:00:35.889419Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774401810061514, 0.0]] }    
+2024-06-09T20:00:35.914288Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774363387726174, 0.0]] }    
+2024-06-09T20:00:35.938487Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774322684708194, 0.0]] }    
+2024-06-09T20:00:35.963525Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.774283113146247, 0.0]] }    
+2024-06-09T20:00:35.989777Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-15.77424215020943, 0.0]] }    
+2024-06-09T20:00:36.017072Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-14.404554929968569, 0.0]] }    
+2024-06-09T20:00:36.044227Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-12.898741572796133, 0.0]] }    
+2024-06-09T20:00:36.071991Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-11.751213935447694, 0.0]] }    
+2024-06-09T20:00:36.100026Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-9.66669297213129, 0.0]] }    
+2024-06-09T20:00:36.129060Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-8.046744728572895, 0.0]] }    
+2024-06-09T20:00:36.157814Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.775243648719401, 0.0]] }    
+2024-06-09T20:00:36.186334Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.721706783009929, 0.0]] }    
+2024-06-09T20:00:36.214991Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676349062893153, 0.0]] }    
+2024-06-09T20:00:36.244017Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676318503717758, 0.0]] }    
+2024-06-09T20:00:36.272885Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676287724918371, 0.0]] }    
+2024-06-09T20:00:36.302272Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676257105180815, 0.0]] }    
+2024-06-09T20:00:36.331810Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676225821405998, 0.0]] }    
+2024-06-09T20:00:36.361836Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676194405477572, 0.0]] }    
+2024-06-09T20:00:36.391566Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676162613830962, 0.0]] }    
+2024-06-09T20:00:36.422166Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676130940159041, 0.0]] }    
+2024-06-09T20:00:36.453163Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676098473958987, 0.0]] }    
+2024-06-09T20:00:36.484764Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676065532932194, 0.0]] }    
+2024-06-09T20:00:36.516342Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.676032159933887, 0.0]] }    
+2024-06-09T20:00:36.548089Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.6759984472746385, 0.0]] }    
+2024-06-09T20:00:36.579920Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.675964729949532, 0.0]] }    
+2024-06-09T20:00:36.611927Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.675930923311133, 0.0]] }    
+2024-06-09T20:00:36.644512Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.67589691644017, 0.0]] }    
+2024-06-09T20:00:36.677347Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.6758624612882365, 0.0]] }    
+2024-06-09T20:00:36.710397Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.651054845499893, 0.0]] }    
+2024-06-09T20:00:36.744412Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.296604098895063, 0.0]] }    
+2024-06-09T20:00:36.778797Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.740015094370955, 0.0]] }    
+2024-06-09T20:00:36.813902Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-6.1994939455120175, 0.0]] }    
+2024-06-09T20:00:36.849100Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.927870407003148, 0.0]] }    
+2024-06-09T20:00:36.885877Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.849476858086408, 0.0]] }    
+2024-06-09T20:00:36.920874Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.849443642842729, 0.0]] }    
+2024-06-09T20:00:36.955436Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.849412009312621, 0.0]] }    
+2024-06-09T20:00:36.990131Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.849380743411903, 0.0]] }    
+2024-06-09T20:00:37.025088Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.849349423347431, 0.0]] }    
+2024-06-09T20:00:37.061484Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.7831909899674985, 0.0]] }    
+2024-06-09T20:00:37.098007Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-17.681917462275017, 0.0]] }    
+2024-06-09T20:00:37.135129Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-23.421379351990197, 0.0]] }    
+2024-06-09T20:00:37.172790Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-23.974360377668035, 0.0]] }    
+2024-06-09T20:00:37.210739Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-23.974281191450874, 0.0]] }    
+2024-06-09T20:00:37.248852Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-23.97420106116852, 0.0]] }    
+2024-06-09T20:00:37.289360Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-21.86971812400288, 0.0]] }    
+2024-06-09T20:00:37.329962Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-17.54258553692791, 0.0]] }    
+2024-06-09T20:00:37.371524Z TRACE transfer_window_view::game::selected::burn: Stopped dragging to adjust burn    
+2024-06-09T20:00:37.372759Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Adjusting })    
+2024-06-09T20:00:37.598911Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-6.708879348077376, 8.331396742280464]])    
+2024-06-09T20:00:37.598950Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.517583694458007e-6)    
+2024-06-09T20:00:37.615822Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-19.884696790743977, 24.50856952802412]])    
+2024-06-09T20:00:37.615862Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.2825978073481e-6)    
+2024-06-09T20:00:37.631961Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-20.111042967346048, 24.787548939429403]])    
+2024-06-09T20:00:37.632001Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.19723111198753e-6)    
+2024-06-09T20:00:37.648592Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-14.098474488218564, 16.68983961034024]])    
+2024-06-09T20:00:37.648657Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.526708975964208e-6)    
+2024-06-09T20:00:37.665380Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-9.49649443253076, 11.00149174436576]])    
+2024-06-09T20:00:37.665419Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.1127521280280064e-6)    
+2024-06-09T20:00:37.682079Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-6.5127403988019745, 7.234150944476598]])    
+2024-06-09T20:00:37.682117Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.850577545449145e-6)    
+2024-06-09T20:00:37.698647Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-4.639466097625264, 4.678431634531056]])    
+2024-06-09T20:00:37.698685Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.680285971223684e-6)    
+2024-06-09T20:00:37.715250Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-3.297566430109975, 3.0438491972327184]])    
+2024-06-09T20:00:37.715291Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.5675501284708396e-6)    
+2024-06-09T20:00:37.731712Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-2.2181774187316705, 2.0475091854634644]])    
+2024-06-09T20:00:37.731751Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.492735029394342e-6)    
+2024-06-09T20:00:37.748596Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-1.548193533342393, 1.4114910959917324]])    
+2024-06-09T20:00:37.748678Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.441311649931417e-6)    
+2024-06-09T20:00:37.765149Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-1.0377850536753257, 0.9345468463386462]])    
+2024-06-09T20:00:37.765188Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.407257610380535e-6)    
+2024-06-09T20:00:37.781568Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.701041454765455, 0.6313022897983269]])    
+2024-06-09T20:00:37.781606Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.38435097908689e-6)    
+2024-06-09T20:00:37.798190Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.4849256756892537, 0.4366855731050158]])    
+2024-06-09T20:00:37.798228Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.368552453994054e-6)    
+2024-06-09T20:00:37.814984Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.33373206261735977, 0.3005326059925319]])    
+2024-06-09T20:00:37.815022Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.357701682323109e-6)    
+2024-06-09T20:00:37.831752Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.22626001283657035, 0.2037518084309503]])    
+2024-06-09T20:00:37.831790Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.35035528195692e-6)    
+2024-06-09T20:00:37.848455Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.48007115010649726, 0.43231397268759963]])    
+2024-06-09T20:00:37.848492Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.334813207349475e-6)    
+2024-06-09T20:00:37.881775Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-8.326762787517595, 7.498421639168363]])    
+2024-06-09T20:00:37.881820Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.078204976038628e-6)    
+2024-06-09T20:00:37.898318Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-5.465631625391182, 4.921914013570017]])    
+2024-06-09T20:00:37.898356Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.915176438137339e-6)    
+2024-06-09T20:00:37.915271Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-12.62186645670295, 11.366251084696787]])    
+2024-06-09T20:00:37.915311Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.565477770736516e-6)    
+2024-06-09T20:00:37.932010Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-17.429410919933268, 15.695544034940339]])    
+2024-06-09T20:00:37.932049Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.128773052180467e-6)    
+2024-06-09T20:00:37.948724Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-20.979685599084167, 18.892639611992692]])    
+2024-06-09T20:00:37.948762Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.66248051735078e-6)    
+2024-06-09T20:00:37.965153Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-13.453113186824677, 12.114805910586202]])    
+2024-06-09T20:00:37.965191Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.3860415611430462e-6)    
+2024-06-09T20:00:37.981809Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-9.095600903258024, 8.19077622055835]])    
+2024-06-09T20:00:37.981849Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.208918833267853e-6)    
+2024-06-09T20:00:37.998305Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-6.056688960183877, 5.454173334784572]])    
+2024-06-09T20:00:37.998343Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.095155601212724e-6)    
+2024-06-09T20:00:38.015071Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-4.175313560181981, 3.7599559815628414]])    
+2024-06-09T20:00:38.015110Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.0186684174067347e-6)    
+2024-06-09T20:00:38.031646Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-2.7722214102442284, 2.4964425601630884]])    
+2024-06-09T20:00:38.031685Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.9687245712410464e-6)    
+2024-06-09T20:00:38.048510Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-1.9087274350486994, 1.7188484249483913]])    
+2024-06-09T20:00:38.048552Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.9347310319570795e-6)    
+2024-06-09T20:00:38.065161Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-1.2728171601652027, 1.1461981060388666]])    
+2024-06-09T20:00:38.065199Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.9122365069268738e-6)    
+2024-06-09T20:00:38.081651Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.8590464841568857, 0.7735890777998079]])    
+2024-06-09T20:00:38.081690Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.8971332953650406e-6)    
+2024-06-09T20:00:38.098194Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.5902631440113594, 0.531544136034868]])    
+2024-06-09T20:00:38.098232Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.8867927027318424e-6)    
+2024-06-09T20:00:38.115028Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.408131170946514, 0.3675305376096612]])    
+2024-06-09T20:00:38.115066Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.879660474789211e-6)    
+2024-06-09T20:00:38.131795Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.27593243325606637, 0.24848284756920563]])    
+2024-06-09T20:00:38.131835Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.8748465247445252e-6)    
+2024-06-09T20:00:38.148406Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.18627071112002133, 0.16774061741010005]])    
+2024-06-09T20:00:38.148445Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.8716004930522612e-6)    
+2024-06-09T20:00:38.165113Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.3994629584117311, 0.35972463343028876]])    
+2024-06-09T20:00:38.165151Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.8646561179176838e-6)    
+2024-06-09T20:00:38.566127Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.584859Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.598189Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.614458Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.631676Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.647913Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.664759Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.681216Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.697632Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.714086Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.730519Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:38.731664Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:38.731685Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.746946Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:38.748017Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:38.748036Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.748045Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[0.0009663966425462609, -0.0]] }    
+2024-06-09T20:00:38.787876Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:00:38.789036Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Dragging(Retrograde) })    
+2024-06-09T20:00:38.789058Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:38.789068Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.00011260802654143506, 0.0]] }    
+2024-06-09T20:00:38.829996Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.15768739756028613, 0.0]] }    
+2024-06-09T20:00:38.870955Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-0.9562851149390895, 0.0]] }    
+2024-06-09T20:00:38.912781Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-2.279207223941734, 0.0]] }    
+2024-06-09T20:00:38.954697Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-2.775518145650834, 0.0]] }    
+2024-06-09T20:00:38.997092Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.140672425845966, 0.0]] }    
+2024-06-09T20:00:39.039264Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.3998951274255576, 0.0]] }    
+2024-06-09T20:00:39.081374Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.6610856469130306, 0.0]] }    
+2024-06-09T20:00:39.122343Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.661075131722349, 0.0]] }    
+2024-06-09T20:00:39.163374Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.6610648215842647, 0.0]] }    
+2024-06-09T20:00:39.204633Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.661054575391986, 0.0]] }    
+2024-06-09T20:00:39.246242Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.66104423370549, 0.0]] }    
+2024-06-09T20:00:39.287823Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.661033798840555, 0.0]] }    
+2024-06-09T20:00:39.330759Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.6610233617667554, 0.0]] }    
+2024-06-09T20:00:39.373387Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-3.9658866549455456, 0.0]] }    
+2024-06-09T20:00:39.416550Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.764791473068687, 0.0]] }    
+2024-06-09T20:00:39.459857Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-7.776617858581346, 0.0]] }    
+2024-06-09T20:00:39.503707Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-11.287131431285427, 0.0]] }    
+2024-06-09T20:00:39.547469Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-12.099449838994966, 0.0]] }    
+2024-06-09T20:00:39.591005Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-12.279762383075283, 0.0]] }    
+2024-06-09T20:00:39.635384Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-12.279739861495232, 0.0]] }    
+2024-06-09T20:00:39.680156Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-12.279716841713354, 0.0]] }    
+2024-06-09T20:00:39.725917Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-9.328721450281302, 0.0]] }    
+2024-06-09T20:00:39.771085Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-5.519717317764602, 0.0]] }    
+2024-06-09T20:00:39.816819Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.46016032630159, 0.0]] }    
+2024-06-09T20:00:39.862288Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.413246923632934, 0.0]] }    
+2024-06-09T20:00:39.907900Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.413234160627842, 0.0]] }    
+2024-06-09T20:00:39.953208Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.4132213712903985, 0.0]] }    
+2024-06-09T20:00:39.998029Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.413208680223244, 0.0]] }    
+2024-06-09T20:00:40.043857Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.413196114663039, 0.0]] }    
+2024-06-09T20:00:40.089091Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.413183292609175, 0.0]] }    
+2024-06-09T20:00:40.134370Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.413170597258216, 0.0]] }    
+2024-06-09T20:00:40.181027Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.413157895468373, 0.0]] }    
+2024-06-09T20:00:40.226749Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.413144840016718, 0.0]] }    
+2024-06-09T20:00:40.272789Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.4131320381716295, 0.0]] }    
+2024-06-09T20:00:40.318933Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, amount: [[-4.389175418913998, 0.0]] }    
+2024-06-09T20:00:40.364810Z TRACE transfer_window_view::game::selected::burn: Stopped dragging to adjust burn    
+2024-06-09T20:00:40.365933Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Adjusting })    
+2024-06-09T20:00:40.515993Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.532707Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.566003Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.582749Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.599666Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.616438Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.633183Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.649184Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.665804Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.682515Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.699609Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.075281563387971, -2.5403631623734992]])    
+2024-06-09T20:00:40.699642Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.144503244580082e-6)    
+2024-06-09T20:00:40.699652Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.715731Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[11.19921280743966, -2.8237491413624003]])    
+2024-06-09T20:00:40.715760Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.489718082539832e-6)    
+2024-06-09T20:00:40.715771Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:00:40.732791Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[8.215148660848298, -2.071352636662524]])    
+2024-06-09T20:00:40.732823Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.7627628698544353e-6)    
+2024-06-09T20:00:40.749129Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.21063930913677, -2.5744920181160214]])    
+2024-06-09T20:00:40.749161Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.135773580937057e-6)    
+2024-06-09T20:00:40.765852Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.286136234271928, -1.8371131336755502]])    
+2024-06-09T20:00:40.765879Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.420256623479803e-6)    
+2024-06-09T20:00:40.782347Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.000761971118619, -1.2608830249857743]])    
+2024-06-09T20:00:40.782378Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.624531786302945e-6)    
+2024-06-09T20:00:40.799399Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.5685651062867656, -0.8997715132334196]])    
+2024-06-09T20:00:40.799428Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.775047890663169e-6)    
+2024-06-09T20:00:40.815974Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.3682425762763826, -0.5971243743895921]])    
+2024-06-09T20:00:40.816001Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.8770705970418725e-6)    
+2024-06-09T20:00:40.832692Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.6487031259196019, -0.4157010065104136]])    
+2024-06-09T20:00:40.832722Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.949145538744023e-6)    
+2024-06-09T20:00:40.849241Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.1167208714979118, -0.281567968771781]])    
+2024-06-09T20:00:40.849275Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.998450616966863e-6)    
+2024-06-09T20:00:40.865944Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.773138329687341, -0.19493769179550896]])    
+2024-06-09T20:00:40.865976Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.032820675697493e-6)    
+2024-06-09T20:00:40.882330Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.5178056661130505, -0.13055857855544994]])    
+2024-06-09T20:00:40.882362Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.055945625905181e-6)    
+2024-06-09T20:00:40.899334Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.36790675170460824, -0.09276333900336188]])    
+2024-06-09T20:00:40.899363Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.0724297323642765e-6)    
+2024-06-09T20:00:40.915955Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.24270130974997364, -0.06119426666834596]])    
+2024-06-09T20:00:40.915983Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.0833273561670084e-6)    
+2024-06-09T20:00:40.932542Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.16584419396561853, -0.04181565332871079]])    
+2024-06-09T20:00:40.932574Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.090784914061756e-6)    
+2024-06-09T20:00:40.949232Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.11352935284669305, -0.028625084470876166]])    
+2024-06-09T20:00:40.949259Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.095895141840125e-6)    
+2024-06-09T20:00:40.965776Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.24268838911826388, -0.061191008883774524]])    
+2024-06-09T20:00:40.965805Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.106842594711373e-6)    
+2024-06-09T20:00:41.049215Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.114903972739342, -1.2896625816038783]])    
+2024-06-09T20:00:41.049251Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.348488921810473e-6)    
+2024-06-09T20:00:41.065873Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[8.486241298625364, -2.139705441124293]])    
+2024-06-09T20:00:41.065903Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.781897365280491e-6)    
+2024-06-09T20:00:41.082383Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.791319607726313, -1.4602127891354046]])    
+2024-06-09T20:00:41.082416Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.093617107339064e-6)    
+2024-06-09T20:00:41.099723Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[13.712560715364374, -3.457460110068415]])    
+2024-06-09T20:00:41.099758Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.933420702742773e-6)    
+2024-06-09T20:00:41.115921Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[9.122664280881047, -2.300171973958991]])    
+2024-06-09T20:00:41.115950Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.541090207030549e-6)    
+2024-06-09T20:00:41.132653Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[6.543056655932146, -1.6497544007557676]])    
+2024-06-09T20:00:41.132680Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.003664133517625e-6)    
+2024-06-09T20:00:41.149315Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.527561512254878, -1.1415711222312215]])    
+2024-06-09T20:00:41.149344Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.337082941671092e-6)    
+2024-06-09T20:00:41.165908Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.1162746141954476, -0.7857318114571644]])    
+2024-06-09T20:00:41.165937Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.573067495749975e-6)    
+2024-06-09T20:00:41.182534Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.14385605516782, -0.5405479652072708]])    
+2024-06-09T20:00:41.182563Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.738547874121628e-6)    
+2024-06-09T20:00:41.199473Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.5078507343100351, -0.3801867407575438]])    
+2024-06-09T20:00:41.199502Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.85650724489924e-6)    
+2024-06-09T20:00:41.215835Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.9919921369465124, -0.25011909257409287]])    
+2024-06-09T20:00:41.215869Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.934796926907268e-6)    
+2024-06-09T20:00:41.233283Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.7026055341852867, -0.17715368106535226]])    
+2024-06-09T20:00:41.233315Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.990594019069067e-6)    
+2024-06-09T20:00:41.249489Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.4687179723184527, -0.11818169675248286]])    
+2024-06-09T20:00:41.249520Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.027971791266657e-6)    
+2024-06-09T20:00:41.266115Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.3213627471520636, -0.08334736394650917]])    
+2024-06-09T20:00:41.266144Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.053671718141257e-6)    
+2024-06-09T20:00:41.282738Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.21823191610908413, -0.06365075983120559]])    
+2024-06-09T20:00:41.282768Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.071157803784242e-6)    
+2024-06-09T20:00:41.299793Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.15193415146902842, -0.04968215659274345]])    
+2024-06-09T20:00:41.299825Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.083348063939915e-6)    
+2024-06-09T20:00:41.315989Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.31669312580463116, -0.10635537618562531]])    
+2024-06-09T20:00:41.316017Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.108828848253469e-6)    
+2024-06-09T20:00:41.566083Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.362554419411452, -3.6992393950338247]])    
+2024-06-09T20:00:41.566121Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.533716289596653e-6)    
+2024-06-09T20:00:41.583112Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.718151988176558, -7.087715280244485]])    
+2024-06-09T20:00:41.583145Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0315449403157629e-5)    
+2024-06-09T20:00:41.599963Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.26481242733686, -10.328384252624344]])    
+2024-06-09T20:00:41.599994Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.1383570738234977e-5)    
+2024-06-09T20:00:41.616281Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.082241786386069, -7.125532816965276]])    
+2024-06-09T20:00:41.616311Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.216058652970867e-5)    
+2024-06-09T20:00:41.632688Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[9.53322750281167, -9.591500470014806]])    
+2024-06-09T20:00:41.632720Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.3304932101009685e-5)    
+2024-06-09T20:00:41.649656Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[6.953524913191235, -6.995672884684845]])    
+2024-06-09T20:00:41.649686Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.4187525621166788e-5)    
+2024-06-09T20:00:41.666196Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.728061566051368, -4.756720153831491]])    
+2024-06-09T20:00:41.666225Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.481415246250092e-5)    
+2024-06-09T20:00:41.682690Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[8.036154757952117, -8.084864962615919]])    
+2024-06-09T20:00:41.682722Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.5961716544369278e-5)    
+2024-06-09T20:00:41.699525Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.740169924987164, -5.774963288265099]])    
+2024-06-09T20:00:41.699562Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.6825787085088568e-5)    
+2024-06-09T20:00:41.715719Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.8203301622756, -3.8434866431663646]])    
+2024-06-09T20:00:41.715747Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.7421213874627936e-5)    
+2024-06-09T20:00:41.733087Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.7670375612285643, -2.7838096331932687]])    
+2024-06-09T20:00:41.733118Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.7863424145593425e-5)    
+2024-06-09T20:00:41.749361Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.824890740226899, -1.8359521003080461]])    
+2024-06-09T20:00:41.749390Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.8159906975855083e-5)    
+2024-06-09T20:00:41.765942Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.2618808258204182, -1.2695295676799772]])    
+2024-06-09T20:00:41.765971Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.836726067709798e-5)    
+2024-06-09T20:00:41.782523Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.8656197591117731, -0.8708666112316434]])    
+2024-06-09T20:00:41.782550Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.851061043475441e-5)    
+2024-06-09T20:00:41.799524Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.6044395634277587, -0.6081033025826489]])    
+2024-06-09T20:00:41.799551Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.8611252035186987e-5)    
+2024-06-09T20:00:41.818578Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.39489405752007184, -0.3972876612947239]])    
+2024-06-09T20:00:41.818610Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.8677236588233946e-5)    
+2024-06-09T20:00:41.832742Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.2772977150476538, -0.2789785224561237]])    
+2024-06-09T20:00:41.832770Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.8723686695068633e-5)    
+2024-06-09T20:00:41.849479Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.1896221773734256, -0.19077154984656217]])    
+2024-06-09T20:00:41.849507Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.8755504259702268e-5)    
+2024-06-09T20:00:41.866028Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.1270415129764529, -0.1278115601301316]])    
+2024-06-09T20:00:41.866059Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.8776845386602567e-5)    
+2024-06-09T20:00:41.883139Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.27344959936824553, -0.27510708187718824]])    
+2024-06-09T20:00:41.883171Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.882289359518033e-5)    
+2024-06-09T20:00:41.932833Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.0764058354366535, -5.107175870938516]])    
+2024-06-09T20:00:41.932870Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.971841808311512e-5)    
+2024-06-09T20:00:41.949443Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[8.381895248636624, -8.468478739795096]])    
+2024-06-09T20:00:41.949474Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.1316930280918634e-5)    
+2024-06-09T20:00:41.966272Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.40204577965566, -10.667665022333633]])    
+2024-06-09T20:00:41.966309Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.3504260835325056e-5)    
+2024-06-09T20:00:41.982650Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.554692260455459, -7.813419727287027]])    
+2024-06-09T20:00:41.982679Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.513600552654935e-5)    
+2024-06-09T20:00:41.999756Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.60906328935681, -10.961075927425444]])    
+2024-06-09T20:00:41.999790Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.7571161153265514e-5)    
+2024-06-09T20:00:42.016371Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.541145008247769, -7.735294319884668]])    
+2024-06-09T20:00:42.016404Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.9351409827627757e-5)    
+2024-06-09T20:00:42.032988Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.292883553759037, -5.385096982181436]])    
+2024-06-09T20:00:42.033022Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.0634900807664184e-5)    
+2024-06-09T20:00:42.049460Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.737805919461456, -3.713764028995165]])    
+2024-06-09T20:00:42.049490Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.1546379763065415e-5)    
+2024-06-09T20:00:42.066265Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.7418592431513384, -2.514265160242733]])    
+2024-06-09T20:00:42.066301Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.219753211624072e-5)    
+2024-06-09T20:00:42.082800Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-1.092041015625, -5.46014404296875]])    
+2024-06-09T20:00:42.082833Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.8656448253794908, -1.6225773701414996]])    
+2024-06-09T20:00:42.082844Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.2643138719036026e-5)    
+2024-06-09T20:00:42.100065Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-4.11907958984375, -25.109649658203125]])    
+2024-06-09T20:00:42.100096Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.366075224658242, -0.9096933463653655]])    
+2024-06-09T20:00:42.100107Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.2962981051804485e-5)    
+2024-06-09T20:00:42.116105Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-5.23773193359375, -41.9014892578125]])    
+2024-06-09T20:00:42.116136Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.9058835532004911, -0.3216662953063863]])    
+2024-06-09T20:00:42.116147Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.316874652968563e-5)    
+2024-06-09T20:00:42.133068Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-5.36236572265625, -53.623626708984375]])    
+2024-06-09T20:00:42.133099Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.675401731195054, 0.007905746172615852]])    
+2024-06-09T20:00:42.133110Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.331738863449215e-5)    
+2024-06-09T20:00:42.149600Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-5.39361572265625, -55.734039306640625]])    
+2024-06-09T20:00:42.149630Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.46660376586259367, 0.17114609043629916]])    
+2024-06-09T20:00:42.149641Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.341684181453245e-5)    
+2024-06-09T20:00:42.166261Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-5.3206787109375, -44.339263916015625]])    
+2024-06-09T20:00:42.166292Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.3307745026271125, 0.20781848500731742]])    
+2024-06-09T20:00:42.166309Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.3485169313540336e-5)    
+2024-06-09T20:00:42.182610Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-3.4642333984375, -34.64222717285156]])    
+2024-06-09T20:00:42.182640Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.22630360453403428, 0.18655726750357418]])    
+2024-06-09T20:00:42.182651Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.3531000975644676e-5)    
+2024-06-09T20:00:42.199660Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-3.43670654296875, -29.212051391601563]])    
+2024-06-09T20:00:42.199693Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.5042036721623698, 0.4943478439353232]])    
+2024-06-09T20:00:42.199703Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.363133662640593e-5)    
+2024-06-09T20:00:42.216340Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.0, -19.18096923828125]])    
+2024-06-09T20:00:42.233510Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.0, -4.819580078125]])    
+2024-06-09T20:00:42.399639Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[6.5459407048221685, 0.7393129075480968]])    
+2024-06-09T20:00:42.399677Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.5272831024272634e-5)    
+2024-06-09T20:00:42.416075Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.39903544743935, 1.092791007495101]])    
+2024-06-09T20:00:42.416108Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.8067273981315926e-5)    
+2024-06-09T20:00:42.432803Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[13.176003989052376, 1.3846109811560958]])    
+2024-06-09T20:00:42.432832Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.197104080651401e-5)    
+2024-06-09T20:00:42.449544Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[15.032929142762818, 1.4632986444389544]])    
+2024-06-09T20:00:42.449576Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.6914693343884725e-5)    
+2024-06-09T20:00:42.465869Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[15.965314646658976, 1.5540566351797418]])    
+2024-06-09T20:00:42.465902Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.282656965222484e-5)    
+2024-06-09T20:00:42.482421Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[11.455134022749146, 1.1150376568777418]])    
+2024-06-09T20:00:42.482454Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.743868441768532e-5)    
+2024-06-09T20:00:42.499218Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[8.161877002406378, 0.7944734815336025]])    
+2024-06-09T20:00:42.499246Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.0924270646644976e-5)    
+2024-06-09T20:00:42.515775Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.534558730671127, 0.5387314881383405]])    
+2024-06-09T20:00:42.515802Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.338323862404747e-5)    
+2024-06-09T20:00:42.532434Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.8571063082122117, 0.3754490145376001]])    
+2024-06-09T20:00:42.532462Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.514454584761098e-5)    
+2024-06-09T20:00:42.549285Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.673926326864511, 0.2602788007761053]])    
+2024-06-09T20:00:42.549312Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.638888935769907e-5)    
+2024-06-09T20:00:42.565822Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.7956899825357018, 0.17479166517206007]])    
+2024-06-09T20:00:42.565850Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.723518757747507e-5)    
+2024-06-09T20:00:42.582465Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.2477803318503145, 0.12145838318097645]])    
+2024-06-09T20:00:42.582493Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.782844811797048e-5)    
+2024-06-09T20:00:42.599405Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.8609755416288009, 0.08380697673726782]])    
+2024-06-09T20:00:42.599433Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.824028677033865e-5)    
+2024-06-09T20:00:42.615918Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.5709842123233757, 0.055579349570145334]])    
+2024-06-09T20:00:42.615945Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.851450864424894e-5)    
+2024-06-09T20:00:42.632825Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.39629351134544755, 0.03857503434258661]])    
+2024-06-09T20:00:42.632859Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.87053634277304e-5)    
+2024-06-09T20:00:42.649471Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.27166744332384724, 0.02644398824598745]])    
+2024-06-09T20:00:42.649500Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.883644797377634e-5)    
+2024-06-09T20:00:42.665991Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.17960159961288552, 0.01748233991903874]])    
+2024-06-09T20:00:42.666026Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.892321829298021e-5)    
+2024-06-09T20:00:42.682493Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.39290203138289703, 0.03824490918968312]])    
+2024-06-09T20:00:42.682525Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.911356396632376e-5)    
+2024-06-09T20:00:42.982655Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[6.495646410032773, 0.6322833358881138]])    
+2024-06-09T20:00:42.982693Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.241057037318439e-5)    
+2024-06-09T20:00:42.999695Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.812316302264392, 1.0524660655349116]])    
+2024-06-09T20:00:42.999727Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.83486454034558e-5)    
+2024-06-09T20:00:43.017112Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.205578411502039, 0.708150416624605]])    
+2024-06-09T20:00:43.017147Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.255876864123613e-5)    
+2024-06-09T20:00:43.033643Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.973595821763112, 0.5277295465831646]])    
+2024-06-09T20:00:43.033674Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.55930530548776e-5)    
+2024-06-09T20:00:43.050124Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.463628607178402, 0.36751260454267676]])    
+2024-06-09T20:00:43.050155Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.775962623079442e-5)    
+2024-06-09T20:00:43.067159Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.3964844332936526, 0.2752831730021496]])    
+2024-06-09T20:00:43.067193Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.930716887704468e-5)    
+2024-06-09T20:00:43.083941Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.5929149316271203, 0.1973469551915606]])    
+2024-06-09T20:00:43.083975Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.036323679951838e-5)    
+2024-06-09T20:00:43.100152Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.0077960422224315, 0.19148926306812786]])    
+2024-06-09T20:00:43.100181Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.109218808197788e-5)    
+2024-06-09T20:00:43.116194Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.5997464092417168, 0.14773371875580915]])    
+2024-06-09T20:00:43.116223Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.15749172538291e-5)    
+2024-06-09T20:00:43.132870Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.3523025599095396, 0.13830568771445306]])    
+2024-06-09T20:00:43.132899Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.19153093329798e-5)    
+2024-06-09T20:00:43.149667Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.19776078331308747, 0.11891222824096927]])    
+2024-06-09T20:00:43.149698Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.214954544027467e-5)    
+2024-06-09T20:00:43.166448Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.10930976633660675, 0.09099241301259708]])    
+2024-06-09T20:00:43.166479Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.230917900187467e-5)    
+2024-06-09T20:00:43.183033Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.0677111068607884, 0.06500744312293541]])    
+2024-06-09T20:00:43.183068Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.241631998197716e-5)    
+2024-06-09T20:00:43.199643Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.1433370424836854, 0.14273465975606997]])    
+2024-06-09T20:00:43.199674Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.26478384409651e-5)    
+2024-06-09T20:00:44.382654Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Apsis { type_: Periapsis, entity: Entity { index: 3, generation: 0 }, time: 73676.98330377866 })    
+2024-06-09T20:00:44.915102Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T20:00:44.915188Z TRACE transfer_window_view::game::underlay::selected: Selected segment point at time=7605.305112865659    
+2024-06-09T20:00:44.916044Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T20:00:44.916061Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Point { entity: Entity { index: 3, generation: 0 }, time: 7605.305112865659 })    
+2024-06-09T20:00:47.431863Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T20:00:47.431924Z TRACE transfer_window_view::game::underlay::selected: Selected segment point at time=7395.471974750275    
+2024-06-09T20:00:47.432979Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T20:00:47.432997Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Point { entity: Entity { index: 3, generation: 0 }, time: 7395.471974750275 })    
+2024-06-09T20:01:04.815135Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[24.184366748519412, 4.994368116054494]])    
+2024-06-09T20:01:04.815176Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.815651089686107e-5)    
+2024-06-09T20:01:04.831898Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[41.422379750768286, 8.55422905505697]])    
+2024-06-09T20:01:04.831930Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.108127041376142e-5)    
+2024-06-09T20:01:04.848202Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[53.312048687161905, 11.00959139982472]])    
+2024-06-09T20:01:04.848232Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.289461630550499e-5)    
+2024-06-09T20:01:04.864756Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[35.636397272527, 7.359352765350216]])    
+2024-06-09T20:01:04.864789Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.780438859130371e-5)    
+2024-06-09T20:01:04.881510Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[50.38982595475855, 10.4061165933728]])    
+2024-06-09T20:01:04.881545Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.129752891972503e-5)    
+2024-06-09T20:01:04.898070Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[33.085818358395166, 6.832626961913548]])    
+2024-06-09T20:01:04.898103Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.7303522009747064e-5)    
+2024-06-09T20:01:04.914835Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[22.18521619847504, 4.581519027626504]])    
+2024-06-09T20:01:04.914869Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.4744974204173e-5)    
+2024-06-09T20:01:04.931625Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[14.905075522190282, 3.0780807589253416]])    
+2024-06-09T20:01:04.931657Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.307835176644286e-5)    
+2024-06-09T20:01:04.948233Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[9.926898143574965, 2.050026122045416]])    
+2024-06-09T20:01:04.948262Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.19911047446493e-5)    
+2024-06-09T20:01:04.964807Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[6.667171309582389, 1.3768525824597049]])    
+2024-06-09T20:01:04.964837Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.1270994530234386e-5)    
+2024-06-09T20:01:04.981099Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.497296072791137, 0.9287467539657716]])    
+2024-06-09T20:01:04.981128Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.078980777585443e-5)    
+2024-06-09T20:01:04.997758Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.121858565637759, 0.644702052577307]])    
+2024-06-09T20:01:04.997785Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.04579678827055e-5)    
+2024-06-09T20:01:05.014678Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.1621989872932246, 0.44652058889917834]])    
+2024-06-09T20:01:05.014707Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.022917772197381e-5)    
+2024-06-09T20:01:05.031367Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.4365293975264386, 0.29666092543937495]])    
+2024-06-09T20:01:05.031398Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(5.007763191772797e-5)    
+2024-06-09T20:01:05.048179Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.9853020914544709, 0.20347695688758458]])    
+2024-06-09T20:01:05.048206Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.997390337117603e-5)    
+2024-06-09T20:01:05.064671Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.6562565453961727, 0.13552501913159956]])    
+2024-06-09T20:01:05.064711Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.990491076563581e-5)    
+2024-06-09T20:01:05.081521Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.4258024664805535, 0.2944456827184977]])    
+2024-06-09T20:01:05.081562Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.975546426171621e-5)    
+2024-06-09T20:01:05.131559Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[23.680639113762062, 4.890342186230978]])    
+2024-06-09T20:01:05.131603Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.739129995508069e-5)    
+2024-06-09T20:01:05.148083Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[40.99976382039531, 8.466953686223063]])    
+2024-06-09T20:01:05.148118Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(4.362350287071708e-5)    
+2024-06-09T20:01:05.164749Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[54.560408765796225, 11.267393054873978]])    
+2024-06-09T20:01:05.164783Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.91263972229118e-5)    
+2024-06-09T20:01:05.181296Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[35.75994526673728, 7.384866940250996]])    
+2024-06-09T20:01:05.181326Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.638539402064699e-5)    
+2024-06-09T20:01:05.197737Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[23.505129001081944, 4.854097197063817]])    
+2024-06-09T20:01:05.197770Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.466872667807251e-5)    
+2024-06-09T20:01:05.214745Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[16.349067739676883, 3.376282848144296]])    
+2024-06-09T20:01:05.214781Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.3514447985080846e-5)    
+2024-06-09T20:01:05.231276Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.635950718031067, 2.235192562371645]])    
+2024-06-09T20:01:05.231306Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.277430292637015e-5)    
+2024-06-09T20:01:05.247918Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.190213659654671, 1.514471362791605]])    
+2024-06-09T20:01:05.247947Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.22803699678632e-5)    
+2024-06-09T20:01:05.264531Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.853847703667267, 1.0223636868822783]])    
+2024-06-09T20:01:05.264559Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.1950343039150705e-5)    
+2024-06-09T20:01:05.281211Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.3105761901576747, 0.697305124945944]])    
+2024-06-09T20:01:05.281240Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.172682227685133e-5)    
+2024-06-09T20:01:05.297651Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.2264987882835, 0.4689664054165975]])    
+2024-06-09T20:01:05.297681Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.1577204276342816e-5)    
+2024-06-09T20:01:05.314528Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.5672619560609995, 0.33011165770575107]])    
+2024-06-09T20:01:05.314556Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.1472236281411916e-5)    
+2024-06-09T20:01:05.331203Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.0442676520252316, 0.21995361041298997]])    
+2024-06-09T20:01:05.331233Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.140245112113263e-5)    
+2024-06-09T20:01:05.347915Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.7101434035520442, 0.14957717518043634]])    
+2024-06-09T20:01:05.347942Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.1355066055757375e-5)    
+2024-06-09T20:01:05.364525Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.4811743682063715, 0.10134953363720932]])    
+2024-06-09T20:01:05.364554Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.132299203310574e-5)    
+2024-06-09T20:01:05.381143Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.0349208054765904, 0.21798488846669323]])    
+2024-06-09T20:01:05.381178Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(3.125415809305144e-5)    
+2024-06-09T20:01:05.481366Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[23.500690975879298, 4.949939622586077]])    
+2024-06-09T20:01:05.481405Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.976554388080475e-5)    
+2024-06-09T20:01:05.498076Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[41.17241657167631, 8.622044504857582]])    
+2024-06-09T20:01:05.498108Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.7364244418089874e-5)    
+2024-06-09T20:01:05.515031Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[54.69316907728791, 11.800670905397222]])    
+2024-06-09T20:01:05.515068Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.4502521123679562e-5)    
+2024-06-09T20:01:05.531318Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[34.20035024535751, 7.452145248821033]])    
+2024-06-09T20:01:05.531348Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.2834842535086358e-5)    
+2024-06-09T20:01:05.547853Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[23.361134976004596, 5.09031544324992]])    
+2024-06-09T20:01:05.547883Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.1749832789070415e-5)    
+2024-06-09T20:01:05.564432Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[15.557558421170604, 3.3656656829441802]])    
+2024-06-09T20:01:05.564461Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.1049143855945976e-5)    
+2024-06-09T20:01:05.580953Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.434251329372232, 2.2201023670688205]])    
+2024-06-09T20:01:05.580982Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.0588564908653113e-5)    
+2024-06-09T20:01:05.597813Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.207437716753649, 1.436740625239838]])    
+2024-06-09T20:01:05.597843Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.0274532117300587e-5)    
+2024-06-09T20:01:05.614572Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.803940850873859, 0.862484437735938]])    
+2024-06-09T20:01:05.614603Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(2.0065079796073173e-5)    
+2024-06-09T20:01:05.631578Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.232801050111646, 0.5116617067207178]])    
+2024-06-09T20:01:05.631612Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.9923489140519466e-5)    
+2024-06-09T20:01:05.648120Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.1110900003146824, 0.2427508205659]])    
+2024-06-09T20:01:05.648153Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.9829846771680127e-5)    
+2024-06-09T20:01:05.664795Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.4215910015309188, 0.021448530020435598]])    
+2024-06-09T20:01:05.664828Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.9766006966253705e-5)    
+2024-06-09T20:01:05.681267Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.9525770946101603, -0.04482428374288375]])    
+2024-06-09T20:01:05.681301Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.9723156100219513e-5)    
+2024-06-09T20:01:05.697647Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.6538614144272337, -0.06871589975236278]])    
+2024-06-09T20:01:05.697675Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.9693786502879476e-5)    
+2024-06-09T20:01:05.714556Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.45822911241243575, -0.07949030540688089]])    
+2024-06-09T20:01:05.714590Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.967338346864225e-5)    
+2024-06-09T20:01:05.731624Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.9817534737498674, -0.2406009263387729]])    
+2024-06-09T20:01:05.731657Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.9630272855605846e-5)    
+2024-06-09T20:01:06.180580Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T20:01:06.180651Z TRACE transfer_window_view::game::underlay::selected: Selected segment point at time=23584.8526652902    
+2024-06-09T20:01:06.181710Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T20:01:06.181728Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Point { entity: Entity { index: 3, generation: 0 }, time: 23584.8526652902 })    
+2024-06-09T20:01:06.348815Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.0, 7.87274169921875]])    
+2024-06-09T20:01:06.365060Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-15.201171875, 20.488983154296875]])    
+2024-06-09T20:01:06.381470Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-29.445770263671875, 17.287353515625]])    
+2024-06-09T20:01:06.398199Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-60.376861572265625, 19.476287841796875]])    
+2024-06-09T20:01:06.415247Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-66.52130126953125, 7.191497802734375]])    
+2024-06-09T20:01:06.431878Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-79.10638427734375, 0.0]])    
+2024-06-09T20:01:06.448865Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-106.074462890625, -5.39361572265625]])    
+2024-06-09T20:01:06.465152Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-52.1383056640625, -3.59576416015625]])    
+2024-06-09T20:01:06.482060Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-34.9227294921875, 1.74615478515625]])    
+2024-06-09T20:01:06.498555Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-21.27386474609375, 3.26385498046875]])    
+2024-06-09T20:01:06.515579Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-2.79534912109375, 1.397674560546875]])    
+2024-06-09T20:01:06.515613Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.2678126704740325, -6.686268866497326]])    
+2024-06-09T20:01:06.515624Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.8675297567884843e-5)    
+2024-06-09T20:01:06.532425Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-5.10400390625, 2.041595458984375]])    
+2024-06-09T20:01:06.532457Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.16641303967669, -11.30919389515875]])    
+2024-06-09T20:01:06.532468Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.7166954329293492e-5)    
+2024-06-09T20:01:06.548971Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-4.501220703125, 4.677978515625]])    
+2024-06-09T20:01:06.549001Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.1136621145695806, -7.112509596995664]])    
+2024-06-09T20:01:06.549012Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.6235945643691803e-5)    
+2024-06-09T20:01:06.565450Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-2.0, 1.0]])    
+2024-06-09T20:01:06.565480Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.877383970536847, -18.531738065731574]])    
+2024-06-09T20:01:06.565491Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.4110596169273181e-5)    
+2024-06-09T20:01:06.582127Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-3.0360107421875, 4.071990966796875]])    
+2024-06-09T20:01:06.582155Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.937003010935883, -11.92211431850013]])    
+2024-06-09T20:01:06.582166Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.2825291701839055e-5)    
+2024-06-09T20:01:06.598495Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-3.129638671875, 4.150543212890625]])    
+2024-06-09T20:01:06.598523Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.011767904110231, -7.495387471494374]])    
+2024-06-09T20:01:06.598534Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.2039324377576286e-5)    
+2024-06-09T20:01:06.615588Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.0, 3.095611572265625]])    
+2024-06-09T20:01:06.615617Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.080004164109447, -5.036937011685734]])    
+2024-06-09T20:01:06.615628Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.1519932660755251e-5)    
+2024-06-09T20:01:06.632561Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.0, 3.022125244140625]])    
+2024-06-09T20:01:06.632594Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.3651961091726152, -3.2165271350069307]])    
+2024-06-09T20:01:06.632614Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.1188831539551238e-5)    
+2024-06-09T20:01:06.649053Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.8820639274418552, -2.132741961041215]])    
+2024-06-09T20:01:06.649084Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0969537965146478e-5)    
+2024-06-09T20:01:06.665170Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.574444323694503, -1.3889486638211594]])    
+2024-06-09T20:01:06.665204Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0828558423069725e-5)    
+2024-06-09T20:01:06.682027Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.4104268906947844, -0.9835087718597412]])    
+2024-06-09T20:01:06.682061Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0728760189415766e-5)    
+2024-06-09T20:01:06.698504Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.29485403917367203, -0.6425932631484558]])    
+2024-06-09T20:01:06.698532Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0662061282907218e-5)    
+2024-06-09T20:01:06.715391Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.20692071771159395, -0.436677616920951]])    
+2024-06-09T20:01:06.715422Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0616465419016032e-5)    
+2024-06-09T20:01:06.732142Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.15869337997567923, -0.2856655612007133]])    
+2024-06-09T20:01:06.732173Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0585723107719422e-5)    
+2024-06-09T20:01:06.749040Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.12907627490134257, -0.1940712866973016]])    
+2024-06-09T20:01:06.749076Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0564878971104225e-5)    
+2024-06-09T20:01:06.765216Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.09950420090845243, -0.12823001517326868]])    
+2024-06-09T20:01:06.765246Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0551124416325947e-5)    
+2024-06-09T20:01:06.781942Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.26387004017776855, -0.28705998068669786]])    
+2024-06-09T20:01:06.781985Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0520866180982816e-5)    
+2024-06-09T20:01:06.881841Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[10.607208025133753, -9.417556259937367]])    
+2024-06-09T20:01:06.881879Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0021947632232712e-5)    
+2024-06-09T20:01:06.898660Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[18.945569177354404, -16.830525709704425]])    
+2024-06-09T20:01:06.898691Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.207061546380319e-6)    
+2024-06-09T20:01:06.915713Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[24.986601284814057, -22.107323442381997]])    
+2024-06-09T20:01:06.915751Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.252661341079891e-6)    
+2024-06-09T20:01:06.932036Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[15.917784671910281, -14.0835326188193]])    
+2024-06-09T20:01:06.932068Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.686378131412411e-6)    
+2024-06-09T20:01:06.949092Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[11.181690972361924, -9.611739050329078]])    
+2024-06-09T20:01:06.949128Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.314700402926547e-6)    
+2024-06-09T20:01:06.965358Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[7.4444290259233625, -6.085446093707004]])    
+2024-06-09T20:01:06.965391Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.08253020239238e-6)    
+2024-06-09T20:01:06.982120Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[5.33714725406064, -3.9782147630023164]])    
+2024-06-09T20:01:06.982159Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.928238069904734e-6)    
+2024-06-09T20:01:06.998397Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[4.171059156228429, -2.485311545158923]])    
+2024-06-09T20:01:06.998429Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.824595285245645e-6)    
+2024-06-09T20:01:07.015256Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[3.492666252931517, -1.4857834863887156]])    
+2024-06-09T20:01:07.015288Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.753964838029062e-6)    
+2024-06-09T20:01:07.032024Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.8448743851859044, -0.8483381832958753]])    
+2024-06-09T20:01:07.032057Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.7067491134004935e-6)    
+2024-06-09T20:01:07.048736Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[2.2768481530737565, -0.4525676763853132]])    
+2024-06-09T20:01:07.048767Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.675060682288424e-6)    
+2024-06-09T20:01:07.065195Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.7752176492808873, -0.2293759300933412]])    
+2024-06-09T20:01:07.065224Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.653851068405581e-6)    
+2024-06-09T20:01:07.081727Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.374645992643689, -0.10651726125276147]])    
+2024-06-09T20:01:07.081760Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.639295790213266e-6)    
+2024-06-09T20:01:07.098515Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.064561770908705, -0.04376834378704466]])    
+2024-06-09T20:01:07.098544Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.629224818906322e-6)    
+2024-06-09T20:01:07.115485Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[0.7897754510708732, -0.009386963821478798]])    
+2024-06-09T20:01:07.115515Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.622343733610757e-6)    
+2024-06-09T20:01:07.131907Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[1.7385489860201468, 0.015275679071752478]])    
+2024-06-09T20:01:07.131935Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.608004004766e-6)    
+2024-06-09T20:01:07.863894Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T20:01:07.863958Z TRACE transfer_window_view::game::underlay::selected: Selected segment point at time=74804.33288113118    
+2024-06-09T20:01:07.865043Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T20:01:07.865062Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Point { entity: Entity { index: 3, generation: 0 }, time: 74804.33288113118 })    
+2024-06-09T20:01:08.881558Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:17.198054Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Apsis { type_: Periapsis, entity: Entity { index: 3, generation: 0 }, time: 73676.98330377866 })    
+2024-06-09T20:01:32.248454Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.265071Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.281560Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.298334Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.315048Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.331666Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.348254Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.364705Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.381361Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.397761Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.414917Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.431590Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.448147Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.464994Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.481457Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.497845Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.514841Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.531517Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.548201Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.564810Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.580778Z TRACE transfer_window_view::game::underlay::icons::burn: Burn icon clicked; switching to Selected    
+2024-06-09T20:01:32.581801Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034, state: Selected })    
+2024-06-09T20:01:32.581821Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.598904Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.615155Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.631612Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.648228Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.664825Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.681614Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:32.698530Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:33.898017Z DEBUG transfer_window_view::game::events: Handling model event StartWarp { end_time: 5945.082073130034 }    
+2024-06-09T20:01:34.615510Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.08072213827069469, -3.8891858310761926]])    
+2024-06-09T20:01:34.615548Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(6.932065127584635e-6)    
+2024-06-09T20:01:34.632018Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.12716707018532536, -6.126898743510983]])    
+2024-06-09T20:01:34.632055Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(7.483166804160088e-6)    
+2024-06-09T20:01:34.648687Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.16098359226662326, -7.756175932549538]])    
+2024-06-09T20:01:34.648721Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.252547504104636e-6)    
+2024-06-09T20:01:34.664986Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.05551119676959155, -5.214396280721569]])    
+2024-06-09T20:01:34.665020Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(8.81681858779483e-6)    
+2024-06-09T20:01:34.681726Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.03986977019244349, -3.7037644591418513]])    
+2024-06-09T20:01:34.681757Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.241621217518422e-6)    
+2024-06-09T20:01:34.698315Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.027180653277537346, -2.4623154823518694]])    
+2024-06-09T20:01:34.698352Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.54059325518751e-6)    
+2024-06-09T20:01:34.715379Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.06349773872603334, -1.6736200326944475]])    
+2024-06-09T20:01:34.715411Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.756653728183571e-6)    
+2024-06-09T20:01:34.732175Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.05742808281130668, -1.0925547061555136]])    
+2024-06-09T20:01:34.732209Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(9.90371786758496e-6)    
+2024-06-09T20:01:34.748780Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.080144231404842, -0.6921963902181653]])    
+2024-06-09T20:01:34.748812Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.000482903529277e-5)    
+2024-06-09T20:01:34.765164Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.06064741841273891, -0.4583578117940028]])    
+2024-06-09T20:01:34.765196Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0073239330387336e-5)    
+2024-06-09T20:01:34.781784Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.06277293491044104, -0.2952833055951684]])    
+2024-06-09T20:01:34.781816Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0121348033713547e-5)    
+2024-06-09T20:01:34.798572Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.09778721447583075, -0.12853881505790746]])    
+2024-06-09T20:01:34.798604Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0154430794834258e-5)    
+2024-06-09T20:01:34.815121Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.08851978758199903, -0.0637351834578652]])    
+2024-06-09T20:01:34.815152Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0176735230288723e-5)    
+2024-06-09T20:01:34.832090Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.08661657075268085, -0.011579531049507583]])    
+2024-06-09T20:01:34.832122Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0192238133387743e-5)    
+2024-06-09T20:01:34.848639Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.07303922418260556, 0.008992753810124678]])    
+2024-06-09T20:01:34.848671Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.020261709022721e-5)    
+2024-06-09T20:01:34.865440Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.1712709641747151, 0.0348447580172414]])    
+2024-06-09T20:01:34.865475Z DEBUG transfer_window_view::game::events: Handling view event SetCameraZoom(1.0224936868259162e-5)    
+2024-06-09T20:01:35.081709Z TRACE transfer_window_model::systems::update_warp: Compensating for warp overshoot of 4.067770545367239    
+2024-06-09T20:01:35.098172Z TRACE transfer_window_model::systems::update_warp: Warp finished    
+2024-06-09T20:01:35.197240Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T20:01:35.197327Z TRACE transfer_window_view::game::underlay::selected: Selected segment point at time=12911.479719926392    
+2024-06-09T20:01:35.198313Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T20:01:35.198330Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Point { entity: Entity { index: 3, generation: 0 }, time: 12911.479719926392 })    
+2024-06-09T20:01:36.682163Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.698525Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.715269Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.731928Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.748435Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.765113Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.781646Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.798326Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.814961Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.831907Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.848536Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.864835Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.881689Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.898044Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.915212Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.931823Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Vessel(Entity { index: 3, generation: 0 }))    
+2024-06-09T20:01:36.931852Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.948524Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.964814Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.981518Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:36.998031Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:37.015143Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:37.031690Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:37.048450Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:37.064858Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:37.081765Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:37.098396Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:40.081834Z DEBUG transfer_window_model::systems::update_timeline: Executing event Burn(StartBurnEvent { entity: Entity { index: 3, generation: 0 }, time: 5945.082073130034 })    
+2024-06-09T20:01:40.081915Z TRACE transfer_window_model::components::path_component: Segment finished at time=5945.082379186242    
+2024-06-09T20:01:44.815113Z DEBUG transfer_window_view::game::events: Handling model event CancelCurrentSegment { entity: Entity { index: 3, generation: 0 } }    
+2024-06-09T20:01:45.747342Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T20:01:45.747442Z TRACE transfer_window_view::game::underlay::selected: Selected segment point at time=9657.030226848292    
+2024-06-09T20:01:45.748383Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T20:01:45.748402Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Point { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292 })    
+2024-06-09T20:01:46.631604Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, state: Selected })    
+2024-06-09T20:01:46.631643Z DEBUG transfer_window_view::game::events: Handling model event CreateBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292 }    
+2024-06-09T20:01:46.631826Z DEBUG transfer_window_model::api::timeline: Adding event Burn(StartBurnEvent { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292 })    
+2024-06-09T20:01:46.631846Z TRACE transfer_window_model::components::vessel_component::timeline: Adding new timeline event Burn(StartBurnEvent { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292 }) at index 0    
+2024-06-09T20:01:47.165398Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.181918Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.198528Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.215259Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.232021Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.248401Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.265134Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.281562Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.298172Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.315413Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.332033Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.348449Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.365207Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.381709Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.398460Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.414158Z TRACE transfer_window_view::game::underlay::icons::burn: Burn icon clicked; switching Selected -> Adjusting    
+2024-06-09T20:01:47.415240Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, state: Adjusting })    
+2024-06-09T20:01:47.415262Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.432015Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.448609Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.465406Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.481847Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.498782Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.532497Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.549002Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.565488Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.582049Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.598686Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.615498Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.632026Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.648616Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.665609Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.681826Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.698574Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.715427Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.732191Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.748754Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.764503Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:01:47.765725Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, state: Dragging(Retrograde) })    
+2024-06-09T20:01:47.765747Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.780942Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:01:47.782136Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, state: Dragging(Retrograde) })    
+2024-06-09T20:01:47.782157Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.782168Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.00012614796065259576, 0.0]] }    
+2024-06-09T20:01:47.797557Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:01:47.798740Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, state: Dragging(Retrograde) })    
+2024-06-09T20:01:47.798761Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.798778Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.0001261239932820225, 0.0]] }    
+2024-06-09T20:01:47.814281Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:01:47.815451Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, state: Dragging(Retrograde) })    
+2024-06-09T20:01:47.815472Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.815482Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.00012609969990746224, 0.0]] }    
+2024-06-09T20:01:47.831434Z TRACE transfer_window_view::game::underlay::icons::adjust_burn: Started dragging to adjust burn Retrograde    
+2024-06-09T20:01:47.832666Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, state: Dragging(Retrograde) })    
+2024-06-09T20:01:47.832688Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    
+2024-06-09T20:01:47.832698Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.000765905636585583, 0.0]] }    
+2024-06-09T20:01:47.849265Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.0055947393554772115, 0.0]] }    
+2024-06-09T20:01:47.866084Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.04122701893043993, 0.0]] }    
+2024-06-09T20:01:47.882272Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.16529630909128085, 0.0]] }    
+2024-06-09T20:01:47.898878Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.4392935153909262, 0.0]] }    
+2024-06-09T20:01:47.915662Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-0.8896704963943912, 0.0]] }    
+2024-06-09T20:01:47.932313Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-1.7841872449103873, 0.0]] }    
+2024-06-09T20:01:47.949103Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-2.9890737240916665, 0.0]] }    
+2024-06-09T20:01:47.965692Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-4.14258824076879, 0.0]] }    
+2024-06-09T20:01:47.982350Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-5.339113837007323, 0.0]] }    
+2024-06-09T20:01:47.998775Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-6.055839816567882, 0.0]] }    
+2024-06-09T20:01:48.015753Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-6.346977231076611, 0.0]] }    
+2024-06-09T20:01:48.032734Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-6.65290189495303, 0.0]] }    
+2024-06-09T20:01:48.048900Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-6.807481008424009, 0.0]] }    
+2024-06-09T20:01:48.065638Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-6.965906890387971, 0.0]] }    
+2024-06-09T20:01:48.082165Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-7.16737555701331, 0.0]] }    
+2024-06-09T20:01:48.098957Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-7.332400440753996, 0.0]] }    
+2024-06-09T20:01:48.115679Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-7.6131677034740965, 0.0]] }    
+2024-06-09T20:01:48.132258Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-7.825601437678168, 0.0]] }    
+2024-06-09T20:01:48.149120Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-8.275142764369933, 0.0]] }    
+2024-06-09T20:01:48.165512Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-8.64987100236534, 0.0]] }    
+2024-06-09T20:01:48.182228Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-8.94756143714984, 0.0]] }    
+2024-06-09T20:01:48.198832Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.385503554227386, 0.0]] }    
+2024-06-09T20:01:48.215431Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.566176027896745, 0.0]] }    
+2024-06-09T20:01:48.232130Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.68609930223686, 0.0]] }    
+2024-06-09T20:01:48.248874Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.879570428759338, 0.0]] }    
+2024-06-09T20:01:48.265167Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.879549284789238, 0.0]] }    
+2024-06-09T20:01:48.281926Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.879528727630541, 0.0]] }    
+2024-06-09T20:01:48.298561Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.93571796740378, 0.0]] }    
+2024-06-09T20:01:48.315348Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.935696829303854, 0.0]] }    
+2024-06-09T20:01:48.333158Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.935675797520807, 0.0]] }    
+2024-06-09T20:01:48.350237Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.935653198026083, 0.0]] }    
+2024-06-09T20:01:48.367754Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.965716136557496, 0.0]] }    
+2024-06-09T20:01:48.385714Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.00959846682404, 0.0]] }    
+2024-06-09T20:01:48.403765Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.00957565064307, 0.0]] }    
+2024-06-09T20:01:48.422205Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.009552687790604, 0.0]] }    
+2024-06-09T20:01:48.441223Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.00952924380968, 0.0]] }    
+2024-06-09T20:01:48.460791Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.046324494030923, 0.0]] }    
+2024-06-09T20:01:48.480714Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.079222192044648, 0.0]] }    
+2024-06-09T20:01:48.501035Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.143262429738462, 0.0]] }    
+2024-06-09T20:01:48.521514Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.143236372386612, 0.0]] }    
+2024-06-09T20:01:48.542428Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.14321013839677, 0.0]] }    
+2024-06-09T20:01:48.564560Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.316853182043593, 0.0]] }    
+2024-06-09T20:01:48.586632Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.389283442468056, 0.0]] }    
+2024-06-09T20:01:48.609451Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.524120482126966, 0.0]] }    
+2024-06-09T20:01:48.632009Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.582719063889419, 0.0]] }    
+2024-06-09T20:01:48.655000Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.641501473068411, 0.0]] }    
+2024-06-09T20:01:48.678748Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.690500657670253, 0.0]] }    
+2024-06-09T20:01:48.702847Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.739634045707355, 0.0]] }    
+2024-06-09T20:01:48.727508Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.93114415781119, 0.0]] }    
+2024-06-09T20:01:48.751982Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.931111031826424, 0.0]] }    
+2024-06-09T20:01:48.777013Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.931078166005229, 0.0]] }    
+2024-06-09T20:01:48.802506Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.931044818794161, 0.0]] }    
+2024-06-09T20:01:48.828375Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.931010463154323, 0.0]] }    
+2024-06-09T20:01:48.854392Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.930975740613084, 0.0]] }    
+2024-06-09T20:01:48.881008Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.930940902357401, 0.0]] }    
+2024-06-09T20:01:48.907828Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.930905341845701, 0.0]] }    
+2024-06-09T20:01:48.935509Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.930869323267734, 0.0]] }    
+2024-06-09T20:01:48.963598Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.988525492197496, 0.0]] }    
+2024-06-09T20:01:48.991920Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-10.98848767823942, 0.0]] }    
+2024-06-09T20:01:49.020484Z TRACE transfer_window_view::game::selected::burn: Stopped dragging to adjust burn    
+2024-06-09T20:01:49.021645Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Burn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, state: Adjusting })    
+2024-06-09T20:01:49.021665Z DEBUG transfer_window_view::game::events: Handling model event AdjustBurn { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292, amount: [[-9.77771477783742, 0.0]] }    
+2024-06-09T20:01:49.414457Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T20:01:49.414545Z TRACE transfer_window_view::game::underlay::selected: Selected segment point at time=25939.81332660366    
+2024-06-09T20:01:49.415510Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T20:01:49.415527Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(Point { entity: Entity { index: 3, generation: 0 }, time: 25939.81332660366 })    
+2024-06-09T20:01:51.065393Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T20:01:51.065431Z TRACE transfer_window_model::api::time: New time state: Level { level: 2, paused: false }    
+2024-06-09T20:01:51.265220Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T20:01:51.265255Z TRACE transfer_window_model::api::time: New time state: Level { level: 3, paused: false }    
+2024-06-09T20:01:51.482042Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T20:01:51.482079Z TRACE transfer_window_model::api::time: New time state: Level { level: 4, paused: false }    
+2024-06-09T20:01:51.831877Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T20:01:51.831913Z TRACE transfer_window_model::api::time: New time state: Level { level: 5, paused: false }    
+2024-06-09T20:01:52.181743Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T20:01:52.181785Z TRACE transfer_window_model::api::time: New time state: Level { level: 6, paused: false }    
+2024-06-09T20:01:56.148451Z DEBUG transfer_window_model::systems::update_timeline: Executing event Burn(StartBurnEvent { entity: Entity { index: 3, generation: 0 }, time: 9657.030226848292 })    
+2024-06-09T20:01:56.148522Z TRACE transfer_window_model::components::path_component: Segment finished at time=9671.170601661235    
+2024-06-09T20:01:56.997949Z TRACE transfer_window_model::components::path_component: Segment finished at time=10435.995956661232    
+2024-06-09T20:01:57.810411Z DEBUG eframe::native::glow_integration: Received WindowEvent::CloseRequested for viewport Some("FFFF")    
+2024-06-09T20:01:57.816476Z DEBUG eframe::native::epi_integration: Closing root viewport (ViewportCommand::CancelClose was not sent)    
+2024-06-09T20:01:57.825953Z DEBUG eframe::native::run: Asking to exit event loop…    
+2024-06-09T20:01:57.842183Z  INFO transfer_window_view::resources: Destroying textures    
+2024-06-09T20:01:57.844257Z DEBUG eframe::native::run: Received Event::LoopExiting - saving app state…    
+2024-06-09T20:01:57.858748Z DEBUG eframe::native::run: eframe window closed    

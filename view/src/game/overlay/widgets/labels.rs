@@ -3,6 +3,19 @@ use transfer_window_model::storage::entity_allocator::Entity;
 
 use crate::game::{util::{format_distance, format_speed, format_time}, View};
 
+pub fn draw_time_until(view: &View, ui: &mut Ui, time: f64) {
+    let text = format!("T-{}", format_time(time - view.model.time()));
+    ui.label(RichText::new(text).size(12.0).weak());
+}
+
+pub fn draw_key(ui: &mut Ui, text: &str) {
+    ui.label(RichText::new(text).size(12.0).strong());
+}
+
+pub fn draw_value(ui: &mut Ui, text: &str) {
+    ui.label(RichText::new(text).size(12.0));
+}
+
 pub fn draw_title(ui: &mut Ui, name: &str) {
     ui.label(RichText::new(name).size(20.0).monospace().strong());
 }
@@ -13,21 +26,21 @@ pub fn draw_subtitle(ui: &mut Ui, name: &str) {
 }
 
 pub fn draw_altitude(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    ui.label(RichText::new("Altitude").monospace().strong());
-    ui.label(format_distance(view.model.position_at_time(entity, time).magnitude()));
+    draw_key(ui, "Altitude");
+    draw_value(ui, &format_distance(view.model.position_at_time(entity, time).magnitude()));
     ui.end_row();
 }
 
 pub fn draw_speed(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    ui.label(RichText::new("Speed").monospace().strong());
-    ui.label(format_speed(view.model.velocity_at_time(entity, time).magnitude()));
+    draw_key(ui, "Speed");
+    draw_value(ui, &format_speed(view.model.velocity_at_time(entity, time).magnitude()));
     ui.end_row();
 }
 
 pub fn draw_distance(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    ui.label(RichText::new("Distance").monospace().strong());
     let distance = view.model.distance_at_time(entity, view.model.vessel_component(entity).target().unwrap(), time);
-    ui.label(format_distance(distance));
+    draw_key(ui, "Distance");
+    draw_value(ui, &format_distance(distance));
     ui.end_row();
 }
 
@@ -38,25 +51,20 @@ pub fn draw_orbits(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     };
     let orbits = ((time - orbit.current_point().time()) / period) as usize;
     if orbits != 0 {
-        ui.label(RichText::new("Orbits:").strong().monospace());
-        ui.label(orbits.to_string());
+        draw_key(ui, "Orbits");
+        draw_value(ui, &orbits.to_string());
         ui.end_row();
     }
 }
 
-pub fn draw_time_until(view: &View, ui: &mut Ui, time: f64) {
-    let text = format!("T-{}", format_time(time - view.model.time()));
-    ui.label(RichText::new(text).weak());
-}
-
 pub fn draw_encounter_to(view: &View, ui: &mut Ui, entity: Entity) {
-    ui.label(RichText::new("To").monospace().strong());
-    ui.label(view.model.name_component(entity).name());
+    draw_key(ui, "To");
+    draw_value(ui, &view.model.name_component(entity).name());
     ui.end_row();
 }
 
 pub fn draw_encounter_from(view: &View, ui: &mut Ui, entity: Entity) {
-    ui.label(RichText::new("From").monospace().strong());
-    ui.label(view.model.name_component(entity).name());
+    draw_key(ui, "From");
+    draw_value(ui, &view.model.name_component(entity).name());
     ui.end_row();
 }

@@ -1,7 +1,7 @@
-use eframe::{egui::{Align2, Grid, RichText, Window}, epaint};
+use eframe::{egui::{Align2, Grid, Window}, epaint};
 use transfer_window_model::components::orbitable_component::OrbitableComponentPhysics;
 
-use crate::game::{selected::Selected, View};
+use crate::game::{overlay::widgets::labels::{draw_key, draw_title, draw_value}, selected::Selected, View};
 
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
@@ -18,21 +18,21 @@ pub fn update(view: &View) {
         .resizable(false)
         .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
         .show(&view.context.clone(), |ui| {
-            ui.label(RichText::new(name).size(20.0).strong().monospace());
+            draw_title(ui, &name);
                 
             Grid::new("Orbitable info grid").show(ui, |ui| {
                 if let OrbitableComponentPhysics::Orbit(orbit) = orbitable_component.physics() {
-                    ui.label(RichText::new("Orbiting").strong().monospace());
-                    ui.label(view.model.name_component(orbit.parent()).name());
+                    draw_key(ui, "Orbiting");
+                    draw_value(ui, &view.model.name_component(orbit.parent()).name());
                     ui.end_row();
                 }
 
-                ui.label(RichText::new("Mass").strong().monospace());
-                ui.label(format!("{:.3e} kg", orbitable_component.mass()));
+                draw_key(ui, "Mass");
+                draw_value(ui, &format!("{:.3e} kg", orbitable_component.mass()));
                 ui.end_row();
 
-                ui.label(RichText::new("Radius").strong().monospace());
-                ui.label(format!("{:.3e} m", orbitable_component.radius()));
+                draw_key(ui, "Radius");
+                draw_value(ui, &format!("{:.3e} m", orbitable_component.radius()));
                 ui.end_row();
             });
         });

@@ -1,6 +1,6 @@
-use eframe::{egui::{Align2, RichText, Window}, epaint};
+use eframe::{egui::{Align2, Window}, epaint};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::custom_image_button::CustomCircularImageButton, selected::Selected, util::format_time, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{custom_image_button::CustomCircularImageButton, labels::{draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
 use super::{burn::draw_burn_info, vessel::visual_timeline};
 
@@ -24,9 +24,8 @@ pub fn update(view: &View) {
             .resizable(false)
             .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
             .show(&view.context.clone(), |ui| {
-        ui.label(RichText::new("Guidance").size(20.0).monospace().strong());
-        let text = format!("T-{}", format_time(time - view.model.time()));
-        ui.label(RichText::new(text).weak());
+        draw_title(ui, "Guidance");
+        draw_time_until(view, ui, time);
 
         ui.horizontal(|ui| {
             styles::SelectedMenuButton::apply(ui);
