@@ -1,6 +1,6 @@
 use eframe::{egui::{Align2, Grid, Window}, epaint};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_orbits, draw_speed, draw_time_until, draw_title}}, selected::Selected, util::ApsisType, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_orbits, draw_speed, draw_subtitle, draw_time_until, draw_title}}, selected::Selected, util::ApsisType, View}, styles};
 
 use super::vessel::visual_timeline;
 
@@ -41,6 +41,7 @@ pub fn update(view: &View) {
             }
         });
 
+        draw_subtitle(ui, "Info");
         Grid::new("Selected apsis info").show(ui, |ui| {
             draw_altitude(view, ui, entity, time);
             draw_speed(view, ui, entity, time);

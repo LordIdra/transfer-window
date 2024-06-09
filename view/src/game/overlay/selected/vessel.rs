@@ -126,7 +126,6 @@ pub fn update(view: &View) {
                 });
             }
 
-            draw_subtitle(ui, "Timeline");
             visual_timeline::draw(view, ui, entity, view.model.time(), false);
         });
 }

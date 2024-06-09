@@ -3,7 +3,7 @@
 use eframe::egui::{Color32, Frame, RichText, Ui};
 use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::timeline::TimelineEvent}, storage::entity_allocator::Entity};
 
-use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImage, labels::draw_value}, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
+use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImage, labels::{draw_subtitle, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
 
 enum VisualTimelineEvent {
     TimelineEvent(TimelineEvent),
@@ -264,6 +264,7 @@ pub fn draw(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_cen
         }
     }
 
+    draw_subtitle(ui, "Timeline");
     for event in events {
         draw_event(view, ui, event, entity, center_time);
     }

@@ -132,10 +132,8 @@
 [x] Log to external file
 [x] Select event when clicked in timeline
 [x] Visual timeline for selected events + points
-
-# Polish
-[ ] Current burn/guidance finishes (exclude intercepts)
-[ ] Show orbital parameters
+[x] Current burn/guidance finishes (exclude intercepts)
+[x] Show orbital parameters
 
 # Campaign
 [ ] Factions (player, ally, enemy)

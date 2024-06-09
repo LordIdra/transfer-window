@@ -1,6 +1,6 @@
 use eframe::{egui::{Align2, Color32, Grid, Ui, Window}, epaint};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton, labels::{draw_key, draw_time_until, draw_title, draw_value}}, selected::Selected, util::format_time, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, custom_image::CustomImage, custom_image_button::CustomCircularImageButton, labels::{draw_key, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::Selected, util::format_time, View}, styles};
 
 use super::vessel::visual_timeline;
 
@@ -17,6 +17,7 @@ pub fn draw_burn_info(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_
         draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::DARK_GRAY, vec![start_bar, end_bar]);
     });
 
+    draw_subtitle(ui, "Info");
     Grid::new("DV grid").show(ui, |ui| {
         ui.horizontal(|ui| {
             let image = CustomImage::new(view, "duration", 20.0);

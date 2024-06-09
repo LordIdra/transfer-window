@@ -1,6 +1,6 @@
 use eframe::{egui::{Align2, Grid, Window}, epaint};
 
-use crate::{game::{events::ModelEvent, overlay::widgets::{buttons::draw_warp_to, labels::{draw_encounter_from, draw_encounter_to, draw_time_until, draw_title}}, selected::Selected, View}, styles};
+use crate::{game::{events::ModelEvent, overlay::widgets::{buttons::draw_warp_to, labels::{draw_encounter_from, draw_encounter_to, draw_subtitle, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
 use super::vessel::visual_timeline;
 
@@ -27,6 +27,7 @@ pub fn update(view: &View) {
             }
         });
 
+        draw_subtitle(ui, "Info");
         Grid::new("Selected encounter info").show(ui, |ui| {
             draw_encounter_from(view, ui, from);
             draw_encounter_to(view, ui, to);
