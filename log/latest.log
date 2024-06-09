@@ -1,0 +1,172 @@
+2024-06-09T16:32:17.552484Z  INFO transfer_window_controller: Starting application    
+2024-06-09T16:32:17.842679Z  INFO transfer_window_controller: Memory: 16670826496 B    
+2024-06-09T16:32:17.842722Z  INFO transfer_window_controller: Swap: 17179865088 B    
+2024-06-09T16:32:17.842770Z  INFO transfer_window_controller: OS: Some("Linux 22.04 Ubuntu")    
+2024-06-09T16:32:17.842798Z  INFO transfer_window_controller: Kernel version: Some("6.5.0-35-generic")    
+2024-06-09T16:32:17.842811Z  INFO transfer_window_controller: CPU architecture: Some("x86_64")    
+2024-06-09T16:32:17.842822Z  INFO transfer_window_controller: CPU #0: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4078 MHz    
+2024-06-09T16:32:17.842835Z  INFO transfer_window_controller: CPU #1: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4093 MHz    
+2024-06-09T16:32:17.842844Z  INFO transfer_window_controller: CPU #2: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4084 MHz    
+2024-06-09T16:32:17.842852Z  INFO transfer_window_controller: CPU #3: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4062 MHz    
+2024-06-09T16:32:17.842861Z  INFO transfer_window_controller: CPU #4: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4036 MHz    
+2024-06-09T16:32:17.842869Z  INFO transfer_window_controller: CPU #5: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4092 MHz    
+2024-06-09T16:32:17.842878Z  INFO transfer_window_controller: CPU #6: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4096 MHz    
+2024-06-09T16:32:17.842886Z  INFO transfer_window_controller: CPU #7: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4082 MHz    
+2024-06-09T16:32:17.842894Z  INFO transfer_window_controller: CPU #8: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4007 MHz    
+2024-06-09T16:32:17.842903Z  INFO transfer_window_controller: CPU #9: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4093 MHz    
+2024-06-09T16:32:17.842918Z  INFO transfer_window_controller: CPU #10: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4037 MHz    
+2024-06-09T16:32:17.842931Z  INFO transfer_window_controller: CPU #11: Intel(R) Core(TM) i5-10400F CPU @ 2.90GHz @ 4090 MHz    
+2024-06-09T16:32:17.846948Z DEBUG eframe: Using the glow renderer    
+2024-06-09T16:32:17.855566Z DEBUG eframe::native::glow_integration: Event::Resumed    
+2024-06-09T16:32:17.855759Z DEBUG eframe::native::glow_integration: trying to create glutin Display with config: ConfigTemplateBuilder { template: ConfigTemplate { color_buffer_type: Rgb { r_size: 8, g_size: 8, b_size: 8 }, alpha_size: 8, depth_size: 0, stencil_size: 0, num_samples: None, min_swap_interval: None, max_swap_interval: None, config_surface_types: ConfigSurfaceTypes(WINDOW), api: None, transparency: false, single_buffering: false, stereoscopy: None, float_pixels: false, max_pbuffer_width: None, hardware_accelerated: None, max_pbuffer_height: None, native_window: None } }    
+2024-06-09T16:32:17.866985Z DEBUG eframe::native::glow_integration: using the first config from config picker closure. config: Glx(Config { inner: Config { raw: GlxConfig(0x572806997580), display: GlxDisplay(0x57280682b0c0) } })    
+2024-06-09T16:32:17.867219Z  INFO winit::platform_impl::platform::x11::window: Guessed window scale factor: 1    
+2024-06-09T16:32:17.867256Z DEBUG winit::platform_impl::platform::x11::window: Calculated physical dimensions: 800x600    
+2024-06-09T16:32:17.868618Z DEBUG winit::platform_impl::platform::x11::ime: failed to create IME context without preedit support.    
+2024-06-09T16:32:17.868752Z DEBUG eframe::native::glow_integration: successfully created GL Display with version: GLX 1.4 and supported features: DisplayFeatures(CONTEXT_ROBUSTNESS | CONTEXT_NO_ERROR | FLOAT_PIXEL_FORMAT | SWAP_CONTROL | CONTEXT_RELEASE_BEHAVIOR | CREATE_ES_CONTEXT | MULTISAMPLING_PIXEL_FORMATS | SRGB_FRAMEBUFFERS)    
+2024-06-09T16:32:17.868787Z DEBUG eframe::native::glow_integration: creating gl context using raw window handle: Some(Xlib(XlibWindowHandle { window: 104857605, visual_id: 40 }))    
+2024-06-09T16:32:17.876974Z DEBUG eframe::native::glow_integration: Initializing egui_winit for viewport "FFFF"    
+2024-06-09T16:32:17.877546Z DEBUG egui_winit::clipboard: Cannot init smithay clipboard without a Wayland display handle    
+2024-06-09T16:32:17.877572Z DEBUG eframe::native::glow_integration: Creating a gl_surface for viewport "FFFF"    
+2024-06-09T16:32:18.041164Z DEBUG egui_glow::painter: 
+opengl version: 3.3.0 NVIDIA 550.67
+opengl renderer: NVIDIA GeForce RTX 2060/PCIe/SSE2
+opengl vendor: NVIDIA Corporation    
+2024-06-09T16:32:18.041207Z DEBUG egui_glow::shader_version: Shader version: Gl140 ("3.30 NVIDIA via Cg compiler").    
+2024-06-09T16:32:18.041218Z DEBUG egui_glow::painter: Shader header: "#version 140\n".    
+2024-06-09T16:32:18.041240Z DEBUG egui_glow::painter: SRGB texture Support: true    
+2024-06-09T16:32:18.041252Z DEBUG egui_glow::painter: SRGB framebuffer Support: true    
+2024-06-09T16:32:18.042712Z DEBUG egui_glow::vao: GL version: "3.3.0 NVIDIA 550.67".    
+2024-06-09T16:32:18.056257Z  INFO transfer_window_controller: Initialising controller    
+2024-06-09T16:32:18.056391Z  INFO transfer_window_controller: OpenGL version: 3.3.0 NVIDIA 550.67    
+2024-06-09T16:32:18.056403Z  INFO transfer_window_controller: OpenGL renderer: NVIDIA GeForce RTX 2060/PCIe/SSE2    
+2024-06-09T16:32:18.056411Z  INFO transfer_window_controller: GLSL version: 3.30 NVIDIA via Cg compiler    
+2024-06-09T16:32:18.056442Z  INFO transfer_window_view::resources: Loading resources    
+2024-06-09T16:32:18.056534Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/warp-here.png    
+2024-06-09T16:32:18.058308Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-light.png    
+2024-06-09T16:32:18.061332Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/planet-target.drawio.png    
+2024-06-09T16:32:18.063344Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-start.png    
+2024-06-09T16:32:18.083223Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/next-orbit.png    
+2024-06-09T16:32:18.083934Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/periapsis.png    
+2024-06-09T16:32:18.090690Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/set-target.png    
+2024-06-09T16:32:18.093972Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-false.png    
+2024-06-09T16:32:18.095527Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/encounter-exit.png    
+2024-06-09T16:32:18.097090Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/encounter-entrance.png    
+2024-06-09T16:32:18.098601Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/star-target.png    
+2024-06-09T16:32:18.106636Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-paused.png    
+2024-06-09T16:32:18.108241Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-torpedo-target.png    
+2024-06-09T16:32:18.115354Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/guidance.png    
+2024-06-09T16:32:18.120337Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/create-burn.png    
+2024-06-09T16:32:18.125397Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-medium.png    
+2024-06-09T16:32:18.134989Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-large.png    
+2024-06-09T16:32:18.143035Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/tank-small.png    
+2024-06-09T16:32:18.150287Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/isp.png    
+2024-06-09T16:32:18.151816Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/blank-slot.png    
+2024-06-09T16:32:18.152068Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/adjust-burn-arrow.png    
+2024-06-09T16:32:18.154181Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/clear-slot.png    
+2024-06-09T16:32:18.155718Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn.png    
+2024-06-09T16:32:18.159928Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/planet.png    
+2024-06-09T16:32:18.161557Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-light-target.png    
+2024-06-09T16:32:18.167681Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/edit.png    
+2024-06-09T16:32:18.168949Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/engine-high-thrust.png    
+2024-06-09T16:32:18.177827Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/torpedo.png    
+2024-06-09T16:32:18.182075Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/moon-target.png    
+2024-06-09T16:32:18.188769Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/intercept.png    
+2024-06-09T16:32:18.193382Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/enable-guidance.png    
+2024-06-09T16:32:18.197909Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/focus.png    
+2024-06-09T16:32:18.199725Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/closest-approach-1.png    
+2024-06-09T16:32:18.204191Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/moon.png    
+2024-06-09T16:32:18.205968Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/previous-orbit.png    
+2024-06-09T16:32:18.206952Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/star.png    
+2024-06-09T16:32:18.208879Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/circle.png    
+2024-06-09T16:32:18.210424Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/fuel.png    
+2024-06-09T16:32:18.211714Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time.png    
+2024-06-09T16:32:18.213420Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/cancel.png    
+2024-06-09T16:32:18.215326Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/unset-target.png    
+2024-06-09T16:32:18.231783Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-warp.png    
+2024-06-09T16:32:18.233445Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/fire-possible.png    
+2024-06-09T16:32:18.248167Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-burnt.png    
+2024-06-09T16:32:18.265805Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/thrust.png    
+2024-06-09T16:32:18.268291Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/ship-light.png    
+2024-06-09T16:32:18.385032Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/burn-end.png    
+2024-06-09T16:32:18.404232Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/time-step-true.png    
+2024-06-09T16:32:18.405902Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/duration.png    
+2024-06-09T16:32:18.407612Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/engine-efficient.png    
+2024-06-09T16:32:18.412298Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/apoapsis.png    
+2024-06-09T16:32:18.418132Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/vessel-icon-torpedo.png    
+2024-06-09T16:32:18.419855Z TRACE transfer_window_view::resources: Loading texture file://view/resources/textures/closest-approach-2.png    
+2024-06-09T16:33:02.410590Z DEBUG transfer_window_controller: Handling controller event NewGame    
+2024-06-09T16:33:02.415491Z  INFO transfer_window_view::resources: Building renderers    
+2024-06-09T16:33:02.415589Z TRACE transfer_window_view::resources: Building renderer for planet-target    
+2024-06-09T16:33:02.416131Z TRACE transfer_window_view::resources: Building renderer for warp-here    
+2024-06-09T16:33:02.416679Z TRACE transfer_window_view::resources: Building renderer for tank-large    
+2024-06-09T16:33:02.417196Z TRACE transfer_window_view::resources: Building renderer for adjust-burn-arrow    
+2024-06-09T16:33:02.417712Z TRACE transfer_window_view::resources: Building renderer for star-target    
+2024-06-09T16:33:02.418215Z TRACE transfer_window_view::resources: Building renderer for planet    
+2024-06-09T16:33:02.418716Z TRACE transfer_window_view::resources: Building renderer for next-orbit    
+2024-06-09T16:33:02.419211Z TRACE transfer_window_view::resources: Building renderer for time-step-true    
+2024-06-09T16:33:02.419722Z TRACE transfer_window_view::resources: Building renderer for burn    
+2024-06-09T16:33:02.420225Z TRACE transfer_window_view::resources: Building renderer for set-target    
+2024-06-09T16:33:02.420788Z TRACE transfer_window_view::resources: Building renderer for fuel    
+2024-06-09T16:33:02.421306Z TRACE transfer_window_view::resources: Building renderer for burn-burnt    
+2024-06-09T16:33:02.421810Z TRACE transfer_window_view::resources: Building renderer for cancel    
+2024-06-09T16:33:02.422377Z TRACE transfer_window_view::resources: Building renderer for unset-target    
+2024-06-09T16:33:02.422882Z TRACE transfer_window_view::resources: Building renderer for create-burn    
+2024-06-09T16:33:02.423442Z TRACE transfer_window_view::resources: Building renderer for duration    
+2024-06-09T16:33:02.423963Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-torpedo-target    
+2024-06-09T16:33:02.424507Z TRACE transfer_window_view::resources: Building renderer for tank-medium    
+2024-06-09T16:33:02.425150Z TRACE transfer_window_view::resources: Building renderer for time-step-false    
+2024-06-09T16:33:02.425660Z TRACE transfer_window_view::resources: Building renderer for edit    
+2024-06-09T16:33:02.426180Z TRACE transfer_window_view::resources: Building renderer for isp    
+2024-06-09T16:33:02.426720Z TRACE transfer_window_view::resources: Building renderer for enable-guidance    
+2024-06-09T16:33:02.427252Z TRACE transfer_window_view::resources: Building renderer for moon-target    
+2024-06-09T16:33:02.427789Z TRACE transfer_window_view::resources: Building renderer for moon    
+2024-06-09T16:33:02.428395Z TRACE transfer_window_view::resources: Building renderer for tank-small    
+2024-06-09T16:33:02.428957Z TRACE transfer_window_view::resources: Building renderer for ship-light    
+2024-06-09T16:33:02.429490Z TRACE transfer_window_view::resources: Building renderer for burn-end    
+2024-06-09T16:33:02.430029Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-torpedo    
+2024-06-09T16:33:02.430617Z TRACE transfer_window_view::resources: Building renderer for previous-orbit    
+2024-06-09T16:33:02.431147Z TRACE transfer_window_view::resources: Building renderer for circle    
+2024-06-09T16:33:02.431660Z TRACE transfer_window_view::resources: Building renderer for engine-high-thrust    
+2024-06-09T16:33:02.432051Z TRACE transfer_window_view::resources: Building renderer for star    
+2024-06-09T16:33:02.432459Z TRACE transfer_window_view::resources: Building renderer for encounter-entrance    
+2024-06-09T16:33:02.432827Z TRACE transfer_window_view::resources: Building renderer for blank-slot    
+2024-06-09T16:33:02.433183Z TRACE transfer_window_view::resources: Building renderer for periapsis    
+2024-06-09T16:33:02.433575Z TRACE transfer_window_view::resources: Building renderer for intercept    
+2024-06-09T16:33:02.433992Z TRACE transfer_window_view::resources: Building renderer for time    
+2024-06-09T16:33:02.434335Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-light-target    
+2024-06-09T16:33:02.434734Z TRACE transfer_window_view::resources: Building renderer for vessel-icon-light    
+2024-06-09T16:33:02.435116Z TRACE transfer_window_view::resources: Building renderer for burn-start    
+2024-06-09T16:33:02.435489Z TRACE transfer_window_view::resources: Building renderer for fire-possible    
+2024-06-09T16:33:02.435904Z TRACE transfer_window_view::resources: Building renderer for clear-slot    
+2024-06-09T16:33:02.436249Z TRACE transfer_window_view::resources: Building renderer for thrust    
+2024-06-09T16:33:02.436628Z TRACE transfer_window_view::resources: Building renderer for time-step-paused    
+2024-06-09T16:33:02.436926Z TRACE transfer_window_view::resources: Building renderer for focus    
+2024-06-09T16:33:02.437234Z TRACE transfer_window_view::resources: Building renderer for engine-efficient    
+2024-06-09T16:33:02.437492Z TRACE transfer_window_view::resources: Building renderer for guidance    
+2024-06-09T16:33:02.437754Z TRACE transfer_window_view::resources: Building renderer for apoapsis    
+2024-06-09T16:33:02.438032Z TRACE transfer_window_view::resources: Building renderer for closest-approach-2    
+2024-06-09T16:33:02.438342Z TRACE transfer_window_view::resources: Building renderer for time-step-warp    
+2024-06-09T16:33:02.438597Z TRACE transfer_window_view::resources: Building renderer for closest-approach-1    
+2024-06-09T16:33:02.438857Z TRACE transfer_window_view::resources: Building renderer for torpedo    
+2024-06-09T16:33:02.439133Z TRACE transfer_window_view::resources: Building renderer for encounter-exit    
+2024-06-09T16:33:07.762817Z TRACE transfer_window_view::game::underlay::selected: Selected item deselected    
+2024-06-09T16:33:07.763405Z DEBUG transfer_window_view::game::events: Handling view event SetSelected(None)    
+2024-06-09T16:33:07.947304Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-7.436065673828125, 2.70654296875]])    
+2024-06-09T16:33:07.963696Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-8.270782470703125, 4.783203125]])    
+2024-06-09T16:33:07.979400Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-12.123016357421875, 6.788330078125]])    
+2024-06-09T16:33:07.995761Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-9.161865234375, 1.417205810546875]])    
+2024-06-09T16:33:08.012333Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-8.4676513671875, 2.528106689453125]])    
+2024-06-09T16:33:08.028983Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-3.13714599609375, 0.0]])    
+2024-06-09T16:33:08.045407Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-6.025634765625, 2.0]])    
+2024-06-09T16:33:08.062120Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.0, 0.0]])    
+2024-06-09T16:33:08.078743Z DEBUG transfer_window_view::game::events: Handling view event PanCamera([[-0.0, 0.0]])    
+2024-06-09T16:33:08.529021Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T16:33:08.529057Z TRACE transfer_window_model::api::time: New time state: Level { level: 2, paused: false }    
+2024-06-09T16:33:08.663769Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T16:33:08.663806Z TRACE transfer_window_model::api::time: New time state: Level { level: 3, paused: false }    
+2024-06-09T16:33:08.830182Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T16:33:08.830215Z TRACE transfer_window_model::api::time: New time state: Level { level: 4, paused: false }    
+2024-06-09T16:33:09.012410Z DEBUG transfer_window_view::game::events: Handling model event IncreaseTimeStepLevel    
+2024-06-09T16:33:09.012445Z TRACE transfer_window_model::api::time: New time state: Level { level: 5, paused: false }    
+2024-06-09T16:33:09.262384Z DEBUG transfer_window_view::game::events: Handling view event IconHovered    

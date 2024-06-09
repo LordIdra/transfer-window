@@ -2,6 +2,7 @@ use std::{collections::HashMap, fs::{self, DirEntry}, sync::{Arc, Mutex}};
 
 use eframe::{egui::{self, ImageSource}, glow};
 use image::GenericImageView;
+use log::{info, trace};
 
 use crate::game::rendering::{texture, texture_renderer::TextureRenderer};
 
@@ -24,6 +25,7 @@ struct Texture {
 impl Texture {
     fn new(context: &egui::Context, gl: &Arc<glow::Context>, entry: &DirEntry) -> Self {
         let uri = "file://".to_owned() + entry.path().as_path().as_os_str().to_str().unwrap();
+        trace!("Loading texture {}", uri);
         let bytes = fs::read(entry.path()).expect("Failed to load file");
         let image = image::load_from_memory(&bytes).expect("Failed to load image");
         let size = (image.dimensions().0 as i32, image.dimensions().1 as i32);
@@ -42,6 +44,7 @@ pub struct Resources {
 
 impl Resources {
     pub fn new(context: &egui::Context, gl: &Arc<glow::Context>) -> Self {
+        info!("Loading resources");
         let textures = directory_entries("view/resources/textures".to_string())
             .into_iter()
             .map(|entry| (entry_name(&entry), entry))
@@ -70,8 +73,10 @@ impl Resources {
     }
 
     pub fn build_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
+        info!("Building renderers");
         let mut texture_renderers = HashMap::new();
         for (texture_name, texture) in &self.textures {
+            trace!("Building renderer for {}", texture_name);
             let texture_renderer = TextureRenderer::new(gl, texture.gl_texture.texture());
             texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
         }
@@ -79,6 +84,7 @@ impl Resources {
     }
 
     pub fn destroy(&self, gl: &Arc<glow::Context>) {
+        info!("Destroying textures");
         for texture in self.textures.values() {
             texture.gl_texture.destroy(gl);
         }

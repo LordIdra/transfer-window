@@ -128,6 +128,8 @@
 [x] Allow selecting apoapsis, intercept, approach, encounter
 [x] Switch to GL_LINES for segment rendering (should be massive speedup)
 [x] Show velocity/altitude of vessel + points + celestial objects
+[x] Add actual logging
+[x] Log to external file
 
 # Polish
 [ ] Select event when clicked in timeline
@@ -173,7 +175,6 @@
 [ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
 
 # Before release
-[ ] Add actual logging?
 [ ] Versioning!
 [ ] Profiling + performance testing on different devices
 [ ] Test compatibility on different devices

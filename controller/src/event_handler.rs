@@ -61,17 +61,17 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
 pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Load game");
-     let serialized = fs::read_to_string("saves/".to_string() + name + ".json");
-     let Ok(serialized) = serialized else {
-         error!("Failed to handle load game; error while loading file: {}", serialized.err().unwrap());
-         return;
-     };
-
-     let model = Model::deserialize(serialized.as_str());
-     let Ok(model) = model else {
-        error!("Failed to handle load game; error while deseraizing: {}", model.err().unwrap());
+    let serialized = fs::read_to_string("saves/".to_string() + name + ".json");
+    let Ok(serialized) = serialized else {
+        error!("Failed to handle load game; error while loading file: {}", serialized.err().unwrap());
         return;
-     };
+    };
 
-     controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, context.clone(), controller.resources.clone(), None));
+    let model = Model::deserialize(serialized.as_str());
+    let Ok(model) = model else {
+    error!("Failed to handle load game; error while deseraizing: {}", model.err().unwrap());
+    return;
+    };
+
+    controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, context.clone(), controller.resources.clone(), None));
 }

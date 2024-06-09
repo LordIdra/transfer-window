@@ -1,8 +1,10 @@
-use std::{sync::Arc, time::Instant};
+use std::{fs::File, sync::Arc, time::Instant};
 
-use eframe::{egui::Context, glow, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
+use eframe::{egui::Context, glow::{self, HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VERSION}, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
 use event_handler::{load_game, new_game, quit};
 use log::{debug, info};
+use sysinfo::System;
+use tracing_subscriber::{fmt::Layer, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 use transfer_window_view::{controller_events::ControllerEvent, menu, resources::Resources, Scene};
 
 mod event_handler;
@@ -14,9 +16,17 @@ struct Controller {
     last_frame: Instant,
 }
 
+fn log_gl_info(gl: &Arc<glow::Context>) {
+    info!("OpenGL version: {}", unsafe { gl.get_parameter_string(VERSION) });
+    info!("OpenGL renderer: {}", unsafe { gl.get_parameter_string(RENDERER) });
+    info!("GLSL version: {}", unsafe { gl.get_parameter_string(SHADING_LANGUAGE_VERSION) });
+}
+
 impl Controller {
     pub fn init(creation_context: &CreationContext) -> Box<dyn eframe::App> {
         info!("Initialising controller");
+
+        log_gl_info(creation_context.gl.as_ref().unwrap());
 
         egui_extras::install_image_loaders(&creation_context.egui_ctx);
         let gl = creation_context.gl.as_ref().unwrap().clone();
@@ -31,7 +41,7 @@ impl Controller {
         let _span = tracy_client::span!("Event handling");
 
         while let Some(event) = events.pop() {
-            debug!("Handling event {:?}", event);
+            debug!("Handling controller event {:?}", event);
             match event {
                 ControllerEvent::Quit => quit(context),
                 ControllerEvent::NewGame => new_game(self, context),
@@ -66,8 +76,35 @@ impl Drop for Controller {
     }
 }
 
+fn setup_logging() {
+    // A layer that logs events to a file.
+    let file = File::create("log/latest.log").expect("Failed to create file");
+    let layer = Layer::new().compact()
+        .with_ansi(false)
+        .with_writer(Arc::new(file));
+    let filter = EnvFilter::builder()
+        .parse("debug,transfer_window_controller=trace,transfer_window_view=trace,transfer_window_model=trace")
+        .expect("Failed to parse env filter");
+    tracing_subscriber::registry()
+        .with(layer)
+        .with(filter)
+        .init();
+
+    info!("Starting application");
+
+    let sys = System::new_all();
+    info!("Memory: {} B", sys.total_memory());
+    info!("Swap: {} B", sys.total_swap());
+    info!("OS: {:?}", System::long_os_version());
+    info!("Kernel version: {:?}", System::kernel_version());
+    info!("CPU architecture: {:?}", System::cpu_arch());
+    for (i, cpu) in sys.cpus().iter().enumerate() {
+        info!("CPU #{}: {} @ {} MHz", i, cpu.brand(), cpu.frequency());
+    }
+}
+
 fn main() {
-    env_logger::init();
+    setup_logging();
 
     let options = NativeOptions {
         renderer: Renderer::Glow,

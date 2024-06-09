@@ -8,11 +8,13 @@ transfer-window-model = { path = "../model" }
 transfer-window-view = { path = "../view" }
 nalgebra-glm = "0.18.0"
 log = "0.4.21"
-env_logger = "0.11.3"
+tracing = "0.1.40"
+tracing-subscriber = {version = "0.3.18", features = ["env-filter"] }
 tracy-client = { version = "0.17.0", optional = true }
 tracing-tracy = { version = "0.11.0", optional = true }
 eframe = { version = "0.27.2", features = ["glow"] }
 egui_extras = { version = "0.27.2", features = ["image", "file"] }
+sysinfo = "0.30.12"
 
 [features]
 profiling = ["dep:tracy-client", "dep:tracing-tracy"]

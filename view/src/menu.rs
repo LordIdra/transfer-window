@@ -1,4 +1,5 @@
 use eframe::egui::{CentralPanel, Context, Key, Window};
+use log::trace;
 
 use crate::controller_events::ControllerEvent;
 
@@ -19,6 +20,7 @@ impl View {
 
         if context.input(|input| input.key_pressed(Key::F12)) {
             self.debug_window_open = !self.debug_window_open;
+            trace!("Menu debug window = {}", self.debug_window_open);
         }
 
         let mut events = vec![];
