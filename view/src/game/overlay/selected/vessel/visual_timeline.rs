@@ -229,7 +229,9 @@ fn generate_burn_guidance_end(view: &View, entity: Entity, events: &mut Vec<Visu
         events.push(VisualTimelineEvent::BurnEnd { time: burn.end_point().time() });
     }
     if let Segment::Guidance(guidance) = view.model.path_component(entity).current_segment() {
-        events.push(VisualTimelineEvent::GuidanceEnd { time: guidance.end_point().time() });
+        if !guidance.will_intercept() {
+            events.push(VisualTimelineEvent::GuidanceEnd { time: guidance.end_point().time() });
+        }
     }
 }
 
