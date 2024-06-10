@@ -123,10 +123,7 @@ impl VisualTimelineEvent {
             Selected::None => false,
             Selected::Orbitable(_) => false,
             Selected::Vessel(_) => false,
-            Selected::Point { .. } => match self {
-                VisualTimelineEvent::Point { .. } => true,
-                _ => false
-            },
+            Selected::Point { .. } => matches!(self, VisualTimelineEvent::Point { .. }),
             Selected::Apsis { type_, .. } => {
                 match self {
                     VisualTimelineEvent::Apsis { type_: other_type, .. } => type_ == *other_type,
@@ -150,30 +147,15 @@ impl VisualTimelineEvent {
                 _ => false,
             }
             Selected::Burn { time, .. } => match self {
-                VisualTimelineEvent::TimelineEvent(event) => {
-                    match event {
-                        TimelineEvent::Burn(event) => event.time() == time,
-                        _ => false
-                    }
-                },
+                VisualTimelineEvent::TimelineEvent(TimelineEvent::Burn(event)) => event.time() == time,
                 _ => false,
             }
             Selected::FireTorpedo { time, .. } => match self {
-                VisualTimelineEvent::TimelineEvent(event) => {
-                    match event {
-                        TimelineEvent::FireTorpedo(event) => event.time() == time,
-                        _ => false
-                    }
-                },
+                VisualTimelineEvent::TimelineEvent(TimelineEvent::FireTorpedo(event)) => event.time() == time,
                 _ => false,
             }
             Selected::EnableGuidance { time, .. } => match self {
-                VisualTimelineEvent::TimelineEvent(event) => {
-                    match event {
-                        TimelineEvent::EnableGuidance(event) => event.time() == time,
-                        _ => false
-                    }
-                },
+                VisualTimelineEvent::TimelineEvent(TimelineEvent::EnableGuidance(event)) => event.time() == time,
                 _ => false,
             }
         }
@@ -266,11 +248,11 @@ pub fn draw(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_cen
 
     draw_subtitle(ui, "Timeline");
     for event in events {
-        draw_event(view, ui, event, entity, center_time);
+        draw_event(view, ui, &event, entity, center_time);
     }
 }
 
-fn draw_event(view: &View, ui: &mut Ui, event: VisualTimelineEvent, entity: Entity, center_time: f64) {
+fn draw_event(view: &View, ui: &mut Ui, event: &VisualTimelineEvent, entity: Entity, center_time: f64) {
     let time_until = (event.time().ceil() - center_time).floor();
 
     let mut frame = Frame::default().begin(ui);
@@ -309,7 +291,7 @@ fn draw_event(view: &View, ui: &mut Ui, event: VisualTimelineEvent, entity: Enti
     // Annoying workaround because allocate_space only uses hover sense for some reason
     if response.contains_pointer() && view.context.input(|input| input.pointer.primary_clicked()) {
         if let Some(selected) = event.selected(entity) {
-            view.add_view_event(ViewEvent::SetSelected(selected))
+            view.add_view_event(ViewEvent::SetSelected(selected));
         }
     }
     

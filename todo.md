@@ -159,12 +159,12 @@
 
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?
+[ ] Collisions with planets (nearly forgot about that lmao)
 [ ] Ballistic weaponry
 [ ] Point defense
 [ ] PDC automatic targeting system
 [ ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 [ ] PDC shells not affected by gravity?
-[ ] Collisions with planets (nearly forgot about that lmao)
 [ ] Energy production/storage/consumption
 
 # Backburner
