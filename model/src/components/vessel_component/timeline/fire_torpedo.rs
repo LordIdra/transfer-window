@@ -17,7 +17,7 @@ pub struct FireTorpedoEvent {
 
 impl FireTorpedoEvent {
     pub fn new(model: &mut Model, fire_from: Entity, time: f64, slot_location: SlotLocation) -> Self {
-        let mut vessel_component = VesselComponent::new(VesselClass::Torpedo).with_ghost();
+        let mut vessel_component = VesselComponent::new(VesselClass::Torpedo, model.vessel_component(fire_from).faction).with_ghost();
         vessel_component.set_target(model.vessel_component(fire_from).target);
 
         let fire_from_orbit = model.orbit_at_time(fire_from, time);

@@ -10,6 +10,13 @@ pub mod system_slot;
 pub mod timeline;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+pub enum Faction {
+    Player,
+    Ally,
+    Enemy,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum VesselClass {
     Torpedo,
     Light,
@@ -43,15 +50,16 @@ pub struct VesselComponent {
     class: VesselClass,
     slots: Slots,
     target: Option<Entity>,
+    faction: Faction,
 }
 
 #[allow(clippy::new_without_default)]
 impl VesselComponent {
-    pub fn new(class: VesselClass) -> Self {
+    pub fn new(class: VesselClass, faction: Faction) -> Self {
         let ghost = false;
         let timeline = Timeline::default();
         let slots = Slots::new(class);
-        Self { ghost, timeline, class, slots, target: None }
+        Self { ghost, timeline, class, slots, target: None, faction }
     }
 
     pub fn with_ghost(mut self) -> Self {

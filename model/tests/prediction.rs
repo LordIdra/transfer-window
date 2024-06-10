@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model, SEGMENTS_TO_PREDICT};
 
 /// This example was taken from insanity-1 (note insanity-1 case may have changed from time of writing)
 #[test]
@@ -32,7 +32,7 @@ fn test_prediction() {
     let orbit = Orbit::new(earth, vessel_mass, earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(VesselClass::Light))
+        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Player))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
     model.recompute_trajectory(vessel);
@@ -88,7 +88,7 @@ fn test_prediction_with_burn() {
     let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 10000.0, 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(VesselClass::Light))
+        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Player))
         .with_path_component(PathComponent::default()
             .with_segment(Segment::Orbit(orbit))));
 

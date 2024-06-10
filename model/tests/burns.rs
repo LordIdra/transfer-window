@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{start_burn::StartBurnEvent, TimelineEvent}, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{start_burn::StartBurnEvent, TimelineEvent}, Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_burn_without_engine_or_fuel_tank() {
@@ -14,7 +14,7 @@ fn test_burn_without_engine_or_fuel_tank() {
     let orbit = Orbit::new(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(class))
+        .with_vessel_component(VesselComponent::new(class, Faction::Player))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
     assert!(!model.can_create_burn(vessel));
@@ -42,7 +42,7 @@ fn test_create_burn_with_zero_dv() {
     let class = VesselClass::Light;
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(class))
+        .with_vessel_component(VesselComponent::new(class, Faction::Player))
         .with_path_component(PathComponent::default()));
     let orbit = Orbit::circle(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     model.path_component_mut(vessel).add_segment(Segment::Orbit(orbit));
@@ -91,7 +91,7 @@ fn test_create_and_adjust_burn() {
     let orbit = Orbit::circle(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(class))
+        .with_vessel_component(VesselComponent::new(class, Faction::Player))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
     model.update(0.01);

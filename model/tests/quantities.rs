@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, PathComponent}, vessel_component::{VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, PathComponent}, vessel_component::{Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_stationary_position() {
@@ -38,7 +38,7 @@ fn test_trajectory_position() {
     let orbit = Orbit::circle(planet, 1.0e3, 1.0e16, vessel_position, 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let path_component = PathComponent::new_with_orbit(orbit.clone());
     let vessel = model.allocate(EntityBuilder::default()
-        .with_vessel_component(VesselComponent::new(VesselClass::Light))
+        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Player))
         .with_path_component(path_component));
 
 
@@ -65,7 +65,7 @@ fn test_trajectory_velocity() {
     let orbit = Orbit::circle(planet, 1.0e3, 1.0e16, vessel_position, 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let path_component = PathComponent::new_with_orbit(orbit.clone());
     let vessel = model.allocate(EntityBuilder::default()
-        .with_vessel_component(VesselComponent::new(VesselClass::Light))
+        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Player))
         .with_path_component(path_component));
 
     let expected = orbit.velocity_from_theta(0.0);
