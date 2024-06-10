@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 use eframe::{egui::Rgba, emath::normalized_angle};
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::{Faction, VesselClass}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::Faction}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 
@@ -11,20 +11,10 @@ const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
 pub fn compute_color_vessel(view: &View, entity: Entity) -> Rgba {
     let faction = view.model.vessel_component(entity).faction();
-    let class = view.model.vessel_component(entity).class();
     let rgb = match faction {
-        Faction::Player => match class {
-            VesselClass::Torpedo => Rgba::from_rgb(0.0, 0.0, 1.0),
-            _ => Rgba::from_rgb(0.0, 1.0, 1.0),
-        }
-        Faction::Ally => match class {
-            VesselClass::Torpedo => Rgba::from_rgb(0.0, 1.0, 0.0),
-            _ => Rgba::from_rgb(0.6, 1.0, 0.6),
-        }
-        Faction::Enemy => match class {
-            VesselClass::Torpedo => Rgba::from_rgb(1.0, 0.0, 0.0),
-            _ => Rgba::from_rgb(1.0, 0.5, 0.0),
-        }
+        Faction::Player => Rgba::from_rgb(0.0, 1.0, 1.0),
+        Faction::Ally => Rgba::from_rgb(0.6, 1.0, 0.6),
+        Faction::Enemy => Rgba::from_rgb(1.0, 0.5, 0.0),
     };
 
     let alpha = if view.is_selected(entity) {

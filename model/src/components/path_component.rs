@@ -64,7 +64,7 @@ impl PathComponent {
             .collect()
     }
     
-    pub fn future_guidance(&self) -> Vec<&Guidance> {
+    pub fn future_guidances(&self) -> Vec<&Guidance> {
         self.future_segments.iter()
             .filter_map(|segment| segment.as_guidance())
             .collect()
@@ -90,7 +90,7 @@ impl PathComponent {
     }
     
     pub fn final_guidance(&self) -> Option<&Guidance> {
-        self.future_guidance().last().copied()
+        self.future_guidances().last().copied()
     }
 
     // Returns none if the path contains no burns or guidance segments

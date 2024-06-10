@@ -16,6 +16,24 @@ pub enum Faction {
     Enemy,
 }
 
+impl Faction {
+    pub fn player_has_intel(&self) -> bool {
+        match self {
+            Faction::Player => true,
+            Faction::Ally => true,
+            Faction::Enemy => false,
+        }
+    }
+
+    pub fn player_has_control(&self) -> bool {
+        match self {
+            Faction::Player => true,
+            Faction::Ally => false,
+            Faction::Enemy => false,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum VesselClass {
     Torpedo,

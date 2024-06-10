@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::path_component::orbit::Orbit, Model, storage::entity_allocator::Entity, api::trajectories::encounter::{Encounter, EncounterType}};
+use crate::{api::trajectories::encounter::{Encounter, EncounterType}, components::path_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
 
 use super::MIN_TIME_BEFORE_ENCOUNTER;
 
@@ -94,13 +94,10 @@ fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 
 /// Solves for when an entity will leave its parent
 /// If the given entity is not on a hyperbolic trajectory, returns none when a call to solve is made
-pub fn solve_for_exit(model: &Model, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
+pub fn solve_for_exit(model: &Model, orbit: &Orbit, entity: Entity, end_time: f64) -> Option<Encounter> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Solve for exit");
-    let orbit = model.path_component(entity)
-        .final_segment()
-        .as_orbit()
-        .expect("Entity does not have an orbit as end segment"); 
+    let start_time = orbit.start_point().time();
     let Some(parent_orbit) = model.orbitable_component(orbit.parent()).orbit() else {
         // Parent cannot be exited as it is a root entity
         return None;

@@ -3,6 +3,7 @@ pub mod closest_point;
 pub mod components;
 pub mod encounters;
 pub mod explosion;
+pub mod intel;
 pub mod quantities;
 pub mod segments;
 pub mod vessels;

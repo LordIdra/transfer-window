@@ -1,3 +1,5 @@
+use encounter::EncounterType;
+use fast_solver::{calculate_entrance_encounter, calculate_exit_encounter};
 use log::trace;
 
 use crate::{components::path_component::{orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
@@ -23,22 +25,18 @@ impl Model {
             return;
         }
         
-        let mut start_time = self.path_component(entity).final_segment().end_time();
         let mut segments = 0;
 
-        // Special case: A spacecraft that is for example in LEO will never have any
+        // A spacecraft that is for example in LEO will never have any
         // encounters, but without this, the predictor would keep on going every single frame
         // and rediscovering the exact same orbits
-        if let Some(final_orbit) = self.path_component(entity).final_orbit() {
-            if final_orbit.end_point().time() == end_time {
-                return;
-            }
+        if self.path_component(entity).final_orbit().unwrap().end_point().time() == end_time {
+            return;
         }
 
-        while let Some(encounter) = find_next_encounter(self, entity, start_time, end_time) {
+        while let Some(encounter) = find_next_encounter(self, self.path_component(entity).final_orbit().unwrap(), entity, end_time) {
             trace!("Found encounter {encounter:?}");
             apply_encounter(self, &encounter);
-            start_time = encounter.time();
             segments += 1;
             if segments >= segment_count {
                 break;
@@ -67,11 +65,22 @@ impl Model {
         let velocity = current_segment.current_velocity();
         let parent_mass = self.mass(parent);
         let mass = self.vessel_component(entity).mass();
-        let time = self.time;
-        let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, time);
+        let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, self.time);
 
         self.path_component_mut(entity).clear_future_segments();
         self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
         self.recompute_trajectory(entity);
+    }
+
+    pub fn next_orbit(&self, entity: Entity, orbit: &Orbit) -> Option<Orbit> {
+        match find_next_encounter(self, orbit, entity, 1.0e10) {
+            Some(encounter) => {
+                Some(match encounter.type_() {
+                    EncounterType::Entrance => calculate_entrance_encounter(self, orbit, encounter.new_parent(), encounter.time()),
+                    EncounterType::Exit => calculate_exit_encounter(self, orbit, encounter.new_parent(), encounter.time()),
+                })
+            }
+            None => None,
+        }
     }
 }

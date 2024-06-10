@@ -134,10 +134,11 @@
 [x] Visual timeline for selected events + points
 [x] Current burn/guidance finishes (exclude intercepts)
 [x] Show orbital parameters
+[x] Factions (player, ally, enemy)
 
 # Campaign
-[ ] Factions (player, ally, enemy)
 [ ] Can't see future enemy movements
+[ ] Can't edit enemy vessels/timeline
 [ ] Menu screen
 [ ] Stations
 [ ] Can only change equipment at stations

@@ -1,4 +1,4 @@
-use crate::{Model, storage::entity_allocator::Entity};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
 
 use self::{ellipse::compute_ellipse_bound, hyperbola::compute_hyperbola_bound, window::Window};
 
@@ -9,14 +9,10 @@ mod util;
 mod window;
 
 /// Finds bounds for all siblings of an entity
-pub fn compute_initial_windows(model: &Model, entity: Entity, siblings: Vec<Entity>, start_time: f64, end_time: f64) -> Vec<Window> {
+pub fn compute_initial_windows<'a>(model: &'a Model, orbit: &'a Orbit, siblings: Vec<Entity>, end_time: f64) -> Vec<Window<'a>> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Get initial windows");
-    let orbit = model
-        .path_component(entity)
-        .final_segment()
-        .as_orbit()
-        .expect("Entity does not have an orbit at requested start time");
+    let start_time = orbit.start_point().time();
     let mut windows = vec![];
 
     for sibling in siblings {

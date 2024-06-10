@@ -31,6 +31,41 @@ fn draw_from_points(view: &View, points: &[DVec2], color: Rgba) {
     view.renderers.add_segment_vertices(&mut vertices);
 }
 
+fn draw_segment(view: &View, segment: &Segment, camera_centre: DVec2, zoom: f64, entity: Entity, segment_points_data: &mut Vec<(Vec<DVec2>, Rgba)>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Draw segment");
+    let absolute_parent_position = view.model.absolute_position(segment.parent());
+    match segment {
+        Segment::Orbit(orbit) => {
+            // When predicting trajectories, the last orbit will have duration zero, so skip it
+            if orbit.duration().abs() == 0.0 {
+                return;
+            }
+            let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
+            let color = orbit::compute_color_vessel(view, entity);
+            if should_render_parent(view, orbit.parent()) {
+                segment_points_data.push((points, color));
+            }
+        },
+
+        Segment::Burn(burn) => {
+            let points = burn::compute_points(burn, absolute_parent_position, camera_centre, zoom);
+            let color = burn::compute_color(view, entity);
+            if should_render_parent(view, burn.parent()) {
+                segment_points_data.push((points, color));
+            }
+        }
+
+        Segment::Guidance(guidance) => {
+            let points = guidance::compute_points(guidance, absolute_parent_position, camera_centre, zoom);
+            let color = guidance::compute_color(view, entity);
+            if should_render_parent(view, guidance.parent()) {
+                segment_points_data.push((points, color));
+            }
+        }
+    };
+}
+
 fn draw_path_segments(view: &View, entity: Entity, camera_centre: DVec2) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments for one entity");
@@ -38,40 +73,15 @@ fn draw_path_segments(view: &View, entity: Entity, camera_centre: DVec2) {
     let path_component = view.model.path_component(entity);
 
     let mut segment_points_data = vec![];
-    for segment in path_component.future_segments() {
-        #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Draw segment");
-        let absolute_parent_position = view.model.absolute_position(segment.parent());
-        match segment {
-            Segment::Orbit(orbit) => {
-                // When predicting trajectories, the last orbit will have duration zero, so skip it
-                if orbit.duration().abs() == 0.0 {
-                    continue;
-                }
-                let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
-                let color = orbit::compute_color_vessel(view, entity);
-                if should_render_parent(view, orbit.parent()) {
-                    segment_points_data.push((points, color));
-                }
-            },
-
-            Segment::Burn(burn) => {
-                let points = burn::compute_points(burn, absolute_parent_position, camera_centre, zoom);
-                let color = burn::compute_color();
-                if should_render_parent(view, burn.parent()) {
-                    segment_points_data.push((points, color));
-                }
-            }
-
-            Segment::Guidance(guidance) => {
-                let points = guidance::compute_points(guidance, absolute_parent_position, camera_centre, zoom);
-                let color = guidance::compute_color();
-                if should_render_parent(view, guidance.parent()) {
-                    segment_points_data.push((points, color));
-                }
-            }
-        };
-    }
+    if view.model.vessel_component(entity).faction().player_has_intel() {
+        for segment in path_component.future_segments() {
+            draw_segment(view, segment, camera_centre, zoom, entity, &mut segment_points_data);
+        }
+    } else {
+        for segment in &view.model.path_without_intel(entity) {
+            draw_segment(view, segment, camera_centre, zoom, entity, &mut segment_points_data);
+        }
+    };
 
     // Reverse to make sure that the segments are rendered in order
     // of how soon they are, so that closer segments take priority

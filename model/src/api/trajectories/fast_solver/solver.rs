@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{components::ComponentType, api::trajectories::encounter::{Encounter, EncounterType}, storage::entity_allocator::Entity, Model};
+use crate::{api::trajectories::encounter::{Encounter, EncounterType}, components::{path_component::orbit::Orbit, ComponentType}, storage::entity_allocator::Entity, Model};
 
 use self::{entrance_solver::solve_for_entrance, exit_solver::solve_for_exit};
 
@@ -14,16 +14,11 @@ const MIN_TIME_BEFORE_ENCOUNTER: f64 = 1.0;
 /// Returns all entities with the same FINAL parent from `can_enter`
 /// It's expected that candidates only contains entities with an orbitable component,
 /// and that entity has a path component
-fn compute_siblings(model: &Model, candidates: &HashSet<Entity>, entity: Entity) -> Vec<Entity> {
-    let end_segment = model.path_component(entity).final_segment();
-    let parent = end_segment.parent();
+fn compute_siblings(model: &Model, candidates: &HashSet<Entity>, orbit: &Orbit) -> Vec<Entity> {
     let mut siblings = vec![];
     for other_entity in candidates {
-        if entity == *other_entity {
-            continue;
-        }
         if let Some(other_orbit) = model.orbitable_component(*other_entity).orbit() {
-            if parent == other_orbit.parent() {
+            if orbit.parent() == other_orbit.parent() {
                 siblings.push(*other_entity);
             }
         }
@@ -36,17 +31,18 @@ fn compute_siblings(model: &Model, candidates: &HashSet<Entity>, entity: Entity)
 // - We continually evaluate the soonest window for encounters
 // - Once a window is evaluated, if it is periodic it will be incremented by a period, otherwise removed
 // - If an encounter is found, bring the end time forward to the time of the encounter (so we don't continue to uselessly compute encounters after the soonest known encounter)
-pub fn find_next_encounter(model: &Model, entity: Entity, start_time: f64, end_time: f64) -> Option<Encounter> {
+pub fn find_next_encounter(model: &Model, orbit: &Orbit, entity: Entity, end_time: f64) -> Option<Encounter> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Find next encounter");
+    let start_time = orbit.start_point().time();
 
     // Find entrance windows
     let can_enter = &model.entities(vec![ComponentType::OrbitableComponent]);
-    let siblings = compute_siblings(model, can_enter, entity);
-    let mut windows = compute_initial_windows(model, entity, siblings, start_time, end_time);
+    let siblings = compute_siblings(model, can_enter, orbit);
+    let mut windows = compute_initial_windows(model, orbit, siblings, end_time);
 
     // If an exit encounter is found, set that as the soonest known encounter
-    let mut soonest_encounter = solve_for_exit(model, entity, start_time, end_time);
+    let mut soonest_encounter = solve_for_exit(model, orbit, entity, end_time);
     let mut end_time = match &soonest_encounter {
         Some(encounter) => encounter.time(),
         None => end_time,

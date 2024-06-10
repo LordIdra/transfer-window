@@ -26,7 +26,7 @@ pub fn eccentricity(position: DVec2, velocity: DVec2, standard_gravitational_par
 }
 
 pub fn speed_to_obtain_eccentricity(position: DVec2, eccentricity: f64, standard_gravitational_parameter: f64, semi_major_axis: f64) -> f64 {
-    f64::sqrt(standard_gravitational_parameter * semi_major_axis * (1.0 - eccentricity.powi(2)) / position.magnitude_squared())
+    f64::sqrt(standard_gravitational_parameter * semi_major_axis * (1.0 - eccentricity) / position.magnitude_squared())
 }
 
 pub fn velocity_to_obtain_eccentricity(position: DVec2, eccentricity: f64, standard_gravitational_parameter: f64, semi_major_axis: f64, direction: OrbitDirection) -> DVec2 {

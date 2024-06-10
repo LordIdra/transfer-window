@@ -1,13 +1,28 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::DVec2;
-use transfer_window_model::components::path_component::burn::Burn;
+use transfer_window_model::{components::{path_component::burn::Burn, vessel_component::Faction}, storage::entity_allocator::Entity};
+
+use crate::game::View;
 
 const INITIAL_POINT_COUNT: usize = 50;
 const TESSELLATION_THRESHOLD: f64 = 1.0e-3;
 const EXTRA_MIN_DISTANCE: f64 = 1.0e-3;
 
-pub fn compute_color() -> Rgba {
-    Rgba::from_srgba_premultiplied(255, 255, 255, 255)
+pub fn compute_color(view: &View, entity: Entity) -> Rgba {
+    let faction = view.model.vessel_component(entity).faction();
+    let rgb = match faction {
+        Faction::Player => Rgba::from_rgb(0.0, 0.0, 1.0),
+        Faction::Ally => Rgba::from_rgb(0.0, 1.0, 0.0),
+        Faction::Enemy => Rgba::from_rgb(1.0, 0.0, 0.0),
+    };
+
+    let alpha = if view.is_selected(entity) {
+        1.0
+    } else {
+        0.7
+    };
+
+    Rgba::from_rgba_unmultiplied(rgb.r(), rgb.g(), rgb.b(), alpha)
 }
 
 /// Uses triangle heuristic as described in <https://www.kerbalspaceprogram.com/news/dev-diaries-orbit-tessellation>
