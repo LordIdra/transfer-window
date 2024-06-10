@@ -3,7 +3,7 @@ use std::fs;
 use eframe::egui::{Context, ViewportCommand};
 use log::error;
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{start_burn::StartBurnEvent, TimelineEvent}, Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 use transfer_window_view::{game, Scene};
 
 use crate::Controller;
@@ -44,7 +44,7 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
     let orbit = Orbit::circle(earth, VesselClass::Light.mass(), 5.9722e24, vec2(0.2e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
-    let _spacecraft_2 = model.allocate(EntityBuilder::default()
+    let spacecraft_2 = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Spacecraft 2".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Enemy))
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
@@ -54,6 +54,13 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_name_component(NameComponent::new("Spacecraft 3".to_string()))
         .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Ally))
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
+
+    model.set_slot(spacecraft_2, SlotLocation::Back, Slot::new_engine(EngineType::Efficient));
+    model.set_slot(spacecraft_2, SlotLocation::Middle, Slot::new_fuel_tank(FuelTankType::Large));
+
+    let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, spacecraft_2, 600.0));
+    model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);
+    model.vessel_component_mut(spacecraft_2).timeline_mut().last_event().unwrap().as_start_burn().unwrap().adjust(&mut model, vec2(-300.0, 50.0));
 
     controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, context.clone(), controller.resources.clone(), Some(spacecraft_1)));
 }

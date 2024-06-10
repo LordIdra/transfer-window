@@ -95,6 +95,10 @@ impl VesselComponent {
         &mut self.class
     }
 
+    pub fn faction(&self) -> Faction {
+        self.faction
+    }
+
     pub fn slots(&self) -> &Slots {
         &self.slots
     }
