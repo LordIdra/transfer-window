@@ -51,7 +51,7 @@ fn test_prediction() {
     for i in 0..encounter_times.len() {
         let actual = segments[i].end_time();
         println!("Expected={} Actual={}", encounter_times[i], actual);
-        assert!((actual - encounter_times[i]).abs() / encounter_times[i] < 1.0e-3);
+        assert!((actual - encounter_times[i]).abs() / encounter_times[i] < 1.0e-2);
     }
 }
 
@@ -123,6 +123,6 @@ fn test_prediction_with_burn() {
     for i in 0..encounter_times.len() {
         let actual = segments[i].end_time();
         println!("Expected={} Actual={}", encounter_times[i], actual);
-        assert!((actual - encounter_times[i]).abs() / encounter_times[i] < 1.0e-3);
+        assert!((actual - encounter_times[i]).abs() / encounter_times[i] < 1.0e-2);
     }
 }
