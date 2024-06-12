@@ -73,6 +73,42 @@ impl Model {
 
     /// # Panics
     /// Panics if entity does not have a position
+    /// Safe to call for orbitables
+    pub fn perceived_position_at_time(&self, entity: Entity, time: f64) -> DVec2 {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return orbitable_component.position_at_time(time);
+        }
+
+        if self.try_path_component(entity).is_some() {
+            return self.perceived_future_segment_at_time(entity, time).position_at_time(time);
+        }
+
+        panic!("Request to get position of entity without path or orbitable components");
+    }
+
+    /// # Panics
+    /// Panics if entity does not have a position
+    /// Safe to call for orbitables
+    pub fn perceived_absolute_position_at_time(&self, entity: Entity, time: f64) -> DVec2 {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Absolute position at time");
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return match orbitable_component.physics() {
+                OrbitableComponentPhysics::Stationary(position) => *position,
+                OrbitableComponentPhysics::Orbit(orbit) => self.perceived_absolute_position_at_time(orbit.parent(), time) + orbit.point_at_time(time).position(),
+            }
+        }
+
+        if self.try_path_component(entity).is_some() {
+            let segment = self.perceived_future_segment_at_time(entity, time);
+            return self.perceived_absolute_position_at_time(segment.parent(), time) + segment.position_at_time(time);
+        }
+
+        panic!("Request to get absolute position of entity without path or orbitable components");
+    }
+
+    /// # Panics
+    /// Panics if entity does not have a position
     pub fn velocity(&self, entity: Entity) -> DVec2 {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return match orbitable_component.physics() {
@@ -147,6 +183,21 @@ impl Model {
     }
 
     /// # Panics
+    /// Panics if entity does not have a velocity
+    /// Safe to call for orbitables
+    pub fn perceived_velocity_at_time(&self, entity: Entity, time: f64) -> DVec2 {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return orbitable_component.velocity_at_time(time);
+        }
+
+        if self.try_path_component(entity).is_some() {
+            return self.perceived_future_segment_at_time(entity, time).velocity_at_time(time);
+        }
+
+        panic!("Request to get position of entity without path or orbitable components");
+    }
+
+    /// # Panics
     /// Panics if entity does not have a mass
     pub fn mass(&self, entity: Entity) -> f64 {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
@@ -188,11 +239,7 @@ impl Model {
         panic!("Request to get dv of entity without vessel component");
     }
 
-    pub fn distance(&self, entity: Entity, other_entity: Entity) -> f64 {
-        (self.absolute_position(entity) - self.absolute_position(other_entity)).magnitude()
-    }
-
-    pub fn distance_at_time(&self, entity: Entity, other_entity: Entity, time: f64) -> f64 {
-        (self.absolute_position_at_time(entity, time) - self.absolute_position_at_time(other_entity, time)).magnitude()
+    pub fn perceived_distance_at_time(&self, entity: Entity, other_entity: Entity, time: f64) -> f64 {
+        (self.perceived_absolute_position_at_time(entity, time) - self.perceived_absolute_position_at_time(other_entity, time)).magnitude()
     }
 }

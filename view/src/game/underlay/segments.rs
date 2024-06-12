@@ -70,18 +70,11 @@ fn draw_path_segments(view: &View, entity: Entity, camera_centre: DVec2) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segments for one entity");
     let zoom = view.camera.zoom();
-    let path_component = view.model.path_component(entity);
 
     let mut segment_points_data = vec![];
-    if view.model.vessel_component(entity).faction().player_has_intel() {
-        for segment in path_component.future_segments() {
-            draw_segment(view, segment, camera_centre, zoom, entity, &mut segment_points_data);
-        }
-    } else {
-        for segment in &view.model.path_without_intel(entity) {
-            draw_segment(view, segment, camera_centre, zoom, entity, &mut segment_points_data);
-        }
-    };
+    for segment in &view.model.perceived_future_segments(entity) {
+        draw_segment(view, segment, camera_centre, zoom, entity, &mut segment_points_data);
+    }
 
     // Reverse to make sure that the segments are rendered in order
     // of how soon they are, so that closer segments take priority

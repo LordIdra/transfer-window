@@ -5,14 +5,11 @@ use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::
 
 use self::weapons::draw_weapons;
 
-use super::vessel::visual_timeline;
+use super::vessel::visual_timeline::draw_visual_timeline;
 
 mod weapons;
 
-fn draw_vessel(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
-    draw_title(ui, "Orbit");
-    draw_time_until(view, ui, time);
-
+fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
     ui.horizontal(|ui| {
         styles::SelectedMenuButton::apply(ui);
 
@@ -30,19 +27,23 @@ fn draw_vessel(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        if draw_create_burn(view, ui, entity, time) {
-            view.add_model_event(ModelEvent::CreateBurn { entity, time });
-            let selected = Selected::Burn { entity, time, state: BurnState::Selected };
-            view.add_view_event(ViewEvent::SetSelected(selected));
-        }
+        if view.model.vessel_component(entity).faction().player_has_control() {
+            if draw_create_burn(view, ui, entity, time) {
+                view.add_model_event(ModelEvent::CreateBurn { entity, time });
+                let selected = Selected::Burn { entity, time, state: BurnState::Selected };
+                view.add_view_event(ViewEvent::SetSelected(selected));
+            }
 
-        if draw_enable_guidance(view, ui, entity, time) {
-            view.add_model_event(ModelEvent::CreateGuidance { entity, time });
-            let selected = Selected::EnableGuidance { entity, time };
-            view.add_view_event(ViewEvent::SetSelected(selected));
+            if draw_enable_guidance(view, ui, entity, time) {
+                view.add_model_event(ModelEvent::CreateGuidance { entity, time });
+                let selected = Selected::EnableGuidance { entity, time };
+                view.add_view_event(ViewEvent::SetSelected(selected));
+            }
         }
     });
-    
+}
+
+fn draw_info(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_subtitle(ui, "Info");
     Grid::new("Selected point info").show(ui, |ui| {
         draw_altitude(view, ui, entity, time);
@@ -88,10 +89,10 @@ pub fn draw_orbit_labels(view: &View, ui: &mut Ui, orbit: &Orbit) {
 }
 
 fn draw_orbit(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let orbit = view.model.orbit_at_time(entity, time);
+    let orbit = view.model.perceived_future_orbit_at_time(entity, time);
     draw_subtitle(ui, "Orbit");
     Grid::new("Selected point orbit info").show(ui, |ui| {
-        draw_orbit_labels(view, ui, orbit);
+        draw_orbit_labels(view, ui, &orbit);
     });
 }
 
@@ -107,12 +108,16 @@ pub fn update(view: &View) {
             .resizable(false)
             .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
             .show(&view.context.clone(), |ui| {
-        draw_vessel(view, entity, ui, time);
+        draw_title(ui, "Orbit");
+        draw_time_until(view, ui, time);
+        draw_controls(view, entity, ui, time);
+        draw_info(view, ui, entity, time);
         draw_orbit(view, ui, entity, time);
-        visual_timeline::draw(view, ui, entity, time, true);
+        draw_visual_timeline(view, ui, entity, time, true);
     });
 
-    if !view.model.vessel_component(entity).slots().weapon_slots().is_empty() {
+    let vessel_component = &view.model.vessel_component(entity);
+    if vessel_component.faction().player_has_control() && !vessel_component.slots().weapon_slots().is_empty() {
         Window::new("Weapons")
                 .title_bar(false)
                 .resizable(false)

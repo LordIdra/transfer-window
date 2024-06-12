@@ -60,7 +60,7 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
 
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, spacecraft_2, 600.0));
     model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);
-    model.vessel_component_mut(spacecraft_2).timeline_mut().last_event().unwrap().as_start_burn().unwrap().adjust(&mut model, vec2(-300.0, 50.0));
+    model.vessel_component_mut(spacecraft_2).timeline_mut().last_event().unwrap().as_start_burn().unwrap().adjust(&mut model, vec2(300.0, 50.0));
 
     controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, context.clone(), controller.resources.clone(), Some(spacecraft_1)));
 }

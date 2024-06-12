@@ -14,15 +14,22 @@ pub struct Encounter {
     time: f64,
     from: Entity,
     to: Entity,
+    position: DVec2,
 }
 
 impl Encounter {
+    pub fn new(view: &View, type_: EncounterType, entity: Entity, time: f64, from: Entity, to: Entity) -> Self {
+        let orbit = view.model.perceived_future_orbit_at_time(entity, time);
+        let position = view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
+        Self { type_, entity, time, from, to, position }
+    }
+    
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in view.model.entities(vec![ComponentType::PathComponent]) {
-            for encounter in view.model.future_encounters(entity) {
+            for encounter in view.model.perceived_future_encounters(entity) {
                 if should_render_at_time(view, entity, encounter.time()) {
-                    let icon = Self { type_: encounter.encounter_type(), entity, time: encounter.time(), from: encounter.from(), to: encounter.to() };
+                    let icon = Self::new(view, encounter.encounter_type(), entity, encounter.time(), encounter.from(), encounter.to());
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
             }
@@ -66,11 +73,10 @@ impl Icon for Encounter {
         ]
     }
 
-    fn position(&self, view: &View) -> DVec2 {
+    fn position(&self, _view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Encounter position");
-        let orbit = view.model.orbit_at_time(self.entity, self.time);
-        view.model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
+        self.position
     }
 
     fn facing(&self, _view: &View) -> Option<DVec2> {
@@ -79,7 +85,8 @@ impl Icon for Encounter {
 
     fn is_selected(&self, view: &View) -> bool {
         if let Selected::Encounter { type_, entity, time, from: _, to: _ } = &view.selected {
-            *type_ == self.type_ && *entity == self.entity && *time == self.time
+            // Time may be slightly off due to non-determinism of encounter prediction
+            *type_ == self.type_ && *entity == self.entity && (*time - self.time).abs() < 1.0
         } else {
             false
         }

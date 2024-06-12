@@ -43,50 +43,61 @@ fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f64) -
     None
 }
 
+fn process_orbit(model: &Model, orbit: &Orbit, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
+    let parent_position = model.absolute_position(orbit.parent());
+    let point = point - parent_position;
+    let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {
+        return;
+    };
+
+    let distance = (closest_position - point).magnitude();
+    let theta = f64::atan2(closest_position.y, closest_position.x);
+    let time = orbit.first_periapsis_time() + orbit.time_since_first_periapsis(theta);
+    if distance > *closest_distance {
+        return;
+    }
+
+    if time > orbit.current_point().time() && time < orbit.end_point().time() {
+        *closest_point = Some((entity, time));
+        *closest_distance = distance;
+        return;
+    }
+
+    if let Some(period) = orbit.period() {
+        // If the orbit has a period, we might have calculated an invalid time that's one period behind a valid time
+        let time = time + period;
+        if time > orbit.current_point().time() && time < orbit.end_point().time() {
+            *closest_point = Some((entity, time));
+            *closest_distance = distance;
+            return;
+        }
+
+        // ffs
+        let time = time + period;
+        if time > orbit.current_point().time() && time < orbit.end_point().time() {
+            *closest_point = Some((entity, time));
+            *closest_distance = distance;
+            return;
+        }
+    }
+}
+
 impl Model {
-    /// Returns the entity and time of the closest point on ANY segment anywhere provided the closest
-    /// distance from the point to a segment is less than `max_distance`
+    /// Returns the entity and time of the closest point on ANY vessel segment provided the closest
+    /// distance from the point to a segment is less than `max_distance.`
     /// Short circuits; if there are multiple points, the first one found is returned
-    pub fn closest_point_on_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
+    /// Also uses the perceived trajectories, not real ones (ie faction dependan)
+    pub fn closest_point_on_perceived_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
-        for entity in self.entities(vec![ComponentType::PathComponent]) {
-            for orbit in self.path_component(entity).future_orbits() {
-                let parent_position = self.absolute_position(orbit.parent());
-                let point = point - parent_position;
-                let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {
-                    continue;
-                };
-
-                let distance = (closest_position - point).magnitude();
-                let theta = f64::atan2(closest_position.y, closest_position.x);
-                let time = orbit.first_periapsis_time() + orbit.time_since_first_periapsis(theta);
-                if distance > closest_distance {
-                    continue
+        for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
+            if self.vessel_component(entity).faction().player_has_intel() {
+                for orbit in self.path_component(entity).future_orbits() {
+                    process_orbit(self, orbit, entity, point, max_distance, &mut closest_distance, &mut closest_point);
                 }
-
-                if time > orbit.current_point().time() && time < orbit.end_point().time() {
-                    closest_point = Some((entity, time));
-                    closest_distance = distance;
-                    continue;
-                }
-
-                if let Some(period) = orbit.period() {
-                    // If the orbit has a period, we might have calculated an invalid time that's one period behind a valid time
-                    let time = time + period;
-                    if time > orbit.current_point().time() && time < orbit.end_point().time() {
-                        closest_point = Some((entity, time));
-                        closest_distance = distance;
-                        continue;
-                    }
-
-                    // ffs
-                    let time = time + period;
-                    if time > orbit.current_point().time() && time < orbit.end_point().time() {
-                        closest_point = Some((entity, time));
-                        closest_distance = distance;
-                        continue;
-                    }
+            } else {
+                for segment in self.compute_perceived_path(entity) {
+                    process_orbit(self, segment.as_orbit().unwrap(), entity, point, max_distance, &mut closest_distance, &mut closest_point);
                 }
             }
         }

@@ -135,10 +135,10 @@
 [x] Current burn/guidance finishes (exclude intercepts)
 [x] Show orbital parameters
 [x] Factions (player, ally, enemy)
+[x] Can't see future enemy movements
+[x] Can't edit enemy vessels/timeline
 
 # Campaign
-[ ] Can't see future enemy movements
-[ ] Can't edit enemy vessels/timeline
 [ ] Menu screen
 [ ] Stations
 [ ] Can only change equipment at stations
@@ -173,6 +173,8 @@
 [ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
 [ ] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
+[ ] Persistent selected state (doesn't deselect on time changed)
+[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
 
 # Before release
 [ ] Versioning!

@@ -111,9 +111,6 @@ impl VisualTimelineEvent {
         }
     }
 
-    /// We try to avoid using times to compare events here because times are sometimes subject to small errors
-    /// depending on the numerical methods used to calculate them
-    /// As a result this block of code is horrible :sob:
     pub fn is_selected(&self, view: &View, other_entity: Entity) -> bool {
         if view.selected.entity(&view.model).is_some_and(|entity| entity != other_entity) {
             return false;
@@ -124,9 +121,10 @@ impl VisualTimelineEvent {
             Selected::Orbitable(_) => false,
             Selected::Vessel(_) => false,
             Selected::Point { .. } => matches!(self, VisualTimelineEvent::Point { .. }),
-            Selected::Apsis { type_, .. } => {
+            Selected::Apsis { type_, time, .. } => {
                 match self {
-                    VisualTimelineEvent::Apsis { type_: other_type, .. } => type_ == *other_type,
+                    // calculations can produce slightly different times when an apsis is calculated
+                    VisualTimelineEvent::Apsis { type_: other_type, time: other_time, .. } => type_ == *other_type && (time - *other_time).abs() < 1.0,
                     _ => false,
                 }
             }
@@ -136,9 +134,10 @@ impl VisualTimelineEvent {
                     _ => false,
                 }
             }
-            Selected::Encounter { type_, from, to, .. } => {
+            Selected::Encounter { type_, from, to, time, .. } => {
                 match self {
-                    VisualTimelineEvent::Encounter { type_: other_type, from: other_from, to: other_to, .. } => type_ == *other_type && from == *other_from && to == *other_to,
+                    // calculations can produce slightly different times when encounters calculated
+                    VisualTimelineEvent::Encounter { type_: other_type, from: other_from, to: other_to, time: other_time, } => type_ == *other_type && from == *other_from && to == *other_to && (time - *other_time).abs() < 1.0,
                     _ => false,
                 }
             }
@@ -169,14 +168,14 @@ fn generate_timeline_events(view: &View, entity: Entity, events: &mut Vec<Visual
 }
 
 fn generate_apoapsis_periapsis(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for orbit in view.model.path_component(entity).future_orbits() {
+    for orbit in view.model.perceived_future_orbits(entity) {
         if let Some(time) = orbit.next_periapsis_time() {
-            let distance = view.model.position_at_time(entity, time).magnitude();
+            let distance = orbit.point_at_time(time).position().magnitude();
             events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Periapsis, time, distance });
         }
 
         if let Some(time) = orbit.next_apoapsis_time() {
-            let distance = view.model.position_at_time(entity, time).magnitude();
+            let distance = orbit.point_at_time(time).position().magnitude();
             events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Apoapsis, time, distance });
         }
     }
@@ -190,18 +189,18 @@ fn generate_closest_approaches(view: &View, entity: Entity, events: &mut Vec<Vis
     let (approach_1_time, approach_2_time) = view.model.find_next_two_closest_approaches(entity, target);
 
     if let Some(time) = approach_1_time {
-        let distance = view.model.distance_at_time(entity, target, time);
+        let distance = view.model.perceived_distance_at_time(entity, target, time);
         events.push(VisualTimelineEvent::Approach { type_: ApproachType::First, target, time, distance });
     }
 
     if let Some(time) = approach_2_time {
-        let distance = view.model.distance_at_time(entity, target, time);
+        let distance = view.model.perceived_distance_at_time(entity, target, time);
         events.push(VisualTimelineEvent::Approach { type_: ApproachType::Second, target, time, distance });
     }
 }
 
 fn generate_encounters(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for encounter in view.model.future_encounters(entity) {
+    for encounter in view.model.perceived_future_encounters(entity) {
         events.push(VisualTimelineEvent::Encounter { type_: encounter.encounter_type(), time: encounter.time(), from: encounter.from(), to: encounter.to() });
     }
 }
@@ -225,14 +224,20 @@ fn advance_cursor_to(ui: &mut Ui, x: f32) {
     ui.advance_cursor_after_rect(rect);
 }
 
-pub fn draw(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_center_time_point: bool) {
+pub fn draw_visual_timeline(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_center_time_point: bool) {
     let mut events = vec![];
 
-    generate_timeline_events(view, entity, &mut events);
+    let has_intel = view.model.vessel_component(entity).faction().player_has_intel();
+
+    if has_intel {
+        generate_timeline_events(view, entity, &mut events);
+    }
     generate_apoapsis_periapsis(view, entity, &mut events);
     generate_closest_approaches(view, entity, &mut events);
     generate_encounters(view, entity, &mut events);
-    generate_burn_guidance_end(view, entity, &mut events);
+    if has_intel {
+        generate_burn_guidance_end(view, entity, &mut events);
+    }
 
     if draw_center_time_point {
         events.push(VisualTimelineEvent::Point { time: center_time });

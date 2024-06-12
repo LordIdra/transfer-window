@@ -1,6 +1,7 @@
 use log::trace;
+use transfer_window_model::components::path_component::segment::Segment;
 
-use super::{selected::Selected, util::{should_render, should_render_at_time}, View};
+use super::{selected::Selected, util::{should_render, should_render_at_time, ApsisType}, View};
 
 
 pub fn update(view: &mut View) {
@@ -26,6 +27,38 @@ pub fn update(view: &mut View) {
     if let Selected::Approach { type_: _, entity, target, time: _ } = view.selected.clone() {
         if !view.model.vessel_component(entity).has_target() || view.model.vessel_component(entity).target().unwrap() != target {
             trace!("Selected approach no longer has target");
+            view.selected = Selected::None;
+        }
+    }
+
+    // Remove or update selected apsis if apsis no longer exists or is in a different place
+    if let Selected::Apsis { type_, entity, time } = view.selected.clone() {
+        if let Segment::Orbit(orbit) = view.model.perceived_future_segment_at_time(entity, time) {
+            let expected_time = match type_ {
+                ApsisType::Periapsis => orbit.next_periapsis_time(),
+                ApsisType::Apoapsis => orbit.next_apoapsis_time(),
+            };
+            if let Some(expected_time) = expected_time {
+                view.selected = Selected::Apsis { type_, entity, time: expected_time }
+            } else {
+                trace!("Selected apsis orbit no longer has an orbit");
+                view.selected = Selected::None;
+            }
+        } else {
+            trace!("Selected apsis is no longer on an orbit");
+            view.selected = Selected::None;
+        }
+    }
+
+    // Remove or update selected encounter if encounter no longer exists or is in a different place
+    if let Selected::Encounter { type_, entity, time, from, to } = view.selected {
+        let mut any_encounter_matches = false;
+        for encounter in view.model.perceived_future_encounters(entity) {
+            if encounter.encounter_type() == type_ && encounter.from() == from && encounter.to() == to && (time - encounter.time()).abs() < 10.0 {
+                any_encounter_matches = true;
+            }
+        }
+        if !any_encounter_matches {
             view.selected = Selected::None;
         }
     }

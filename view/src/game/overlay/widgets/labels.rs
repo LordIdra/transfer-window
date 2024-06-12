@@ -27,25 +27,25 @@ pub fn draw_subtitle(ui: &mut Ui, name: &str) {
 
 pub fn draw_altitude(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_key(ui, "Altitude");
-    draw_value(ui, &format_distance(view.model.position_at_time(entity, time).magnitude()));
+    draw_value(ui, &format_distance(view.model.perceived_position_at_time(entity, time).magnitude()));
     ui.end_row();
 }
 
 pub fn draw_speed(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_key(ui, "Speed");
-    draw_value(ui, &format_speed(view.model.velocity_at_time(entity, time).magnitude()));
+    draw_value(ui, &format_speed(view.model.perceived_velocity_at_time(entity, time).magnitude()));
     ui.end_row();
 }
 
 pub fn draw_distance(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let distance = view.model.distance_at_time(entity, view.model.vessel_component(entity).target().unwrap(), time);
+    let distance = view.model.perceived_distance_at_time(entity, view.model.vessel_component(entity).target().unwrap(), time);
     draw_key(ui, "Distance");
     draw_value(ui, &format_distance(distance));
     ui.end_row();
 }
 
 pub fn draw_orbits(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let orbit = view.model.orbit_at_time(entity, time);
+    let orbit = view.model.perceived_future_orbit_at_time(entity, time);
     let Some(period) = orbit.period() else {
         return;
     };

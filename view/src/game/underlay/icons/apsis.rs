@@ -45,21 +45,28 @@ fn compute_time_of_next_apoapsis(orbit: &Orbit) -> Option<f64> {
 pub struct Apsis {
     type_: ApsisType,
     entity: Entity,
-    time: f64
+    time: f64,
+    position: DVec2,
 }
 
 impl Apsis {
+    pub fn new(view: &View, type_: ApsisType, entity: Entity, time: f64) -> Self {
+        let orbit = view.model.perceived_future_orbit_at_time(entity, time);
+        let position = view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
+        Self { type_, entity, time, position }
+    }
+    
     pub fn generate_for_orbit(view: &View, entity: Entity, orbit: &Orbit, icons: &mut Vec<Box<dyn Icon>>) {
         if let Some(time) = compute_time_of_next_periapsis(orbit) {
             if should_render_at_time(view, entity, time) {
-                let icon = Self { type_: ApsisType::Periapsis, entity, time };
+                let icon = Apsis::new(view, ApsisType::Periapsis, entity, time);
                 icons.push(Box::new(icon) as Box<dyn Icon>);
             }
         }
 
         if let Some(time) = compute_time_of_next_apoapsis(orbit) {
             if should_render_at_time(view, entity, time) {
-                let icon = Self { type_: ApsisType::Apoapsis, entity, time };
+                let icon = Apsis::new(view, ApsisType::Apoapsis, entity, time);
                 icons.push(Box::new(icon) as Box<dyn Icon>);
             }
         }
@@ -67,8 +74,8 @@ impl Apsis {
 
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.model.entities(vec![ComponentType::PathComponent]) {
-            for orbit in view.model.path_component(entity).future_orbits() {
+        for entity in view.model.entities(vec![ComponentType::VesselComponent]) {
+            for orbit in &view.model.perceived_future_orbits(entity) {
                 Self::generate_for_orbit(view, entity, orbit, &mut icons);
             }
         }
@@ -117,11 +124,10 @@ impl Icon for Apsis {
         ]
     }
 
-    fn position(&self, view: &View) -> DVec2 {
+    fn position(&self, _view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Apoapsis position");
-        let orbit = view.model.orbit_at_time(self.entity, self.time);
-        view.model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
+        self.position
     }
 
     fn facing(&self, _view: &View) -> Option<DVec2> {
@@ -130,7 +136,8 @@ impl Icon for Apsis {
 
     fn is_selected(&self, view: &View) -> bool {
         if let Selected::Apsis { type_, entity, time } = &view.selected {
-            *type_ == self.type_ && *entity == self.entity && *time == self.time
+            // calculations can produce slightly different times when an apsis is calculated
+            *type_ == self.type_ && *entity == self.entity && (*time - self.time).abs() < 1.0
         } else {
             false
         }

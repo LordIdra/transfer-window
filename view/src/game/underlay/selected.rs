@@ -29,7 +29,7 @@ pub fn update(view: &View) {
         let select_distance = SELECT_DISTANCE / view.camera.zoom();
         if let Some(latest_window) = pointer.latest_pos() { 
             let latest_world = view.window_space_to_world_space(latest_window);
-            if let Some((entity, time)) = view.model.closest_point_on_trajectory(latest_world, select_distance) {
+            if let Some((entity, time)) = view.model.closest_point_on_perceived_trajectory(latest_world, select_distance) {
                 trace!("Selected segment point at time={}", time);
                 let selected = Selected::Point { entity, time };
                 view.add_view_event(ViewEvent::SetSelected(selected));

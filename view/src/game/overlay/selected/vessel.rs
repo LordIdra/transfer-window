@@ -1,5 +1,6 @@
 use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::VesselComponent, storage::entity_allocator::Entity};
+use visual_timeline::draw_visual_timeline;
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel}, labels::{draw_key, draw_subtitle, draw_title, draw_value}}}, selected::Selected, util::{format_distance, format_speed}, View}, styles};
 
@@ -60,6 +61,60 @@ fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
     ui.end_row();
 }
 
+fn draw_resources(ui: &mut Ui, vessel_component: &VesselComponent, name: String) {
+    if should_draw_fuel(vessel_component) || should_draw_dv(vessel_component) || should_draw_torpedoes(vessel_component) {
+        draw_subtitle(ui, "Resources");
+        Grid::new("Vessel resource grid ".to_string() + name.as_str()).show(ui, |ui| {
+            if should_draw_fuel(vessel_component) {
+                draw_fuel(ui, vessel_component);
+            }
+            if should_draw_dv(vessel_component) {
+                draw_dv(ui, vessel_component);
+            }
+            if should_draw_torpedoes(vessel_component) {
+                draw_torpedoes(ui, vessel_component);
+            }
+        });
+    }
+}
+
+fn draw_controls(vessel_component: &VesselComponent, view: &View, entity: Entity, ui: &mut Ui) {
+    let add_edit_button = vessel_component.can_edit_ever();
+    let add_cancel_burn_button = view.model.path_component(entity).current_segment().is_burn();
+    let add_cancel_guidance_button = view.model.path_component(entity).current_segment().is_guidance();
+    if add_edit_button || add_cancel_burn_button || add_cancel_guidance_button {
+        ui.horizontal(|ui| {
+            styles::SelectedMenuButton::apply(ui);
+
+            if add_edit_button && draw_edit_vessel(view, ui, entity) {
+                let vessel_editor = Some(VesselEditor::new(entity));
+                view.add_view_event(ViewEvent::SetVesselEditor(vessel_editor));
+            }
+
+            if add_cancel_burn_button && draw_cancel_burn(view, ui) {
+                view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
+            }
+
+            if add_cancel_guidance_button && draw_cancel_guidance(view, ui) {
+                if view.model.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
+                    // also cancel intercept
+                    view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
+                }
+                view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
+            }
+        });
+    }
+}
+
+fn draw_info(view: &View, ui: &mut Ui, name: &str, entity: Entity) {
+    draw_subtitle(ui, "Info");
+    Grid::new("Vessel info grid ".to_string() + name).show(ui, |ui| {
+        draw_altitude(view, ui, entity);
+        draw_speed(view, ui, entity);
+    });
+}
+
+
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update vessel");
@@ -68,64 +123,27 @@ pub fn update(view: &View) {
     };
 
     let name = view.model.name_component(entity).name().to_uppercase();
+    let vessel_component = view.model.vessel_component(entity);
+    let has_intel = vessel_component.faction().player_has_intel();
+    let has_control = vessel_component.faction().player_has_control();
 
     Window::new("Selected vessel ".to_string() + name.as_str())
-        .title_bar(false)
-        .resizable(false)
-        .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
-        .show(&view.context.clone(), |ui| {
+            .title_bar(false)
+            .resizable(false)
+            .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
+            .show(&view.context.clone(), |ui| {
+        draw_title(ui, &name);
 
-            draw_title(ui, &name);
+        if has_control {
+            draw_controls(vessel_component, view, entity, ui);
+        }
 
-            let vessel_component = view.model.vessel_component(entity);
-            let add_edit_button = vessel_component.can_edit_ever();
-            let add_cancel_burn_button = view.model.path_component(entity).current_segment().is_burn();
-            let add_cancel_guidance_button = view.model.path_component(entity).current_segment().is_guidance();
-            if add_edit_button || add_cancel_burn_button || add_cancel_guidance_button {
-                ui.horizontal(|ui| {
-                    styles::SelectedMenuButton::apply(ui);
+        draw_info(view, ui, &name, entity);
 
-                    if add_edit_button && draw_edit_vessel(view, ui, entity) {
-                        let vessel_editor = Some(VesselEditor::new(entity));
-                        view.add_view_event(ViewEvent::SetVesselEditor(vessel_editor));
-                    }
+        if has_intel {
+            draw_resources(ui, vessel_component, name);
+        }
 
-                    if add_cancel_burn_button && draw_cancel_burn(view, ui) {
-                        view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
-                    }
-
-                    if add_cancel_guidance_button && draw_cancel_guidance(view, ui) {
-                        if view.model.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
-                            // also cancel intercept
-                            view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
-                        }
-                        view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
-                    }
-                });
-            }
-
-            draw_subtitle(ui, "Info");
-            Grid::new("Vessel info grid ".to_string() + name.as_str()).show(ui, |ui| {
-                draw_altitude(view, ui, entity);
-                draw_speed(view, ui, entity);
-            });
-
-            let vessel_component = view.model.vessel_component(entity);
-            if should_draw_fuel(vessel_component) || should_draw_dv(vessel_component) || should_draw_torpedoes(vessel_component) {
-                draw_subtitle(ui, "Resources");
-                Grid::new("Vessel resource grid ".to_string() + name.as_str()).show(ui, |ui| {
-                    if should_draw_fuel(vessel_component) {
-                        draw_fuel(ui, vessel_component);
-                    }
-                    if should_draw_dv(vessel_component) {
-                        draw_dv(ui, vessel_component);
-                    }
-                    if should_draw_torpedoes(vessel_component) {
-                        draw_torpedoes(ui, vessel_component);
-                    }
-                });
-            }
-
-            visual_timeline::draw(view, ui, entity, view.model.time(), false);
-        });
+        draw_visual_timeline(view, ui, entity, view.model.time(), false);
+    });
 }

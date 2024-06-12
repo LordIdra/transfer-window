@@ -17,6 +17,9 @@ impl Intercept {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in view.entities_should_render(vec![ComponentType::VesselComponent]) {
+            if !view.model.vessel_component(entity).faction().player_has_intel() {
+                continue;
+            }
             if let Some(TimelineEvent::Intercept(intercept)) = view.model.vessel_component(entity).timeline().last_event() {
                 if should_render_at_time(view, entity, intercept.time()) {
                     let icon = Self { entity, time: intercept.time() };

@@ -17,6 +17,9 @@ impl Guidance {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in view.entities_should_render(vec![ComponentType::VesselComponent]) {
+            if !view.model.vessel_component(entity).faction().player_has_intel() {
+                continue;
+            }
             for event in view.model.vessel_component(entity).timeline().events() {
                 if event.is_enable_guidance() && should_render_at_time(view, entity, event.time()) {
                     let icon = Self { entity, time: event.time() };

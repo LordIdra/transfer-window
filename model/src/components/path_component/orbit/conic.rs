@@ -27,7 +27,6 @@ impl Conic {
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         let mut eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);
-        dbg!(eccentricity);
         if eccentricity <= 1.0 {
             // Ellipse cannot model orbits with eccentricity extremely close to 1 - this small adjustment should not make a difference
             if (eccentricity - 1.0).abs() < 1.0e-4 {

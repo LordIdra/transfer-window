@@ -163,7 +163,7 @@ pub fn should_render(view: &View, entity: Entity) -> bool {
 }
 
 pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
-    let Some(parent) = view.model.parent_at_time(entity, time) else {
+    let Some(parent) = view.model.perceived_parent_at_time(entity, time) else {
         return true;
     };
     should_render_parent(view, parent)

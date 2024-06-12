@@ -12,11 +12,17 @@ pub struct ClosestApproach {
     type_: ApproachType,
     vessel: Entity, // the vessel that is targeting another vessel
     target: Entity,
-    entity: Entity, // which entity to draw this approach icon for
     time: f64,
+    position: DVec2,
 }
 
 impl ClosestApproach {
+    pub fn new(view: &View, type_: ApproachType, vessel: Entity, target: Entity, entity: Entity, time: f64) -> Self {
+        let orbit = view.model.perceived_future_orbit_at_time(entity, time);
+        let position = view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
+        Self { type_, vessel, target, time, position }
+    }
+    
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         if let Some(entity) = view.selected.entity(&view.model) {
@@ -26,18 +32,18 @@ impl ClosestApproach {
                     
                     if let Some(time) = approach_1 {
                         if should_render_at_time(view, entity, time) {
-                            let icon = Self { type_: ApproachType::First, vessel: entity, target, entity, time };
+                            let icon = Self::new(view, ApproachType::First, entity, target, entity, time);
                             icons.push(Box::new(icon) as Box<dyn Icon>);
-                            let icon = Self { type_: ApproachType::First, vessel: entity, target, entity: target, time };
+                            let icon = Self::new(view, ApproachType::First, entity, target, target, time);
                             icons.push(Box::new(icon) as Box<dyn Icon>);
                         }
                     }
 
                     if let Some(time) = approach_2 {
                         if should_render_at_time(view, entity, time) {
-                            let icon = Self { type_: ApproachType::Second, vessel: entity, target, entity, time };
+                            let icon = Self::new(view, ApproachType::Second, entity, target, entity, time);
                             icons.push(Box::new(icon) as Box<dyn Icon>);
-                            let icon = Self { type_: ApproachType::Second, vessel: entity, target, entity: target, time };
+                                let icon = Self::new(view, ApproachType::Second, entity, target, target, time);
                             icons.push(Box::new(icon) as Box<dyn Icon>);
                         }
                     }
@@ -82,11 +88,10 @@ impl Icon for ClosestApproach {
         ]
     }
 
-    fn position(&self, view: &View) -> DVec2 {
+    fn position(&self, _view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Closest approach position");
-        let orbit = view.model.orbit_at_time(self.entity, self.time);
-        view.model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
+        self.position
     }
 
     fn facing(&self, _view: &View) -> Option<DVec2> {

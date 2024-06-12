@@ -2,7 +2,37 @@ use eframe::{egui::{Align2, Grid, Window}, epaint};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_orbits, draw_speed, draw_subtitle, draw_time_until, draw_title}}, selected::Selected, util::ApsisType, View}, styles};
 
-use super::vessel::visual_timeline;
+use super::vessel::visual_timeline::draw_visual_timeline;
+
+fn draw_controls(ui: &mut eframe::egui::Ui, view: &View, time: f64, entity: transfer_window_model::storage::entity_allocator::Entity, type_: ApsisType) {
+    ui.horizontal(|ui| {
+        styles::SelectedMenuButton::apply(ui);
+
+        if let Some(time) = draw_previous(view, ui, time, entity) {
+            let selected = Selected::Apsis { type_, entity, time };
+            view.add_view_event(ViewEvent::SetSelected(selected));
+        }
+
+        if let Some(time) = draw_next(view, ui, time, entity) {
+            let selected = Selected::Apsis { type_, entity, time };
+            view.add_view_event(ViewEvent::SetSelected(selected));
+        }
+
+        if draw_warp_to(view, ui, time) {
+            view.add_model_event(ModelEvent::StartWarp { end_time: time });
+        }
+    });
+}
+
+fn draw_info(ui: &mut eframe::egui::Ui, view: &View, entity: transfer_window_model::storage::entity_allocator::Entity, time: f64) {
+    draw_subtitle(ui, "Info");
+    Grid::new("Selected apsis info").show(ui, |ui| {
+        draw_altitude(view, ui, entity, time);
+        draw_speed(view, ui, entity, time);
+        draw_orbits(view, ui, entity, time);
+    });
+}
+
 
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
@@ -22,32 +52,10 @@ pub fn update(view: &View) {
         };
         draw_title(ui, name);
         draw_time_until(view, ui, time);
-
-        ui.horizontal(|ui| {
-            styles::SelectedMenuButton::apply(ui);
-
-            if let Some(time) = draw_previous(view, ui, time, entity) {
-                let selected = Selected::Apsis { type_, entity, time };
-                view.add_view_event(ViewEvent::SetSelected(selected));
-            }
-
-            if let Some(time) = draw_next(view, ui, time, entity) {
-                let selected = Selected::Apsis { type_, entity, time };
-                view.add_view_event(ViewEvent::SetSelected(selected));
-            }
-
-            if draw_warp_to(view, ui, time) {
-                view.add_model_event(ModelEvent::StartWarp { end_time: time });
-            }
-        });
-
-        draw_subtitle(ui, "Info");
-        Grid::new("Selected apsis info").show(ui, |ui| {
-            draw_altitude(view, ui, entity, time);
-            draw_speed(view, ui, entity, time);
-            draw_orbits(view, ui, entity, time);
-        });
-
-        visual_timeline::draw(view, ui, entity, time, false);
+        draw_controls(ui, view, time, entity, type_);
+        draw_info(ui, view, entity, time);
+        if view.model.try_vessel_component(entity).is_some() {
+            draw_visual_timeline(view, ui, entity, time, false);
+        }
     });
 }

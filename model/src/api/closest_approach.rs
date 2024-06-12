@@ -1,4 +1,3 @@
-use log::error;
 use transfer_window_common::numerical_methods::itp::itp;
 
 use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
@@ -21,38 +20,35 @@ fn compute_time_step(orbit_a: &Orbit, orbit_b: &Orbit, start_time: f64, end_time
 }
 
 impl Model {
-    fn orbits(&self, entity: Entity) -> Vec<&Orbit> {
+    fn perceived_orbits(&self, entity: Entity) -> Vec<Orbit> {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return match orbitable_component.orbit() {
-                Some(orbit) => vec![orbit],
+                Some(orbit) => vec![orbit.clone()], // TODO remove cloning
                 None => vec![],
             }
         }
 
-        if let Some(path_component) = self.try_path_component(entity) {
-            return path_component.future_orbits()
-        }
-
-        error!("Attempt to get orbits of an entity than cannot have orbits");
-        vec![]
+        self.perceived_future_segments(entity).iter()
+            .filter_map(|segment| segment.as_orbit().cloned())
+            .collect()
     }
 
     /// Returns an ordered vector of pairs of orbits that have the same parent
-    fn find_same_parent_orbit_pairs(&self, entity_a: Entity, entity_b: Entity) -> Vec<(&Orbit, &Orbit)> {
+    fn find_same_parent_orbit_pairs(&self, entity_a: Entity, entity_b: Entity) -> Vec<(Orbit, Orbit)> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Find same parent orbits");
         let mut same_parent_orbit_pairs = vec![];
-        let orbits_a: Vec<&Orbit> = self.orbits(entity_a);
-        let orbits_b: Vec<&Orbit> = self.orbits(entity_b);
+        let orbits_a: Vec<Orbit> = self.perceived_orbits(entity_a);
+        let orbits_b: Vec<Orbit> = self.perceived_orbits(entity_b);
         let mut index_a = 0;
         let mut index_b = 0;
         
         while index_a < orbits_a.len() && index_b < orbits_b.len() {
-            let orbit_a = orbits_a[index_a];
-            let orbit_b = orbits_b[index_b];
+            let orbit_a = &orbits_a[index_a];
+            let orbit_b = &orbits_b[index_b];
             
             if orbit_a.parent() == orbit_b.parent() {
-                same_parent_orbit_pairs.push((orbit_a, orbit_b));
+                same_parent_orbit_pairs.push((orbit_a.clone(), orbit_b.clone())); // todo remove clone
             }
 
             if orbit_a.end_point().time() < orbit_b.end_point().time() {
@@ -65,7 +61,7 @@ impl Model {
         same_parent_orbit_pairs
     }
 
-    /// Returns the time at which the next closest approach will occur.
+    /// Returns the time at which the next *perceived* closest approach will occur.
     /// This ignore burns. Why? Picture two spacecraft getting closer
     /// to each other. One of them starts burning to accelerate and
     /// ends up moving away from the other spacecraft. This is logical
@@ -82,7 +78,7 @@ impl Model {
             let orbit_b = pair.1;
             let start_time = f64::max(f64::max(orbit_b.start_point().time(), orbit_a.start_point().time()), start_time);
             let end_time = f64::min(orbit_a.end_point().time(), orbit_b.end_point().time());
-            let time_step = compute_time_step(orbit_a, orbit_b, start_time, end_time);
+            let time_step = compute_time_step(&orbit_a, &orbit_b, start_time, end_time);
             let distance = |time: f64| (orbit_a.point_at_time(time).position() - orbit_b.point_at_time(time).position()).magnitude();
             let distance_prime = |time: f64| (distance(time + DISTANCE_DERIVATIVE_DELTA) - distance(time)) / DISTANCE_DERIVATIVE_DELTA;
 
