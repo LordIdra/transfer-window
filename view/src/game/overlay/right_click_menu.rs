@@ -1,6 +1,6 @@
 use eframe::egui::{Align2, Ui, Window};
 use nalgebra_glm::vec2;
-use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, View}, styles};
 
@@ -58,8 +58,10 @@ fn draw(view: &View, right_clicked: Entity) {
                 ui.set_height(30.0);
                 draw_focus(view, ui, right_clicked);
                 if let Some(selected) = view.selected.entity(&view.model) {
-                    if view.model.try_vessel_component(selected).is_some() {
-                        draw_set_target(view, ui, right_clicked, selected);
+                    if let Some(vessel_component) = view.model.try_vessel_component(selected) {
+                        if Faction::Player.can_control(vessel_component.faction()) {
+                            draw_set_target(view, ui, right_clicked, selected);
+                        }
                     }
                 }
             });

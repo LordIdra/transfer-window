@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::orbit::Orbit, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::{should_render_at_time, ApsisType}, View};
 
@@ -50,8 +50,7 @@ pub struct Apsis {
 }
 
 impl Apsis {
-    pub fn new(view: &View, type_: ApsisType, entity: Entity, time: f64) -> Self {
-        let orbit = view.model.perceived_future_orbit_at_time(entity, time);
+    pub fn new(view: &View, type_: ApsisType, entity: Entity, orbit: &Orbit, time: f64) -> Self {
         let position = view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
         Self { type_, entity, time, position }
     }
@@ -59,14 +58,14 @@ impl Apsis {
     pub fn generate_for_orbit(view: &View, entity: Entity, orbit: &Orbit, icons: &mut Vec<Box<dyn Icon>>) {
         if let Some(time) = compute_time_of_next_periapsis(orbit) {
             if should_render_at_time(view, entity, time) {
-                let icon = Apsis::new(view, ApsisType::Periapsis, entity, time);
+                let icon = Apsis::new(view, ApsisType::Periapsis, entity, orbit, time);
                 icons.push(Box::new(icon) as Box<dyn Icon>);
             }
         }
 
         if let Some(time) = compute_time_of_next_apoapsis(orbit) {
             if should_render_at_time(view, entity, time) {
-                let icon = Apsis::new(view, ApsisType::Apoapsis, entity, time);
+                let icon = Apsis::new(view, ApsisType::Apoapsis, entity, orbit, time);
                 icons.push(Box::new(icon) as Box<dyn Icon>);
             }
         }
@@ -75,7 +74,7 @@ impl Apsis {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in view.model.entities(vec![ComponentType::VesselComponent]) {
-            for orbit in &view.model.perceived_future_orbits(entity) {
+            for orbit in &view.model.future_orbits(entity, Some(Faction::Player)) {
                 Self::generate_for_orbit(view, entity, orbit, &mut icons);
             }
         }

@@ -142,21 +142,21 @@
 [ ] Menu screen
 [ ] Stations
 [ ] Can only change equipment at stations
-[ ] Satellite class
-[ ] Trainer class
-[ ] Scout class
+- Satellite class
+- Trainer class
+- Scout class
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
 ## Optional Levels
-- Scientific notation
-- Orbital parameters
-- ISP
-- Kepler's equation
-- N-Body simulations (vs patched conics)
-- Rocket fuels overview
-- Proportional guidance
-- Euler integration
+[ ] Scientific notation
+[ ] Orbital parameters
+[ ] ISP
+[ ] Kepler's equation
+[ ] N-Body simulations (vs patched conics)
+[ ] Rocket fuels overview
+[ ] Proportional guidance
+[ ] Integration techniques (euler RK4 etc)
 
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?

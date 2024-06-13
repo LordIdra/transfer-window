@@ -1,6 +1,6 @@
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, Model};
+use crate::{components::{path_component::orbit::Orbit, vessel_component::Faction}, storage::entity_allocator::Entity, Model};
 
 const DISTANCE_DERIVATIVE_DELTA: f64 = 0.1;
 
@@ -20,26 +20,25 @@ fn compute_time_step(orbit_a: &Orbit, orbit_b: &Orbit, start_time: f64, end_time
 }
 
 impl Model {
-    fn perceived_orbits(&self, entity: Entity) -> Vec<Orbit> {
+    fn perceived_orbits(&self, entity: Entity, observer: Option<Faction>) -> Vec<Orbit> {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return match orbitable_component.orbit() {
                 Some(orbit) => vec![orbit.clone()], // TODO remove cloning
                 None => vec![],
             }
         }
-
-        self.perceived_future_segments(entity).iter()
+        self.future_segments(entity, observer).iter()
             .filter_map(|segment| segment.as_orbit().cloned())
             .collect()
     }
 
     /// Returns an ordered vector of pairs of orbits that have the same parent
-    fn find_same_parent_orbit_pairs(&self, entity_a: Entity, entity_b: Entity) -> Vec<(Orbit, Orbit)> {
+    fn find_same_parent_orbit_pairs(&self, entity_a: Entity, entity_b: Entity, observer: Option<Faction>) -> Vec<(Orbit, Orbit)> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Find same parent orbits");
         let mut same_parent_orbit_pairs = vec![];
-        let orbits_a: Vec<Orbit> = self.perceived_orbits(entity_a);
-        let orbits_b: Vec<Orbit> = self.perceived_orbits(entity_b);
+        let orbits_a: Vec<Orbit> = self.perceived_orbits(entity_a, observer);
+        let orbits_b: Vec<Orbit> = self.perceived_orbits(entity_b, observer);
         let mut index_a = 0;
         let mut index_b = 0;
         
@@ -68,10 +67,10 @@ impl Model {
     /// and makes sense, but in practice is very counterintuitive and
     /// isn't really useful information eg when trying to plan a
     /// rendezvous.
-    pub fn find_next_closest_approach(&self, entity_a: Entity, entity_b: Entity, start_time: f64) -> Option<f64> {
+    pub fn find_next_closest_approach(&self, entity_a: Entity, entity_b: Entity, start_time: f64, observer: Option<Faction>) -> Option<f64> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Find next closest approach");
-        let same_parent_orbit_pairs = self.find_same_parent_orbit_pairs(entity_a, entity_b);
+        let same_parent_orbit_pairs = self.find_same_parent_orbit_pairs(entity_a, entity_b, observer);
 
         for pair in same_parent_orbit_pairs {
             let orbit_a = pair.0;
@@ -115,17 +114,14 @@ impl Model {
         None
     }
 
-    pub fn find_next_two_closest_approaches(&self, entity_a: Entity, entity_b: Entity) -> (Option<f64>, Option<f64>) {
-        if let Some(time_1) = self.find_next_closest_approach(entity_a, entity_b, self.time) {
-
+    pub fn find_next_two_closest_approaches(&self, entity_a: Entity, entity_b: Entity, observer: Option<Faction>) -> (Option<f64>, Option<f64>) {
+        if let Some(time_1) = self.find_next_closest_approach(entity_a, entity_b, self.time, observer) {
             // Add 1.0 to make sure we don't find the same approach by accident
-            if let Some(time_2) = self.find_next_closest_approach(entity_a, entity_b, time_1 + 1.0) {
+            if let Some(time_2) = self.find_next_closest_approach(entity_a, entity_b, time_1 + 1.0, observer) {
                 return (Some(time_1), Some(time_2));
             }
-
             return (Some(time_1), None);
         }
-
         (None, None)
     }
 }
@@ -201,7 +197,7 @@ mod test {
             (segment_d_3, segment_e_5),
         ];
 
-        let actual = model.find_same_parent_orbit_pairs(entity_d, entity_e);
+        let actual = model.find_same_parent_orbit_pairs(entity_d, entity_e, None);
 
         assert_eq!(actual.len(), expected.len());
 
@@ -230,13 +226,13 @@ mod test {
         let vessel_b = model.allocate(EntityBuilder::default().with_path_component(path_component));
 
         let expected = orbit.period().unwrap() / 4.0;
-        let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0).unwrap();
+        let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0, None).unwrap();
 
         println!("Actual: {} Expected: {}", actual, expected);
         assert!((expected - actual).abs() / expected < 1.0e-3);
 
         let expected = orbit.period().unwrap() * 3.0 / 4.0;
-        let actual = model.find_next_closest_approach(vessel_a, vessel_b, orbit.period().unwrap() / 2.0).unwrap();
+        let actual = model.find_next_closest_approach(vessel_a, vessel_b, orbit.period().unwrap() / 2.0, None).unwrap();
 
         println!("Actual: {} Expected: {}", actual, expected);
         assert!((expected - actual).abs() / expected < 1.0e-3);

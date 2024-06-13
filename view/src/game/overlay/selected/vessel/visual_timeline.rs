@@ -1,7 +1,7 @@
 #![allow(clippy::match_same_arms)]
 
 use eframe::egui::{Color32, Frame, RichText, Ui};
-use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::timeline::TimelineEvent}, storage::entity_allocator::Entity};
+use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::{timeline::TimelineEvent, Faction}}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImage, labels::{draw_subtitle, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
 
@@ -168,7 +168,7 @@ fn generate_timeline_events(view: &View, entity: Entity, events: &mut Vec<Visual
 }
 
 fn generate_apoapsis_periapsis(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for orbit in view.model.perceived_future_orbits(entity) {
+    for orbit in view.model.future_orbits(entity, Some(Faction::Player)) {
         if let Some(time) = orbit.next_periapsis_time() {
             let distance = orbit.point_at_time(time).position().magnitude();
             events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Periapsis, time, distance });
@@ -186,21 +186,21 @@ fn generate_closest_approaches(view: &View, entity: Entity, events: &mut Vec<Vis
         return;
     };
 
-    let (approach_1_time, approach_2_time) = view.model.find_next_two_closest_approaches(entity, target);
+    let (approach_1_time, approach_2_time) = view.model.find_next_two_closest_approaches(entity, target, Some(Faction::Player));
 
     if let Some(time) = approach_1_time {
-        let distance = view.model.perceived_distance_at_time(entity, target, time);
+        let distance = view.model.distance_at_time(entity, target, time, Some(Faction::Player));
         events.push(VisualTimelineEvent::Approach { type_: ApproachType::First, target, time, distance });
     }
 
     if let Some(time) = approach_2_time {
-        let distance = view.model.perceived_distance_at_time(entity, target, time);
+        let distance = view.model.distance_at_time(entity, target, time, Some(Faction::Player));
         events.push(VisualTimelineEvent::Approach { type_: ApproachType::Second, target, time, distance });
     }
 }
 
 fn generate_encounters(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for encounter in view.model.perceived_future_encounters(entity) {
+    for encounter in view.model.future_encounters(entity, Some(Faction::Player)) {
         events.push(VisualTimelineEvent::Encounter { type_: encounter.encounter_type(), time: encounter.time(), from: encounter.from(), to: encounter.to() });
     }
 }
@@ -226,8 +226,8 @@ fn advance_cursor_to(ui: &mut Ui, x: f32) {
 
 pub fn draw_visual_timeline(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_center_time_point: bool) {
     let mut events = vec![];
-
-    let has_intel = view.model.vessel_component(entity).faction().player_has_intel();
+    let faction = view.model.vessel_component(entity).faction();
+    let has_intel = Faction::Player.has_intel_for(faction);
 
     if has_intel {
         generate_timeline_events(view, entity, &mut events);

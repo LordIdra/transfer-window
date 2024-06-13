@@ -20,9 +20,9 @@ impl FireTorpedoEvent {
         let mut vessel_component = VesselComponent::new(VesselClass::Torpedo, model.vessel_component(fire_from).faction).with_ghost();
         vessel_component.set_target(model.vessel_component(fire_from).target);
 
-        let fire_from_orbit = model.orbit_at_time(fire_from, time);
+        let fire_from_orbit = model.orbit_at_time(fire_from, time, None);
         let point_at_time = fire_from_orbit.point_at_time(time);
-        let parent_mass = model.mass_at_time(fire_from_orbit.parent(), time);
+        let parent_mass = model.mass(fire_from_orbit.parent());
         let rocket_equation_function = RocketEquationFunction::from_vessel_component(&vessel_component);
         let orbit = Orbit::new(
             fire_from_orbit.parent(), rocket_equation_function.mass(), parent_mass, 

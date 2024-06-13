@@ -1,5 +1,5 @@
 use log::trace;
-use transfer_window_model::components::path_component::segment::Segment;
+use transfer_window_model::components::{path_component::segment::Segment, vessel_component::Faction};
 
 use super::{selected::Selected, util::{should_render, should_render_at_time, ApsisType}, View};
 
@@ -33,7 +33,7 @@ pub fn update(view: &mut View) {
 
     // Remove or update selected apsis if apsis no longer exists or is in a different place
     if let Selected::Apsis { type_, entity, time } = view.selected.clone() {
-        if let Segment::Orbit(orbit) = view.model.perceived_future_segment_at_time(entity, time) {
+        if let Segment::Orbit(orbit) = view.model.segment_at_time(entity, time, Some(Faction::Player)) {
             let expected_time = match type_ {
                 ApsisType::Periapsis => orbit.next_periapsis_time(),
                 ApsisType::Apoapsis => orbit.next_apoapsis_time(),
@@ -53,7 +53,7 @@ pub fn update(view: &mut View) {
     // Remove or update selected encounter if encounter no longer exists or is in a different place
     if let Selected::Encounter { type_, entity, time, from, to } = view.selected {
         let mut any_encounter_matches = false;
-        for encounter in view.model.perceived_future_encounters(entity) {
+        for encounter in view.model.future_encounters(entity, Some(Faction::Player)) {
             if encounter.encounter_type() == type_ && encounter.from() == from && encounter.to() == to && (time - encounter.time()).abs() < 10.0 {
                 any_encounter_matches = true;
             }

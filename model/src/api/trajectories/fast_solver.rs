@@ -7,7 +7,7 @@ pub mod solver;
 
 pub fn calculate_exit_encounter(model: &Model, orbit: &Orbit, new_parent: Entity, time: f64) -> Orbit {
     let old_parent = orbit.parent();
-    let new_parent_mass = model.mass_at_time(new_parent, time);
+    let new_parent_mass = model.mass(new_parent);
     let mass = orbit.mass();
 
     let old_parent_point = &model.orbitable_component(old_parent).orbit().unwrap().point_at_time(time);
@@ -18,7 +18,7 @@ pub fn calculate_exit_encounter(model: &Model, orbit: &Orbit, new_parent: Entity
 }
 
 pub fn calculate_entrance_encounter(model: &Model, orbit: &Orbit, new_parent: Entity, time: f64) -> Orbit {
-    let new_parent_mass = model.mass_at_time(new_parent, time);
+    let new_parent_mass = model.mass(new_parent);
     let mass = orbit.mass();
 
     let new_parent_point = &model.orbitable_component(new_parent).orbit().unwrap().point_at_time(time);

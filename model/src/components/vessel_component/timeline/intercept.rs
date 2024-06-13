@@ -16,8 +16,8 @@ impl InterceptEvent {
 
     #[allow(clippy::missing_panics_doc)]
     pub fn execute(&self, model: &mut Model) {
-        let parent = model.parent_at_time(self.entity, self.time).unwrap();
-        let offset = model.position_at_time(self.entity, self.time);
+        let parent = model.parent_at_time(self.entity, self.time, None).unwrap();
+        let offset = model.position_at_time(self.entity, self.time, None);
         let combined_mass = model.mass(self.entity) + model.mass(self.target);
         model.add_explosion(Explosion::new(parent, offset, combined_mass));
         model.deallocate(self.entity);

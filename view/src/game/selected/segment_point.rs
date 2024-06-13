@@ -1,5 +1,5 @@
 use eframe::egui::PointerState;
-use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
 
 use crate::game::{selected::Selected, util::add_textured_square, View};
 
@@ -11,7 +11,7 @@ const SELECTED_ALPHA: f32 = 1.0;
 fn draw_selected_circle(view: &View, entity: Entity, time: f64, alpha: f32) {
     let select_radius = SELECT_RADIUS / view.camera.zoom();
     let mut vertices = vec![];
-    let segment = view.model.perceived_future_segment_at_time(entity, time);
+    let segment = view.model.segment_at_time(entity, time, Some(Faction::Player));
     let point = view.model.absolute_position(segment.parent()) + segment.position_at_time(time);
     add_textured_square(&mut vertices, point, select_radius, alpha);
     view.renderers.add_texture_vertices("circle", &mut vertices);
@@ -35,7 +35,7 @@ pub fn draw_hover(view: &View, pointer: &PointerState) {
     
     let select_distance = SELECT_DISTANCE / view.camera.zoom();
     let latest_world = view.window_space_to_world_space(latest_window);
-    if let Some((entity, time)) = view.model.closest_point_on_perceived_trajectory(latest_world, select_distance) {
+    if let Some((entity, time)) = view.model.closest_point_on_any_trajectory(latest_world, select_distance, Some(Faction::Player)) {
         draw_selected_circle(view, entity, time, HOVERED_ALPHA);
     }
 }

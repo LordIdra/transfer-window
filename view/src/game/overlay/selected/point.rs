@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
-use transfer_window_model::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::Faction}, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_key, draw_orbits, draw_speed, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
 
@@ -27,7 +27,9 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        if view.model.vessel_component(entity).faction().player_has_control() {
+        
+        let faction = view.model.vessel_component(entity).faction();
+        if Faction::Player.can_control(faction) {
             if draw_create_burn(view, ui, entity, time) {
                 view.add_model_event(ModelEvent::CreateBurn { entity, time });
                 let selected = Selected::Burn { entity, time, state: BurnState::Selected };
@@ -89,7 +91,7 @@ pub fn draw_orbit_labels(view: &View, ui: &mut Ui, orbit: &Orbit) {
 }
 
 fn draw_orbit(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let orbit = view.model.perceived_future_orbit_at_time(entity, time);
+    let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
     draw_subtitle(ui, "Orbit");
     Grid::new("Selected point orbit info").show(ui, |ui| {
         draw_orbit_labels(view, ui, &orbit);
@@ -117,7 +119,7 @@ pub fn update(view: &View) {
     });
 
     let vessel_component = &view.model.vessel_component(entity);
-    if vessel_component.faction().player_has_control() && !vessel_component.slots().weapon_slots().is_empty() {
+    if Faction::Player.can_control(vessel_component.faction()) && !vessel_component.slots().weapon_slots().is_empty() {
         Window::new("Weapons")
                 .title_bar(false)
                 .resizable(false)

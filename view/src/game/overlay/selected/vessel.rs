@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::VesselComponent, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{Faction, VesselComponent}, storage::entity_allocator::Entity};
 use visual_timeline::draw_visual_timeline;
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel}, labels::{draw_key, draw_subtitle, draw_title, draw_value}}}, selected::Selected, util::{format_distance, format_speed}, View}, styles};
@@ -124,8 +124,8 @@ pub fn update(view: &View) {
 
     let name = view.model.name_component(entity).name().to_uppercase();
     let vessel_component = view.model.vessel_component(entity);
-    let has_intel = vessel_component.faction().player_has_intel();
-    let has_control = vessel_component.faction().player_has_control();
+    let has_intel = Faction::Player.has_intel_for(vessel_component.faction());
+    let has_control = Faction::Player.can_control(vessel_component.faction());
 
     Window::new("Selected vessel ".to_string() + name.as_str())
             .title_bar(false)

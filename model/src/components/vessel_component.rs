@@ -9,7 +9,7 @@ use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 pub mod system_slot;
 pub mod timeline;
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub enum Faction {
     Player,
     Ally,
@@ -17,20 +17,21 @@ pub enum Faction {
 }
 
 impl Faction {
-    pub fn player_has_intel(&self) -> bool {
+    pub fn has_intel_for(self, other: Self) -> bool {
         match self {
-            Faction::Player => true,
-            Faction::Ally => true,
-            Faction::Enemy => false,
+            Faction::Player | Faction::Ally => match other {
+                Faction::Player | Faction::Ally => true,
+                Faction::Enemy => false,
+            }
+            Faction::Enemy => match other {
+                Faction::Player | Faction::Ally => false,
+                Faction::Enemy => true,
+            }
         }
     }
 
-    pub fn player_has_control(&self) -> bool {
-        match self {
-            Faction::Player => true,
-            Faction::Ally => false,
-            Faction::Enemy => false,
-        }
+    pub fn can_control(self, other: Self) -> bool {
+        self == other
     }
 }
 

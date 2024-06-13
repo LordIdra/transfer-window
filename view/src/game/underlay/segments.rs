@@ -1,6 +1,6 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{orbitable_component::OrbitableComponentPhysics, path_component::segment::Segment, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableComponentPhysics, path_component::segment::Segment, vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{util::{add_line, should_render_parent}, View};
 
@@ -72,7 +72,7 @@ fn draw_path_segments(view: &View, entity: Entity, camera_centre: DVec2) {
     let zoom = view.camera.zoom();
 
     let mut segment_points_data = vec![];
-    for segment in &view.model.perceived_future_segments(entity) {
+    for segment in &view.model.future_segments(entity, Some(Faction::Player)) {
         draw_segment(view, segment, camera_centre, zoom, entity, &mut segment_points_data);
     }
 

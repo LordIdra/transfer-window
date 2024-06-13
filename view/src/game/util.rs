@@ -1,7 +1,7 @@
 use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
 use thousands::Separable;
-use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
 
 use super::{selected::util::BurnAdjustDirection, View};
 
@@ -141,8 +141,8 @@ pub fn compute_burn_arrow_position(view: &View, entity: Entity, time: f64, direc
 
 pub fn compute_adjust_fire_torpedo_arrow_position(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
     let event = view.model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
-    let orbit = view.model.orbit_at_time(entity, time);
-    let burn_position = view.model.absolute_position(orbit.parent()) + view.model.position_at_time(entity, time);
+    let orbit = view.model.orbit_at_time(entity, time, None);
+    let burn_position = view.model.absolute_position(orbit.parent()) + view.model.position_at_time(entity, time, None);
     let burn_to_arrow_unit = view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * direction.vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
 }
@@ -163,7 +163,7 @@ pub fn should_render(view: &View, entity: Entity) -> bool {
 }
 
 pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
-    let Some(parent) = view.model.perceived_parent_at_time(entity, time) else {
+    let Some(parent) = view.model.parent_at_time(entity, time, Some(Faction::Player)) else {
         return true;
     };
     should_render_parent(view, parent)

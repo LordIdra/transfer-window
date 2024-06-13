@@ -3,7 +3,7 @@ use std::mem::swap;
 use nalgebra_glm::DVec2;
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::{path_component::orbit::Orbit, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
+use crate::{components::{path_component::orbit::Orbit, vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
 
 /// Returns the closest point to `point` on the given orbit if it is less than `radius` away from the orbit
 /// Returns none if the closest distance to `point` is further than the radius
@@ -87,21 +87,14 @@ impl Model {
     /// distance from the point to a segment is less than `max_distance.`
     /// Short circuits; if there are multiple points, the first one found is returned
     /// Also uses the perceived trajectories, not real ones (ie faction dependan)
-    pub fn closest_point_on_perceived_trajectory(&self, point: DVec2, max_distance: f64) -> Option<(Entity, f64)> {
+    pub fn closest_point_on_any_trajectory(&self, point: DVec2, max_distance: f64, observer: Option<Faction>) -> Option<(Entity, f64)> {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
         for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
-            if self.vessel_component(entity).faction().player_has_intel() {
-                for orbit in self.path_component(entity).future_orbits() {
-                    process_orbit(self, orbit, entity, point, max_distance, &mut closest_distance, &mut closest_point);
-                }
-            } else {
-                for segment in self.compute_perceived_path(entity) {
-                    process_orbit(self, segment.as_orbit().unwrap(), entity, point, max_distance, &mut closest_distance, &mut closest_point);
-                }
+            for orbit in &self.future_orbits(entity, observer) {
+                process_orbit(self, orbit, entity, point, max_distance, &mut closest_distance, &mut closest_point);
             }
         }
-
         closest_point
     }
 }

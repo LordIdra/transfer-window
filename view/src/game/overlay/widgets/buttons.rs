@@ -1,5 +1,5 @@
 use eframe::egui::Ui;
-use transfer_window_model::{components::vessel_component::timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}, Faction}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 
@@ -7,7 +7,7 @@ use super::custom_image_button::CustomCircularImageButton;
 
 // Returns new time if could be drawn & clicked
 pub fn draw_previous(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Option<f64> {
-    let orbit = view.model.orbit_at_time(entity, time);
+    let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
     let time = time - orbit.period()?;
     let enabled = time > orbit.current_point().time();
     let button = CustomCircularImageButton::new(view, "previous-orbit", 36.0)
@@ -22,7 +22,7 @@ pub fn draw_previous(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Opt
 
 // Returns new time if could be drawn & clicked
 pub fn draw_next(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Option<f64> {
-    let orbit = view.model.orbit_at_time(entity, time);
+    let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
     let time = time + orbit.period()?;
     let enabled = time < orbit.end_point().time();
     let button = CustomCircularImageButton::new(view, "next-orbit", 36.0)

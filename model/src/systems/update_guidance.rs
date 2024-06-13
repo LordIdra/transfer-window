@@ -4,7 +4,10 @@ use crate::{components::{path_component::guidance::{will_intercept, Guidance}, v
 
 /// True if would have intercepted last frame but now will not intercept
 fn should_recalculate(model: &Model, guidance: &Guidance) -> bool {
-    let end_distance = (guidance.end_point().position() - model.position_at_time(guidance.target(), guidance.end_point().time())).magnitude();
+    let entity = guidance.target();
+    let time = guidance.end_point().time();
+    let faction = guidance.faction();
+    let end_distance = (guidance.end_point().position() - model.position_at_time(entity, time, Some(faction))).magnitude();
     guidance.will_intercept() && !will_intercept(end_distance)
 }
 

@@ -2,7 +2,7 @@ use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::Faction, storage::entity_allocator::Entity, Model};
 
 use self::guidance_point::GuidancePoint;
 
@@ -32,7 +32,7 @@ fn proportional_guidance_acceleration(absolute_position: DVec2, target_absolute_
     acceleration_unit * PROPORTIONALITY_CONSTANT * closing_speed * line_of_sight_rate
 }
 
-fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_rocket_equation_function: &RocketEquationFunction, start_point: &GuidancePoint) -> (bool, Vec<GuidancePoint>) {
+fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, faction: Faction, start_rocket_equation_function: &RocketEquationFunction, start_point: &GuidancePoint) -> (bool, Vec<GuidancePoint>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute guidance points");
     let mut points = vec![start_point.clone()];
@@ -52,7 +52,7 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_
         let distance_at_delta_time = |delta_time: f64| {
             // Mass is technically not correct, but the difference is almost certainly negligible, and it's not really important anyway
             let point = last.next(delta_time, rocket_equation_function.mass());
-            (model.absolute_position_at_time(parent,point.time()) + point.position() - model.absolute_position_at_time(target, point.time())).magnitude()
+            (model.absolute_position_at_time(parent, point.time(), Some(faction)) + point.position() - model.absolute_position_at_time(target, point.time(), Some(faction))).magnitude()
         };
         let distance_prime_at_delta_time = |delta_time: f64| {
             (distance_at_delta_time(delta_time + DISTANCE_DERIVATIVE_DELTA) - distance_at_delta_time(delta_time)) / DISTANCE_DERIVATIVE_DELTA
@@ -72,10 +72,10 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_
             return (false, points);
         }
 
-        let absolute_position = model.absolute_position_at_time(parent, time) + last.position();
-        let absolute_velocity = model.absolute_velocity_at_time(parent, time) + last.velocity();
-        let target_absolute_position = model.absolute_position_at_time(target, time);
-        let target_absolute_velocity = model.absolute_velocity_at_time(target, time);
+        let absolute_position = model.absolute_position_at_time(parent, time, Some(faction)) + last.position();
+        let absolute_velocity = model.absolute_velocity_at_time(parent, time, Some(faction)) + last.velocity();
+        let target_absolute_position = model.absolute_position_at_time(target, time, Some(faction));
+        let target_absolute_velocity = model.absolute_velocity_at_time(target, time, Some(faction));
         let mass = rocket_equation_function.mass();
 
         let requested_acceleration = proportional_guidance_acceleration(absolute_position, target_absolute_position, absolute_velocity, target_absolute_velocity);
@@ -96,6 +96,7 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, start_
 pub struct Guidance {
     parent: Entity,
     target: Entity,
+    faction: Faction,
     rocket_equation_function: RocketEquationFunction,
     current_point: GuidancePoint,
     points: Vec<GuidancePoint>,
@@ -104,12 +105,13 @@ pub struct Guidance {
 
 impl Guidance {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(model: &Model, parent: Entity, target: Entity, parent_mass: f64, start_time: f64, rocket_equation_function: &RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
+    pub fn new(model: &Model, parent: Entity, target: Entity, faction: Faction, parent_mass: f64, start_time: f64, rocket_equation_function: &RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
         let start_point = GuidancePoint::new(parent_mass, rocket_equation_function.mass(), start_time, start_position, start_velocity, vec2(0.0, 0.0), 0.0);
-        let (will_intercept, points) = compute_guidance_points(model, parent, target, rocket_equation_function, &start_point);
+        let (will_intercept, points) = compute_guidance_points(model, parent, target, faction, rocket_equation_function, &start_point);
         Self { 
             parent,
             target,
+            faction,
             rocket_equation_function: rocket_equation_function.clone(),
             current_point: start_point.clone(),
             points,
@@ -163,6 +165,10 @@ impl Guidance {
 
     pub fn target(&self) -> Entity {
         self.target
+    }
+
+    pub fn faction(&self) -> Faction {
+        self.faction
     }
 
     pub fn is_finished(&self) -> bool {

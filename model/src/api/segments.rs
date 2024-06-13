@@ -56,10 +56,9 @@ impl Model {
     pub(crate) fn create_guidance(&mut self, entity: Entity, time: f64) {
         assert!(self.vessel_component_mut(entity).class_mut().is_torpedo());
 
-        let target = self.vessel_component(entity)
-            .target()
+        let target = self.vessel_component(entity).target()
             .expect("Cannot enable guidance on torpedo without a target");
-        
+        let faction = self.vessel_component(entity).faction();
         let path_component = self.path_component_mut(entity);
         path_component.remove_segments_after(time);
 
@@ -69,7 +68,7 @@ impl Model {
         let start_velocity = last_segment.end_velocity();
         let parent_mass = self.mass(parent);
         let rocket_equation_function = self.rocket_equation_function_at_end_of_trajectory(entity);
-        let guidance = Guidance::new(self, parent, target, parent_mass, time, &rocket_equation_function, start_position, start_velocity);
+        let guidance = Guidance::new(self, parent, target, faction, parent_mass, time, &rocket_equation_function, start_position, start_velocity);
         self.add_guidance(entity, parent, guidance);
     }
 
@@ -83,11 +82,12 @@ impl Model {
             .unwrap();
         let parent = guidance.parent();
         let target = guidance.target();
+        let faction = self.vessel_component(entity).faction();
         let start_position = guidance.current_point().position();
         let start_velocity = guidance.current_point().velocity();
         let parent_mass = self.mass(parent);
         let rocket_equation_function = guidance.rocket_equation_function_at_time(self.time);
-        let guidance = Guidance::new(self, parent, target, parent_mass, self.time, &rocket_equation_function, start_position, start_velocity);
+        let guidance = Guidance::new(self, parent, target, faction, parent_mass, self.time, &rocket_equation_function, start_position, start_velocity);
         self.path_component_mut(entity).clear_future_segments();
         self.add_guidance(entity, parent, guidance);
     }
@@ -132,26 +132,6 @@ impl Model {
     }
 
     /// # Panics
-    /// Panics if the entity does not have an orbit at the given time
-    pub fn orbit_at_time(&self, entity: Entity, time: f64) -> &Orbit {
-        #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Orbit at time");
-        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            if let Some(orbit) = orbitable_component.orbit() {
-                return orbit;
-            }
-        }
-
-        if let Some(path_component) = self.try_path_component(entity) {
-            if let Segment::Orbit(orbit) = path_component.future_segment_at_time(time) {
-                return orbit;
-            }
-        }
-
-        panic!("There is no orbit at the requested time")
-    }
-
-    /// # Panics
     /// Panics if the entity does not have a burn at the given time
     pub fn burn_starting_at_time(&self, entity: Entity, time: f64) -> &Burn {
         if let Some(path_component) = self.try_path_component(entity) {
@@ -175,29 +155,5 @@ impl Model {
         } else {
             Some(change)
         }
-    }
-
-    pub fn parent(&self, entity: Entity) -> Option<Entity> {
-        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return orbitable_component.orbit().map(Orbit::parent);
-        }
-
-        if let Some(path_component) = self.try_path_component(entity) {
-            return Some(path_component.current_segment().parent());
-        }
-
-        None
-    }
-
-    pub fn parent_at_time(&self, entity: Entity, time: f64) -> Option<Entity> {
-        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return orbitable_component.orbit().map(Orbit::parent);
-        }
-
-        if let Some(path_component) = self.try_path_component(entity) {
-            return Some(path_component.future_segment_at_time(time).parent());
-        }
-
-        None
     }
 }

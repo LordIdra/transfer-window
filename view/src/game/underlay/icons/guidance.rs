@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::should_render_at_time, View};
 
@@ -17,7 +17,8 @@ impl Guidance {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in view.entities_should_render(vec![ComponentType::VesselComponent]) {
-            if !view.model.vessel_component(entity).faction().player_has_intel() {
+            let faction = view.model.vessel_component(entity).faction();
+            if !Faction::Player.has_intel_for(faction) {
                 continue;
             }
             for event in view.model.vessel_component(entity).timeline().events() {
