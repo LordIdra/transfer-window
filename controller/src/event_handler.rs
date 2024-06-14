@@ -76,10 +76,10 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
 
     model.vessel_component_mut(torpedo).set_target(Some(spacecraft_1));
 
-    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 716560.0));
+    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 716_560.0));
     model.vessel_component_mut(torpedo).timeline_mut().add(event);
 
-    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 720720.0));
+    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 720_720.0));
     model.vessel_component_mut(torpedo).timeline_mut().add(event);
 
     controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, context.clone(), controller.resources.clone(), Some(spacecraft_1)));

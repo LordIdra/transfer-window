@@ -24,7 +24,7 @@ fn test_stationary_velocity() {
         .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(earth_position))));
 
     assert!(model.velocity(planet) == vec2(0.0, 0.0));
-    assert!(model.absolute_velocity(planet, None) == vec2(0.0, 0.0));
+    assert!(model.absolute_velocity(planet) == vec2(0.0, 0.0));
 }
 
 #[test]
@@ -70,7 +70,7 @@ fn test_trajectory_velocity() {
 
     let expected = orbit.velocity_from_theta(0.0);
     assert!((model.velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
-    assert!((model.absolute_velocity(vessel, None) - expected).magnitude() / expected.magnitude() < 1.0e-3);
+    assert!((model.absolute_velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
 
     model.update(orbit.period().unwrap() / 4.0);
     
@@ -78,7 +78,7 @@ fn test_trajectory_velocity() {
     let expected = orbit.velocity_from_theta(expected_theta);
     
     assert!((model.velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
-    assert!((model.absolute_velocity(vessel, None) - expected).magnitude() / expected.magnitude() < 1.0e-3);
+    assert!((model.absolute_velocity(vessel) - expected).magnitude() / expected.magnitude() < 1.0e-3);
 }
 
 #[test]

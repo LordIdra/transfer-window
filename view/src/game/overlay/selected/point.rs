@@ -94,7 +94,7 @@ fn draw_orbit(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
     draw_subtitle(ui, "Orbit");
     Grid::new("Selected point orbit info").show(ui, |ui| {
-        draw_orbit_labels(view, ui, &orbit);
+        draw_orbit_labels(view, ui, orbit);
     });
 }
 

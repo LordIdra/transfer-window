@@ -273,7 +273,7 @@ impl PathComponent {
     }
 
     pub fn set_perceived_segments(&mut self, perceived_segments: Vec<Segment>) {
-        self.perceived_segments = perceived_segments
+        self.perceived_segments = perceived_segments;
     }
 }
 

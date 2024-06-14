@@ -61,10 +61,10 @@ fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
     ui.end_row();
 }
 
-fn draw_resources(ui: &mut Ui, vessel_component: &VesselComponent, name: String) {
+fn draw_resources(ui: &mut Ui, vessel_component: &VesselComponent, name: &str) {
     if should_draw_fuel(vessel_component) || should_draw_dv(vessel_component) || should_draw_torpedoes(vessel_component) {
         draw_subtitle(ui, "Resources");
-        Grid::new("Vessel resource grid ".to_string() + name.as_str()).show(ui, |ui| {
+        Grid::new("Vessel resource grid ".to_string() + name).show(ui, |ui| {
             if should_draw_fuel(vessel_component) {
                 draw_fuel(ui, vessel_component);
             }
@@ -127,7 +127,7 @@ pub fn update(view: &View) {
     let has_intel = Faction::Player.has_intel_for(vessel_component.faction());
     let has_control = Faction::Player.can_control(vessel_component.faction());
 
-    Window::new("Selected vessel ".to_string() + name.as_str())
+    Window::new("Selected vessel ".to_string() + &name)
             .title_bar(false)
             .resizable(false)
             .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
@@ -141,7 +141,7 @@ pub fn update(view: &View) {
         draw_info(view, ui, &name, entity);
 
         if has_intel {
-            draw_resources(ui, vessel_component, name);
+            draw_resources(ui, vessel_component, &name);
         }
 
         draw_visual_timeline(view, ui, entity, view.model.time(), false);

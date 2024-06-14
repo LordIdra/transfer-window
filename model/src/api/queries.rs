@@ -16,7 +16,7 @@ impl Model {
             }
         }
         for segment in self.path_component(entity).future_segments() {
-            segments.push(segment)
+            segments.push(segment);
         }
         segments
     }
@@ -45,12 +45,16 @@ impl Model {
         panic!("Attempt to get current segment of entity without path or orbitable component")
     }
 
+    /// # Panics
+    /// Panics if there is no segment at the given time
     pub fn current_orbit(&self, entity: Entity) -> &Orbit {
         self.current_segment(entity)
             .as_orbit()
             .expect("Segment is not orbit")
     }
     
+    /// # Panics
+    /// Panics if there is no segment at the given time
     pub fn segment_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Segment {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return match orbitable_component.physics() {
@@ -66,6 +70,8 @@ impl Model {
         self.path_component(entity).future_segment_at_time(time)
     }
 
+    /// # Panics
+    /// Panics if there is no orbit at the given time
     pub fn orbit_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Orbit {
         self.segment_at_time(entity, time, observer).as_orbit().expect("No orbit exists at the given time")
     }
@@ -160,7 +166,7 @@ impl Model {
 
     /// # Panics
     /// Panics if entity does not have a velocity
-    pub fn absolute_velocity(&self, entity: Entity, observer: Option<Faction>) -> DVec2 {
+    pub fn absolute_velocity(&self, entity: Entity) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Absolute velocity");
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
@@ -169,7 +175,7 @@ impl Model {
             }
         }
         let segment = self.current_segment(entity);
-        self.absolute_velocity(segment.parent(), observer) + segment.current_velocity()
+        self.absolute_velocity(segment.parent()) + segment.current_velocity()
     }
 
     /// # Panics

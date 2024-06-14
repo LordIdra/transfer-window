@@ -77,7 +77,7 @@ impl Model {
             let orbit_b = pair.1;
             let start_time = f64::max(f64::max(orbit_b.start_point().time(), orbit_a.start_point().time()), start_time);
             let end_time = f64::min(orbit_a.end_point().time(), orbit_b.end_point().time());
-            let time_step = compute_time_step(&orbit_a, &orbit_b, start_time, end_time);
+            let time_step = compute_time_step(orbit_a, orbit_b, start_time, end_time);
             let distance = |time: f64| (orbit_a.point_at_time(time).position() - orbit_b.point_at_time(time).position()).magnitude();
             let distance_prime = |time: f64| (distance(time + DISTANCE_DERIVATIVE_DELTA) - distance(time)) / DISTANCE_DERIVATIVE_DELTA;
 

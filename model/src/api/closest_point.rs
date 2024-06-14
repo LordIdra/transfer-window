@@ -77,7 +77,6 @@ fn process_orbit(model: &Model, orbit: &Orbit, entity: Entity, point: DVec2, max
         if time > orbit.current_point().time() && time < orbit.end_point().time() {
             *closest_point = Some((entity, time));
             *closest_distance = distance;
-            return;
         }
     }
 }

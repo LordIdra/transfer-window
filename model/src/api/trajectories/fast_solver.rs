@@ -39,7 +39,7 @@ fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
         .as_orbit()
         .expect("Attempt to do an exit encounter on a non-orbit");
 
-    let new_orbit = calculate_exit_encounter(model, &old_orbit, new_parent, time);
+    let new_orbit = calculate_exit_encounter(model, old_orbit, new_parent, time);
 
     model.path_component_mut(entity).add_segment(Segment::Orbit(new_orbit));
 }
@@ -55,7 +55,7 @@ fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64)
         .as_orbit()
         .expect("Attempt to do an entrance encounter on a non-orbit");
 
-    let new_orbit = calculate_entrance_encounter(model, &old_orbit, new_parent, time);
+    let new_orbit = calculate_entrance_encounter(model, old_orbit, new_parent, time);
 
     model.path_component_mut(entity).add_segment(Segment::Orbit(new_orbit));
 }

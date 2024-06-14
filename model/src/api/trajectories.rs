@@ -73,18 +73,15 @@ impl Model {
     }
 
     pub(crate) fn next_orbit(&self, entity: Entity, orbit: &mut Orbit) -> Option<Orbit> {
-        match find_next_encounter(self, orbit, entity, 1.0e10) {
-            Some(encounter) => {
-                orbit.end_at(encounter.time());
-                Some(match encounter.type_() {
-                    EncounterType::Entrance => calculate_entrance_encounter(self, orbit, encounter.new_parent(), encounter.time()),
-                    EncounterType::Exit => calculate_exit_encounter(self, orbit, encounter.new_parent(), encounter.time()),
-                })
-            }
-            None => {
-                orbit.end_at(1.0e10);
-                None
-            },
+        if let Some(encounter) = find_next_encounter(self, orbit, entity, 1.0e10) {
+            orbit.end_at(encounter.time());
+            Some(match encounter.type_() {
+                EncounterType::Entrance => calculate_entrance_encounter(self, orbit, encounter.new_parent(), encounter.time()),
+                EncounterType::Exit => calculate_exit_encounter(self, orbit, encounter.new_parent(), encounter.time()),
+            })
+        } else {
+            orbit.end_at(1.0e10);
+            None
         }
     }
 

@@ -143,6 +143,8 @@
 [ ] Select vessel for points/apoapsis/etc
 [ ] Tooltips for speed on warp arrows
 [ ] Explorer tree
+[ ] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
+[ ] Handle ITP failure crashes
 
 # Campaign
 [ ] Menu screen
@@ -177,7 +179,6 @@
 # Backburner
 [ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 [ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
-[ ] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
 [ ] Persistent selected state (doesn't deselect on time changed)
 [ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
