@@ -23,7 +23,6 @@ fn draw_info(ui: &mut Ui, view: &View, entity: transfer_window_model::storage::e
     });
 }
 
-
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update approach");

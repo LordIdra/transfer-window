@@ -45,7 +45,7 @@ impl EnableGuidanceEvent {
     #[allow(clippy::missing_panics_doc)]
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time)
-            && model.vessel_component(entity).has_target()
+            && model.vessel_component(entity).target().is_some_and(|target| model.try_vessel_component(target).is_some())
             && model.final_dv(entity).unwrap() > MIN_DV_TO_ENABLE_GUIDANCE
     }
 }

@@ -140,11 +140,12 @@
 [x] fix 5 km lol
 [x] fix weird closest distance formatting (repro around moon?)
 [x] Can't select orbitable ap/pe
-[ ] Select vessel for points/apoapsis/etc
+[ ] Select vessel/orbitable for points/apoapsis/etc
 [ ] Tooltips for speed on warp arrows
 [ ] Explorer tree
 [ ] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [ ] Handle ITP failure crashes
+[ ] Fix being able to intercept planets
 
 # Campaign
 [ ] Menu screen
@@ -182,6 +183,7 @@
 [ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
 [ ] Persistent selected state (doesn't deselect on time changed)
 [ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
+[ ] Fix egui flickering
 
 # Before release
 [ ] Versioning!
