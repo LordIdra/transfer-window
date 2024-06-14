@@ -14,7 +14,7 @@ use transfer_window_common::numerical_methods::itp::itp;
 /// 
 /// Here is the catch: When solving for the minimum, the start time of the bound may not actually be positive
 /// The solution to this is to keep moving it back by a fixed amount until it's positive, then deploy ITP
-pub fn solve_for_entrance(orbit: &Orbit, sibling_orbit: &Orbit, start_time: f64, end_time: f64) -> Option<f64> {
+pub fn solve_for_entrance(orbit: &Orbit, sibling_orbit: &Orbit, start_time: f64, end_time: f64) -> Result<Option<f64>, &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Solve for entrance");
     let distance = |time: f64| (orbit.position_from_theta(orbit.theta_from_time(time)) - sibling_orbit.position_from_theta(sibling_orbit.theta_from_time(time))).magnitude();
@@ -22,7 +22,7 @@ pub fn solve_for_entrance(orbit: &Orbit, sibling_orbit: &Orbit, start_time: f64,
     let distance_prime_start = distance_prime(start_time);
     let distance_prime_end = distance_prime(end_time);
     if distance_prime_start.is_sign_negative() && distance_prime_end.is_sign_positive() {
-        let min_distance_time = itp(&distance_prime, start_time, end_time);
+        let min_distance_time = itp(&distance_prime, start_time, end_time)?;
         let min_distance = distance(min_distance_time);
         let soi = sibling_orbit.sphere_of_influence();
         if min_distance < soi {
@@ -33,8 +33,8 @@ pub fn solve_for_entrance(orbit: &Orbit, sibling_orbit: &Orbit, start_time: f64,
                     adjusted_start_time -= period / 32.0;
                 }
             }
-            return Some(itp(&f, min_distance_time, adjusted_start_time));
+            return Ok(Some(itp(&f, min_distance_time, adjusted_start_time)?));
         }
     }
-    None
+    Ok(None)
 }

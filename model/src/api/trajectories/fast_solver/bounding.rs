@@ -9,7 +9,7 @@ mod util;
 mod window;
 
 /// Finds bounds for all siblings of an entity
-pub fn compute_initial_windows<'a>(model: &'a Model, orbit: &'a Orbit, siblings: Vec<Entity>, end_time: f64) -> Vec<Window<'a>> {
+pub fn compute_initial_windows<'a>(model: &'a Model, orbit: &'a Orbit, siblings: Vec<Entity>, end_time: f64) -> Result<Vec<Window<'a>>, &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Get initial windows");
     let start_time = orbit.start_point().time();
@@ -19,11 +19,11 @@ pub fn compute_initial_windows<'a>(model: &'a Model, orbit: &'a Orbit, siblings:
         let sibling_orbit = model.orbitable_component(sibling).orbit().unwrap();
         assert!(sibling_orbit.is_ellipse(), "Orbitable is on hyperbolic trajectory");
         if orbit.is_ellipse() {
-            for window in compute_ellipse_bound(orbit, sibling_orbit, sibling, start_time) {
+            for window in compute_ellipse_bound(orbit, sibling_orbit, sibling, start_time)? {
                 windows.push(window);
             }
         } else {
-            for window in compute_hyperbola_bound(orbit, sibling_orbit, sibling) {
+            for window in compute_hyperbola_bound(orbit, sibling_orbit, sibling)? {
                 windows.push(window);
             }
         }
@@ -44,5 +44,5 @@ pub fn compute_initial_windows<'a>(model: &'a Model, orbit: &'a Orbit, siblings:
         window.is_periodic() || !window.is_periodic() && window.latest_time() > start_time && window.soonest_time() < end_time
     });
 
-    windows
+    Ok(windows)
 }

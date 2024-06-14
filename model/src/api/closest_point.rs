@@ -1,5 +1,6 @@
 use std::mem::swap;
 
+use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_common::numerical_methods::itp::itp;
 
@@ -36,7 +37,12 @@ fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f64) -
     }
 
     let time = itp(&distance_prime, min_time, max_time);
-    let position = orbit.position_from_theta(orbit.theta_from_time(time));
+    if let Err(err) = time {
+        error!("Error while computing closest point: {}", err);
+        return None;
+    }
+
+    let position = orbit.position_from_theta(orbit.theta_from_time(time.unwrap()));
     if (position - point).magnitude() < max_distance {
         return Some(position);
     }

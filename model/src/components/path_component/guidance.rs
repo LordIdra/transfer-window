@@ -1,3 +1,4 @@
+use log::error;
 use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 use transfer_window_common::numerical_methods::itp::itp;
@@ -59,12 +60,16 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, factio
         };
         if distance_prime_at_delta_time(0.0).is_sign_negative() && distance_prime_at_delta_time(GUIDANCE_TIME_STEP).is_sign_positive() {
             // Distance derivative sign flips, so we have a minimum distance within GUIDANCE_TIME_STEP
-            let intercept_delta_time = itp(&distance_prime_at_delta_time, 0.0, GUIDANCE_TIME_STEP);
-            let intercept_distance = distance_at_delta_time(intercept_delta_time);
-            if will_intercept(intercept_distance) {
-                // We have an intercept
-                points.push(last.next(intercept_delta_time, rocket_equation_function.mass()));
-                return (true, points);
+            match itp(&distance_prime_at_delta_time, 0.0, GUIDANCE_TIME_STEP) {
+                Err(err) => error!("{}", err),
+                Ok(intercept_delta_time) => {
+                    let intercept_distance = distance_at_delta_time(intercept_delta_time);
+                    if will_intercept(intercept_distance) {
+                        // We have an intercept
+                        points.push(last.next(intercept_delta_time, rocket_equation_function.mass()));
+                        return (true, points);
+                    }
+                },
             }
         }
 

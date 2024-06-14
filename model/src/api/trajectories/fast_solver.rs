@@ -81,7 +81,7 @@ mod test {
             let mut soonest_encounter: Option<Encounter> = None;
             for entity in model.entities(vec![ComponentType::PathComponent]) {
                 let orbit = model.path_component(entity).final_orbit().unwrap();
-                let encounter = find_next_encounter(&model, orbit, entity, end_time);
+                let encounter = find_next_encounter(&model, orbit, entity, end_time).unwrap();
                 if let Some(encounter) = encounter {
                     if let Some(soonest_encounter) = &mut soonest_encounter {
                         if encounter.time() < soonest_encounter.time() {

@@ -27,7 +27,7 @@ pub fn update(view: &View) {
                     TimeStep::Level { level: _, paused } | TimeStep::Warp { speed: _, paused } => paused,
                 };
 
-                for i in 0..TIME_STEP_LEVELS.len() {
+                for (i, level) in TIME_STEP_LEVELS.iter().enumerate() {
                     let texture = if *paused {
                         "time-step-paused"
                     } else {
@@ -45,7 +45,7 @@ pub fn update(view: &View) {
                         }
                     };
                     ui.add(CustomImage::new(view, texture, 24.0)
-                        .with_padding(2.0)).on_hover_text(format!("{}x", TIME_STEP_LEVELS[i].round()));
+                        .with_padding(2.0)).on_hover_text(format!("{}x", level.round()));
                     ui.add_space(-9.0);
                 }
             })

@@ -1,6 +1,7 @@
 use crate::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
 fn update_path_component(model: &mut Model, entity: Entity, time: f64) {
+    let mut should_recompute_perceived_segments = !model.path_component(entity).current_segment().is_orbit();
     model.path_component_mut(entity).current_segment_mut().next(time);
     loop {
         let current_segment = model.path_component(entity).current_segment();
@@ -9,10 +10,17 @@ fn update_path_component(model: &mut Model, entity: Entity, time: f64) {
         }
 
         model.path_component_mut(entity).on_segment_finished(time);
+        should_recompute_perceived_segments = should_recompute_perceived_segments || !model.path_component(entity).current_segment().is_orbit()
     }
 
     if model.vessel_component(entity).should_recompute_trajectory() {
         model.recompute_trajectory(entity);
+        should_recompute_perceived_segments = true;
+    }
+
+    if should_recompute_perceived_segments {
+        let perceived_segments = model.compute_perceived_path(entity);
+        model.path_component_mut(entity).set_perceived_segments(perceived_segments);
     }
 }
 
@@ -28,8 +36,6 @@ impl Model {
         for entity in self.entities(vec![ComponentType::VesselComponent]) {
             if !self.vessel_component(entity).is_ghost() {
                 update_path_component(self, entity, time);
-                let perceived_segments = self.compute_perceived_path(entity);
-                self.path_component_mut(entity).set_perceived_segments(perceived_segments);
             }
         }
         for entity in self.entities(vec![ComponentType::OrbitableComponent]) {

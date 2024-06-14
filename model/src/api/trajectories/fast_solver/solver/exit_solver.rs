@@ -13,7 +13,7 @@ use super::MIN_TIME_BEFORE_ENCOUNTER;
 /// - The 'side' of the orbit which we use as our bound depends on the orbit direction
 /// - Convert the angle to a time, and make sure the time is later than the start time
 /// - Finally, check that the time is not after end time - if it is, no encounter is possible
-fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Option<f64> {
+fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Result<Option<f64>, &'static str> {
     // SDF negative outside of SOI
     let sdf = |theta: f64| soi - orbit.position_from_theta(theta).magnitude(); 
     let periapsis = orbit.argument_of_periapsis();
@@ -21,7 +21,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 
     if sdf(apoapsis).is_sign_positive() {
         // Object will never leave the SOI
-        return None;
+        return Ok(None);
     }
     
     let theta = if orbit.is_clockwise() {
@@ -31,7 +31,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if from < to {
             from += 2.0 * PI;
         }
-        itp(&sdf, to, from)
+        itp(&sdf, to, from)?
 
     } else {
         // Check from apoapsis to periapsis (anticlockwise)
@@ -40,7 +40,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if from < to {
             from += 2.0 * PI;
         }
-        itp(&sdf, from, to)
+        itp(&sdf, from, to)?
     };
 
     let mut time = orbit.first_periapsis_time() + orbit.time_since_first_periapsis(theta);
@@ -48,10 +48,10 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         time += orbit.period().unwrap();
     }
     if time > end_time {
-        return None;
+        return Ok(None);
     }
 
-    Some(time)
+    Ok(Some(time))
 }
 
 /// - Start at time = `start_time`
@@ -62,7 +62,7 @@ fn find_elliptical_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
 ///   - Check encounter is before `end_time`
 /// - Double the `time_step`
 /// - Repeat until t > `end_time`
-fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Option<f64> {
+fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time: f64) -> Result<Option<f64>, &'static str> {
     let f = |time: f64| {
         let theta = orbit.theta_from_time(time);
         let distance = orbit.position_from_theta(theta).magnitude();
@@ -81,40 +81,44 @@ fn find_hyperbolic_exit_time(orbit: &Orbit, soi: f64, start_time: f64, end_time:
         if new_f.is_sign_negative() && previous_f.is_sign_positive() {
             let min = time - (time_step / 2.0);
             let max = time;
-            let encounter_time = itp(&f, max, min);
+            let encounter_time = itp(&f, max, min)?;
             if encounter_time > end_time {
-                return None;
+                return Ok(None);
             }
-            return Some(encounter_time);
+            return Ok(Some(encounter_time));
         }
         previous_f = new_f;
     }
-    None
+    Ok(None)
 }
 
 /// Solves for when an entity will leave its parent
 /// If the given entity is not on a hyperbolic trajectory, returns none when a call to solve is made
-pub fn solve_for_exit(model: &Model, orbit: &Orbit, entity: Entity, end_time: f64) -> Option<Encounter> {
+pub fn solve_for_exit(model: &Model, orbit: &Orbit, entity: Entity, end_time: f64) -> Result<Option<Encounter>, &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Solve for exit");
     let start_time = orbit.start_point().time();
     let Some(parent_orbit) = model.orbitable_component(orbit.parent()).orbit() else {
         // Parent cannot be exited as it is a root entity
-        return None;
+        return Ok(None);
     };
 
     let encounter_time = if orbit.is_ellipse() {
-        find_elliptical_exit_time(orbit, parent_orbit.sphere_of_influence(), start_time, end_time)
+        find_elliptical_exit_time(orbit, parent_orbit.sphere_of_influence(), start_time, end_time)?
     } else {
-        find_hyperbolic_exit_time(orbit, parent_orbit.sphere_of_influence(), start_time, end_time)
-    }?;
+        find_hyperbolic_exit_time(orbit, parent_orbit.sphere_of_influence(), start_time, end_time)?
+    };
+
+    let Some(encounter_time) = encounter_time else {
+        return Ok(None)
+    };
     
     if encounter_time < start_time + MIN_TIME_BEFORE_ENCOUNTER {
         // Another encounter could be calculated as being eg 0.01 seconds later
         // if eg an entity exits an SOI and then an 'entrance' is calculated to be very shortly after
         // So we add MIN_TIME_BEFORE_ENCOUNTER
-        return None;
+        return Ok(None);
     }
 
-    Some(Encounter::new(EncounterType::Exit, entity, parent_orbit.parent(), encounter_time))
+    Ok(Some(Encounter::new(EncounterType::Exit, entity, parent_orbit.parent(), encounter_time)))
 }

@@ -31,7 +31,7 @@ fn compute_siblings(model: &Model, candidates: &HashSet<Entity>, orbit: &Orbit) 
 // - We continually evaluate the soonest window for encounters
 // - Once a window is evaluated, if it is periodic it will be incremented by a period, otherwise removed
 // - If an encounter is found, bring the end time forward to the time of the encounter (so we don't continue to uselessly compute encounters after the soonest known encounter)
-pub fn find_next_encounter(model: &Model, orbit: &Orbit, entity: Entity, end_time: f64) -> Option<Encounter> {
+pub fn find_next_encounter(model: &Model, orbit: &Orbit, entity: Entity, end_time: f64) -> Result<Option<Encounter>, &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Find next encounter");
     let start_time = orbit.start_point().time();
@@ -39,10 +39,10 @@ pub fn find_next_encounter(model: &Model, orbit: &Orbit, entity: Entity, end_tim
     // Find entrance windows
     let can_enter = &model.entities(vec![ComponentType::OrbitableComponent]);
     let siblings = compute_siblings(model, can_enter, orbit);
-    let mut windows = compute_initial_windows(model, orbit, siblings, end_time);
+    let mut windows = compute_initial_windows(model, orbit, siblings, end_time)?;
 
     // If an exit encounter is found, set that as the soonest known encounter
-    let mut soonest_encounter = solve_for_exit(model, orbit, entity, end_time);
+    let mut soonest_encounter = solve_for_exit(model, orbit, entity, end_time)?;
     let mut end_time = match &soonest_encounter {
         Some(encounter) => encounter.time(),
         None => end_time,
@@ -66,7 +66,7 @@ pub fn find_next_encounter(model: &Model, orbit: &Orbit, entity: Entity, end_tim
         let window = windows.pop().unwrap();
         let from = f64::max(window.soonest_time(), start_time);
         let to = f64::min(window.latest_time(), end_time);
-        if let Some(encounter_time) = solve_for_entrance(window.orbit(), window.other_orbit(), from, to) {
+        if let Some(encounter_time) = solve_for_entrance(window.orbit(), window.other_orbit(), from, to)? {
             // Add a minimum time as another encounter could be calculated as being eg 0.01 seconds later
             // if eg an entity exits an SOI and then an 'entrance' is calculated to be very shortly after
             if encounter_time > start_time + MIN_TIME_BEFORE_ENCOUNTER {
@@ -80,5 +80,5 @@ pub fn find_next_encounter(model: &Model, orbit: &Orbit, entity: Entity, end_tim
         }
     }
 
-    soonest_encounter
+    Ok(soonest_encounter)
 }

@@ -6,8 +6,8 @@ use crate::{components::path_component::orbit::Orbit, storage::entity_allocator:
 
 use super::{sdf::make_sdf, util::find_other_stationary_point, window::Window};
 
-fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> (f64, f64) {
-    let theta_1 = itp(&f, min_theta, max_theta);
+fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> Result<(f64, f64), &'static str> {
+    let theta_1 = itp(&f, min_theta, max_theta)?;
     // the other angle is in the 'opposite' range
     // we can find this by subtracting 2pi from the highest theta
     let (new_min_theta, new_max_theta) = if min_theta > max_theta {
@@ -15,21 +15,21 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
     } else {
         (min_theta, max_theta - 2.0 * PI)
     };
-    let theta_2 = itp(&f, new_min_theta, new_max_theta);
+    let theta_2 = itp(&f, new_min_theta, new_max_theta)?;
     let theta_2 = normalize_angle(theta_2);
-    (theta_1, theta_2)
+    Ok((theta_1, theta_2))
 }
 
-fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> (f64, f64) {
+fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> Result<(f64, f64), &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Min max signed distance");
     let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-4, 1.0e-6, 256).expect("Failed to converge while solving for ellipse bounds");
-    let theta_2 = find_other_stationary_point(sdf, theta_1);
+    let theta_2 = find_other_stationary_point(sdf, theta_1)?;
     let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
     if sdf(theta_1) < sdf(theta_2) { 
-        (theta_1, theta_2)
+        Ok((theta_1, theta_2))
     } else { 
-        (theta_2, theta_1)
+        Ok((theta_2, theta_1))
     }
 }
 
@@ -71,44 +71,44 @@ impl<'a> BounderData<'a> {
         vec![]
     }
 
-    fn one_bound_inner(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+    fn one_bound_inner(self, sdf: impl Fn(f64) -> f64) -> Result<Vec<Window<'a>>, &'static str> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("One bound inner");
         // Bound start/end points are on the INSIDE
         let f = |theta: f64| (sdf)(theta) - self.soi;
-        let intersections = find_intersections(&f, self.min_theta, self.max_theta);
+        let intersections = find_intersections(&f, self.min_theta, self.max_theta)?;
         let angle_bound = make_range_containing(intersections.0, intersections.1, self.min_theta);
         let bound = angle_window_to_time_window(self.orbit, angle_bound);
         // The reason we segment here is that our solver relies on the assumption that if there is a minimum,
         // the derivative with respect to time is positive at the start and negative at the end
         // There are some cases where this is not true, but splitting the window up into a few segments helps keep this assumption
-        self.make_segmented_window(true, bound.0, bound.1, 4)
+        Ok(self.make_segmented_window(true, bound.0, bound.1, 4))
     }
 
-    fn one_bound_outer(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+    fn one_bound_outer(self, sdf: impl Fn(f64) -> f64) -> Result<Vec<Window<'a>>, &'static str> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("One bound outer");
         // Bound start/end points are on the OUTSIDE
         let f = |theta: f64| (sdf)(theta) + self.soi;
-        let intersections = find_intersections(&f, self.min_theta, self.max_theta);
+        let intersections = find_intersections(&f, self.min_theta, self.max_theta)?;
         let angle_bound = make_range_containing(intersections.0, intersections.1, self.max_theta);
         let bound = angle_window_to_time_window(self.orbit, angle_bound);
         // The reason we segment here is that our solver relies on the assumption that if there is a minimum,
         // the derivative with respect to time is positive at the start and negative at the end
         // There are some cases where this is not true, but splitting the window up into a few segments helps keep this assumption
-        self.make_segmented_window(true, bound.0, bound.1, 4)
+        Ok(self.make_segmented_window(true, bound.0, bound.1, 4))
     }
 
-    fn two_bounds(self, sdf: impl Fn(f64) -> f64) -> Vec<Window<'a>> {
+    fn two_bounds(self, sdf: impl Fn(f64) -> f64) -> Result<Vec<Window<'a>>, &'static str> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Two bounds");
         let f_inner = |theta: f64| (sdf)(theta) - self.soi;
         let f_outer = |theta: f64| (sdf)(theta) + self.soi;
         #[cfg(feature = "profiling")]
         let _span1 = tracy_client::span!("Finding intersections");
-        let inner_intersections = find_intersections(&f_inner, self.min_theta, self.max_theta);
-        let outer_intersections = find_intersections(&f_outer, self.min_theta, self.max_theta);
-        let zero_intersections = find_intersections(&sdf, self.min_theta, self.max_theta);
+        let inner_intersections = find_intersections(&f_inner, self.min_theta, self.max_theta)?;
+        let outer_intersections = find_intersections(&f_outer, self.min_theta, self.max_theta)?;
+        let zero_intersections = find_intersections(&sdf, self.min_theta, self.max_theta)?;
         #[cfg(feature = "profiling")]
         drop(_span1);
 
@@ -136,16 +136,16 @@ impl<'a> BounderData<'a> {
         let window_1 = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound_1);
         let window_2 = Window::new(self.orbit, self.sibling_orbit, self.sibling, true, bound_2);
 
-        vec![window_1, window_2] 
+        Ok(vec![window_1, window_2] )
     }
 }
 
-pub fn compute_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64) -> Vec<Window<'a>> {
+pub fn compute_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity, start_time: f64) -> Result<Vec<Window<'a>>, &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Ellipse bounding");
     let argument_of_apoapsis = orbit.argument_of_periapsis() + PI;
     let sdf = make_sdf(orbit, sibling_orbit);
-    let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis);
+    let (min_theta, max_theta) = find_min_max_signed_distance(&sdf, argument_of_apoapsis)?;
     let (min, max) = (sdf(min_theta), sdf(max_theta));
     let soi = sibling_orbit.sphere_of_influence();
     let data = BounderData {
@@ -159,10 +159,10 @@ pub fn compute_ellipse_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sib
     };
 
     if min.abs() < soi && max.abs() < soi {
-        data.no_bounds()
+        Ok(data.no_bounds())
     } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() > soi) 
            || (max.is_sign_negative() && min.is_sign_negative() && max.abs() > soi) {
-        BounderData::no_encounters()
+        Ok(BounderData::no_encounters())
     } else if (max.is_sign_positive() && min.is_sign_positive() && min.abs() < soi)
            || (max.is_sign_positive() && min.is_sign_negative() && min.abs() < soi) {
         data.one_bound_inner(sdf)

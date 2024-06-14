@@ -1,6 +1,6 @@
 use encounter::EncounterType;
 use fast_solver::{calculate_entrance_encounter, calculate_exit_encounter};
-use log::trace;
+use log::{error, trace};
 
 use crate::{components::path_component::{orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
 
@@ -34,12 +34,24 @@ impl Model {
             return;
         }
 
-        while let Some(encounter) = find_next_encounter(self, self.path_component(entity).final_orbit().unwrap(), entity, end_time) {
-            trace!("Found encounter {encounter:?}");
-            apply_encounter(self, &encounter);
-            segments += 1;
-            if segments >= segment_count {
-                break;
+        loop {
+            match find_next_encounter(self, self.path_component(entity).final_orbit().unwrap(), entity, end_time) {
+                Ok(encounter) => {
+                    if let Some(encounter) = encounter {
+                        trace!("Found encounter {encounter:?}");
+                        apply_encounter(self, &encounter);
+                        segments += 1;
+                        if segments >= segment_count {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                },
+                Err(err) => {
+                    error!("Error while predicting: {}", err);
+                    break;
+                },
             }
         }
         
@@ -73,15 +85,23 @@ impl Model {
     }
 
     pub(crate) fn next_orbit(&self, entity: Entity, orbit: &mut Orbit) -> Option<Orbit> {
-        if let Some(encounter) = find_next_encounter(self, orbit, entity, 1.0e10) {
-            orbit.end_at(encounter.time());
-            Some(match encounter.type_() {
-                EncounterType::Entrance => calculate_entrance_encounter(self, orbit, encounter.new_parent(), encounter.time()),
-                EncounterType::Exit => calculate_exit_encounter(self, orbit, encounter.new_parent(), encounter.time()),
-            })
-        } else {
-            orbit.end_at(1.0e10);
-            None
+        match find_next_encounter(self, orbit, entity, 1.0e10) {
+            Ok(encounter) => {
+                if let Some(encounter) = encounter {
+                    orbit.end_at(encounter.time());
+                    Some(match encounter.type_() {
+                        EncounterType::Entrance => calculate_entrance_encounter(self, orbit, encounter.new_parent(), encounter.time()),
+                        EncounterType::Exit => calculate_exit_encounter(self, orbit, encounter.new_parent(), encounter.time()),
+                    })
+                } else {
+                    orbit.end_at(1.0e10);
+                    None
+                }
+            },
+            Err(err) => {
+                error!("Error while computing next orbit: {}", err);
+                None
+            },
         }
     }
 

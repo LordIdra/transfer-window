@@ -1,3 +1,4 @@
+use log::error;
 use transfer_window_common::numerical_methods::itp::itp;
 
 use crate::{components::{path_component::orbit::Orbit, vessel_component::Faction}, storage::entity_allocator::Entity, Model};
@@ -93,7 +94,12 @@ impl Model {
             loop {
                 let distance_prime_value = distance_prime(time);
                 if previous_distance_prime_value.is_sign_negative() && distance_prime_value.is_sign_positive() {
-                    return Some(itp(&distance_prime, previous_time, time));
+                    let approach_time = itp(&distance_prime, previous_time, time);
+                    if let Err(err) = approach_time {
+                        error!("Error while computing closest approach: {}", err);
+                        return None;
+                    }
+                    return Some(approach_time.unwrap());
                 }
                 previous_time = time;
                 previous_distance_prime_value = distance_prime_value;

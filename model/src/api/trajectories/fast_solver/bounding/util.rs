@@ -49,7 +49,7 @@ pub fn angle_window_to_time_window(orbit: &Orbit, mut window: (f64, f64)) -> (f6
 // Assuming we've already found a stationary point on a periodic function with 1 minimum and 1 maximum,
 // we can find the other by creating a range that just about excludes the known stationary point
 // Should only be used on ellipse SDFs
-pub fn find_other_stationary_point(distance_function: impl Fn(f64) -> f64, known_stationary_point_theta: f64) -> f64 {
+pub fn find_other_stationary_point(distance_function: impl Fn(f64) -> f64, known_stationary_point_theta: f64) -> Result<f64, &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Find other stationary point");
     let mut min = known_stationary_point_theta - 0.001;
