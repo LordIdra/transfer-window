@@ -2,6 +2,8 @@ use crate::{components::ComponentType, Model};
 
 impl Model {
     pub(crate) fn update_fuel(&mut self) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Update fuel");
         let time = self.time();
         for entity in self.entities(vec![ComponentType::VesselComponent]) {
             if !self.vessel_component(entity).is_ghost() {

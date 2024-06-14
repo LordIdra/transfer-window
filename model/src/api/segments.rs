@@ -54,6 +54,8 @@ impl Model {
     }
 
     pub(crate) fn create_guidance(&mut self, entity: Entity, time: f64) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Create guidance");
         assert!(self.vessel_component_mut(entity).class_mut().is_torpedo());
 
         let target = self.vessel_component(entity).target()
@@ -73,6 +75,8 @@ impl Model {
     }
 
     pub(crate) fn recalculate_current_guidance(&mut self, entity: Entity) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Recalculate current guidance");
         assert!(self.path_component(entity).current_segment().is_guidance());
         assert!(self.path_component(entity).current_segment().as_guidance().unwrap().will_intercept());
 

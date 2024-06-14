@@ -18,11 +18,12 @@ impl Model {
     /// the final segment of entity's path MUST be an Orbit.
     /// Trajectory prediction is extremely complex, good luck if
     /// you need to modify this...
+    /// Returns true is a new segment was added
     /// # Panics
     /// Panics if the last segment of the entity is a burn
-    fn predict(&mut self, entity: Entity, end_time: f64, segment_count: usize) {
+    fn predict(&mut self, entity: Entity, end_time: f64, segment_count: usize) -> bool {
         if segment_count == 0 {
-            return;
+            return false;
         }
         
         let mut segments = 0;
@@ -31,7 +32,7 @@ impl Model {
         // encounters, but without this, the predictor would keep on going every single frame
         // and rediscovering the exact same orbits
         if self.path_component(entity).final_orbit().unwrap().end_point().time() == end_time {
-            return;
+            return false;
         }
 
         loop {
@@ -62,12 +63,13 @@ impl Model {
                 .expect("Attempt to predict when the last segment is a burn!")
                 .end_at(end_time);
         }
+        true
     }
 
-    pub fn recompute_trajectory(&mut self, entity: Entity) {
+    pub fn recompute_trajectory(&mut self, entity: Entity) -> bool {
         // Add 1 because the final orbit will have duration 0
         let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - self.path_component(entity).future_orbits_after_final_non_orbit().len();
-        self.predict(entity, 1.0e10, segments_to_predict);
+        self.predict(entity, 1.0e10, segments_to_predict)
     }
 
     pub fn recompute_entire_trajectory(&mut self, entity: Entity) {

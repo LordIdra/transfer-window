@@ -15,6 +15,8 @@ impl Model {
     /// Handles recalculation of guidance segments which had an intercept,
     /// but do not any longer
     pub(crate) fn update_guidance(&mut self) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Update guidance");
         for entity in self.entities(vec![ComponentType::VesselComponent]) {
             let Some(guidance) = self.path_component(entity).final_guidance() else { 
                 continue 

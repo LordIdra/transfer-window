@@ -1,7 +1,9 @@
 use crate::{components::ComponentType, storage::entity_allocator::Entity, Model};
 
 fn update_path_component(model: &mut Model, entity: Entity, time: f64) {
-    let mut should_recompute_perceived_segments = !model.path_component(entity).current_segment().is_orbit();
+    #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Update path component");
+    let mut should_recompute_perceived_segments = model.path_component(entity).perceived_segments().is_empty() || !model.path_component(entity).current_segment().is_orbit();
     model.path_component_mut(entity).current_segment_mut().next(time);
     loop {
         let current_segment = model.path_component(entity).current_segment();
@@ -14,8 +16,9 @@ fn update_path_component(model: &mut Model, entity: Entity, time: f64) {
     }
 
     if model.vessel_component(entity).should_recompute_trajectory() {
-        model.recompute_trajectory(entity);
-        should_recompute_perceived_segments = true;
+        if model.recompute_trajectory(entity) {
+            should_recompute_perceived_segments = true;
+        }
     }
 
     if should_recompute_perceived_segments {
@@ -25,6 +28,8 @@ fn update_path_component(model: &mut Model, entity: Entity, time: f64) {
 }
 
 fn update_orbitable_component(model: &mut Model, entity: Entity, time: f64) {
+    #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Update orbitable component");
     if let Some(orbit) = model.orbitable_component_mut(entity).orbit_mut() {
         orbit.next(time);
     }
@@ -32,6 +37,8 @@ fn update_orbitable_component(model: &mut Model, entity: Entity, time: f64) {
 
 impl Model {
     pub(crate) fn update_trajectory(&mut self) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Update trajectory");
         let time = self.time();
         for entity in self.entities(vec![ComponentType::VesselComponent]) {
             if !self.vessel_component(entity).is_ghost() {

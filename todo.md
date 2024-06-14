@@ -150,7 +150,7 @@
 
 # Campaign
 [ ] Menu screen
-[ ] Stations
+[ ] Stations (stations have resources which can be transferred)
 [ ] Can only change equipment at stations
 - Satellite class
 - Trainer class
@@ -168,6 +168,15 @@
 [ ] Proportional guidance
 [ ] Integration techniques (euler RK4 etc)
 
+# Stations
+[ ] Add station vessel class (can't be edited)
+[ ] Station icon
+[ ] Station-grade equipment (can't be added to normal vessels)
+[ ] Docking
+[ ] Resource transfer
+[ ] Undocking
+
+
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?
 [ ] Collisions with planets (nearly forgot about that lmao)
@@ -176,6 +185,7 @@
 [ ] PDC automatic targeting system
 [ ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 [ ] PDC shells not affected by gravity?
+[ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumption
 
 # Backburner
@@ -189,6 +199,7 @@
 
 # Before release
 [ ] Versioning!
+[ ] Icon/branding
 [ ] Dev mode compiles in save/load buttons
 [ ] Profiling + performance testing on different devices
 [ ] Test compatibility on different devices
