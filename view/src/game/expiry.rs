@@ -1,5 +1,5 @@
 use log::trace;
-use transfer_window_model::components::{path_component::segment::Segment, vessel_component::Faction};
+use transfer_window_model::components::vessel_component::Faction;
 
 use super::{selected::Selected, util::{should_render, should_render_at_time, ApsisType}, View};
 
@@ -33,7 +33,7 @@ pub fn update(view: &mut View) {
 
     // Remove or update selected apsis if apsis no longer exists or is in a different place
     if let Selected::Apsis { type_, entity, time } = view.selected.clone() {
-        if let Segment::Orbit(orbit) = view.model.segment_at_time(entity, time, Some(Faction::Player)) {
+        if let Some(orbit) = view.model.segment_at_time(entity, time, Some(Faction::Player)).as_orbit() {
             let expected_time = match type_ {
                 ApsisType::Periapsis => orbit.next_periapsis_time(),
                 ApsisType::Apoapsis => orbit.next_apoapsis_time(),

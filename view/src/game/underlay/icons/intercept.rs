@@ -77,7 +77,7 @@ impl Icon for Intercept {
 
     fn is_selected(&self, view: &View) -> bool {
         if let Selected::Intercept { entity, time } = &view.selected {
-            *entity == self.entity && *time == self.time
+            *entity == self.entity && (*time - self.time).abs() < 1.0
         } else {
             false
         }

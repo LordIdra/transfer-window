@@ -1,4 +1,4 @@
-use crate::{components::{path_component::segment::Segment, vessel_component::Faction}, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::Faction, storage::entity_allocator::Entity, Model};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncounterType {
@@ -40,7 +40,7 @@ impl Model {
         let mut encounters = vec![];
         let mut previous_parent = None;
         for segment in self.future_segments(entity, observer) {
-            let Segment::Orbit(orbit) = segment else {
+            let Some(orbit) = segment.as_orbit() else {
                 continue;
             };
             if let Some(previous_parent) = previous_parent {

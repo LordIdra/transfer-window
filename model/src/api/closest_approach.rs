@@ -20,34 +20,34 @@ fn compute_time_step(orbit_a: &Orbit, orbit_b: &Orbit, start_time: f64, end_time
 }
 
 impl Model {
-    fn perceived_orbits(&self, entity: Entity, observer: Option<Faction>) -> Vec<Orbit> {
+    /// Safe to call for orbitables
+    fn perceived_orbits(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Orbit> {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return match orbitable_component.orbit() {
-                Some(orbit) => vec![orbit.clone()], // TODO remove cloning
+                Some(orbit) => vec![orbit],
                 None => vec![],
             }
         }
-        self.future_segments(entity, observer).iter()
-            .filter_map(|segment| segment.as_orbit().cloned())
-            .collect()
+        self.future_orbits(entity, observer)
     }
 
     /// Returns an ordered vector of pairs of orbits that have the same parent
-    fn find_same_parent_orbit_pairs(&self, entity_a: Entity, entity_b: Entity, observer: Option<Faction>) -> Vec<(Orbit, Orbit)> {
+    fn find_same_parent_orbit_pairs(&self, entity_a: Entity, entity_b: Entity, observer: Option<Faction>) -> Vec<(&Orbit, &Orbit)> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Find same parent orbits");
+        let orbits_a = self.perceived_orbits(entity_a, observer);
+        let orbits_b = self.perceived_orbits(entity_b, observer);
+
         let mut same_parent_orbit_pairs = vec![];
-        let orbits_a: Vec<Orbit> = self.perceived_orbits(entity_a, observer);
-        let orbits_b: Vec<Orbit> = self.perceived_orbits(entity_b, observer);
         let mut index_a = 0;
         let mut index_b = 0;
         
         while index_a < orbits_a.len() && index_b < orbits_b.len() {
-            let orbit_a = &orbits_a[index_a];
-            let orbit_b = &orbits_b[index_b];
+            let orbit_a = orbits_a[index_a];
+            let orbit_b = orbits_b[index_b];
             
             if orbit_a.parent() == orbit_b.parent() {
-                same_parent_orbit_pairs.push((orbit_a.clone(), orbit_b.clone())); // todo remove clone
+                same_parent_orbit_pairs.push((orbit_a, orbit_b));
             }
 
             if orbit_a.end_point().time() < orbit_b.end_point().time() {

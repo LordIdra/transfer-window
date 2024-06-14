@@ -117,6 +117,14 @@ impl Segment {
         }
     }
 
+    pub fn mass_at_time(&self, time: f64) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.mass(),
+            Segment::Burn(burn) => burn.point_at_time(time).mass(),
+            Segment::Guidance(guidance) => guidance.point_at_time(time).mass(),
+        }
+    }
+
     pub fn parent(&self) -> Entity {
         match self {
             Segment::Orbit(orbit) => orbit.parent(),

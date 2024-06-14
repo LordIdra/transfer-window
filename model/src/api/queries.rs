@@ -1,4 +1,3 @@
-use std::collections::VecDeque;
 
 use nalgebra_glm::{vec2, DVec2};
 
@@ -6,25 +5,31 @@ use crate::{components::{orbitable_component::OrbitableComponentPhysics, path_co
 
 impl Model {
     /// NOT safe to call for orbitables
-    pub fn future_segments(&self, entity: Entity, observer: Option<Faction>) -> VecDeque<Segment> {
+    pub fn future_segments(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Segment> {
+        let mut segments = vec![];
         if let Some(observer) = observer {
             if !observer.has_intel_for(self.vessel_component(entity).faction()) {
-                return self.compute_perceived_path(entity);
+                for segment in self.path_component(entity).perceived_segments() {
+                    segments.push(segment);
+                }
+                return segments;
             }
         }
-        self.path_component(entity).future_segments().clone() // TODO get rid of this clone and implement proper caching
+        for segment in self.path_component(entity).future_segments() {
+            segments.push(segment)
+        }
+        segments
     }
 
     /// NOT safe to call for orbitables
-    pub fn future_orbits(&self, entity: Entity, observer: Option<Faction>) -> Vec<Orbit> {
-        if let Some(observer) = observer {
-            if !observer.has_intel_for(self.vessel_component(entity).faction()) {
-                return self.compute_perceived_path(entity).iter()
-                    .map(|segment| segment.as_orbit().unwrap().clone())
-                    .collect();
+    pub fn future_orbits(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Orbit> {
+        let mut orbits = vec![];
+        for segment in self.future_segments(entity, observer) {
+            if let Some(orbit) = segment.as_orbit() {
+                orbits.push(orbit);
             }
         }
-        self.path_component(entity).future_orbits().iter().cloned().cloned().collect() // TODO get rid of this clone and implement proper caching
+        orbits
     }
 
     /// NOT Safe to call for orbitables
@@ -43,44 +48,27 @@ impl Model {
     }
     
     /// NOT Safe to call for orbitables
-    pub fn segment_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> Segment {
+    pub fn segment_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Segment {
         if let Some(observer) = observer {
             if !observer.has_intel_for(self.vessel_component(entity).faction()) {
-                // The reason we clamp to the end time is because encounter prediction is nondeterministic
-                // So if we call encounter prediction one frame, get the time, and store the result, the
-                // same call the next frame might be very slightly sooner. Then suppose we feed the result into
-                // this function... oh, look, we got a panic because the stored time is slightly after the 
-                // end segment. Yes this is a stupid solution but I don't know how to better solve it
-                let perceived_path = self.compute_perceived_path(entity);
-                let time = f64::min(time, perceived_path.back().unwrap().end_time());
-                for segment in perceived_path {
-                    if time >= segment.start_time() && time <= segment.end_time() {
-                        return segment;
-                    }
-                }
-                panic!("No segment exists at the given time")
+                return self.path_component(entity).perceived_segment_at_time(time);
             }
         }
-        self.path_component(entity).future_segment_at_time(time).clone() // TODO get rid of this clone and implement proper caching
+        self.path_component(entity).future_segment_at_time(time)
     }
 
     /// NOT Safe to call for orbitables
-    pub fn orbit_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> Orbit {
-        self.segment_at_time(entity, time, observer)
-            .as_orbit()
-            .expect("Segment at time is not orbit")
-            .clone() //TODO YEET
+    pub fn orbit_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Orbit {
+        self.segment_at_time(entity, time, observer).as_orbit().expect("No orbit exists at the given time")
     }
 
     pub fn parent(&self, entity: Entity) -> Option<Entity> {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return orbitable_component.orbit().map(Orbit::parent);
         }
-
         if let Some(path_component) = self.try_path_component(entity) {
             return Some(path_component.current_segment().parent());
         }
-
         None
     }
 
@@ -211,7 +199,7 @@ impl Model {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return orbitable_component.mass();
         }
-        self.segment_at_time(entity, time, observer).current_mass()
+        self.segment_at_time(entity, time, observer).mass_at_time(time)
     }
 
     /// Returns none if the entity does not have an engine

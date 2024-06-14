@@ -17,6 +17,8 @@ pub mod segment;
 pub struct PathComponent {
     past_segments: Vec<Segment>,
     future_segments: VecDeque<Segment>,
+    /// The segments a faction without intel on this entity would see
+    perceived_segments: Vec<Segment>,
 }
 
 impl PathComponent {
@@ -244,6 +246,34 @@ impl PathComponent {
 
     pub fn clear_future_segments(&mut self) {
         self.future_segments.clear();
+    }
+    
+    pub fn perceived_segments(&self) -> &Vec<Segment> {
+        &self.perceived_segments
+    }
+
+    /// Returns the first segment it finds matching the time
+    /// If the time is exactly on the border between two segments,
+    /// returns the first one
+    /// # Panics
+    /// Panics if the trajectory has no segment at the given time
+    pub fn perceived_segment_at_time(&self, time: f64) -> &Segment {
+        for segment in &self.perceived_segments {
+            // The reason we clamp to the end time is because encounter prediction is nondeterministic
+            // So if we call encounter prediction one frame, get the time, and store the result, the
+            // same call the next frame might be very slightly sooner. Then suppose we feed the result into
+            // this function... oh, look, we got a panic because the stored time is slightly after the 
+            // end segment. Yes this is a stupid solution but I don't know how to better solve it
+            let time = f64::min(time, self.perceived_segments.last().unwrap().end_time());
+            if time >= segment.start_time() && time <= segment.end_time(){
+                return segment
+            }
+        }
+        panic!("No segment exists at the given time")
+    }
+
+    pub fn set_perceived_segments(&mut self, perceived_segments: Vec<Segment>) {
+        self.perceived_segments = perceived_segments
     }
 }
 

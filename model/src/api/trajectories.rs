@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 use encounter::EncounterType;
 use fast_solver::{calculate_entrance_encounter, calculate_exit_encounter};
 use log::trace;
@@ -90,7 +88,7 @@ impl Model {
         }
     }
 
-    pub(crate) fn compute_perceived_path(&self, entity: Entity) -> VecDeque<Segment> {
+    pub(crate) fn compute_perceived_path(&self, entity: Entity) -> Vec<Segment> {
         let current_segment = self.path_component(entity).current_segment();
         let parent = current_segment.parent();
         let parent_mass = self.mass(parent);
@@ -98,15 +96,15 @@ impl Model {
         let position = current_segment.current_position();
         let velocity = current_segment.current_velocity();
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, self.time);
-        let mut segments = VecDeque::new();
-        segments.push_back(Segment::Orbit(orbit));
+        let mut segments = Vec::new();
+        segments.push(Segment::Orbit(orbit));
 
         while segments.len() < SEGMENTS_TO_PREDICT + 1 {
-            let last_orbit = segments.back_mut().unwrap().as_orbit_mut().unwrap();
+            let last_orbit = segments.last_mut().unwrap().as_orbit_mut().unwrap();
             let Some(orbit) = self.next_orbit(entity, last_orbit) else {
                 break;
             };
-            segments.push_back(Segment::Orbit(orbit));
+            segments.push(Segment::Orbit(orbit));
         }
 
         segments
