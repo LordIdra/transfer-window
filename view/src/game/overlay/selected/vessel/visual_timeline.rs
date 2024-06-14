@@ -233,7 +233,9 @@ pub fn draw_visual_timeline(view: &View, ui: &mut Ui, entity: Entity, center_tim
         generate_timeline_events(view, entity, &mut events);
     }
     generate_apoapsis_periapsis(view, entity, &mut events);
-    generate_closest_approaches(view, entity, &mut events);
+    if has_intel {
+        generate_closest_approaches(view, entity, &mut events);
+    }
     generate_encounters(view, entity, &mut events);
     if has_intel {
         generate_burn_guidance_end(view, entity, &mut events);
@@ -246,7 +248,7 @@ pub fn draw_visual_timeline(view: &View, ui: &mut Ui, entity: Entity, center_tim
     events.sort_by(|a, b| a.time().total_cmp(&b.time()));
 
     if let Some(last_event) = view.model.vessel_component(entity).timeline().last_event() {
-        if last_event.is_intercept() {
+        if has_intel && last_event.is_intercept() {
             events.retain(|event| event.time() <= last_event.time());
         }
     }

@@ -27,6 +27,9 @@ impl ClosestApproach {
         let mut icons = vec![];
         if let Some(entity) = view.selected.entity(&view.model) {
             if let Some(vessel_component) = view.model.try_vessel_component(entity) {
+                if !Faction::Player.has_intel_for(vessel_component.faction()) {
+                    return vec![];
+                }
                 if let Some(target) = vessel_component.target() {
                     let (approach_1, approach_2) = view.model.find_next_two_closest_approaches(entity, target, Some(Faction::Player));
                     

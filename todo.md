@@ -142,11 +142,11 @@
 [x] Can't select orbitable ap/pe
 [x] Select vessel/orbitable for points/apoapsis/etc
 [x] Fix being able to intercept planets
-[ ] Tooltips for speed on warp arrows
-[ ] Explorer tree
+[x] Tooltips for speed on warp arrows
 [ ] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [ ] Handle ITP failure crashes
 [ ] Allow selecting burn + guidance points?
+[ ] Explorer tree
 
 # Campaign
 [ ] Menu screen

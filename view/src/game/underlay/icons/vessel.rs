@@ -1,6 +1,6 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::VesselClass, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::{Faction, VesselClass}, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, View};
 
@@ -32,8 +32,10 @@ impl Icon for Vessel {
             VesselClass::Light => "vessel-icon-light",
         }.to_string();
         if let Some(target) = view.selected.target(&view.model) {
-            if target == self.entity {
-                base_name += "-target";
+            if Faction::Player.has_intel_for(view.model.vessel_component(view.selected.entity(&view.model).unwrap()).faction()) {
+                if target == self.entity {
+                    base_name += "-target";
+                }
             }
         }
         base_name
