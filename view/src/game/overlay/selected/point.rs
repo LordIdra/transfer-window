@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::Faction}, storage::entity_allocator::Entity};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_key, draw_orbits, draw_speed, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_next, draw_previous, draw_select_vessel, draw_warp_to}, labels::{draw_altitude, draw_key, draw_orbits, draw_speed, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
 
 use self::weapons::draw_weapons;
 
@@ -12,6 +12,10 @@ mod weapons;
 fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
     ui.horizontal(|ui| {
         styles::SelectedMenuButton::apply(ui);
+
+        if draw_select_vessel(view, ui, entity) {
+            view.add_view_event(ViewEvent::SetSelected(Selected::Vessel(entity)));
+        }
 
         if let Some(time) = draw_previous(view, ui, time, entity) {
             let selected = Selected::Point { entity, time };

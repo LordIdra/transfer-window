@@ -146,6 +146,7 @@
 [ ] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [ ] Handle ITP failure crashes
 [ ] Fix being able to intercept planets
+[ ] Allow selecting burn + guidance points?
 
 # Campaign
 [ ] Menu screen

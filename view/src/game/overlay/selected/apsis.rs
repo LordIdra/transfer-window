@@ -1,12 +1,21 @@
-use eframe::{egui::{Align2, Grid, Window}, epaint};
+use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_next, draw_previous, draw_warp_to}, labels::{draw_altitude, draw_orbits, draw_speed, draw_subtitle, draw_time_until, draw_title}}, selected::Selected, util::ApsisType, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_next, draw_previous, draw_select_orbitable, draw_select_vessel, draw_warp_to}, labels::{draw_altitude, draw_orbits, draw_speed, draw_subtitle, draw_time_until, draw_title}}, selected::Selected, util::ApsisType, View}, styles};
 
 use super::vessel::visual_timeline::draw_visual_timeline;
 
-fn draw_controls(ui: &mut eframe::egui::Ui, view: &View, time: f64, entity: transfer_window_model::storage::entity_allocator::Entity, type_: ApsisType) {
+fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity, type_: ApsisType) {
     ui.horizontal(|ui| {
         styles::SelectedMenuButton::apply(ui);
+
+        if view.model.try_vessel_component(entity).is_some() {
+            if draw_select_vessel(view, ui, entity) {
+                view.add_view_event(ViewEvent::SetSelected(Selected::Vessel(entity)));
+            }
+        } else if draw_select_orbitable(view, ui, entity) {
+            view.add_view_event(ViewEvent::SetSelected(Selected::Orbitable(entity)));
+        }
 
         if let Some(time) = draw_previous(view, ui, time, entity) {
             let selected = Selected::Apsis { type_, entity, time };
@@ -24,7 +33,7 @@ fn draw_controls(ui: &mut eframe::egui::Ui, view: &View, time: f64, entity: tran
     });
 }
 
-fn draw_info(ui: &mut eframe::egui::Ui, view: &View, entity: transfer_window_model::storage::entity_allocator::Entity, time: f64) {
+fn draw_info(ui: &mut Ui, view: &View, entity: Entity, time: f64) {
     draw_subtitle(ui, "Info");
     Grid::new("Selected apsis info").show(ui, |ui| {
         draw_altitude(view, ui, entity, time);

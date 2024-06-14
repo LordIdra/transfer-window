@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Ui, Window}, epaint};
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{custom_image_button::CustomCircularImageButton, labels::{draw_time_until, draw_title}}, selected::Selected, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::draw_select_vessel, custom_image_button::CustomCircularImageButton, labels::{draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
 use super::{burn::draw_burn_info, vessel::visual_timeline::draw_visual_timeline};
 
@@ -9,6 +9,10 @@ fn draw_controls(view: &View, ui: &mut Ui, time: f64, entity: Entity) {
     ui.horizontal(|ui| {
         styles::SelectedMenuButton::apply(ui);
         ui.set_height(36.0);
+
+        if draw_select_vessel(view, ui, entity) {
+            view.add_view_event(ViewEvent::SetSelected(Selected::Vessel(entity)));
+        }
 
         let enabled = view.model.can_warp_to(time);
         let button = CustomCircularImageButton::new(view, "warp-here", 36.0)

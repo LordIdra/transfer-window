@@ -1,9 +1,41 @@
 use eframe::egui::Ui;
-use transfer_window_model::{components::vessel_component::{timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}, Faction}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}, Faction, VesselClass}}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 
 use super::custom_image_button::CustomCircularImageButton;
+
+pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
+    let class = view.model.vessel_component(entity).class();
+    let icon = match class {
+        VesselClass::Torpedo => "vessel-icon-torpedo",
+        VesselClass::Light => "vessel-icon-light",
+    };
+    let tooltip = match class {
+        VesselClass::Torpedo => "Select torpedo",
+        VesselClass::Light => "Select vessel",
+    };
+    let button = CustomCircularImageButton::new(view, icon, 36.0)
+        .with_padding(8.0);
+    ui.add(button).on_hover_text(tooltip).clicked()
+}
+
+pub fn draw_select_orbitable(view: &View, ui: &mut Ui, entity: Entity) -> bool {
+    let type_ = view.model.orbitable_component(entity).type_();
+    let icon = match type_ {
+        OrbitableType::Star => "star",
+        OrbitableType::Planet => "planet",
+        OrbitableType::Moon => "moon",
+    };
+    let tooltip = match type_ {
+        OrbitableType::Star => "Select star",
+        OrbitableType::Planet => "Select planet",
+        OrbitableType::Moon => "Select moon",
+    };
+    let button = CustomCircularImageButton::new(view, icon, 36.0)
+        .with_padding(8.0);
+    ui.add(button).on_hover_text(tooltip).clicked()
+}
 
 // Returns new time if could be drawn & clicked
 pub fn draw_previous(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Option<f64> {
