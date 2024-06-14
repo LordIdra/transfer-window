@@ -140,12 +140,12 @@
 [x] fix 5 km lol
 [x] fix weird closest distance formatting (repro around moon?)
 [x] Can't select orbitable ap/pe
-[ ] Select vessel/orbitable for points/apoapsis/etc
+[x] Select vessel/orbitable for points/apoapsis/etc
+[x] Fix being able to intercept planets
 [ ] Tooltips for speed on warp arrows
 [ ] Explorer tree
 [ ] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [ ] Handle ITP failure crashes
-[ ] Fix being able to intercept planets
 [ ] Allow selecting burn + guidance points?
 
 # Campaign

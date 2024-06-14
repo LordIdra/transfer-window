@@ -45,7 +45,7 @@ pub fn update(view: &View) {
                         }
                     };
                     ui.add(CustomImage::new(view, texture, 24.0)
-                        .with_padding(2.0));
+                        .with_padding(2.0)).on_hover_text(format!("{}x", TIME_STEP_LEVELS[i].round()));
                     ui.add_space(-9.0);
                 }
             })
