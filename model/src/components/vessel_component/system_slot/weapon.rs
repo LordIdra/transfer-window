@@ -4,7 +4,7 @@ use self::torpedo::Torpedo;
 
 use super::{System, SystemType};
 
-mod torpedo;
+pub mod torpedo;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum WeaponType {

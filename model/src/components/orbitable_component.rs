@@ -1,7 +1,7 @@
 use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 
-use super::path_component::orbit::Orbit;
+use super::path_component::{orbit::Orbit, segment::Segment};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum OrbitableType {
@@ -13,35 +13,35 @@ pub enum OrbitableType {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum OrbitableComponentPhysics {
     Stationary(DVec2),
-    Orbit(Orbit),
+    Orbit(Segment), // stored as a segment because you can go from Segment to &Orbit but not vice versa
 }
 
 impl OrbitableComponentPhysics {
     pub fn position(&self) -> DVec2 {
         match self {
             OrbitableComponentPhysics::Stationary(position) => *position,
-            OrbitableComponentPhysics::Orbit(orbit) => orbit.current_point().position(),
+            OrbitableComponentPhysics::Orbit(orbit) => orbit.current_position(),
         }
     }
 
     pub fn position_at_time(&self, time: f64) -> DVec2 {
         match self {
             OrbitableComponentPhysics::Stationary(position) => *position,
-            OrbitableComponentPhysics::Orbit(orbit) => orbit.position_from_theta(orbit.theta_from_time(time)),
+            OrbitableComponentPhysics::Orbit(orbit) => orbit.position_at_time(time),
         }
     }
 
     pub fn velocity(&self) -> DVec2 {
         match self {
             OrbitableComponentPhysics::Stationary(_) => vec2(0.0, 0.0),
-            OrbitableComponentPhysics::Orbit(orbit) => orbit.current_point().velocity(),
+            OrbitableComponentPhysics::Orbit(orbit) => orbit.current_velocity(),
         }
     }
 
     pub fn velocity_at_time(&self, time: f64) -> DVec2 {
         match self {
             OrbitableComponentPhysics::Stationary(velocity) => *velocity,
-            OrbitableComponentPhysics::Orbit(orbit) => orbit.velocity_from_theta(orbit.theta_from_time(time)),
+            OrbitableComponentPhysics::Orbit(orbit) => orbit.velocity_at_time(time),
         }
     }
 }
@@ -68,17 +68,27 @@ impl OrbitableComponent {
         self.radius
     }
 
-    pub fn orbit(&self) -> Option<&Orbit> {
+    /// Returned segment is always an oribt
+    pub fn segment(&self) -> Option<&Segment> {
         match &self.physics {
             OrbitableComponentPhysics::Stationary(_) => None,
-            OrbitableComponentPhysics::Orbit(orbit) => Some(orbit),
+            OrbitableComponentPhysics::Orbit(segment) => Some(segment),
         }
     }
 
+    /// Returned segment is always an oribt
+    pub fn orbit(&self) -> Option<&Orbit> {
+        match &self.physics {
+            OrbitableComponentPhysics::Stationary(_) => None,
+            OrbitableComponentPhysics::Orbit(segment) => Some(segment.as_orbit().unwrap()),
+        }
+    }
+
+    /// Returned segment is always an oribt
     pub fn orbit_mut(&mut self) -> Option<&mut Orbit> {
         match &mut self.physics {
             OrbitableComponentPhysics::Stationary(_) => None,
-            OrbitableComponentPhysics::Orbit(orbit) => Some(orbit),
+            OrbitableComponentPhysics::Orbit(segment) => Some(segment.as_orbit_mut().unwrap()),
         }
     }
 

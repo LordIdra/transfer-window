@@ -32,23 +32,32 @@ impl Model {
         orbits
     }
 
-    /// NOT Safe to call for orbitables
     pub fn current_segment(&self, entity: Entity) -> &Segment {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return match orbitable_component.physics() {
+                OrbitableComponentPhysics::Stationary(_) => panic!("Attempt to get segment of stationary orbitable"),
+                OrbitableComponentPhysics::Orbit(segment) => segment,
+            }
+        }
         if let Some(path_component) = self.try_path_component(entity) {
             return path_component.current_segment();
         }
         panic!("Attempt to get current segment of entity without path or orbitable component")
     }
 
-    /// NOT Safe to call for orbitables
     pub fn current_orbit(&self, entity: Entity) -> &Orbit {
         self.current_segment(entity)
             .as_orbit()
             .expect("Segment is not orbit")
     }
     
-    /// NOT Safe to call for orbitables
     pub fn segment_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Segment {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return match orbitable_component.physics() {
+                OrbitableComponentPhysics::Stationary(_) => panic!("Attempt to get segment of stationary orbitable"),
+                OrbitableComponentPhysics::Orbit(segment) => segment,
+            }
+        }
         if let Some(observer) = observer {
             if !observer.has_intel_for(self.vessel_component(entity).faction()) {
                 return self.path_component(entity).perceived_segment_at_time(time);
@@ -57,7 +66,6 @@ impl Model {
         self.path_component(entity).future_segment_at_time(time)
     }
 
-    /// NOT Safe to call for orbitables
     pub fn orbit_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Orbit {
         self.segment_at_time(entity, time, observer).as_orbit().expect("No orbit exists at the given time")
     }
@@ -106,9 +114,8 @@ impl Model {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Absolute position");
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return match orbitable_component.physics() {
-                OrbitableComponentPhysics::Stationary(position) => *position,
-                OrbitableComponentPhysics::Orbit(orbit) => self.absolute_position(orbit.parent()) + orbit.current_point().position(),
+            if let OrbitableComponentPhysics::Stationary(position) = orbitable_component.physics() {
+                return *position;
             }
         }
         let segment = self.current_segment(entity);
@@ -121,9 +128,8 @@ impl Model {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Absolute position at time");
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return match orbitable_component.physics() {
-                OrbitableComponentPhysics::Stationary(position) => *position,
-                OrbitableComponentPhysics::Orbit(orbit) => self.absolute_position_at_time(orbit.parent(), time, observer) + orbit.point_at_time(time).position(),
+            if let OrbitableComponentPhysics::Stationary(position) = orbitable_component.physics() {
+                return *position;
             }
         }
         let segment = self.segment_at_time(entity, time, observer);
@@ -134,9 +140,8 @@ impl Model {
     /// Panics if entity does not have a position
     pub fn velocity(&self, entity: Entity) -> DVec2 {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return match orbitable_component.physics() {
-                OrbitableComponentPhysics::Stationary(_) => vec2(0.0, 0.0),
-                OrbitableComponentPhysics::Orbit(orbit) => orbit.current_point().velocity(),
+            if let OrbitableComponentPhysics::Stationary(_) = orbitable_component.physics() {
+                return vec2(0.0, 0.0);
             }
         }
         self.current_segment(entity).current_velocity()
@@ -146,9 +151,8 @@ impl Model {
     /// Panics if entity does not have a position
     pub fn velocity_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> DVec2 {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return match orbitable_component.physics() {
-                OrbitableComponentPhysics::Stationary(_) => vec2(0.0, 0.0),
-                OrbitableComponentPhysics::Orbit(orbit) => orbit.point_at_time(time).velocity(),
+            if let OrbitableComponentPhysics::Stationary(_) = orbitable_component.physics() {
+                return vec2(0.0, 0.0);
             }
         }
         self.segment_at_time(entity, time, observer).velocity_at_time(time)
@@ -160,9 +164,8 @@ impl Model {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Absolute velocity");
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return match orbitable_component.physics() {
-                OrbitableComponentPhysics::Stationary(_) => vec2(0.0, 0.0),
-                OrbitableComponentPhysics::Orbit(orbit) => self.absolute_velocity(orbit.parent(), observer) + orbit.current_point().velocity(),
+            if let OrbitableComponentPhysics::Stationary(_) = orbitable_component.physics() {
+                return vec2(0.0, 0.0);
             }
         }
         let segment = self.current_segment(entity);
@@ -175,9 +178,8 @@ impl Model {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Absolute velocity at time");
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return match orbitable_component.physics() {
-                OrbitableComponentPhysics::Stationary(_) => vec2(0.0, 0.0),
-                OrbitableComponentPhysics::Orbit(orbit) => self.absolute_velocity_at_time(orbit.parent(), time, observer) + orbit.point_at_time(time).velocity(),
+            if let OrbitableComponentPhysics::Stationary(_) = orbitable_component.physics() {
+                return vec2(0.0, 0.0);
             }
         }
         let segment = self.segment_at_time(entity, time, observer);

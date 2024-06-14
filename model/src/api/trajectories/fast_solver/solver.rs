@@ -17,7 +17,7 @@ const MIN_TIME_BEFORE_ENCOUNTER: f64 = 1.0;
 fn compute_siblings(model: &Model, candidates: &HashSet<Entity>, orbit: &Orbit) -> Vec<Entity> {
     let mut siblings = vec![];
     for other_entity in candidates {
-        if let Some(other_orbit) = model.orbitable_component(*other_entity).orbit() {
+        if let Some(other_orbit) = model.orbitable_component(*other_entity).segment() {
             if orbit.parent() == other_orbit.parent() {
                 siblings.push(*other_entity);
             }

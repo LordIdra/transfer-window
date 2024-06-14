@@ -3,7 +3,7 @@ use std::fs;
 use eframe::egui::{Context, ViewportCommand};
 use log::error;
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{start_burn::StartBurnEvent, TimelineEvent}, Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::{torpedo::Torpedo, WeaponType}, Slot, SlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 use transfer_window_view::{game, Scene};
 
 use crate::Controller;
@@ -29,13 +29,13 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
     let orbit = Orbit::new(sun, 5.9722e24, 1_988_400e24, vec2(147.095e9, 0.0), vec2(0.0, 30.29e3), 0.0).with_end_at(1.0e10);
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(5.9722e24, 6.371e6, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(orbit))));
+        .with_orbitable_component(OrbitableComponent::new(5.9722e24, 6.371e6, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
     let orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0).with_end_at(1.0e10);
     let moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(orbit))));
+        .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
 
     let orbit = Orbit::circle(earth, VesselClass::Light.mass(), 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let spacecraft_1 = model.allocate(EntityBuilder::default()
@@ -57,10 +57,30 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
 
     model.set_slot(spacecraft_2, SlotLocation::Back, Slot::new_engine(EngineType::Efficient));
     model.set_slot(spacecraft_2, SlotLocation::Middle, Slot::new_fuel_tank(FuelTankType::Large));
+    model.set_slot(spacecraft_2, SlotLocation::Front, Slot::new_weapon(WeaponType::Torpedo(Torpedo::new())));
 
-    let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, spacecraft_2, 600.0));
+    let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, spacecraft_2, 200.0));
     model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);
     model.vessel_component_mut(spacecraft_2).timeline_mut().last_event().unwrap().as_start_burn().unwrap().adjust(&mut model, vec2(300.0, 50.0));
+
+    let fire_torpedo_event = FireTorpedoEvent::new(&mut model, spacecraft_2, 100.0, SlotLocation::Front);
+    let torpedo = fire_torpedo_event.ghost();
+    let event = TimelineEvent::FireTorpedo(fire_torpedo_event);
+    model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);
+    
+    let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, torpedo, 130.0));
+    model.vessel_component_mut(torpedo).timeline_mut().add(event);
+    model.vessel_component_mut(torpedo).timeline_mut().last_event().unwrap().as_start_burn().unwrap().adjust(&mut model, vec2(-353.0, 50.0));
+
+    model.update(0.1);
+
+    model.vessel_component_mut(torpedo).set_target(Some(spacecraft_1));
+
+    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 716560.0));
+    model.vessel_component_mut(torpedo).timeline_mut().add(event);
+
+    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 720720.0));
+    model.vessel_component_mut(torpedo).timeline_mut().add(event);
 
     controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, context.clone(), controller.resources.clone(), Some(spacecraft_1)));
 }

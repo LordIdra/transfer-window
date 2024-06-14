@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
-use transfer_window_model::components::orbitable_component::{OrbitableComponent, OrbitableComponentPhysics};
+use transfer_window_model::components::orbitable_component::OrbitableComponent;
 
 use crate::game::{overlay::widgets::labels::{draw_key, draw_subtitle, draw_title, draw_value}, selected::Selected, util::format_distance, View};
 
@@ -21,7 +21,7 @@ fn draw_info(ui: &mut Ui, orbitable_component: &OrbitableComponent) {
 fn draw_orbit(ui: &mut Ui, orbitable_component: &OrbitableComponent, view: &View) {
     draw_subtitle(ui, "Orbit");
     Grid::new("Orbitable orbit info grid").show(ui, |ui| {
-        if let OrbitableComponentPhysics::Orbit(orbit) = orbitable_component.physics() {
+        if let Some(orbit) = orbitable_component.orbit() {
             draw_orbit_labels(view, ui, orbit);
             draw_key(ui, "Sphere of influence");
             draw_value(ui, &format_distance(orbit.sphere_of_influence()));

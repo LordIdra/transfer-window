@@ -1,6 +1,6 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{orbitable_component::OrbitableComponentPhysics, path_component::segment::Segment, vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::segment::Segment, vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{util::{add_line, should_render_parent}, View};
 
@@ -86,7 +86,7 @@ fn draw_path_segments(view: &View, entity: Entity, camera_centre: DVec2) {
 
 fn draw_orbitable_segment(view: &View, entity: Entity, camera_centre: DVec2) {
     let orbitable_component = view.model.orbitable_component(entity);
-    if let OrbitableComponentPhysics::Orbit(orbit) = orbitable_component.physics() {
+    if let Some(orbit) = orbitable_component.orbit() {
         let absolute_parent_position = view.model.absolute_position(orbit.parent());
         let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, view.camera.zoom());
         let color = orbit::compute_color_orbitable(view, entity);

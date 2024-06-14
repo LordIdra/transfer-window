@@ -28,6 +28,8 @@ impl Model {
         for entity in self.entities(vec![ComponentType::VesselComponent]) {
             if !self.vessel_component(entity).is_ghost() {
                 update_path_component(self, entity, time);
+                let perceived_segments = self.compute_perceived_path(entity);
+                self.path_component_mut(entity).set_perceived_segments(perceived_segments);
             }
         }
         for entity in self.entities(vec![ComponentType::OrbitableComponent]) {

@@ -80,7 +80,8 @@ impl Apsis {
         }
 
         for entity in view.model.entities(vec![ComponentType::OrbitableComponent]) {
-            if let Some(orbit) = view.model.orbitable_component(entity).orbit() {
+            if let Some(segment) = view.model.orbitable_component(entity).segment() {
+                let orbit = segment.as_orbit().unwrap();
                 Self::generate_for_orbit(view, entity, orbit, &mut icons);
             }
         }

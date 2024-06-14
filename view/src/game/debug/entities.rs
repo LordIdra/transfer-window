@@ -61,7 +61,7 @@ fn draw_orbitable(ui: &mut Ui, orbitable_component: &OrbitableComponent) {
     ui.label(format!("Type: {:?}", orbitable_component.type_()));
     match orbitable_component.physics() {
         OrbitableComponentPhysics::Stationary(position) => { ui.label(format!("Position: {position:.3?}")); }
-        OrbitableComponentPhysics::Orbit(orbit) => { draw_orbit(ui, orbit); }
+        OrbitableComponentPhysics::Orbit(segment) => { draw_orbit(ui, segment.as_orbit().unwrap()); }
     }
 }
 

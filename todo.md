@@ -137,6 +137,12 @@
 [x] Factions (player, ally, enemy)
 [x] Can't see future enemy movements
 [x] Can't edit enemy vessels/timeline
+[x] fix 5 km lol
+[x] fix weird closest distance formatting (repro around moon?)
+[x] Can't select orbitable ap/pe
+[ ] Select vessel for points/apoapsis/etc
+[ ] Tooltips for speed on warp arrows
+[ ] Explorer tree
 
 # Campaign
 [ ] Menu screen

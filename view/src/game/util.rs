@@ -112,7 +112,7 @@ pub fn format_distance(distance: f64) -> String {
     } else if distance < 100_000.0 {
         format!("{:.2} km", (distance / 1000.0))
     } else if distance < 1_000_000.0 {
-        format!("{:.1} km", (distance / 1000.0).round().separate_with_commas())
+        format!("{:.1} km", (distance / 1000.0))
     } else {
         format!("{} km", (distance / 1000.0).round().separate_with_commas())
     }
@@ -126,9 +126,9 @@ pub fn format_speed(speed: f64) -> String {
     } else if speed < 100_000.0 {
         format!("{:.2} km/s", (speed / 1000.0))
     } else if speed < 1_000_000.0 {
-        format!("{:.1} km", (speed / 1000.0).round().separate_with_commas())
+        format!("{:.1} km/s", (speed / 1000.0))
     } else {
-        format!("{} km", (speed / 1000.0).round().separate_with_commas())
+        format!("{} km/s", (speed / 1000.0).round().separate_with_commas())
     }
 }
 

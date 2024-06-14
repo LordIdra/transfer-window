@@ -46,7 +46,7 @@ impl Model {
             if let Some(previous_parent) = previous_parent {
                 let new_parent = orbit.parent();
                 if new_parent != previous_parent {
-                    let encounter_type = if let Some(previous_parent_orbit) = self.orbitable_component(previous_parent).orbit() {
+                    let encounter_type = if let Some(previous_parent_orbit) = self.orbitable_component(previous_parent).segment() {
                         if previous_parent_orbit.parent() == new_parent {
                             EncounterType::Exit
                         } else {
