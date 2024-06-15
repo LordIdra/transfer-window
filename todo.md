@@ -150,6 +150,7 @@
 [x] Fix backward adjustment
 [x] Explorer tree
 [x] Fix very low/high eccentricity orbits...
+[x] Fix the weird thing where you can modify torpedo trajectory after intercept
 
 # Campaign
 [ ] Menu screen
@@ -197,10 +198,6 @@
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumption
-
-# Backburner
-[ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
-[ ] Fix egui flickering
 
 # Performance
 [ ] Texture atlas

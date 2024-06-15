@@ -1,6 +1,6 @@
 use std::{fs::File, sync::Arc, time::Instant};
 
-use eframe::{egui::Context, glow::{self, HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VERSION}, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
+use eframe::{egui::{Context, Key, ViewportBuilder, ViewportCommand}, glow::{self, HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VERSION}, run_native, App, CreationContext, Frame, NativeOptions};
 use event_handler::{load_game, new_game, quit};
 use log::{debug, info};
 use sysinfo::System;
@@ -27,6 +27,8 @@ impl Controller {
         info!("Initialising controller");
 
         log_gl_info(creation_context.gl.as_ref().unwrap());
+
+        creation_context.egui_ctx.send_viewport_cmd(ViewportCommand::Maximized(true));
 
         egui_extras::install_image_loaders(&creation_context.egui_ctx);
         let gl = creation_context.gl.as_ref().unwrap().clone();
@@ -65,6 +67,12 @@ impl App for Controller {
         };
 
         self.handle_events(events, context);
+
+        // toggle fullscreen on f11
+        let fullscreen = context.input(|input| input.viewport().fullscreen.is_some_and(|fullscreen| fullscreen));
+        if context.input(|input| input.key_pressed(Key::F11)) {
+            context.send_viewport_cmd(ViewportCommand::Fullscreen(!fullscreen));
+        }
 
         context.request_repaint(); // Without this, the context will only update when some input changes
     }
@@ -107,7 +115,7 @@ fn main() {
     setup_logging();
 
     let options = NativeOptions {
-        renderer: Renderer::Glow,
+        viewport: ViewportBuilder::default(),
         ..Default::default()
     };
 
