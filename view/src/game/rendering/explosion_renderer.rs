@@ -55,6 +55,8 @@ impl ExplosionRenderer {
     }
 
     pub fn render(&self, gl: &Arc<Context>, time: f64, screen_rect: Rect, zoom: f64) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Explosion render");
         let time_since_start = (time - self.explosion_time) as f32;
         let center = self.center.unwrap();
         

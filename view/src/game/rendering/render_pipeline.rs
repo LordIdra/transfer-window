@@ -93,6 +93,8 @@ impl RenderPipeline {
     }
 
     pub fn render(&self, gl: &Arc<Context>, render_bloom: impl FnOnce(), render_normal: impl FnOnce(), render_explosion: impl FnOnce(), screen_rect: Rect) {
+        #[cfg(feature = "profiling")]
+            let _span = tracy_client::span!("Render pipeline");
         let width = screen_rect.width() as i32;
         let height = screen_rect.height() as i32;
 
@@ -126,18 +128,22 @@ impl RenderPipeline {
             gl.bind_framebuffer(DRAW_FRAMEBUFFER, Some(self.intermediate_framebuffer));
             gl.blit_framebuffer(0, 0, width, height, 0, 0, width, height, COLOR_BUFFER_BIT, NEAREST);
 
-            // Bloom passes
-            self.bloom_program.use_program(gl);
-            for _ in 0..BLOOM_PASSES {
-                gl.bind_texture(TEXTURE_2D, Some(self.bloom_texture_1)); // from
-                gl.bind_framebuffer(FRAMEBUFFER, Some(self.bloom_framebuffer_2)); // to
-                self.bloom_program.uniform_bool(gl, "is_horizontal", false);
-                self.screen_vao.draw(gl);
+            {
+                #[cfg(feature = "profiling")]
+                let _span = tracy_client::span!("Bloom passes");
+                // Bloom passes
+                self.bloom_program.use_program(gl);
+                for _ in 0..BLOOM_PASSES {
+                    gl.bind_texture(TEXTURE_2D, Some(self.bloom_texture_1)); // from
+                    gl.bind_framebuffer(FRAMEBUFFER, Some(self.bloom_framebuffer_2)); // to
+                    self.bloom_program.uniform_bool(gl, "is_horizontal", false);
+                    self.screen_vao.draw(gl);
 
-                gl.bind_texture(TEXTURE_2D, Some(self.bloom_texture_2)); // from
-                gl.bind_framebuffer(FRAMEBUFFER, Some(self.bloom_framebuffer_1)); // to
-                self.bloom_program.uniform_bool(gl, "is_horizontal", true);
-                self.screen_vao.draw(gl);
+                    gl.bind_texture(TEXTURE_2D, Some(self.bloom_texture_2)); // from
+                    gl.bind_framebuffer(FRAMEBUFFER, Some(self.bloom_framebuffer_1)); // to
+                    self.bloom_program.uniform_bool(gl, "is_horizontal", true);
+                    self.screen_vao.draw(gl);
+                }
             }
 
             // Render final textures to screen

@@ -143,8 +143,6 @@ pub fn update(view: &View) {
             }
         };
 
-        #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Render pipeline");
         render_pipeline.lock().unwrap().render(painter.gl(), render_bloom, render_normal, render_explosion, screen_rect);
     }));
 

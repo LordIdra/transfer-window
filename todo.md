@@ -145,12 +145,12 @@
 [x] Tooltips for speed on warp arrows
 [x] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [x] Handle ITP failure crashes
+[x] Persistent selected state (doesn't deselect on time changed)
 [ ] Allow selecting burn + guidance points?
 [ ] Explorer tree
 
 # Campaign
 [ ] Menu screen
-[ ] Stations (stations have resources which can be transferred)
 [ ] Can only change equipment at stations
 - Satellite class
 - Trainer class
@@ -169,13 +169,21 @@
 [ ] Integration techniques (euler RK4 etc)
 
 # Stations
-[ ] Add station vessel class (can't be edited)
+[ ] Add station vessel class (can't be edited, no engines)
 [ ] Station icon
 [ ] Station-grade equipment (can't be added to normal vessels)
+[ ] Docking ports
 [ ] Docking
-[ ] Resource transfer
+[ ] Docking port interface
 [ ] Undocking
-
+[ ] (un)docking icons
+[ ] Resource transfer
+[ ] Resource transfer takes time
+[ ] Resource transfer can be cancelled
+[ ] Equipment swapping
+[ ] Equipment has install time
+[ ] Undocking disabled until swap complete
+[ ] Swap can be cancelled
 
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?
@@ -189,13 +197,16 @@
 [ ] Energy production/storage/consumption
 
 # Backburner
-[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
-[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
 [ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
-[ ] Persistent selected state (doesn't deselect on time changed)
-[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
 [ ] Fix egui flickering
-[ ] Very low/high eccentricity orbits...
+[ ] Fix Very low/high eccentricity orbits...
+
+# Performance
+[ ] Texture atlas
+[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
+[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
+[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
+[ ] Smaller screen texture renderer framebuffer
 
 # Before release
 [ ] Versioning!

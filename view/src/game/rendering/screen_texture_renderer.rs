@@ -47,6 +47,9 @@ impl ScreenTextureRenderer {
     }
 
     pub fn render(&mut self, gl: &Arc<Context>, texture: glow::Texture, screen_rect: Rect, from: Pos2, to: Pos2, alpha: f32) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Screen texture render");
+        
         unsafe {
             clear_framebuffer(gl, self.multisample_framebuffer);
             clear_framebuffer(gl, self.intermediate_framebuffer);
