@@ -217,3 +217,4 @@
 [ ] Test compatibility on different devices
 [ ] Website
 [ ] Add licenses
+[ ] Log to multiple files

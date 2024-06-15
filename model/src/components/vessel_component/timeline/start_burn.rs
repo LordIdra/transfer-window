@@ -51,7 +51,9 @@ impl StartBurnEvent {
 
     #[allow(clippy::missing_panics_doc)]
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
-        model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time)
+        let vessel_component = model.vessel_component(entity);
+        vessel_component.timeline().is_time_after_last_blocking_event(time)
+            && !vessel_component.timeline.last_event().is_some_and(|event| event.is_enable_guidance() || event.is_intercept())
             && model.final_dv(entity).unwrap() > MIN_DV_TO_CREATE_BURN
     }
 }
