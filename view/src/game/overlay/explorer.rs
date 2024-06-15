@@ -58,32 +58,30 @@ fn render_vessel(view: &View, ui: &mut Ui, entity: Entity) {
 
 fn render_entity(view: &View, ui: &mut Ui, entity: Entity, levels: &[bool]) {
     ui.horizontal(|ui| {
-        // wtf
         if levels.is_empty() {
             ui.add_space(7.0);
         }
-        ui.add_space(3.0);
-
+        ui.add_space(4.0);
         for i in 0..levels.len() {
             let level = levels[i];
             let is_last_level = i == levels.len() - 1;
             if level && is_last_level {
-                if levels.len() > 1 {
-                    ui.add_space(-7.0);
-                }
+                // if levels.len() > 1 {
+                //     ui.add_space(-7.0);
+                // }
                 ui.add(CustomImage::new(view, "explorer-intersection", 24.0));
             } else if level && !is_last_level {
-                if levels.len() > 1 {
-                    ui.add_space(-7.0);
-                }
+                // if levels.len() > 1 {
+                //     ui.add_space(-7.0);
+                // }
                 ui.add(CustomImage::new(view, "explorer-straight", 24.0));
             } else if is_last_level {
-                if levels.len() > 1 {
-                    ui.add_space(-7.0);
-                }
+                // if levels.len() > 1 {
+                //     ui.add_space(-7.0);
+                // }
                 ui.add(CustomImage::new(view, "explorer-corner", 24.0));
             } else {
-                ui.add_space(32.0);
+                ui.add_space(24.0);
             }
         }
         if view.model.try_vessel_component(entity).is_some() {
