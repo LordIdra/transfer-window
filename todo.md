@@ -146,7 +146,7 @@
 [x] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [x] Handle ITP failure crashes
 [x] Persistent selected state (doesn't deselect on time changed)
-[ ] Allow selecting burn + guidance points?
+[x] Allow selecting burn + guidance points?
 [ ] Explorer tree
 [ ] Shift to fine adjust
 [ ] Fix backward adjustment

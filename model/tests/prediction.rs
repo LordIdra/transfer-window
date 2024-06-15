@@ -42,7 +42,7 @@ fn test_prediction() {
     // + 1 to account for the last segment which will have a time of 0
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
     
-    let encounter_times = vec![1452880.5996859074, 1453237.8732705116, 1756031.4693295956, 1759789.8763918877];
+    let encounter_times = [1_452_880.599_685_907_4, 1_453_237.873_270_511_6, 1_756_031.469_329_595_6, 1_759_789.876_391_887_7];
 
     for i in 0..segments.len()-1 {
         assert_eq!(segments[i].end_time(), segments[i+1].start_time());
@@ -114,7 +114,7 @@ fn test_prediction_with_burn() {
 
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
 
-    let encounter_times = vec![1451640.0092875957, 1453650.030605793, 1756813.440374136, 1760025.6886267662];
+    let encounter_times = [1_451_640.009_287_595_7, 1_453_650.030_605_793, 1_756_813.440_374_136, 1_760_025.688_626_766_2];
 
     for i in 3..segments.len()-1 {
         assert_eq!(segments[i].end_time(), segments[i+1].start_time());

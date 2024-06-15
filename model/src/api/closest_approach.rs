@@ -234,13 +234,13 @@ mod test {
         let expected = orbit.period().unwrap() / 4.0;
         let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0, None).unwrap();
 
-        println!("Actual: {} Expected: {}", actual, expected);
+        println!("Actual: {actual} Expected: {expected}");
         assert!((expected - actual).abs() / expected < 1.0e-3);
 
         let expected = orbit.period().unwrap() * 3.0 / 4.0;
         let actual = model.find_next_closest_approach(vessel_a, vessel_b, orbit.period().unwrap() / 2.0, None).unwrap();
 
-        println!("Actual: {} Expected: {}", actual, expected);
+        println!("Actual: {actual} Expected: {expected}");
         assert!((expected - actual).abs() / expected < 1.0e-3);
     }
 }

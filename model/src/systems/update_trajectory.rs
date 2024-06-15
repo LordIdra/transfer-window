@@ -12,13 +12,11 @@ fn update_path_component(model: &mut Model, entity: Entity, time: f64) {
         }
 
         model.path_component_mut(entity).on_segment_finished(time);
-        should_recompute_perceived_segments = should_recompute_perceived_segments || !model.path_component(entity).current_segment().is_orbit()
+        should_recompute_perceived_segments = should_recompute_perceived_segments || !model.path_component(entity).current_segment().is_orbit();
     }
 
-    if model.vessel_component(entity).should_recompute_trajectory() {
-        if model.recompute_trajectory(entity) {
-            should_recompute_perceived_segments = true;
-        }
+    if model.vessel_component(entity).should_recompute_trajectory() && model.recompute_trajectory(entity) {
+        should_recompute_perceived_segments = true;
     }
 
     if should_recompute_perceived_segments {

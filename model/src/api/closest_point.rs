@@ -85,17 +85,16 @@ fn process_orbit(orbit: &Orbit, entity: Entity, point: DVec2, max_distance: f64,
     }
 }
 
-fn itp_to_find_turning_point(initial_points: Vec<(f64, f64)>, derivative: impl Fn(f64) -> f64, distance: impl Fn(f64) -> f64, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>, entity: Entity) {
+fn itp_to_find_turning_point(initial_points: &[(f64, f64)], derivative: impl Fn(f64) -> f64, distance: impl Fn(f64) -> f64, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>, entity: Entity) {
     // Find any pairs of points where the distance derivative flips from negative to positive or vice versa
     // This gives us all the minima/maxima on the burn
     // When a pair is found, use the ITP solver to find the time of the minimum/maximum
     let (mut previous_time, mut previous_distance_derivative) = initial_points.first().unwrap();
-    for i in 1..initial_points.len() {
-        let (current_time, current_distance_derivative) = initial_points[i];
+    for (current_time, current_distance_derivative) in initial_points.iter().skip(1) {
         let time = if previous_distance_derivative.is_sign_negative() && current_distance_derivative.is_sign_positive() {
-            Some(itp(&derivative, previous_time, current_time))
+            Some(itp(&derivative, previous_time, *current_time))
         } else if previous_distance_derivative.is_sign_positive() && current_distance_derivative.is_sign_negative() {
-            Some(itp(&derivative, current_time, previous_time))
+            Some(itp(&derivative, *current_time, previous_time))
         } else {
             None
         };
@@ -105,14 +104,14 @@ fn itp_to_find_turning_point(initial_points: Vec<(f64, f64)>, derivative: impl F
                     let distance = distance(time);
                     if distance < max_distance && distance < *closest_distance {
                         *closest_distance = distance;
-                        *closest_point = Some((entity, time))
+                        *closest_point = Some((entity, time));
                     }
                 },
                 Err(err) => error!("Error while computing closest point: {}", err),
             }
         }
-        previous_time = current_time;
-        previous_distance_derivative = current_distance_derivative;
+        previous_time = *current_time;
+        previous_distance_derivative = *current_distance_derivative;
     }
 }
 
@@ -135,7 +134,7 @@ fn process_burn(burn: &Burn, entity: Entity, point: DVec2, max_distance: f64, cl
         initial_points.push((time, derivative(time)));
     }
 
-    itp_to_find_turning_point(initial_points, derivative, distance, max_distance, closest_distance, closest_point, entity);
+    itp_to_find_turning_point(&initial_points, derivative, distance, max_distance, closest_distance, closest_point, entity);
 }
 
 fn process_guidance(guidance: &Guidance, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
@@ -157,7 +156,7 @@ fn process_guidance(guidance: &Guidance, entity: Entity, point: DVec2, max_dista
         initial_points.push((time, derivative(time)));
     }
 
-    itp_to_find_turning_point(initial_points, derivative, distance, max_distance, closest_distance, closest_point, entity);
+    itp_to_find_turning_point(&initial_points, derivative, distance, max_distance, closest_distance, closest_point, entity);
 }
 
 impl Model {

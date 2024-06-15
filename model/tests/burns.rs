@@ -69,9 +69,9 @@ fn test_create_burn_with_zero_dv() {
 
     assert_eq!(model.path_component(vessel).final_burn().unwrap().total_dv(), 0.0);
 
-    println!("mass after = {} mass before = {}", mass_after, mass_before);
-    println!("position after = {:?} position before = {:?}", position_after, position_before);
-    println!("velocity after = {:?} velocity before = {:?}", velocity_after, velocity_before);
+    println!("mass after = {mass_after} mass before = {mass_before}");
+    println!("position after = {position_after:?} position before = {position_before:?}");
+    println!("velocity after = {velocity_after:?} velocity before = {velocity_before:?}");
 
     assert!((mass_after - mass_before).abs() < 1.0e-5);
     assert!((position_after - position_before).magnitude() < 1.0e-1);

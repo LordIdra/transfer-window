@@ -122,6 +122,6 @@ mod test {
 
         let step_end_time = rocket_equation_function.step_by_dv(rocket_equation_function.end().used_dv()).unwrap().burn_time();
         let actual_end_time = rocket_equation_function.end().burn_time();
-        assert!((step_end_time - actual_end_time).abs() < 1.0e-3)
+        assert!((step_end_time - actual_end_time).abs() < 1.0e-3);
     }
 }
