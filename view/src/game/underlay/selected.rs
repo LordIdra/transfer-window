@@ -21,18 +21,27 @@ pub fn update(view: &View) {
     }
 
     // Draw hover circle
-    if !matches!(view.selected, Selected::Point { .. }) {
+    if !matches!(view.selected, Selected::OrbitPoint { .. }) {
         segment_point::draw_hover(view, &pointer);
     }
 
-    // Select hover
+    // Select point
     if pointer.primary_clicked() && !view.pointer_over_ui && !view.pointer_over_icon {
         let select_distance = SELECT_DISTANCE / view.camera.zoom();
         if let Some(latest_window) = pointer.latest_pos() { 
             let latest_world = view.window_space_to_world_space(latest_window);
-            if let Some((entity, time)) = view.model.closest_point_on_any_vessel_trajectory(latest_world, select_distance, Some(Faction::Player)) {
-                trace!("Selected segment point at time={}", time);
-                let selected = Selected::Point { entity, time };
+
+            if let Some((entity, time)) = view.model.closest_burn_point(latest_world, select_distance, Some(Faction::Player)) {
+                trace!("Selected orbit point at time={}", time);
+                let selected = Selected::BurnPoint { entity, time };
+                view.add_view_event(ViewEvent::SetSelected(selected));
+            } else if let Some((entity, time)) = view.model.closest_guidance_point(latest_world, select_distance, Some(Faction::Player)) {
+                trace!("Selected orbit point at time={}", time);
+                let selected = Selected::GuidancePoint { entity, time };
+                view.add_view_event(ViewEvent::SetSelected(selected));
+            } else if let Some((entity, time)) = view.model.closest_orbit_point(latest_world, select_distance, Some(Faction::Player)) {
+                trace!("Selected orbit point at time={}", time);
+                let selected = Selected::OrbitPoint { entity, time };
                 view.add_view_event(ViewEvent::SetSelected(selected));
             }
         }
@@ -47,7 +56,9 @@ pub fn update(view: &View) {
             | Selected::Encounter { .. }
             | Selected::Intercept { .. }
             | Selected::EnableGuidance { .. }=> (),
-        Selected::Point { .. } => segment_point::draw_selected(view),
+        Selected::BurnPoint { .. }
+            | Selected::GuidancePoint { .. } 
+            | Selected::OrbitPoint { .. } => segment_point::draw_selected(view),
         Selected::Burn { .. } => burn::update_adjustment(view, &pointer),
         Selected::FireTorpedo { .. } => fire_torpedo::update_adjustment(view, &pointer),
     }

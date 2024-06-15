@@ -104,6 +104,16 @@ pub fn format_time(time: f64) -> String {
     }
 }
 
+pub fn format_time_with_millis(time: f64) -> String {
+    if time < 1.0 {
+        format!("{time:.2}s")
+    } else if time < 10.0 {
+        format!("{time:.1}s")
+    } else {
+        format_time(time)
+    }
+}
+
 pub fn format_distance(distance: f64) -> String {
     if distance < 1_000.0 {
         format!("{} m", distance.round())

@@ -21,7 +21,7 @@ pub fn draw_title(ui: &mut Ui, name: &str) {
 }
 
 pub fn draw_subtitle(ui: &mut Ui, name: &str) {
-    ui.add_space(8.0);
+    ui.add_space(12.0);
     ui.label(RichText::new(name.to_uppercase()).size(14.0).monospace().strong());
 }
 

@@ -111,11 +111,11 @@ pub fn draw_edit_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
 pub fn draw_cancel_burn(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "cancel", 36.0)
         .with_padding(8.0);
-    ui.add(button).on_hover_text("Cancel current burn").clicked()
+    ui.add(button).on_hover_text("Cancel burn").clicked()
 }
 
 pub fn draw_cancel_guidance(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "cancel", 36.0)
         .with_padding(8.0);
-    ui.add(button).on_hover_text("Cancel current guidance").clicked()
+    ui.add(button).on_hover_text("Cancel guidance").clicked()
 }

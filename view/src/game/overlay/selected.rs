@@ -8,7 +8,9 @@ mod fire_torpedo;
 mod guidance;
 mod intercept;
 mod orbitable;
-mod point;
+mod burn_point;
+mod guidance_point;
+mod orbit_point;
 mod vessel;
 
 pub fn update(view: &View) {
@@ -16,7 +18,9 @@ pub fn update(view: &View) {
     let _span = tracy_client::span!("Update selected");
     approach::update(view);
     apsis::update(view);
-    point::update(view);
+    burn_point::update(view);
+    guidance_point::update(view);
+    orbit_point::update(view);
     burn::update(view);
     encounter::update(view);
     guidance::update(view);

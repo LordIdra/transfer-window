@@ -23,7 +23,11 @@ fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -
 fn find_min_max_signed_distance(sdf: &impl Fn(f64) -> f64, argument_of_apoapsis: f64) -> Result<(f64, f64), &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Min max signed distance");
-    let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-4, 1.0e-6, 256).expect("Failed to converge while solving for ellipse bounds");
+    let theta_1 = laguerre_to_find_stationary_point(&sdf, argument_of_apoapsis, 1.0e-4, 1.0e-6, 256);
+    if theta_1.is_none() {
+        return Err("Failed to converge while solving for ellipse bounds");
+    }
+    let theta_1 = theta_1.unwrap();
     let theta_2 = find_other_stationary_point(sdf, theta_1)?;
     let (theta_1, theta_2) = (normalize_angle(theta_1), normalize_angle(theta_2));
     if sdf(theta_1) < sdf(theta_2) { 

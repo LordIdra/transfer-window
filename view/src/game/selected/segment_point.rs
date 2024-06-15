@@ -19,8 +19,11 @@ fn draw_selected_circle(view: &View, entity: Entity, time: f64, alpha: f32) {
 
 #[allow(clippy::too_many_arguments)]
 pub fn draw_selected(view: &View) {
-    if let Selected::Point { entity, time } = view.selected.clone() {
-        draw_selected_circle(view, entity, time, SELECTED_ALPHA);
+    match view.selected.clone() {
+        Selected::BurnPoint { entity, time }
+            | Selected::GuidancePoint { entity, time }
+            | Selected::OrbitPoint { entity, time } => draw_selected_circle(view, entity, time, SELECTED_ALPHA),
+        _ => ()
     }
 }
 
@@ -35,7 +38,15 @@ pub fn draw_hover(view: &View, pointer: &PointerState) {
     
     let select_distance = SELECT_DISTANCE / view.camera.zoom();
     let latest_world = view.window_space_to_world_space(latest_window);
-    if let Some((entity, time)) = view.model.closest_point_on_any_vessel_trajectory(latest_world, select_distance, Some(Faction::Player)) {
+    if let Some((entity, time)) = view.model.closest_burn_point(latest_world, select_distance, Some(Faction::Player)) {
+        draw_selected_circle(view, entity, time, HOVERED_ALPHA);
+        return;
+    }
+    if let Some((entity, time)) = view.model.closest_guidance_point(latest_world, select_distance, Some(Faction::Player)) {
+        draw_selected_circle(view, entity, time, HOVERED_ALPHA);
+        return;
+    }
+    if let Some((entity, time)) = view.model.closest_orbit_point(latest_world, select_distance, Some(Faction::Player)) {
         draw_selected_circle(view, entity, time, HOVERED_ALPHA);
     }
 }

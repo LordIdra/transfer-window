@@ -3,7 +3,7 @@ use transfer_window_model::components::orbitable_component::OrbitableComponent;
 
 use crate::game::{overlay::widgets::labels::{draw_key, draw_subtitle, draw_title, draw_value}, selected::Selected, util::format_distance, View};
 
-use super::point::draw_orbit_labels;
+use super::orbit_point::draw_orbit_labels;
 
 fn draw_info(ui: &mut Ui, orbitable_component: &OrbitableComponent) {
     draw_subtitle(ui, "Info");

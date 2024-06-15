@@ -105,9 +105,9 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::Apsis { type_, time, distance: _ } => Some(Selected::Apsis { type_: *type_, entity, time: *time }),
             VisualTimelineEvent::Approach { type_, target, time, distance: _ } => Some(Selected::Approach { type_: *type_, entity, target: *target, time: *time }),
             VisualTimelineEvent::Encounter { type_, time, from, to } => Some(Selected::Encounter { type_: *type_, entity, time: *time, from: *from, to: *to }),
-            VisualTimelineEvent::Point { .. } => None,
-            VisualTimelineEvent::BurnEnd { .. } => None,
-            VisualTimelineEvent::GuidanceEnd { .. } => None,
+            VisualTimelineEvent::Point { .. } 
+                | VisualTimelineEvent::BurnEnd { .. } 
+                | VisualTimelineEvent::GuidanceEnd { .. } => None,
         }
     }
 
@@ -120,7 +120,9 @@ impl VisualTimelineEvent {
             Selected::None => false,
             Selected::Orbitable(_) => false,
             Selected::Vessel(_) => false,
-            Selected::Point { .. } => matches!(self, VisualTimelineEvent::Point { .. }),
+            Selected::BurnPoint { .. } 
+                | Selected::GuidancePoint { .. } 
+                | Selected::OrbitPoint { .. } => matches!(self, VisualTimelineEvent::Point { .. }),
             Selected::Apsis { type_, time, .. } => {
                 match self {
                     // calculations can produce slightly different times when an apsis is calculated

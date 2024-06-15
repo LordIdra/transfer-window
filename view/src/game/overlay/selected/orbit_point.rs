@@ -18,12 +18,12 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
         }
 
         if let Some(time) = draw_previous(view, ui, time, entity) {
-            let selected = Selected::Point { entity, time };
+            let selected = Selected::OrbitPoint { entity, time };
             view.add_view_event(ViewEvent::SetSelected(selected));
         }
 
         if let Some(time) = draw_next(view, ui, time, entity) {
-            let selected = Selected::Point { entity, time };
+            let selected = Selected::OrbitPoint { entity, time };
             view.add_view_event(ViewEvent::SetSelected(selected));
         }
 
@@ -104,8 +104,8 @@ fn draw_orbit(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
 
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
-    let _span = tracy_client::span!("Update point");
-    let Selected::Point { entity, time } = view.selected.clone() else {
+    let _span = tracy_client::span!("Update orbit point");
+    let Selected::OrbitPoint { entity, time } = view.selected.clone() else {
         return;
     };
 

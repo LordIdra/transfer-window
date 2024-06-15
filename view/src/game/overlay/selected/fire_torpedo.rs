@@ -1,8 +1,8 @@
 use eframe::{egui::{Align2, Ui, Window}, epaint};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::draw_select_vessel, custom_image_button::CustomCircularImageButton, labels::{draw_time_until, draw_title}}, selected::Selected, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::draw_select_vessel, custom_image_button::CustomCircularImageButton, labels::{draw_subtitle, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
-use super::{burn::draw_burn_info, vessel::visual_timeline::draw_visual_timeline};
+use super::{burn::draw_burn_labels, vessel::visual_timeline::draw_visual_timeline};
 
 fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: transfer_window_model::storage::entity_allocator::Entity) {
     ui.horizontal(|ui| {
@@ -59,7 +59,8 @@ pub fn update(view: &View) {
             draw_title(ui, "Torpedo Launch");
             draw_time_until(view, ui, time);
             draw_controls(ui, view, time, entity);
-            draw_burn_info(view, ui, max_dv, start_dv, end_dv, duration);
+            draw_subtitle(ui, "Burn");
+            draw_burn_labels(view, ui, max_dv, start_dv, end_dv, duration);
             draw_visual_timeline(view, ui, entity, time, false);
         });
 }

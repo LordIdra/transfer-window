@@ -98,6 +98,18 @@ impl Model {
         self.segment_at_time(entity, time, observer).as_orbit().expect("No orbit exists at the given time")
     }
 
+    /// # Panics
+    /// Panics if there is no burn at the given time
+    pub fn burn_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Burn {
+        self.segment_at_time(entity, time, observer).as_burn().expect("No burn exists at the given time")
+    }
+
+    /// # Panics
+    /// Panics if there is no burn at the given time
+    pub fn guidance_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Guidance {
+        self.segment_at_time(entity, time, observer).as_guidance().expect("No guidance exists at the given time")
+    }
+
     pub fn parent(&self, entity: Entity) -> Option<Entity> {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return orbitable_component.orbit().map(Orbit::parent);

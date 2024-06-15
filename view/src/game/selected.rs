@@ -16,7 +16,9 @@ pub enum Selected {
     None,
     Orbitable(Entity),
     Vessel(Entity),
-    Point { entity: Entity, time: f64 },
+    BurnPoint { entity: Entity, time: f64 },
+    GuidancePoint { entity: Entity, time: f64 },
+    OrbitPoint { entity: Entity, time: f64 },
     Apsis { type_: ApsisType, entity: Entity, time: f64 },
     Approach { type_: ApproachType, entity: Entity, target: Entity, time: f64 },
     Encounter { type_: EncounterType, entity: Entity, time: f64, from: Entity, to: Entity },
@@ -34,7 +36,9 @@ impl Selected {
             Selected::Orbitable(entity) 
                 | Selected::Vessel(entity) 
                 | Selected::Burn { entity, .. }
-                | Selected::Point { entity, .. } 
+                | Selected::BurnPoint { entity, .. } 
+                | Selected::GuidancePoint { entity, .. } 
+                | Selected::OrbitPoint { entity, .. } 
                 | Selected::Apsis { entity, .. }
                 | Selected::Approach {  entity, .. }
                 | Selected::Encounter { entity, .. }
@@ -50,7 +54,9 @@ impl Selected {
                 | Selected::Vessel(_) => None,
             Selected::FireTorpedo { time, .. }
                 | Selected::Burn { time, .. }
-                | Selected::Point { time, .. } 
+                | Selected::BurnPoint { time, .. } 
+                | Selected::GuidancePoint { time, .. } 
+                | Selected::OrbitPoint { time, .. } 
                 | Selected::Apsis { time, .. }
                 | Selected::Approach { time, .. }
                 | Selected::Encounter { time, .. }
