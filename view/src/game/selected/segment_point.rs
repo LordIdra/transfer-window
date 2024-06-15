@@ -35,7 +35,7 @@ pub fn draw_hover(view: &View, pointer: &PointerState) {
     
     let select_distance = SELECT_DISTANCE / view.camera.zoom();
     let latest_world = view.window_space_to_world_space(latest_window);
-    if let Some((entity, time)) = view.model.closest_point_on_any_trajectory(latest_world, select_distance, Some(Faction::Player)) {
+    if let Some((entity, time)) = view.model.closest_point_on_any_vessel_trajectory(latest_world, select_distance, Some(Faction::Player)) {
         draw_selected_circle(view, entity, time, HOVERED_ALPHA);
     }
 }

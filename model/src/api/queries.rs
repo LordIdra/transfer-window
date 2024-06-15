@@ -1,7 +1,7 @@
 
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::{orbitable_component::OrbitableComponentPhysics, path_component::{orbit::Orbit, segment::Segment}, vessel_component::Faction}, storage::entity_allocator::Entity, Model};
+use crate::{components::{orbitable_component::OrbitableComponentPhysics, path_component::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment}, vessel_component::Faction}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     /// NOT safe to call for orbitables
@@ -30,6 +30,28 @@ impl Model {
             }
         }
         orbits
+    }
+
+    /// NOT safe to call for orbitables
+    pub fn future_burns(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Burn> {
+        let mut burns = vec![];
+        for segment in self.future_segments(entity, observer) {
+            if let Some(burn) = segment.as_burn() {
+                burns.push(burn);
+            }
+        }
+        burns
+    }
+
+    /// NOT safe to call for orbitables
+    pub fn future_guidances(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Guidance> {
+        let mut guidances = vec![];
+        for segment in self.future_segments(entity, observer) {
+            if let Some(guidance) = segment.as_guidance() {
+                guidances.push(guidance);
+            }
+        }
+        guidances
     }
 
     pub fn current_segment(&self, entity: Entity) -> &Segment {
