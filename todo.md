@@ -147,9 +147,8 @@
 [x] Handle ITP failure crashes
 [x] Persistent selected state (doesn't deselect on time changed)
 [x] Allow selecting burn + guidance points?
+[x] Fix backward adjustment
 [ ] Explorer tree
-[ ] Shift to fine adjust
-[ ] Fix backward adjustment
 
 # Campaign
 [ ] Menu screen
@@ -201,7 +200,7 @@
 # Backburner
 [ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
 [ ] Fix egui flickering
-[ ] Fix Very low/high eccentricity orbits...
+[ ] Fix very low/high eccentricity orbits...
 
 # Performance
 [ ] Texture atlas
