@@ -1,8 +1,8 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity};
 
-use crate::game::{events::ViewEvent, selected::Selected, View};
+use crate::game::{events::ViewEvent, selected::Selected, util::orbitable_texture, View};
 
 use super::Icon;
 
@@ -24,12 +24,7 @@ impl Orbitable {
 
 impl Icon for Orbitable {
     fn texture(&self, view: &View) -> String {
-        let mut texture = match view.model.orbitable_component(self.entity).type_() {
-            OrbitableType::Star => "star",
-            OrbitableType::Planet => "planet",
-            OrbitableType::Moon => "moon",
-        }.to_string();
-
+        let mut texture = orbitable_texture(view.model.orbitable_component(self.entity).type_()).to_string();
         if let Some(target) = view.selected.target(&view.model) {
             if target == self.entity {
                 texture += "-target";

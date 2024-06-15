@@ -1,16 +1,13 @@
 use eframe::egui::Ui;
 use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}, Faction, VesselClass}}, storage::entity_allocator::Entity};
 
-use crate::game::View;
+use crate::game::{util::{orbitable_texture, vessel_texture}, View};
 
 use super::custom_image_button::CustomCircularImageButton;
 
 pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
     let class = view.model.vessel_component(entity).class();
-    let icon = match class {
-        VesselClass::Torpedo => "vessel-icon-torpedo",
-        VesselClass::Light => "vessel-icon-light",
-    };
+    let icon = vessel_texture(class);
     let tooltip = match class {
         VesselClass::Torpedo => "Select torpedo",
         VesselClass::Light => "Select vessel",
@@ -22,11 +19,7 @@ pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
 
 pub fn draw_select_orbitable(view: &View, ui: &mut Ui, entity: Entity) -> bool {
     let type_ = view.model.orbitable_component(entity).type_();
-    let icon = match type_ {
-        OrbitableType::Star => "star",
-        OrbitableType::Planet => "planet",
-        OrbitableType::Moon => "moon",
-    };
+    let icon = orbitable_texture(type_);
     let tooltip = match type_ {
         OrbitableType::Star => "Select star",
         OrbitableType::Planet => "Select planet",
@@ -118,4 +111,10 @@ pub fn draw_cancel_guidance(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "cancel", 36.0)
         .with_padding(8.0);
     ui.add(button).on_hover_text("Cancel guidance").clicked()
+}
+
+pub fn draw_focus(view: &View, ui: &mut Ui) -> bool {
+    let button = CustomCircularImageButton::new(view, "focus", 30.0)
+        .with_padding(3.0);
+    ui.add(button).on_hover_text("Focus").clicked()
 }

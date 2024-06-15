@@ -26,7 +26,7 @@ impl VesselEditor {
 /// Returns whether the close button was clicked
 fn draw_header(view: &View, ui: &mut Ui, entity: Entity) {
     ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
-        let name = view.model.name_component(entity).name().to_uppercase();
+        let name = view.model.name_component(entity).name();
         ui.label(RichText::new(name).strong().size(32.0));
     });
 }

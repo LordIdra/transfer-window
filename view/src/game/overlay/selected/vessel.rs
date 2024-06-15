@@ -2,7 +2,7 @@ use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::{Faction, VesselComponent}, storage::entity_allocator::Entity};
 use visual_timeline::draw_visual_timeline;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel}, labels::{draw_key, draw_subtitle, draw_title, draw_value}}}, selected::Selected, util::{format_distance, format_speed}, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel, draw_focus}, labels::{draw_key, draw_subtitle, draw_title, draw_value}}}, selected::Selected, util::{format_distance, format_speed}, View}, styles};
 
 pub mod visual_timeline;
 
@@ -78,32 +78,38 @@ fn draw_resources(ui: &mut Ui, vessel_component: &VesselComponent, name: &str) {
     }
 }
 
-fn draw_controls(vessel_component: &VesselComponent, view: &View, entity: Entity, ui: &mut Ui) {
-    let add_edit_button = vessel_component.can_edit_ever();
-    let add_cancel_burn_button = view.model.path_component(entity).current_segment().is_burn();
-    let add_cancel_guidance_button = view.model.path_component(entity).current_segment().is_guidance();
-    if add_edit_button || add_cancel_burn_button || add_cancel_guidance_button {
-        ui.horizontal(|ui| {
-            styles::SelectedMenuButton::apply(ui);
+fn draw_controls(vessel_component: &VesselComponent, view: &View, entity: Entity, ui: &mut Ui, has_intel: bool) {
+    ui.horizontal(|ui| {
+        styles::SelectedMenuButton::apply(ui);
 
-            if add_edit_button && draw_edit_vessel(view, ui, entity) {
-                let vessel_editor = Some(VesselEditor::new(entity));
-                view.add_view_event(ViewEvent::SetVesselEditor(vessel_editor));
-            }
+        if draw_focus(view, ui) {
+            view.add_view_event(ViewEvent::ResetCameraPanning);
+            view.add_view_event(ViewEvent::SetCameraFocus(entity));
+        }
 
-            if add_cancel_burn_button && draw_cancel_burn(view, ui) {
-                view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
-            }
+        if !has_intel {
+            return;
+        }
 
-            if add_cancel_guidance_button && draw_cancel_guidance(view, ui) {
-                if view.model.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
-                    // also cancel intercept
-                    view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
-                }
-                view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
+        if vessel_component.can_edit_ever() && draw_edit_vessel(view, ui, entity) {
+            let vessel_editor = Some(VesselEditor::new(entity));
+            view.add_view_event(ViewEvent::SetVesselEditor(vessel_editor));
+        }
+
+        if view.model.path_component(entity).current_segment().is_burn() && draw_cancel_burn(view, ui) {
+            view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
+        }
+
+        if view.model.path_component(entity).current_segment().is_guidance() && draw_cancel_guidance(view, ui) {
+            if view.model.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
+                // also cancel intercept
+                view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
             }
-        });
-    }
+            view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
+        }
+    });
+
+    ui.add_space(-4.0);
 }
 
 fn draw_info(view: &View, ui: &mut Ui, name: &str, entity: Entity) {
@@ -122,7 +128,7 @@ pub fn update(view: &View) {
         return
     };
 
-    let name = view.model.name_component(entity).name().to_uppercase();
+    let name = view.model.name_component(entity).name();
     let vessel_component = view.model.vessel_component(entity);
     let has_intel = Faction::Player.has_intel_for(vessel_component.faction());
     let has_control = Faction::Player.can_control(vessel_component.faction());
@@ -133,11 +139,7 @@ pub fn update(view: &View) {
             .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
             .show(&view.context.clone(), |ui| {
         draw_title(ui, &name);
-
-        if has_control {
-            draw_controls(vessel_component, view, entity, ui);
-        }
-
+        draw_controls(vessel_component, view, entity, ui, has_control);
         draw_info(view, ui, &name, entity);
 
         if has_intel {

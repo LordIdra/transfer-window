@@ -148,7 +148,7 @@
 [x] Persistent selected state (doesn't deselect on time changed)
 [x] Allow selecting burn + guidance points?
 [x] Fix backward adjustment
-[ ] Explorer tree
+[x] Explorer tree
 
 # Campaign
 [ ] Menu screen

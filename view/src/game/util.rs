@@ -1,7 +1,7 @@
 use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
 use thousands::Separable;
-use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{Faction, VesselClass}}, storage::entity_allocator::Entity};
 
 use super::{selected::util::BurnAdjustDirection, View};
 
@@ -177,6 +177,21 @@ pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
         return true;
     };
     should_render_parent(view, parent)
+}
+
+pub fn vessel_texture(class: VesselClass) -> &'static str {
+    match class {
+        VesselClass::Torpedo => "vessel-icon-torpedo",
+        VesselClass::Light => "vessel-icon-light",
+    }
+}
+
+pub fn orbitable_texture(type_: OrbitableType) -> &'static str {
+    match type_ {
+        OrbitableType::Star => "star",
+        OrbitableType::Planet => "planet",
+        OrbitableType::Moon => "moon",
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
