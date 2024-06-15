@@ -17,8 +17,8 @@ fn draw_focus(view: &View, ui: &mut Ui, entity: Entity) {
 fn draw_set_target(view: &View, ui: &mut Ui, right_clicked: Entity, selected: Entity) {
     let is_already_target = view.model.target(selected) == Some(right_clicked);
     if is_already_target {
-        let button = CustomCircularImageButton::new(view, "unset-target", 30.0)
-            .with_padding(4.0);
+        let button = CustomCircularImageButton::new(view, "unset-target", 36.0)
+            .with_padding(8.0);
         if ui.add(button).on_hover_text("Unset target").clicked() {
             view.add_model_event(ModelEvent::SetTarget { 
                 entity: selected, 
@@ -28,9 +28,9 @@ fn draw_set_target(view: &View, ui: &mut Ui, right_clicked: Entity, selected: En
         }
     } else {
         let enabled = selected != right_clicked;
-        let button = CustomCircularImageButton::new(view, "set-target", 30.0)
+        let button = CustomCircularImageButton::new(view, "set-target", 36.0)
             .with_enabled(enabled)
-            .with_padding(4.0);
+            .with_padding(8.0);
         if ui.add_enabled(enabled, button)
                 .on_hover_text("Set target")
                 .clicked() {

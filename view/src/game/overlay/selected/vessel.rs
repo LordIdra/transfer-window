@@ -87,20 +87,16 @@ fn draw_controls(vessel_component: &VesselComponent, view: &View, entity: Entity
             view.add_view_event(ViewEvent::SetCameraFocus(entity));
         }
 
-        if !has_intel {
-            return;
-        }
-
-        if vessel_component.can_edit_ever() && draw_edit_vessel(view, ui, entity) {
+        if has_intel && vessel_component.can_edit_ever() && draw_edit_vessel(view, ui, entity) {
             let vessel_editor = Some(VesselEditor::new(entity));
             view.add_view_event(ViewEvent::SetVesselEditor(vessel_editor));
         }
 
-        if view.model.path_component(entity).current_segment().is_burn() && draw_cancel_burn(view, ui) {
+        if has_intel && view.model.path_component(entity).current_segment().is_burn() && draw_cancel_burn(view, ui) {
             view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
         }
 
-        if view.model.path_component(entity).current_segment().is_guidance() && draw_cancel_guidance(view, ui) {
+        if has_intel && view.model.path_component(entity).current_segment().is_guidance() && draw_cancel_guidance(view, ui) {
             if view.model.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
                 // also cancel intercept
                 view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
@@ -108,8 +104,6 @@ fn draw_controls(vessel_component: &VesselComponent, view: &View, entity: Entity
             view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
         }
     });
-
-    ui.add_space(-4.0);
 }
 
 fn draw_info(view: &View, ui: &mut Ui, name: &str, entity: Entity) {

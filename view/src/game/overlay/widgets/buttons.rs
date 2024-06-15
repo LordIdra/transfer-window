@@ -114,7 +114,7 @@ pub fn draw_cancel_guidance(view: &View, ui: &mut Ui) -> bool {
 }
 
 pub fn draw_focus(view: &View, ui: &mut Ui) -> bool {
-    let button = CustomCircularImageButton::new(view, "focus", 30.0)
-        .with_padding(3.0);
+    let button = CustomCircularImageButton::new(view, "focus", 36.0)
+        .with_padding(8.0);
     ui.add(button).on_hover_text("Focus").clicked()
 }
