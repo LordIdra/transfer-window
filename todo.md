@@ -149,6 +149,7 @@
 [x] Allow selecting burn + guidance points?
 [x] Fix backward adjustment
 [x] Explorer tree
+[x] Fix very low/high eccentricity orbits...
 
 # Campaign
 [ ] Menu screen
@@ -200,7 +201,6 @@
 # Backburner
 [ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
 [ ] Fix egui flickering
-[ ] Fix very low/high eccentricity orbits...
 
 # Performance
 [ ] Texture atlas

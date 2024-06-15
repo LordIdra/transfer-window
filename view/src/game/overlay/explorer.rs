@@ -66,19 +66,10 @@ fn render_entity(view: &View, ui: &mut Ui, entity: Entity, levels: &[bool]) {
             let level = levels[i];
             let is_last_level = i == levels.len() - 1;
             if level && is_last_level {
-                // if levels.len() > 1 {
-                //     ui.add_space(-7.0);
-                // }
                 ui.add(CustomImage::new(view, "explorer-intersection", 24.0));
             } else if level && !is_last_level {
-                // if levels.len() > 1 {
-                //     ui.add_space(-7.0);
-                // }
                 ui.add(CustomImage::new(view, "explorer-straight", 24.0));
             } else if is_last_level {
-                // if levels.len() > 1 {
-                //     ui.add_space(-7.0);
-                // }
                 ui.add(CustomImage::new(view, "explorer-corner", 24.0));
             } else {
                 ui.add_space(24.0);

@@ -25,23 +25,11 @@ impl Conic {
     pub fn new(parent_mass: f64, position: DVec2, velocity: DVec2) -> Self {
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * parent_mass;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
-        let mut eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
+        let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
         let direction = OrbitDirection::new(position, velocity);
         if eccentricity <= 1.0 {
-            // Ellipse cannot model orbits with eccentricity extremely close to 1 - this small adjustment should not make a difference
-            if (eccentricity - 1.0).abs() < 1.0e-4 {
-                eccentricity -= 1.0e-4;
-            }
-            // Ellipse may not be able to model orbits with eccentricity extremely close to 0 - this small adjustment should not make a difference
-            if eccentricity.abs() < 1.0e-4 {
-                eccentricity += 1.0e-4;
-            }
             Conic::Ellipse(Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction))
         } else {
-            // Hyperbola cannot model orbits with eccentricity extremely close to 1 - this small adjustment should not make a difference
-            if (eccentricity - 1.0).abs() < 1.0e-4 {
-                eccentricity += 1.0e-4;
-            }
             Conic::Hyperbola(Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction))
         }
     }
@@ -49,7 +37,7 @@ impl Conic {
     pub fn circle(parent_mass: f64, position: DVec2, direction: OrbitDirection) -> Self {
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * parent_mass;
         let semi_major_axis = position.magnitude();
-        let eccentricity: f64 = 1.01e-4;
+        let eccentricity: f64 = 1.0e-6;
         let velocity = velocity_to_obtain_eccentricity(position, eccentricity, standard_gravitational_parameter, semi_major_axis, direction);
         Self::new(parent_mass, position, velocity)
     }
