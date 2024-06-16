@@ -3,7 +3,7 @@ use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::vessel_component::Faction, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity, Model};
 
 use self::guidance_point::GuidancePoint;
 

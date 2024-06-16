@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Color32, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::{vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::{orbitable_texture, vessel_texture}};
 
@@ -40,7 +40,7 @@ fn render_orbitable(view: &View, ui: &mut Ui, entity: Entity) {
 
 fn render_vessel(view: &View, ui: &mut Ui, entity: Entity) {
     let vessel_component = view.model.vessel_component(entity);
-    let texture = vessel_texture(vessel_component.class());
+    let texture = vessel_texture(vessel_component);
     let name = view.model.name_component(entity).name();
     let faction = vessel_component.faction();
     ui.add_space(-7.0);

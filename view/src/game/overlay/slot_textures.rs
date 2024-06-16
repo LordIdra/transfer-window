@@ -1,4 +1,4 @@
-use transfer_window_model::components::vessel_component::system_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, Slot, System};
+use transfer_window_model::components::vessel_component::ship::ship_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, ShipSlot, System};
 
 pub trait TexturedSlot {
     fn texture(&self) -> &str;
@@ -33,18 +33,18 @@ impl TexturedSlot for WeaponType {
     }
 }
 
-impl TexturedSlot for Slot {
+impl TexturedSlot for ShipSlot {
     fn texture(&self) -> &str {
         match self {
-            Slot::Weapon(weapon) => match weapon {
+            ShipSlot::Weapon(weapon) => match weapon {
                 None => "blank-slot",
                 Some(weapon) => weapon.type_().texture(),
             },
-            Slot::FuelTank(fuel_tank) => match fuel_tank {
+            ShipSlot::FuelTank(fuel_tank) => match fuel_tank {
                 None => "blank-slot",
                 Some(fuel_tank) => fuel_tank.type_().texture(),
             },
-            Slot::Engine(engine) => match engine {
+            ShipSlot::Engine(engine) => match engine {
                 None => "blank-slot",
                 Some(engine) => engine.type_().texture(),
             },

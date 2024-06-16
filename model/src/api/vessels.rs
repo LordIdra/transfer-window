@@ -1,8 +1,10 @@
-use crate::{components::vessel_component::{system_slot::{Slot, SlotLocation}, timeline::fire_torpedo::FireTorpedoEvent}, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::{ship::ship_slot::{ShipSlot, ShipSlotLocation}, timeline::fire_torpedo::FireTorpedoEvent}, storage::entity_allocator::Entity, Model};
 
 impl Model {
-    pub fn set_slot(&mut self, entity: Entity, location: SlotLocation, slot: Slot) {
-        self.vessel_component_mut(entity).set_slot(location, slot);
+    /// # Panics
+    /// 
+    pub fn set_slot(&mut self, entity: Entity, location: ShipSlotLocation, slot: ShipSlot) {
+        self.vessel_component_mut(entity).as_ship_mut().unwrap().set_slot(location, slot);
         self.recompute_entire_trajectory(entity);
     }
 

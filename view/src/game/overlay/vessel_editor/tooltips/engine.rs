@@ -1,5 +1,5 @@
 use eframe::egui::{Grid, RichText, Ui};
-use transfer_window_model::components::vessel_component::system_slot::{engine::{Engine, EngineType}, System};
+use transfer_window_model::components::vessel_component::ship::ship_slot::{engine::{Engine, EngineType}, System};
 
 use crate::game::View;
 

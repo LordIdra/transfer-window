@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::{timeline::TimelineEvent, Faction}, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::{timeline::TimelineEvent, faction::Faction}, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::should_render_at_time, View};
 

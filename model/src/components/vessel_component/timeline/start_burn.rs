@@ -45,15 +45,15 @@ impl StartBurnEvent {
     }
 
     pub fn can_create_ever(model: &Model, entity: Entity) -> bool {
-        model.vessel_component(entity).slots().engine().is_some()
-            && !model.vessel_component(entity).slots().fuel_tanks().is_empty()
+        model.vessel_component(entity).has_engine()
+            && model.vessel_component(entity).has_fuel_tank()
     }
 
     #[allow(clippy::missing_panics_doc)]
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         let vessel_component = model.vessel_component(entity);
         vessel_component.timeline().is_time_after_last_blocking_event(time)
-            && !vessel_component.timeline.last_event().is_some_and(|event| event.is_enable_guidance() || event.is_intercept())
+            && !vessel_component.timeline().last_event().is_some_and(|event| event.is_enable_guidance() || event.is_intercept())
             && model.final_dv(entity).unwrap() > MIN_DV_TO_CREATE_BURN
     }
 }

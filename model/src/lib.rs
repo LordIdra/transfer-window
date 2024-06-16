@@ -76,6 +76,7 @@ impl Model {
         self.update_warp(dt);
         self.update_time(dt);
         self.update_timeline();
+        self.update_target();
         self.update_fuel();
         self.update_trajectory();
         self.update_guidance();

@@ -2,7 +2,7 @@
 use model::*;
 use log::debug;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::vessel_component::system_slot::{Slot, SlotLocation}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::ship::ship_slot::{ShipSlot, ShipSlotLocation}, storage::entity_allocator::Entity};
 
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
@@ -20,8 +20,8 @@ pub enum ModelEvent {
     CreateBurn { entity: Entity, time: f64 },
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
     SetTarget { entity: Entity, target: Option<Entity> },
-    SetSlot { entity: Entity, slot_location: SlotLocation, slot: Slot },
-    CreateFireTorpedo { entity: Entity, slot_location: SlotLocation, time: f64 },
+    SetSlot { entity: Entity, slot_location: ShipSlotLocation, slot: ShipSlot },
+    CreateFireTorpedo { entity: Entity, slot_location: ShipSlotLocation, time: f64 },
     AdjustFireTorpedo { entity: Entity, time: f64, amount: DVec2 },
     CreateGuidance { entity: Entity, time: f64, },
     CancelLastTimelineEvent { entity: Entity },

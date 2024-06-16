@@ -1,7 +1,7 @@
 use log::error;
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::{path_component::orbit::Orbit, vessel_component::Faction}, storage::entity_allocator::Entity, Model};
+use crate::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction}, storage::entity_allocator::Entity, Model};
 
 const DISTANCE_DERIVATIVE_DELTA: f64 = 0.1;
 

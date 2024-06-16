@@ -1,5 +1,5 @@
 use log::trace;
-use transfer_window_model::components::vessel_component::Faction;
+use transfer_window_model::components::vessel_component::faction::Faction;
 
 use crate::game::{events::ViewEvent, selected::{burn, fire_torpedo, segment_point::{self, SELECT_DISTANCE}, Selected}, View};
 

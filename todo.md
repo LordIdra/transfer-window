@@ -151,13 +151,39 @@
 [x] Explorer tree
 [x] Fix very low/high eccentricity orbits...
 [x] Fix the weird thing where you can modify torpedo trajectory after intercept
+[x] Scout
+[x] Frigate
+[ ] Equipment + torpedoes add mass
+[ ] Close button for vessel editor
+
+# Ships & systems
+
+[ ] Tiny fuel tank
+[ ] Small fuel tank
+[ ] Medium fuel tank (frigate+)
+[ ] Regular engine
+[ ] Efficient engine
+[ ] Booster engine
+[ ] Torpedo launcher
+[ ] Enhanced torpedo launcher
+
+# Stations
+[ ] Add station vessel class (can't be edited, no engines)
+[ ] Station icon
+[ ] Docking ports
+[ ] Docking port interface
+[ ] Docking
+[ ] Undocking
+[ ] Resource transfer
+[ ] Resource transfer takes time
+[ ] Resource transfer can be cancelled
+[ ] Equipment swapping
+[ ] Equipment has install time
+[ ] Undocking disabled until swap complete
+[ ] Swap can be cancelled
 
 # Campaign
 [ ] Menu screen
-[ ] Can only change equipment at stations
-- Satellite class
-- Trainer class
-- Scout class
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
@@ -170,23 +196,6 @@
 [ ] Rocket fuels overview
 [ ] Proportional guidance
 [ ] Integration techniques (euler RK4 etc)
-
-# Stations
-[ ] Add station vessel class (can't be edited, no engines)
-[ ] Station icon
-[ ] Station-grade equipment (can't be added to normal vessels)
-[ ] Docking ports
-[ ] Docking
-[ ] Docking port interface
-[ ] Undocking
-[ ] (un)docking icons
-[ ] Resource transfer
-[ ] Resource transfer takes time
-[ ] Resource transfer can be cancelled
-[ ] Equipment swapping
-[ ] Equipment has install time
-[ ] Undocking disabled until swap complete
-[ ] Swap can be cancelled
 
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?
@@ -209,7 +218,7 @@
 # Before release
 [ ] Versioning!
 [ ] Icon/branding
-[ ] Dev mode compiles in save/load buttons
+[ ] Dev mode compiles in debug menu
 [ ] Profiling + performance testing on different devices
 [ ] Test compatibility on different devices
 [ ] Website

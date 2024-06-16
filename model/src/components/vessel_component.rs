@@ -1,213 +1,209 @@
+use faction::Faction;
 use serde::{Deserialize, Serialize};
+use ship::{Ship, ShipClass};
+use timeline::Timeline;
+use torpedo::Torpedo;
 
 use crate::storage::entity_allocator::Entity;
 
-use self::{system_slot::{fuel_tank::FUEL_DENSITY, Slot, SlotLocation, Slots, System}, timeline::Timeline};
-
 use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
-pub mod system_slot;
+pub mod faction;
+pub mod ship;
 pub mod timeline;
-
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq)]
-pub enum Faction {
-    Player,
-    Ally,
-    Enemy,
-}
-
-impl Faction {
-    pub fn has_intel_for(self, other: Self) -> bool {
-        match self {
-            Faction::Player | Faction::Ally => match other {
-                Faction::Player | Faction::Ally => true,
-                Faction::Enemy => false,
-            }
-            Faction::Enemy => match other {
-                Faction::Player | Faction::Ally => false,
-                Faction::Enemy => true,
-            }
-        }
-    }
-
-    pub fn can_control(self, other: Self) -> bool {
-        self == other
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub enum VesselClass {
-    Torpedo,
-    Light,
-}
-
-impl VesselClass {
-    pub fn mass(&self) -> f64 {
-        match self {
-            VesselClass::Torpedo => 1.0e3,
-            VesselClass::Light => 1.0e4,
-        }
-    }
-
-    pub fn is_torpedo(self) -> bool {
-        matches!(self, Self::Torpedo)
-    }
-
-    pub fn name(&self) -> &str {
-        match self {
-            VesselClass::Torpedo => "Torpedo",
-            VesselClass::Light => "Light",
-        }
-    }
-}
+mod torpedo;
 
 /// Must have `MassComponent` and `PathComponent`
 #[derive(Debug, Serialize, Deserialize)]
-pub struct VesselComponent {
-    ghost: bool,
-    timeline: Timeline,
-    class: VesselClass,
-    slots: Slots,
-    target: Option<Entity>,
-    faction: Faction,
+pub enum VesselComponent {
+    Ship(Ship),
+    Torpedo(Torpedo),
 }
 
 #[allow(clippy::new_without_default)]
 impl VesselComponent {
-    pub fn new(class: VesselClass, faction: Faction) -> Self {
-        let ghost = false;
-        let timeline = Timeline::default();
-        let slots = Slots::new(class);
-        Self { ghost, timeline, class, slots, target: None, faction }
+    pub fn new_ship(class: ShipClass, faction: Faction) -> Self {
+        Self::Ship(Ship::new(class, faction))
     }
 
-    pub fn with_ghost(mut self) -> Self {
-        self.ghost = true;
-        self
-    }
-
-    pub fn is_ghost(&self) -> bool {
-        self.ghost
-    }
-
-    pub fn set_ghost(&mut self, ghost: bool) {
-        self.ghost = ghost;
+    pub fn new_torpedo(faction: Faction) -> Self {
+        Self::Torpedo(Torpedo::new(faction))
     }
 
     pub fn set_target(&mut self, target: Option<Entity>) {
-        self.target = target;
+        match self {
+            VesselComponent::Ship(ship) => ship.set_target(target),
+            VesselComponent::Torpedo(torpedo) => torpedo.set_target(target),
+        }
     }
     
     pub fn target(&self) -> Option<Entity> {
-        self.target
+        match self {
+            VesselComponent::Ship(ship) => ship.target(),
+            VesselComponent::Torpedo(torpedo) => torpedo.target(),
+        }
     }
 
     pub fn has_target(&self) -> bool {
-        self.target.is_some()
-    }
-
-    pub fn class(&self) -> VesselClass {
-        self.class
-    }
-
-    pub fn class_mut(&mut self) -> &mut VesselClass {
-        &mut self.class
+        self.target().is_some()
     }
 
     pub fn faction(&self) -> Faction {
-        self.faction
-    }
-
-    pub fn slots(&self) -> &Slots {
-        &self.slots
-    }
-
-    pub(crate) fn slots_mut(&mut self) -> &mut Slots {
-        &mut self.slots
-    }
-
-    pub(crate) fn set_slot(&mut self, location: SlotLocation, slot: Slot) {
-        self.slots.set(location, slot);
+        match self {
+            VesselComponent::Ship(ship) => ship.faction(),
+            VesselComponent::Torpedo(torpedo) => torpedo.faction(),
+        }
     }
 
     pub fn dry_mass(&self) -> f64 {
-        self.class.mass()
+        match self {
+            VesselComponent::Ship(ship) => ship.dry_mass(),
+            VesselComponent::Torpedo(_) => Torpedo::dry_mass(),
+        }
     }
 
     pub fn wet_mass(&self) -> f64 {
-        self.dry_mass() + self.max_fuel_kg() * FUEL_DENSITY
+        match self {
+            VesselComponent::Ship(ship) => ship.wet_mass(),
+            VesselComponent::Torpedo(_) => Torpedo::wet_mass(),
+        }
     }
 
     pub fn mass(&self) -> f64 {
-        self.dry_mass() + self.fuel_kg() * FUEL_DENSITY
+        match self {
+            VesselComponent::Ship(ship) => ship.mass(),
+            VesselComponent::Torpedo(torpedo) => torpedo.mass(),
+        }
     }
 
     pub fn max_fuel_litres(&self) -> f64 {
-        let mut fuel = 0.0;
-        for fuel_tank in self.slots.fuel_tanks() {
-            fuel += fuel_tank.type_().capacity_litres();
+        match self {
+            VesselComponent::Ship(ship) => ship.max_fuel_litres(),
+            VesselComponent::Torpedo(_) => Torpedo::max_fuel_litres(),
         }
-        fuel
     }
 
     pub fn max_fuel_kg(&self) -> f64 {
-        self.max_fuel_litres() * FUEL_DENSITY
+        match self {
+            VesselComponent::Ship(ship) => ship.max_fuel_kg(),
+            VesselComponent::Torpedo(_) => Torpedo::max_fuel_kg(),
+        }
     }
 
     pub fn max_dv(&self) -> Option<f64> {
         let initial_mass = self.dry_mass() + self.max_fuel_kg();
         let final_mass = self.dry_mass();
-        let isp = self.slots().engine()?.type_().specific_impulse_space();
+        let isp = self.specific_impulse()?;
         Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
     }
 
     pub fn fuel_litres(&self) -> f64 {
-        let mut fuel = 0.0;
-        for fuel_tank in self.slots.fuel_tanks() {
-            fuel += fuel_tank.remaining_litres();
+        match self {
+            VesselComponent::Ship(ship) => ship.fuel_litres(),
+            VesselComponent::Torpedo(torpedo) => torpedo.fuel_litres(),
         }
-        fuel
+    }
+
+    pub fn specific_impulse(&self) -> Option<f64> {
+        match self {
+            VesselComponent::Ship(ship) => ship.specific_impulse(),
+            VesselComponent::Torpedo(_) => Some(Torpedo::specific_impulse()),
+        }
+    }
+
+    pub fn fuel_kg_per_second(&self) -> Option<f64> {
+        match self {
+            VesselComponent::Ship(ship) => ship.fuel_kg_per_second(),
+            VesselComponent::Torpedo(_) => Some(Torpedo::fuel_kg_per_second()),
+        }
     }
 
     pub fn fuel_kg(&self) -> f64 {
-        self.fuel_litres() * FUEL_DENSITY
+        match self {
+            VesselComponent::Ship(ship) => ship.fuel_kg(),
+            VesselComponent::Torpedo(torpedo) => torpedo.fuel_kg(),
+        }
+    }
+
+    pub fn set_fuel_kg(&mut self, new_fuel_kg: f64) {
+        match self {
+            VesselComponent::Ship(ship) => ship.set_fuel_kg(new_fuel_kg),
+            VesselComponent::Torpedo(torpedo) => torpedo.set_fuel_kg(new_fuel_kg),
+        }
     }
 
     pub fn dv(&self) -> Option<f64> {
         let initial_mass = self.mass();
         let final_mass = self.dry_mass();
-        let isp = self.slots().engine()?.type_().specific_impulse_space();
+        let isp = self.specific_impulse()?;
         Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
     }
 
     pub fn can_edit_ever(&self) -> bool {
-        !self.class.is_torpedo()
+        match self {
+            VesselComponent::Ship(_) => true,
+            VesselComponent::Torpedo(_) => false,
+        }
     }
 
     pub fn timeline(&self) -> &Timeline {
-        &self.timeline
+        match self {
+            VesselComponent::Ship(ship) => ship.timeline(),
+            VesselComponent::Torpedo(torpedo) => torpedo.timeline(),
+        }
     }
 
     pub fn timeline_mut(&mut self) -> &mut Timeline {
-        &mut self.timeline
-    }
-
-    /// # Panics
-    /// Panics if the slot does not exist or is not a torpedo
-    pub fn final_torpedoes(&self, slot_location: SlotLocation) -> usize { 
-        let initial_torpedoes = self.slots()
-            .get(slot_location)
-            .as_weapon()
-            .unwrap()
-            .type_()
-            .as_torpedo()
-            .stockpile();
-        let depleted_torpedoes = self.timeline()
-            .depleted_torpedoes(slot_location);
-        initial_torpedoes - depleted_torpedoes
+        match self {
+            VesselComponent::Ship(ship) => ship.timeline_mut(),
+            VesselComponent::Torpedo(torpedo) => torpedo.timeline_mut(),
+        }
     }
 
     pub(crate) fn should_recompute_trajectory(&self) -> bool {
-        !(self.class.is_torpedo() && self.timeline.last_event().is_some_and(|event| event.is_intercept()))
+        !(self.as_torpedo().is_some() && self.timeline().last_event().is_some_and(|event| event.is_intercept()))
+    }
+
+    pub fn as_ship(&self) -> Option<&Ship> {
+        match self {
+            VesselComponent::Ship(ref ship) => Some(ship),
+            VesselComponent::Torpedo(_) => None,
+        }
+    }
+
+    pub fn as_ship_mut(&mut self) -> Option<&mut Ship> {
+        match self {
+            VesselComponent::Ship(ref mut ship) => Some(ship),
+            VesselComponent::Torpedo(_) => None,
+        }
+    }
+
+    pub fn as_torpedo(&self) -> Option<&Torpedo> {
+        match self {
+            VesselComponent::Ship(_) => None,
+            VesselComponent::Torpedo(ref torpedo) => Some(torpedo),
+        }
+    }
+
+    pub fn as_torpedo_mut(&mut self) -> Option<&mut Torpedo> {
+        match self {
+            VesselComponent::Ship(_) => None,
+            VesselComponent::Torpedo(ref mut torpedo) => Some(torpedo),
+        }
+    }
+
+    pub fn has_engine(&self) -> bool {
+        self.specific_impulse().is_some()
+    }
+
+    pub fn has_fuel_tank(&self) -> bool {
+        self.max_fuel_kg() != 0.0
+    }
+
+    pub fn is_ghost(&self) -> bool {
+        match self {
+            VesselComponent::Ship(_) => false,
+            VesselComponent::Torpedo(torpedo) => torpedo.is_ghost(),
+        }
     }
 }

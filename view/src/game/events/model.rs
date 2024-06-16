@@ -2,7 +2,7 @@ use std::fs;
 
 use log::error;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::vessel_component::{system_slot::{Slot, SlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{ship::ship_slot::{ShipSlot, ShipSlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 
@@ -73,13 +73,13 @@ pub fn set_target(view: &mut View, entity: Entity, target: Option<Entity>) {
     view.model.vessel_component_mut(entity).set_target(target);
 }
 
-pub fn set_slot(view: &mut View, entity: Entity, location: SlotLocation, slot: Slot) {
+pub fn set_slot(view: &mut View, entity: Entity, location: ShipSlotLocation, slot: ShipSlot) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Set slot");
     view.model.set_slot(entity, location, slot);
 }
 
-pub fn create_fire_torpedo(view: &mut View, entity: Entity, location: SlotLocation, time: f64) {
+pub fn create_fire_torpedo(view: &mut View, entity: Entity, location: ShipSlotLocation, time: f64) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Fire torpedo");
     let event = TimelineEvent::FireTorpedo(FireTorpedoEvent::new(&mut view.model, entity, time, location));

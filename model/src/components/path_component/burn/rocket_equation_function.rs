@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::components::{path_component::orbit::scary_math::STANDARD_GRAVITY, vessel_component::{system_slot::System, VesselComponent}};
+use crate::components::{path_component::orbit::scary_math::STANDARD_GRAVITY, vessel_component::VesselComponent};
 
 /// Helper struct for computing vessel mass after N seconds of
 /// firing its engine using the rocket equation.
@@ -30,9 +30,8 @@ impl RocketEquationFunction {
     pub fn from_vessel_component(vessel_component: &VesselComponent) -> Self {
         let dry_mass_kg = vessel_component.dry_mass();
         let initial_fuel_mass_kg = vessel_component.fuel_kg();
-        let engine = vessel_component.slots().engine().unwrap();
-        let fuel_consumption_kg_per_second = engine.type_().fuel_kg_per_second();
-        let specific_impulse = engine.type_().specific_impulse_space();
+        let fuel_consumption_kg_per_second = vessel_component.fuel_kg_per_second().unwrap();
+        let specific_impulse = vessel_component.specific_impulse().unwrap();
         RocketEquationFunction::new(dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, 0.0)
     }
 

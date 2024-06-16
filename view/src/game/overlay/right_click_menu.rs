@@ -1,6 +1,6 @@
 use eframe::egui::{Align2, Ui, Window};
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, View}, styles};
 

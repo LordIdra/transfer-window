@@ -1,6 +1,6 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::segment::Segment, vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::segment::Segment, vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{util::{add_line, should_render_parent}, View};
 

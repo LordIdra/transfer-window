@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, Slot, SlotLocation}, timeline::{start_burn::StartBurnEvent, TimelineEvent}, Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{faction::Faction, ship::{ship_slot::{engine::EngineType, fuel_tank::FuelTankType, ShipSlot, ShipSlotLocation}, ShipClass}, timeline::{start_burn::StartBurnEvent, TimelineEvent}, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_burn_without_engine_or_fuel_tank() {
@@ -10,24 +10,24 @@ fn test_burn_without_engine_or_fuel_tank() {
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = VesselClass::Light;
+    let class = ShipClass::Frigate;
     let orbit = Orbit::new(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(class, Faction::Player))
+        .with_vessel_component(VesselComponent::new_ship(class, Faction::Player))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
-    assert!(!model.can_create_burn(vessel));
+    assert!(!StartBurnEvent::can_create_ever(&model, vessel));
 
-    let engine = Slot::new_engine(EngineType::Efficient);
-    model.set_slot(vessel, SlotLocation::Back, engine);
+    let engine = ShipSlot::new_engine(EngineType::Efficient);
+    model.set_slot(vessel, ShipSlotLocation::Back, engine);
 
-    assert!(!model.can_create_burn(vessel));
+    assert!(!StartBurnEvent::can_create_ever(&model, vessel));
 
-    let fuel_tank = Slot::new_fuel_tank(FuelTankType::Medium);
-    model.set_slot(vessel, SlotLocation::Middle, fuel_tank);
+    let fuel_tank = ShipSlot::new_fuel_tank(FuelTankType::Medium);
+    model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
 
-    assert!(model.can_create_burn(vessel));
+    assert!(StartBurnEvent::can_create_ever(&model, vessel));
 }
 
 #[test]
@@ -39,21 +39,22 @@ fn test_create_burn_with_zero_dv() {
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = VesselClass::Light;
+    let class = ShipClass::Frigate;
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(class, Faction::Player))
+        .with_vessel_component(VesselComponent::new_ship(class, Faction::Player))
         .with_path_component(PathComponent::default()));
     let orbit = Orbit::circle(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     model.path_component_mut(vessel).add_segment(Segment::Orbit(orbit));
 
     model.update(0.01);
 
-    let engine = Slot::new_engine(EngineType::Efficient);
-    model.set_slot(vessel, SlotLocation::Back, engine);
-    let fuel_tank = Slot::new_fuel_tank(FuelTankType::Medium);
-    model.set_slot(vessel, SlotLocation::Middle, fuel_tank);
-    assert!(model.can_create_burn(vessel));
+    let engine = ShipSlot::new_engine(EngineType::Efficient);
+    model.set_slot(vessel, ShipSlotLocation::Back, engine);
+    let fuel_tank = ShipSlot::new_fuel_tank(FuelTankType::Medium);
+    model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
+    
+    assert!(StartBurnEvent::can_create_ever(&model, vessel));
 
     let time = 101.0;
     let mass_before = model.mass_at_time(vessel, time, None);
@@ -87,22 +88,23 @@ fn test_create_and_adjust_burn() {
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = VesselClass::Light;
+    let class = ShipClass::Frigate;
     let orbit = Orbit::circle(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(class, Faction::Player))
+        .with_vessel_component(VesselComponent::new_ship(class, Faction::Player))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
     model.update(0.01);
 
     let engine_type = EngineType::HighThrust;
-    let engine = Slot::new_engine(engine_type.clone());
-    model.set_slot(vessel, SlotLocation::Back, engine);
+    let engine = ShipSlot::new_engine(engine_type.clone());
+    model.set_slot(vessel, ShipSlotLocation::Back, engine);
     let fuel_tank_type = FuelTankType::Medium;
-    let fuel_tank = Slot::new_fuel_tank(fuel_tank_type.clone());
-    model.set_slot(vessel, SlotLocation::Middle, fuel_tank);
-    assert!(model.can_create_burn(vessel));
+    let fuel_tank = ShipSlot::new_fuel_tank(fuel_tank_type.clone());
+    model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
+    
+    assert!(StartBurnEvent::can_create_ever(&model, vessel));
     
     let burn_time = 100.0;
     let dv = vec2(150.0, 0.0);

@@ -1,7 +1,7 @@
 
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::{orbitable_component::OrbitableComponentPhysics, path_component::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment}, vessel_component::Faction}, storage::entity_allocator::Entity, Model};
+use crate::{components::{orbitable_component::OrbitableComponentPhysics, path_component::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment}, vessel_component::faction::Faction}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     /// NOT safe to call for orbitables

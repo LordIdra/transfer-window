@@ -39,14 +39,14 @@ impl EnableGuidanceEvent {
     }
 
     pub fn can_create_ever(model: &Model, entity: Entity) -> bool {
-        model.vessel_component(entity).class().is_torpedo()
+        model.vessel_component(entity).as_torpedo().is_some()
     }
 
     #[allow(clippy::missing_panics_doc)]
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         let vessel_component = model.vessel_component(entity);
         vessel_component.timeline().is_time_after_last_blocking_event(time)
-            && !vessel_component.timeline.last_event().is_some_and(|event| event.is_intercept())
+            && !vessel_component.timeline().last_event().is_some_and(|event| event.is_intercept())
             && vessel_component.target().is_some_and(|target| model.try_vessel_component(target).is_some())
             && model.final_dv(entity).unwrap() > MIN_DV_TO_ENABLE_GUIDANCE
     }

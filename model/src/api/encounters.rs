@@ -1,4 +1,4 @@
-use crate::{components::vessel_component::Faction, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity, Model};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncounterType {

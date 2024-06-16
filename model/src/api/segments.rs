@@ -56,7 +56,7 @@ impl Model {
     pub(crate) fn create_guidance(&mut self, entity: Entity, time: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Create guidance");
-        assert!(self.vessel_component_mut(entity).class_mut().is_torpedo());
+        assert!(self.vessel_component_mut(entity).as_torpedo().is_some());
 
         let target = self.vessel_component(entity).target()
             .expect("Cannot enable guidance on torpedo without a target");
@@ -128,11 +128,6 @@ impl Model {
         path_component.add_segment(Segment::Orbit(orbit));
 
         self.recompute_trajectory(entity);
-    }
-
-    pub fn can_create_burn(&self, entity: Entity) -> bool {
-        let slots = self.vessel_component(entity).slots();
-        slots.engine().is_some() && !slots.fuel_tanks().is_empty()
     }
 
     /// # Panics

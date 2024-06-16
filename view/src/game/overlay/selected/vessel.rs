@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::{Faction, VesselComponent}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{faction::Faction, VesselComponent}, storage::entity_allocator::Entity};
 use visual_timeline::draw_visual_timeline;
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel, draw_focus}, labels::{draw_key, draw_subtitle, draw_title, draw_value}}}, selected::Selected, util::{format_distance, format_speed}, View}, styles};
@@ -19,7 +19,7 @@ fn draw_speed(view: &View, ui: &mut Ui, entity: Entity) {
 }
 
 fn should_draw_fuel(vessel_component: &VesselComponent) -> bool {
-    !vessel_component.slots().fuel_tanks().is_empty()
+    vessel_component.has_fuel_tank()
 }
 
 fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent) {
@@ -47,12 +47,13 @@ fn draw_dv(ui: &mut Ui, vessel_component: &VesselComponent) {
 }
 
 fn should_draw_torpedoes(vessel_component: &VesselComponent) -> bool {
-    vessel_component.slots().max_torpedoes() != 0
+    vessel_component.as_ship().is_some_and(|ship| ship.max_torpedoes() != 0)
 }
 
 fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
-    let max_torpedoes = vessel_component.slots().max_torpedoes();
-    let torpedoes = vessel_component.slots().torpedoes();
+    let ship = &vessel_component.as_ship().unwrap();
+    let max_torpedoes = ship.max_torpedoes();
+    let torpedoes = ship.torpedoes();
 
     let dv_proportion = torpedoes as f32 / max_torpedoes as f32;
     draw_key(ui, "Torpedoes");

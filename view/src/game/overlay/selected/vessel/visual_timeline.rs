@@ -1,7 +1,7 @@
 #![allow(clippy::match_same_arms)]
 
 use eframe::egui::{Color32, Frame, RichText, Ui};
-use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::{timeline::TimelineEvent, Faction}}, storage::entity_allocator::Entity};
+use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::{timeline::TimelineEvent, faction::Faction}}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImage, labels::{draw_subtitle, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
 

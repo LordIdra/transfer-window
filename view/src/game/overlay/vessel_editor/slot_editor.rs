@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Id, ImageButton, LayerId, Order, Pos2, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, Slot, SlotLocation}, VesselClass}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::ship::{ship_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, ShipSlot, ShipSlotLocation}, ShipClass}, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::slot_textures::TexturedSlot, View}, styles};
 
@@ -12,13 +12,13 @@ const SLOT_SELECTOR_SIZE: f32 = 50.0;
 
 
 /// 1 individual item that could be equipped in the slot
-struct SlotSelector {
+struct ShipSlotSelector {
     texture: String,
-    slot: Slot,
+    slot: ShipSlot,
 }
 
-impl SlotSelector {
-    pub fn new(texture: String, slot: Slot) -> Self {
+impl ShipSlotSelector {
+    pub fn new(texture: String, slot: ShipSlot) -> Self {
         Self { texture, slot }
     }
 
@@ -37,56 +37,56 @@ impl SlotSelector {
 }
 
 /// All the selectors together
-pub struct SlotEditor {
+pub struct ShipSlotEditor {
     entity: Entity,
-    vessel_class: VesselClass,
-    location: SlotLocation,
-    selectors: Vec<SlotSelector>,
+    ship_class: ShipClass,
+    location: ShipSlotLocation,
+    selectors: Vec<ShipSlotSelector>,
 }
 
-impl SlotEditor {
-    pub fn new(entity: Entity, vessel_class: VesselClass, location: SlotLocation, slot: &Slot) -> Self {
+impl ShipSlotEditor {
+    pub fn new(entity: Entity, ship_class: ShipClass, location: ShipSlotLocation, slot: &ShipSlot) -> Self {
         let mut selectors = vec![];
         match slot {
-            Slot::Weapon(_) => {
-                selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::Weapon(None)));
+            ShipSlot::Weapon(_) => {
+                selectors.push(ShipSlotSelector::new("clear-slot".to_string(), ShipSlot::Weapon(None)));
                 for type_ in WeaponType::types() {
                     let texture = type_.texture().to_string();
-                    let slot = Slot::new_weapon(type_);
-                    selectors.push(SlotSelector::new(texture, slot));
+                    let slot = ShipSlot::new_weapon(type_);
+                    selectors.push(ShipSlotSelector::new(texture, slot));
                 }
             }
 
-            Slot::FuelTank(_) => {
-                selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::FuelTank(None)));
+            ShipSlot::FuelTank(_) => {
+                selectors.push(ShipSlotSelector::new("clear-slot".to_string(), ShipSlot::FuelTank(None)));
                 for type_ in FuelTankType::types() {
                     let texture = type_.texture().to_string();
-                    let slot = Slot::new_fuel_tank(type_);
-                    selectors.push(SlotSelector::new(texture, slot));
+                    let slot = ShipSlot::new_fuel_tank(type_);
+                    selectors.push(ShipSlotSelector::new(texture, slot));
                 }
             }
 
-            Slot::Engine(_) => {
-                selectors.push(SlotSelector::new("clear-slot".to_string(), Slot::Engine(None)));
+            ShipSlot::Engine(_) => {
+                selectors.push(ShipSlotSelector::new("clear-slot".to_string(), ShipSlot::Engine(None)));
                 for type_ in EngineType::types() {
                     let texture = type_.texture().to_string();
-                    let slot = Slot::new_engine(type_);
-                    selectors.push(SlotSelector::new(texture, slot));
+                    let slot = ShipSlot::new_engine(type_);
+                    selectors.push(ShipSlotSelector::new(texture, slot));
                 }
             }
         };
 
-        SlotEditor { entity, vessel_class, location, selectors }
+        ShipSlotEditor { entity, ship_class, location, selectors }
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn draw(&self, view: &View, vessel_name: &str, slot_location: SlotLocation, slot_center: Pos2, scalar: f32) {
-        let slot_translation = scalar * compute_slot_locations(self.vessel_class)
+    pub fn draw(&self, view: &View, vessel_name: &str, slot_location: ShipSlotLocation, slot_center: Pos2, scalar: f32) {
+        let slot_translation = scalar * compute_slot_locations(self.ship_class)
             .get(&self.location)
             .expect("Slot editor location does not exist");
         let slot_selector_center = slot_center + epaint::vec2(
             slot_translation, 
-            -SLOT_SELECTOR_HEIGHT_PROPORTION * compute_slot_size(self.vessel_class) * scalar);
+            -SLOT_SELECTOR_HEIGHT_PROPORTION * compute_slot_size(self.ship_class) * scalar);
         let mut should_close = false;
         let name = format!("Slot selector - {vessel_name} - {slot_location:?}");
         let id = Id::new(name.clone());

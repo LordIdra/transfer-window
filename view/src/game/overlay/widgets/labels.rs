@@ -1,5 +1,5 @@
 use eframe::egui::{RichText, Ui};
-use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
 
 use crate::game::{util::{format_distance, format_speed, format_time}, View};
 

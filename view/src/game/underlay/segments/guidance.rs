@@ -1,6 +1,6 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::guidance::Guidance, vessel_component::Faction}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::guidance::Guidance, vessel_component::faction::Faction}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 

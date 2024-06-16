@@ -1,5 +1,5 @@
 use eframe::egui::PointerState;
-use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
 
 use crate::game::{selected::Selected, util::add_textured_square, View};
 
