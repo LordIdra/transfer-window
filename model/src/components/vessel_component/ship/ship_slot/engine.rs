@@ -6,34 +6,35 @@ use super::{System, SystemType};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum EngineType {
-    Torpedo,
+    Regular,
     Efficient,
-    HighThrust,
+    Booster,
 }
 
 impl SystemType for EngineType {}
 
 impl EngineType {
-    pub fn types() -> [Self; 2] {
+    pub fn types() -> [Self; 3] {
         [
+            EngineType::Regular,
             EngineType::Efficient, 
-            EngineType::HighThrust,
+            EngineType::Booster,
         ]
     }
 
     pub fn fuel_kg_per_second(&self) -> f64 {
         match self {
-            EngineType::Torpedo => 10.0,
+            EngineType::Regular => 10.0,
             EngineType::Efficient => 5.0,
-            EngineType::HighThrust => 120.0,
+            EngineType::Booster => 30.0,
         }
     }
 
     pub fn thrust_newtons(&self) -> f64 {
         match self {
-            EngineType::Torpedo => 25000.0,
-            EngineType::Efficient => 15000.0,
-            EngineType::HighThrust => 300_000.0,
+            EngineType::Regular => 25_000.0,
+            EngineType::Efficient => 18_000.0,
+            EngineType::Booster => 80_000.0,
         }
     }
 

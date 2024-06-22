@@ -3,7 +3,7 @@ use std::fs;
 use eframe::egui::{Context, ViewportCommand};
 use log::error;
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{ship::ship_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::{torpedo::Torpedo, WeaponType}, ShipSlot, ShipSlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, faction::Faction, ship::ShipClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{ship::ship_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, ShipSlot, ShipSlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, faction::Faction, ship::ShipClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 use transfer_window_view::{game, Scene};
 
 use crate::Controller;
@@ -62,8 +62,8 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
     model.set_slot(spacecraft_2, ShipSlotLocation::Back, ShipSlot::new_engine(EngineType::Efficient));
-    model.set_slot(spacecraft_2, ShipSlotLocation::Middle, ShipSlot::new_fuel_tank(FuelTankType::Large));
-    model.set_slot(spacecraft_2, ShipSlotLocation::Front, ShipSlot::new_weapon(WeaponType::Torpedo(Torpedo::new())));
+    model.set_slot(spacecraft_2, ShipSlotLocation::Middle, ShipSlot::new_fuel_tank(FuelTankType::Medium));
+    model.set_slot(spacecraft_2, ShipSlotLocation::Front, ShipSlot::new_weapon(WeaponType::new_torpedo()));
 
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, spacecraft_2, 200.0));
     model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);

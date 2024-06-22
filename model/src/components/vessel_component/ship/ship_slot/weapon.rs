@@ -9,28 +9,38 @@ pub mod torpedo;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum WeaponType {
     Torpedo(Torpedo),
+    EnhancedTorpedo(Torpedo),
 }
 
 impl SystemType for WeaponType {}
 
 impl WeaponType {
-    pub fn types() -> [Self; 1] {
+    pub fn new_torpedo() -> Self {
+        Self::Torpedo(Torpedo::new(2))
+    }
+
+    pub fn new_enhanced_torpedo() -> Self {
+        Self::EnhancedTorpedo(Torpedo::new(4))
+    }
+
+    pub fn types() -> [Self; 2] {
         [
-            WeaponType::Torpedo(Torpedo::new())
+            Self::new_torpedo(),
+            Self::new_enhanced_torpedo(),
         ]
     }
 
     #[allow(clippy::missing_panics_doc)]
     pub fn as_torpedo(&self) -> &Torpedo {
         match self {
-            WeaponType::Torpedo(torpedo) => torpedo,
+            WeaponType::EnhancedTorpedo(torpedo) | WeaponType::Torpedo(torpedo) => torpedo,
         }
     }
 
     #[allow(clippy::missing_panics_doc)]
     pub fn as_torpedo_mut(&mut self) -> &mut Torpedo {
         match self {
-            WeaponType::Torpedo(torpedo) => torpedo,
+            WeaponType::EnhancedTorpedo(torpedo) | WeaponType::Torpedo(torpedo) => torpedo,
         }
     }
 }

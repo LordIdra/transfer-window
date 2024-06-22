@@ -8,7 +8,8 @@ pub fn show_tooltip(ui: &mut Ui, weapon: &Option<Weapon>) {
     };
 
     let name = match weapon.type_() {
-        WeaponType::Torpedo(_) => "Torpedo",
+        WeaponType::Torpedo(_) => "Torpedo Launcher",
+        WeaponType::EnhancedTorpedo(_) => "Enhanced Torpedo Launcher",
     };
 
     ui.label(RichText::new(name).strong().monospace().size(20.0));

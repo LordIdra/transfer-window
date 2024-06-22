@@ -153,19 +153,15 @@
 [x] Fix the weird thing where you can modify torpedo trajectory after intercept
 [x] Scout
 [x] Frigate
-[ ] Equipment + torpedoes add mass
+[x] Tiny fuel tank
+[x] Small fuel tank
+[x] Medium fuel tank (frigate+)
+[x] Regular engine
+[x] Efficient engine (frigate+)
+[x] Booster engine (frigate+)
+[x] Torpedo launcher
+[x] Enhanced torpedo launcher
 [ ] Close button for vessel editor
-
-# Ships & systems
-
-[ ] Tiny fuel tank
-[ ] Small fuel tank
-[ ] Medium fuel tank (frigate+)
-[ ] Regular engine
-[ ] Efficient engine
-[ ] Booster engine
-[ ] Torpedo launcher
-[ ] Enhanced torpedo launcher
 
 # Stations
 [ ] Add station vessel class (can't be edited, no engines)
@@ -207,6 +203,9 @@
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumption
+
+# Backburner
+[ ] Equipment + torpedoes add mass
 
 # Performance
 [ ] Texture atlas

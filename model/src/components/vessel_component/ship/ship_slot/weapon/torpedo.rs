@@ -1,27 +1,25 @@
 use serde::{Deserialize, Serialize};
 
 
-const STOCKPILE: usize = 3;
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Torpedo {
+    max_stockpile: usize,
     stockpile: usize,
-    cooldown: f64,
 }
 
 impl Torpedo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self { stockpile: STOCKPILE, cooldown: 0.0 }
+    pub fn new(max_stockpile: usize) -> Self {
+        let stockpile = max_stockpile;
+        Self { max_stockpile, stockpile }
     }
 
     pub fn deplete(&mut self) {
         self.stockpile -= 1;
     }
 
-    #[allow(clippy::unused_self)]
     pub fn max_stockpile(&self) -> usize {
-        STOCKPILE
+        self.max_stockpile
     }
 
     pub fn stockpile(&self) -> usize {

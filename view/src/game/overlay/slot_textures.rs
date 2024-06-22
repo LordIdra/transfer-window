@@ -7,9 +7,9 @@ pub trait TexturedSlot {
 impl TexturedSlot for EngineType {
     fn texture(&self) -> &str {
         match self {
-            EngineType::Torpedo => unreachable!(),
+            EngineType::Regular => "engine-regular",
             EngineType::Efficient => "engine-efficient",
-            EngineType::HighThrust => "engine-high-thrust",
+            EngineType::Booster => "engine-booster",
         }
     }
 }
@@ -17,10 +17,9 @@ impl TexturedSlot for EngineType {
 impl TexturedSlot for FuelTankType {
     fn texture(&self) -> &str {
         match self {
-            FuelTankType::Torpedo => unreachable!(),
+            FuelTankType::Tiny => "tank-tiny",
             FuelTankType::Small => "tank-small",
             FuelTankType::Medium => "tank-medium",
-            FuelTankType::Large => "tank-large",
         }
     }
 }
@@ -29,6 +28,7 @@ impl TexturedSlot for WeaponType {
     fn texture(&self) -> &str {
         match self {
             WeaponType::Torpedo(_) => "torpedo",
+            WeaponType::EnhancedTorpedo(_) => "enhanced-torpedo",
         }
     }
 }

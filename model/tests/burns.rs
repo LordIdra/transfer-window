@@ -24,7 +24,7 @@ fn test_burn_without_engine_or_fuel_tank() {
 
     assert!(!StartBurnEvent::can_create_ever(&model, vessel));
 
-    let fuel_tank = ShipSlot::new_fuel_tank(FuelTankType::Medium);
+    let fuel_tank = ShipSlot::new_fuel_tank(FuelTankType::Small);
     model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
 
     assert!(StartBurnEvent::can_create_ever(&model, vessel));
@@ -51,7 +51,7 @@ fn test_create_burn_with_zero_dv() {
 
     let engine = ShipSlot::new_engine(EngineType::Efficient);
     model.set_slot(vessel, ShipSlotLocation::Back, engine);
-    let fuel_tank = ShipSlot::new_fuel_tank(FuelTankType::Medium);
+    let fuel_tank = ShipSlot::new_fuel_tank(FuelTankType::Small);
     model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
     
     assert!(StartBurnEvent::can_create_ever(&model, vessel));
@@ -97,10 +97,10 @@ fn test_create_and_adjust_burn() {
 
     model.update(0.01);
 
-    let engine_type = EngineType::HighThrust;
+    let engine_type = EngineType::Booster;
     let engine = ShipSlot::new_engine(engine_type.clone());
     model.set_slot(vessel, ShipSlotLocation::Back, engine);
-    let fuel_tank_type = FuelTankType::Medium;
+    let fuel_tank_type = FuelTankType::Small;
     let fuel_tank = ShipSlot::new_fuel_tank(fuel_tank_type.clone());
     model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
     

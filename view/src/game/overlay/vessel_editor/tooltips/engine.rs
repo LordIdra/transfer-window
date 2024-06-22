@@ -11,9 +11,9 @@ pub fn show_tooltip(view: &View, ui: &mut Ui, engine: &Option<Engine>) {
 
     let type_ = engine.type_();
     let name = match type_ {
-        EngineType::Torpedo => unreachable!(),
+        EngineType::Regular => "Regular Engine",
         EngineType::Efficient => "Efficient Engine",
-        EngineType::HighThrust => "High Thrust Engine",
+        EngineType::Booster => "High Thrust Engine",
     };
 
 

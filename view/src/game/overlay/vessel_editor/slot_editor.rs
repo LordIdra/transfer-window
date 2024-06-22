@@ -1,7 +1,7 @@
-use eframe::{egui::{Align2, Id, ImageButton, LayerId, Order, Pos2, Ui, Window}, epaint};
+use eframe::{egui::{Align2, Color32, Id, LayerId, Order, Pos2, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::ship::{ship_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, ShipSlot, ShipSlotLocation}, ShipClass}, storage::entity_allocator::Entity};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::slot_textures::TexturedSlot, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{slot_textures::TexturedSlot, widgets::custom_image_button::CustomCircularImageButton}, View}, styles};
 
 use super::{tooltips::show_tooltip, util::{compute_slot_locations, compute_slot_size}};
 
@@ -24,8 +24,11 @@ impl ShipSlotSelector {
 
     pub fn draw(&self, view: &View, ui: &mut Ui) -> bool {
         let slot_selector_size = epaint::Vec2::splat(SLOT_SELECTOR_SIZE);        
-        let image_button = ImageButton::new(view.resources.texture_image(self.texture.as_str()));
-        let response = ui.add_sized(slot_selector_size, image_button);
+        let button = CustomCircularImageButton::new(view, &self.texture, 60.0)
+            .with_normal_color(Color32::from_rgba_premultiplied(40, 40, 40, 170))
+            .with_hover_color(Color32::from_rgba_premultiplied(70, 70, 70, 220))
+            .with_padding(8.0);
+        let response = ui.add_sized(slot_selector_size, button);
         let clicked = response.clicked();
         styles::DefaultWindow::apply(&view.context);
         response.on_hover_ui(|ui| { 
