@@ -15,7 +15,7 @@ pub struct Vessel {
 impl Vessel {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(vec![ComponentType::VesselComponent]) {
+        for entity in view.entities_should_render(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
             if !view.model.vessel_component(entity).is_ghost() {
                 let icon = Self { entity };
                 icons.push(Box::new(icon) as Box<dyn Icon>);
@@ -51,7 +51,7 @@ impl Icon for Vessel {
     }
 
     fn radius(&self, _view: &View) -> f64 {
-        10.0
+        15.0
     }
 
     fn priorities(&self, view: &View) -> [u64; 4] {

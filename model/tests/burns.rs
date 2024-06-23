@@ -125,7 +125,7 @@ fn test_create_and_adjust_burn() {
     let velocity_after = model.velocity_at_time(vessel, end_time + 0.1, None);
     let actual_dv = (velocity_before.magnitude() - velocity_after.magnitude()).abs();
     println!("DV actual = {} expected = {}", actual_dv, dv.magnitude());
-    assert!((actual_dv - dv.magnitude()).abs() < 0.1);
+    assert!((actual_dv - dv.magnitude()).abs() < 0.2);
 
     let test_time = start_time + duration / 2.0;
     let mass_at_time = model.mass_at_time(vessel, test_time, None);

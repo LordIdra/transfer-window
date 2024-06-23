@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction}, storage::entity_allocator::Entity};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_next, draw_previous, draw_select_vessel, draw_warp_to}, labels::{draw_altitude, draw_key, draw_orbits, draw_speed, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_next, draw_previous, draw_select_vessel, draw_warp_to}, labels::{draw_altitude_at_time, draw_key, draw_orbits, draw_speed_at_time, draw_subtitle, draw_target_distance_at_time, draw_target_relative_speed_at_time, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
 
 use self::weapons::draw_weapons;
 
@@ -52,8 +52,12 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
 fn draw_info(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_subtitle(ui, "Info");
     Grid::new("Selected point info").show(ui, |ui| {
-        draw_altitude(view, ui, entity, time);
-        draw_speed(view, ui, entity, time);
+        draw_altitude_at_time(view, ui, entity, time);
+        draw_speed_at_time(view, ui, entity, time);
+        if view.model.vessel_component(entity).has_target() {
+            draw_target_distance_at_time(view, ui, entity, time);
+            draw_target_relative_speed_at_time(view, ui, entity, time);
+        }
         draw_orbits(view, ui, entity, time);
     });
 }

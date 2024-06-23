@@ -26,6 +26,7 @@ pub enum ModelEvent {
     CreateGuidance { entity: Entity, time: f64, },
     CancelLastTimelineEvent { entity: Entity },
     CancelCurrentSegment { entity: Entity },
+    Dock { entity: Entity },
 }
 
 #[derive(Debug)]
@@ -85,6 +86,7 @@ impl View {
                 ModelEvent::CancelLastTimelineEvent { entity } => cancel_last_event(self, entity),
                 ModelEvent::CreateGuidance { entity, time } => enable_torpedo_guidance(self, entity, time),
                 ModelEvent::CancelCurrentSegment { entity } => cancel_current_segment(self, entity),
+                ModelEvent::Dock { entity } => dock(self, entity),
             }
         }
     }

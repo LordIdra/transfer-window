@@ -11,6 +11,7 @@ pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
     let tooltip = match vessel_component {
         VesselComponent::Torpedo(_) => "Select torpedo",
         VesselComponent::Ship(_) => "Select ship",
+        VesselComponent::Station(_) => "Select station",
     };
     let button = CustomCircularImageButton::new(view, icon, 36.0)
         .with_padding(8.0);
@@ -117,4 +118,12 @@ pub fn draw_focus(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "focus", 36.0)
         .with_padding(8.0);
     ui.add(button).on_hover_text("Focus").clicked()
+}
+
+pub fn draw_dock(view: &View, ui: &mut Ui, entity: Entity) -> bool {
+    let enabled = view.model.can_dock(entity);
+    let button = CustomCircularImageButton::new(view, "dock", 36.0)
+        .with_enabled(enabled)
+        .with_padding(8.0);
+    ui.add_enabled(enabled, button).on_hover_text("Dock").clicked()
 }

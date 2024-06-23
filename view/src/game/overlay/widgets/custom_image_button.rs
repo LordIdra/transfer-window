@@ -20,6 +20,7 @@ pub struct CustomCircularImageButton {
     enabled: bool,
     normal_color: Color32,
     hover_color: Color32,
+    pointer: bool,
 }
 
 impl CustomCircularImageButton {
@@ -34,7 +35,8 @@ impl CustomCircularImageButton {
         let enabled = true;
         let normal_color = Color32::TRANSPARENT;
         let hover_color = Color32::from_rgb(HOVERED_CIRCLE_ALPHA, HOVERED_CIRCLE_ALPHA, HOVERED_CIRCLE_ALPHA);
-        Self { context, renderer, texture, screen_rect, size, sense, padding, margin, enabled, normal_color, hover_color }
+        let pointer = true;
+        Self { context, renderer, texture, screen_rect, size, sense, padding, margin, enabled, normal_color, hover_color, pointer }
     }
 
     /// Space around the icon, not including circle
@@ -63,6 +65,11 @@ impl CustomCircularImageButton {
         self.hover_color = color;
         self
     }
+    
+    pub fn with_pointer(mut self, pointer: bool) -> Self {
+        self.pointer = pointer;
+        self
+    }
 }
 
 impl Widget for CustomCircularImageButton {
@@ -85,7 +92,9 @@ impl Widget for CustomCircularImageButton {
         let center = to_screen.transform_pos(Pos2::new(self.size / 2.0, self.size / 2.0));
         let radius = self.size / 2.0 - self.margin;
         let circle_color = if response.hovered() || response.clicked() {
-            self.context.set_cursor_icon(CursorIcon::PointingHand);
+            if self.pointer {
+                self.context.set_cursor_icon(CursorIcon::PointingHand);
+            }
             self.hover_color
         } else {
             self.normal_color

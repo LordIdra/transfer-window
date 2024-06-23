@@ -16,7 +16,7 @@ pub struct Burn {
 impl Burn {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.model.entities(vec![ComponentType::VesselComponent]) {
+        for entity in view.model.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
             let faction = view.model.vessel_component(entity).faction();
             if !Faction::Player.has_intel_for(faction) {
                 continue;

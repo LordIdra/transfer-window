@@ -260,4 +260,16 @@ impl Model {
     pub fn distance_at_time(&self, entity: Entity, other_entity: Entity, time: f64, observer: Option<Faction>) -> f64 {
         (self.absolute_position_at_time(entity, time, observer) - self.absolute_position_at_time(other_entity, time, observer)).magnitude()
     }
+
+    pub fn relative_speed_at_time(&self, entity: Entity, other_entity: Entity, time: f64, observer: Option<Faction>) -> f64 {
+        (self.absolute_velocity_at_time(entity, time, observer) - self.absolute_velocity_at_time(other_entity, time, observer)).magnitude()
+    }
+
+    pub fn distance(&self, entity: Entity, other_entity: Entity) -> f64 {
+        (self.absolute_position(entity) - self.absolute_position(other_entity)).magnitude()
+    }
+
+    pub fn relative_speed(&self, entity: Entity, other_entity: Entity) -> f64 {
+        (self.absolute_velocity(entity) - self.absolute_velocity(other_entity)).magnitude()
+    }
 }

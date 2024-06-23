@@ -107,3 +107,9 @@ pub fn cancel_current_segment(view: &mut View, entity: Entity) {
     let _span = tracy_client::span!("Cancel current segment");
     view.model.recompute_entire_trajectory(entity);
 }
+
+pub fn dock(view: &mut View, entity: Entity) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Dock");
+    view.model.dock(entity);
+}

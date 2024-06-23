@@ -41,8 +41,8 @@ pub fn update(view: &View) {
             .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
             .show(&view.context.clone(), |ui| {
         let title = match type_ {
-            EncounterType::Entrance =>  view.model.name_component(to).name() + "Entrance",
-            EncounterType::Exit => view.model.name_component(from).name() + "Exit",
+            EncounterType::Entrance =>  view.model.name_component(to).name() + " Entrance",
+            EncounterType::Exit => view.model.name_component(from).name() + " Exit",
         };
         draw_title(ui, &title);
         draw_time_until(view, ui, time);

@@ -164,10 +164,9 @@
 [ ] Close button for vessel editor
 
 # Stations
-[ ] Add station vessel class (can't be edited, no engines)
-[ ] Station icon
-[ ] Docking ports
-[ ] Docking port interface
+[x] Add station vessel class (can't be edited, no engines)
+[x] Station icon
+[x] Docking ports
 [ ] Docking
 [ ] Undocking
 [ ] Resource transfer
@@ -223,3 +222,9 @@
 [ ] Website
 [ ] Add licenses
 [ ] Log to multiple files
+
+# Artificial Intelligence
+- 3 independent neural networks
+- targeting
+- navigation
+- guidance

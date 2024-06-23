@@ -6,7 +6,7 @@ use crate::game::events::ViewEvent;
 use super::View;
 
 pub const MIN_ZOOM: f64 = 1.0e-9;
-pub const MAX_ZOOM: f64 = 1.0;
+pub const MAX_ZOOM: f64 = 100.0;
 const ZOOM_SENSITIVITY: f64 = 0.003;
 
 fn update_pan(view: &View, mouse_delta: Vec2) {

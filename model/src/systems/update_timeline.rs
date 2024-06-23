@@ -21,7 +21,7 @@ impl Model {
     pub(crate) fn update_timeline(&mut self) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Update timeline");
-        for entity in self.entities(vec![ComponentType::VesselComponent]) {
+        for entity in self.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
             update_entity_timeline(self, entity);
         }
     }

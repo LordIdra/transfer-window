@@ -12,15 +12,21 @@ fn should_recalculate(model: &Model, guidance: &Guidance) -> bool {
 }
 
 impl Model {
-    /// Handles recalculation of guidance segments which had an intercept,
-    /// but do not any longer
+    /// Handles recalculation of guidance segments which had an intercept, but do not any longer.
     pub(crate) fn update_guidance(&mut self) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Update guidance");
-        for entity in self.entities(vec![ComponentType::VesselComponent]) {
+        for entity in self.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
             let Some(guidance) = self.path_component(entity).final_guidance() else { 
-                continue 
+                continue;
             };
+
+            if self.docked(guidance.target()) {
+                if self.vessel_component(entity).timeline().last_event().is_some_and(|event| event.is_intercept()) {
+                    self.cancel_last_event(entity);
+                }
+                continue;
+            }
 
             if !should_recalculate(self, guidance) {
                 continue;

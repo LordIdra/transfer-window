@@ -5,7 +5,7 @@ use crate::game::{events::ViewEvent, selected::Selected, util::{orbitable_textur
 
 use super::{widgets::{custom_image::CustomImage, custom_image_button::CustomCircularImageButton, labels::draw_title}, View};
 
-fn vessel_hover_circle_color(faction: Faction) -> Color32 {
+pub fn vessel_hover_circle_color(faction: Faction) -> Color32 {
     match faction {
         Faction::Player => Color32::from_rgb(45, 90, 120),
         Faction::Ally => Color32::from_rgb(0, 120, 90),
@@ -13,7 +13,7 @@ fn vessel_hover_circle_color(faction: Faction) -> Color32 {
     }
 }
 
-fn vessel_normal_circle_color(faction: Faction) -> Color32 {
+pub fn vessel_normal_circle_color(faction: Faction) -> Color32 {
     match faction {
         Faction::Player => Color32::from_rgb(30, 60, 80),
         Faction::Ally => Color32::from_rgb(0, 80, 60),

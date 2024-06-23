@@ -186,6 +186,7 @@ pub fn vessel_texture(vessel_component: &VesselComponent) -> &'static str {
             ShipClass::Frigate => "vessel-icon-frigate",
         },
         VesselComponent::Torpedo(_) => "vessel-icon-torpedo",
+        VesselComponent::Station(_) => "vessel-icon-station",
     }
 }
 

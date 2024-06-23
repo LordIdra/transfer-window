@@ -49,7 +49,7 @@ impl Model {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Update trajectory");
         let time = self.time();
-        for entity in self.entities(vec![ComponentType::VesselComponent]) {
+        for entity in self.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
             if !self.vessel_component(entity).is_ghost() {
                 update_path_component(self, entity, time);
             }

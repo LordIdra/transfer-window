@@ -15,6 +15,14 @@ pub fn update(view: &mut View) {
         }
     }
 
+    // Remove selected if docked
+    if let Some(entity) = view.selected.entity(&view.model) {
+        if view.model.try_vessel_component(entity).is_some() && view.model.try_path_component(entity).is_none() {
+            trace!("Selected docked at time = {}", view.model.time());
+            view.selected = Selected::None;
+        }
+    }
+
     // Remove selected if expired
     if let Some(time) = view.selected.time() {
         if time < view.model.time() {

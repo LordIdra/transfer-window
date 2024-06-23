@@ -1,22 +1,12 @@
-use eframe::{egui::{Align2, Color32, Grid, RichText, Ui, Window}, epaint};
+use docking::draw_docking;
+use eframe::{egui::{Align2, Color32, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::{faction::Faction, VesselComponent}, storage::entity_allocator::Entity};
 use visual_timeline::draw_visual_timeline;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_edit_vessel, draw_focus}, labels::{draw_key, draw_subtitle, draw_title, draw_value}}}, selected::Selected, util::{format_distance, format_speed}, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_dock, draw_edit_vessel, draw_focus}, labels::{draw_info, draw_key, draw_subtitle, draw_title, draw_value}}}, selected::Selected, View}, styles};
 
+mod docking;
 pub mod visual_timeline;
-
-fn draw_altitude(view: &View, ui: &mut Ui, entity: Entity) {
-    ui.label(RichText::new("Altitude").size(12.0).strong());
-    ui.label(RichText::new(format_distance(view.model.position(entity).magnitude())).size(12.0));
-    ui.end_row();
-}
-
-fn draw_speed(view: &View, ui: &mut Ui, entity: Entity) {
-    ui.label(RichText::new("Speed").size(12.0).strong());
-    ui.label(RichText::new(format_speed(view.model.velocity(entity).magnitude())).size(12.0));
-    ui.end_row();
-}
 
 fn should_draw_fuel(vessel_component: &VesselComponent) -> bool {
     vessel_component.has_fuel_tank()
@@ -104,17 +94,16 @@ fn draw_controls(vessel_component: &VesselComponent, view: &View, entity: Entity
             }
             view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
         }
+
+        if has_intel && vessel_component.timeline().last_blocking_event().is_none() {
+            if let Some(target) = vessel_component.target() {
+                if view.model.try_vessel_component(target).is_some() && view.model.can_ever_dock_to_target(entity) && draw_dock(view, ui, entity) {
+                    view.add_model_event(ModelEvent::Dock { entity });
+                }
+            }
+        }
     });
 }
-
-fn draw_info(view: &View, ui: &mut Ui, name: &str, entity: Entity) {
-    draw_subtitle(ui, "Info");
-    Grid::new("Vessel info grid ".to_string() + name).show(ui, |ui| {
-        draw_altitude(view, ui, entity);
-        draw_speed(view, ui, entity);
-    });
-}
-
 
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
@@ -136,6 +125,12 @@ pub fn update(view: &View) {
         draw_title(ui, &name);
         draw_controls(vessel_component, view, entity, ui, has_control);
         draw_info(view, ui, &name, entity);
+
+        if has_intel {
+            if let VesselComponent::Station(station) = view.model.vessel_component(entity) {
+                draw_docking(view, ui, station);
+            }
+        }
 
         if has_intel {
             draw_resources(ui, vessel_component, &name);

@@ -1,6 +1,7 @@
 use faction::Faction;
 use serde::{Deserialize, Serialize};
 use ship::{Ship, ShipClass};
+use station::{Station, StationClass};
 use timeline::Timeline;
 use torpedo::Torpedo;
 
@@ -10,6 +11,7 @@ use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
 pub mod faction;
 pub mod ship;
+pub mod station;
 pub mod timeline;
 mod torpedo;
 
@@ -18,6 +20,7 @@ mod torpedo;
 pub enum VesselComponent {
     Ship(Ship),
     Torpedo(Torpedo),
+    Station(Station),
 }
 
 #[allow(clippy::new_without_default)]
@@ -30,10 +33,15 @@ impl VesselComponent {
         Self::Torpedo(Torpedo::new(faction))
     }
 
+    pub fn new_station(class: StationClass, faction: Faction) -> Self {
+        Self::Station(Station::new(class, faction))
+    }
+
     pub fn set_target(&mut self, target: Option<Entity>) {
         match self {
             VesselComponent::Ship(ship) => ship.set_target(target),
             VesselComponent::Torpedo(torpedo) => torpedo.set_target(target),
+            VesselComponent::Station(station) => station.set_target(target),
         }
     }
     
@@ -41,6 +49,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.target(),
             VesselComponent::Torpedo(torpedo) => torpedo.target(),
+            VesselComponent::Station(station) => station.target(),
         }
     }
 
@@ -52,6 +61,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.faction(),
             VesselComponent::Torpedo(torpedo) => torpedo.faction(),
+            VesselComponent::Station(station) => station.faction(),
         }
     }
 
@@ -59,6 +69,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.dry_mass(),
             VesselComponent::Torpedo(_) => Torpedo::dry_mass(),
+            VesselComponent::Station(station) => station.dry_mass(),
         }
     }
 
@@ -66,6 +77,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.wet_mass(),
             VesselComponent::Torpedo(_) => Torpedo::wet_mass(),
+            VesselComponent::Station(station) => station.wet_mass(),
         }
     }
 
@@ -73,6 +85,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.mass(),
             VesselComponent::Torpedo(torpedo) => torpedo.mass(),
+            VesselComponent::Station(station) => station.mass(),
         }
     }
 
@@ -80,6 +93,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.max_fuel_litres(),
             VesselComponent::Torpedo(_) => Torpedo::max_fuel_litres(),
+            VesselComponent::Station(station) => station.max_fuel_litres(),
         }
     }
 
@@ -87,6 +101,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.max_fuel_kg(),
             VesselComponent::Torpedo(_) => Torpedo::max_fuel_kg(),
+            VesselComponent::Station(station) => station.max_fuel_kg(),
         }
     }
 
@@ -101,6 +116,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.fuel_litres(),
             VesselComponent::Torpedo(torpedo) => torpedo.fuel_litres(),
+            VesselComponent::Station(station) => station.fuel_litres(),
         }
     }
 
@@ -108,6 +124,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.specific_impulse(),
             VesselComponent::Torpedo(_) => Some(Torpedo::specific_impulse()),
+            VesselComponent::Station(station) => station.specific_impulse(),
         }
     }
 
@@ -115,6 +132,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.fuel_kg_per_second(),
             VesselComponent::Torpedo(_) => Some(Torpedo::fuel_kg_per_second()),
+            VesselComponent::Station(station) => station.fuel_kg_per_second(),
         }
     }
 
@@ -122,6 +140,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.fuel_kg(),
             VesselComponent::Torpedo(torpedo) => torpedo.fuel_kg(),
+            VesselComponent::Station(station) => station.fuel_kg(),
         }
     }
 
@@ -129,6 +148,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.set_fuel_kg(new_fuel_kg),
             VesselComponent::Torpedo(torpedo) => torpedo.set_fuel_kg(new_fuel_kg),
+            VesselComponent::Station(_) => panic!("Attempt to set fuel of station"),
         }
     }
 
@@ -142,7 +162,7 @@ impl VesselComponent {
     pub fn can_edit_ever(&self) -> bool {
         match self {
             VesselComponent::Ship(_) => true,
-            VesselComponent::Torpedo(_) => false,
+            VesselComponent::Torpedo(_) | VesselComponent::Station(_) => false,
         }
     }
 
@@ -150,6 +170,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.timeline(),
             VesselComponent::Torpedo(torpedo) => torpedo.timeline(),
+            VesselComponent::Station(station) => station.timeline(),
         }
     }
 
@@ -157,6 +178,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.timeline_mut(),
             VesselComponent::Torpedo(torpedo) => torpedo.timeline_mut(),
+            VesselComponent::Station(station) => station.timeline_mut(),
         }
     }
 
@@ -167,28 +189,42 @@ impl VesselComponent {
     pub fn as_ship(&self) -> Option<&Ship> {
         match self {
             VesselComponent::Ship(ref ship) => Some(ship),
-            VesselComponent::Torpedo(_) => None,
+            VesselComponent::Torpedo(_) | VesselComponent::Station(_) => None,
         }
     }
 
     pub fn as_ship_mut(&mut self) -> Option<&mut Ship> {
         match self {
             VesselComponent::Ship(ref mut ship) => Some(ship),
-            VesselComponent::Torpedo(_) => None,
+            VesselComponent::Torpedo(_) | VesselComponent::Station(_) => None,
         }
     }
 
     pub fn as_torpedo(&self) -> Option<&Torpedo> {
         match self {
-            VesselComponent::Ship(_) => None,
+            VesselComponent::Ship(_) | VesselComponent::Station(_) => None,
             VesselComponent::Torpedo(ref torpedo) => Some(torpedo),
         }
     }
 
     pub fn as_torpedo_mut(&mut self) -> Option<&mut Torpedo> {
         match self {
-            VesselComponent::Ship(_) => None,
+            VesselComponent::Ship(_) | VesselComponent::Station(_) => None,
             VesselComponent::Torpedo(ref mut torpedo) => Some(torpedo),
+        }
+    }
+
+    pub fn as_station(&self) -> Option<&Station> {
+        match self {
+            VesselComponent::Ship(_) | VesselComponent::Torpedo(_)  => None,
+            VesselComponent::Station(ref station) => Some(station),
+        }
+    }
+
+    pub fn as_station_mut(&mut self) -> Option<&mut Station> {
+        match self {
+            VesselComponent::Ship(_) | VesselComponent::Torpedo(_)  => None,
+            VesselComponent::Station(ref mut station) => Some(station),
         }
     }
 
@@ -202,8 +238,15 @@ impl VesselComponent {
 
     pub fn is_ghost(&self) -> bool {
         match self {
-            VesselComponent::Ship(_) => false,
+            VesselComponent::Ship(_) | VesselComponent::Station(_) => false,
             VesselComponent::Torpedo(torpedo) => torpedo.is_ghost(),
+        }
+    }
+
+    pub fn can_dock(&self) -> bool {
+        match self {
+            VesselComponent::Ship(_) => true,
+            VesselComponent::Torpedo(_) | VesselComponent::Station(_) => false,
         }
     }
 }

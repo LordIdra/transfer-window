@@ -216,9 +216,9 @@ impl Ship {
         let mut max_torpedoes = 0;
         for weapon in self.weapon_slots() {
             if let Some(weapon) = weapon.1 {
-                #[allow(irrefutable_let_patterns)]
-                if let WeaponType::Torpedo(torpedo) = weapon.type_() {
-                    max_torpedoes += torpedo.max_stockpile();
+                match weapon.type_() {
+                    WeaponType::Torpedo(torpedo) => max_torpedoes += torpedo.max_stockpile(),
+                    WeaponType::EnhancedTorpedo(enhanced_torpedo) => max_torpedoes += enhanced_torpedo.max_stockpile(),
                 }
             }
         }
@@ -229,9 +229,9 @@ impl Ship {
         let mut torpedoes = 0;
         for weapon in self.weapon_slots() {
             if let Some(weapon) = weapon.1 {
-                #[allow(irrefutable_let_patterns)]
-                if let WeaponType::Torpedo(torpedo) = weapon.type_() {
-                    torpedoes += torpedo.stockpile();
+                match weapon.type_() {
+                    WeaponType::Torpedo(torpedo) => torpedoes += torpedo.stockpile(),
+                    WeaponType::EnhancedTorpedo(enhanced_torpedo) => torpedoes += enhanced_torpedo.stockpile(),
                 }
             }
         }
