@@ -1,9 +1,11 @@
-use eframe::{egui::{Align, Align2, Layout, RichText, Ui, Window}, epaint};
+use eframe::{egui::{Align, Align2, Color32, Layout, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::ship::ship_slot::ShipSlotLocation, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, View};
 
 use self::{slot_editor::ShipSlotEditor, ship::draw_vessel_editor};
+
+use super::widgets::custom_image_button::CustomCircularImageButton;
 
 mod slot_editor;
 mod tooltips;
@@ -38,7 +40,7 @@ pub fn update(view: &View) {
         return;
     };
 
-    if !view.model.can_edit(vessel_editor.entity) {
+    if !view.model.docked(vessel_editor.entity) {
         view.add_view_event(ViewEvent::SetVesselEditor(None));
         return;
     }
@@ -50,8 +52,24 @@ pub fn update(view: &View) {
             .resizable(false)
             .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
             .show(&view.context.clone(), |ui| {
-        draw_header(view, ui, vessel_editor.entity);
-        let rect = draw_vessel_editor(view, ui, &vessel_name, vessel_editor.entity);
+
+        let rect = ui.horizontal_top(|ui| {
+            let rect = ui.vertical(|ui| {
+                draw_header(view, ui, vessel_editor.entity);
+                draw_vessel_editor(view, ui, &vessel_name, vessel_editor.entity)
+            }).inner;
+
+            let button = CustomCircularImageButton::new(view, "cancel", 36.0)
+                .with_padding(12.0)
+                .with_normal_color(Color32::from_rgb(60, 60, 60))
+                .with_hover_color(Color32::from_rgb(80, 80, 80));
+            if ui.add(button).on_hover_text("Close editor").clicked() {
+                view.add_view_event(ViewEvent::SetVesselEditor(None));
+            }
+
+            rect
+        }).inner;
+
         let center = rect.center();
         let scalar = rect.size().x;
 

@@ -167,8 +167,10 @@
 [x] Add station vessel class (can't be edited, no engines)
 [x] Station icon
 [x] Docking ports
-[ ] Docking
-[ ] Undocking
+[x] Docking
+[x] Undocking
+[x] Draw resources
+[x] Fix section divider in UI
 [ ] Resource transfer
 [ ] Resource transfer takes time
 [ ] Resource transfer can be cancelled
@@ -205,6 +207,7 @@
 
 # Backburner
 [ ] Equipment + torpedoes add mass
+[ ] Selected vessel's segments take priority over non-selected when selecting point
 
 # Performance
 [ ] Texture atlas

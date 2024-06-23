@@ -3,7 +3,7 @@ use eframe::{egui::{Align2, Color32, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::vessel_component::{faction::Faction, VesselComponent}, storage::entity_allocator::Entity};
 use visual_timeline::draw_visual_timeline;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{vessel_editor::VesselEditor, widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_dock, draw_edit_vessel, draw_focus}, labels::{draw_info, draw_key, draw_subtitle, draw_title, draw_value}}}, selected::Selected, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, buttons::{draw_cancel_burn, draw_cancel_guidance, draw_dock, draw_focus}, labels::{draw_info, draw_key, draw_subtitle, draw_title, draw_value}}, selected::Selected, View}, styles};
 
 mod docking;
 pub mod visual_timeline;
@@ -23,7 +23,7 @@ fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent) {
 }
 
 fn should_draw_dv(vessel_component: &VesselComponent) -> bool {
-    vessel_component.dv().is_some() && vessel_component.max_dv().is_some()
+    vessel_component.has_engine() && vessel_component.has_fuel_tank()
 }
 
 fn draw_dv(ui: &mut Ui, vessel_component: &VesselComponent) {
@@ -52,20 +52,24 @@ fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent) {
     ui.end_row();
 }
 
+pub fn draw_resources_grid(ui: &mut Ui, vessel_component: &VesselComponent, name: &str) {
+    Grid::new("Vessel resource grid ".to_string() + name).show(ui, |ui| {
+        if should_draw_fuel(vessel_component) {
+            draw_fuel(ui, vessel_component);
+        }
+        if should_draw_dv(vessel_component) {
+            draw_dv(ui, vessel_component);
+        }
+        if should_draw_torpedoes(vessel_component) {
+            draw_torpedoes(ui, vessel_component);
+        }
+    });
+}
+
 fn draw_resources(ui: &mut Ui, vessel_component: &VesselComponent, name: &str) {
     if should_draw_fuel(vessel_component) || should_draw_dv(vessel_component) || should_draw_torpedoes(vessel_component) {
         draw_subtitle(ui, "Resources");
-        Grid::new("Vessel resource grid ".to_string() + name).show(ui, |ui| {
-            if should_draw_fuel(vessel_component) {
-                draw_fuel(ui, vessel_component);
-            }
-            if should_draw_dv(vessel_component) {
-                draw_dv(ui, vessel_component);
-            }
-            if should_draw_torpedoes(vessel_component) {
-                draw_torpedoes(ui, vessel_component);
-            }
-        });
+        draw_resources_grid(ui, vessel_component, name);
     }
 }
 
@@ -76,11 +80,6 @@ fn draw_controls(vessel_component: &VesselComponent, view: &View, entity: Entity
         if draw_focus(view, ui) {
             view.add_view_event(ViewEvent::ResetCameraPanning);
             view.add_view_event(ViewEvent::SetCameraFocus(entity));
-        }
-
-        if has_intel && vessel_component.can_edit_ever() && draw_edit_vessel(view, ui, entity) {
-            let vessel_editor = Some(VesselEditor::new(entity));
-            view.add_view_event(ViewEvent::SetVesselEditor(vessel_editor));
         }
 
         if has_intel && view.model.path_component(entity).current_segment().is_burn() && draw_cancel_burn(view, ui) {
@@ -98,7 +97,9 @@ fn draw_controls(vessel_component: &VesselComponent, view: &View, entity: Entity
         if has_intel && vessel_component.timeline().last_blocking_event().is_none() {
             if let Some(target) = vessel_component.target() {
                 if view.model.try_vessel_component(target).is_some() && view.model.can_ever_dock_to_target(entity) && draw_dock(view, ui, entity) {
-                    view.add_model_event(ModelEvent::Dock { entity });
+                    view.add_model_event(ModelEvent::Dock { station: target, entity });
+                    view.add_view_event(ViewEvent::SetCameraFocus(target));
+                    view.add_view_event(ViewEvent::SetSelected(Selected::Vessel(target)));
                 }
             }
         }
@@ -127,13 +128,10 @@ pub fn update(view: &View) {
         draw_info(view, ui, &name, entity);
 
         if has_intel {
-            if let VesselComponent::Station(station) = view.model.vessel_component(entity) {
-                draw_docking(view, ui, station);
-            }
-        }
-
-        if has_intel {
             draw_resources(ui, vessel_component, &name);
+            if let VesselComponent::Station(station) = view.model.vessel_component(entity) {
+                draw_docking(view, ui, entity, station);
+            }
         }
 
         draw_visual_timeline(view, ui, entity, view.model.time(), false);

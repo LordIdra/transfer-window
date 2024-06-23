@@ -44,6 +44,6 @@ pub fn burn_adjustment_amount(amount: f64) -> f64 {
     if amount.is_sign_positive() {
         1.0e-8 * amount.powf(2.5)
     } else {
-        20.0 * amount.powf(2.5)
+        1.0e-9 * -amount.abs().powf(2.5)
     }
 }

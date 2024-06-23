@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use super::{faction::Faction, timeline::Timeline};
+use super::{faction::Faction, ship::ship_slot::fuel_tank::FUEL_DENSITY, timeline::Timeline};
 
 pub const DOCKING_DISTANCE: f64 = 1.0e2;
 pub const DOCKING_SPEED: f64 = 10.0;
@@ -49,6 +49,13 @@ impl StationClass {
         }
     }
 
+    pub fn max_fuel_litres(&self) -> f64 {
+        match self {
+            Self::Hub => 13.0e3,
+            Self::Outpost => 8.0e3,
+        }
+    }
+
     pub fn default_docking_ports(&self) -> HashMap<DockingPortLocation, Option<Entity>> {
         match self {
             StationClass::Hub => [
@@ -72,6 +79,7 @@ pub struct Station {
     target: Option<Entity>,
     timeline: Timeline,
     docking_ports: HashMap<DockingPortLocation, Option<Entity>>,
+    fuel_litres: f64,
 }
 
 impl Station {
@@ -79,7 +87,8 @@ impl Station {
         let target = None;
         let timeline = Timeline::default();
         let docking_ports = class.default_docking_ports();
-        Self { class, faction, target, timeline, docking_ports }
+        let fuel_litres = class.max_fuel_litres();
+        Self { class, faction, target, timeline, docking_ports, fuel_litres }
     }
 
     pub fn class(&self) -> StationClass {
@@ -119,19 +128,19 @@ impl Station {
     }
 
     pub fn max_fuel_litres(&self) -> f64 {
-        0.0
+        self.class.max_fuel_litres()
     }
 
     pub fn max_fuel_kg(&self) -> f64 {
-        0.0
+        self.max_fuel_litres() * FUEL_DENSITY
     }
 
     pub fn fuel_litres(&self) -> f64 {
-        0.0
+        self.fuel_litres
     }
 
     pub fn fuel_kg(&self) -> f64 {
-        0.0
+        self.fuel_litres() * FUEL_DENSITY
     }
 
     pub fn specific_impulse(&self) -> Option<f64> {
@@ -152,6 +161,5 @@ impl Station {
 
     pub fn undock(&mut self, location: DockingPortLocation) {
         self.docking_ports.insert(location, None);
-        //TODO create path component
     }
 }

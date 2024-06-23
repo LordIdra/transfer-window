@@ -82,7 +82,6 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
     });
 }
 
-
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update burn");

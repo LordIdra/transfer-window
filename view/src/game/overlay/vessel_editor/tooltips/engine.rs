@@ -13,7 +13,7 @@ pub fn show_tooltip(view: &View, ui: &mut Ui, engine: &Option<Engine>) {
     let name = match type_ {
         EngineType::Regular => "Regular Engine",
         EngineType::Efficient => "Efficient Engine",
-        EngineType::Booster => "High Thrust Engine",
+        EngineType::Booster => "Booster Engine",
     };
 
 

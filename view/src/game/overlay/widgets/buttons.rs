@@ -94,12 +94,10 @@ pub fn draw_enable_guidance(view: &View, ui: &mut Ui, entity: Entity, time: f64)
     ui.add_enabled(enabled, button).on_hover_text("Enable guidance").clicked()
 }
 
-pub fn draw_edit_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
-    let enabled = view.model.can_edit(entity);
+pub fn draw_edit_vessel(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "edit", 36.0)
-        .with_padding(8.0)
-        .with_enabled(enabled);
-    ui.add_enabled(enabled, button).on_hover_text("Edit").clicked()
+        .with_padding(8.0);
+    ui.add(button).on_hover_text("Edit").clicked()
 }
 
 pub fn draw_cancel_burn(view: &View, ui: &mut Ui) -> bool {
@@ -126,4 +124,10 @@ pub fn draw_dock(view: &View, ui: &mut Ui, entity: Entity) -> bool {
         .with_enabled(enabled)
         .with_padding(8.0);
     ui.add_enabled(enabled, button).on_hover_text("Dock").clicked()
+}
+
+pub fn draw_undock(view: &View, ui: &mut Ui) -> bool {
+    let button = CustomCircularImageButton::new(view, "undock", 36.0)
+        .with_padding(8.0);
+    ui.add(button).on_hover_text("Undock").clicked()
 }
