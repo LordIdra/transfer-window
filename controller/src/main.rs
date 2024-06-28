@@ -1,4 +1,4 @@
-use std::{fs::File, sync::Arc, time::Instant};
+use std::{fs::File, fs::create_dir_all, sync::Arc, time::Instant};
 
 use eframe::{egui::Context, glow::{self, HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VERSION}, run_native, App, CreationContext, Frame, NativeOptions, Renderer};
 use event_handler::{load_game, new_game, quit};
@@ -78,6 +78,7 @@ impl Drop for Controller {
 
 fn setup_logging() {
     // A layer that logs events to a file.
+    create_dir_all("log").expect("Failed to create log directory");
     let file = File::create("log/latest.log").expect("Failed to create file");
     let layer = Layer::new().compact()
         .with_ansi(false)
