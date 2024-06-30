@@ -249,10 +249,13 @@ impl Model {
     /// Panics if the entity does not have a vessel component
     pub fn final_dv(&self, entity: Entity) -> Option<f64> {
         if let Some(vessel_component) = self.try_vessel_component(entity) {
-            return match self.path_component(entity).final_rocket_equation_function() {
-                Some(rocket_equation_function) => Some(rocket_equation_function.remaining_dv()),
+            if !vessel_component.has_engine() {
+                return None
+            }
+            return Some(match self.path_component(entity).final_rocket_equation_function() {
+                Some(rocket_equation_function) => rocket_equation_function.remaining_dv(),
                 None => vessel_component.dv(),
-            };
+            });
         }
         panic!("Attempt to get dv of entity without vessel component");
     }

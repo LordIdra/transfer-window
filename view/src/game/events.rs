@@ -2,14 +2,14 @@
 use model::*;
 use log::debug;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::vessel_component::{ship::ship_slot::{ShipSlot, ShipSlotLocation}, station::{DockingPortLocation, ResourceTransferDirection}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
 mod model;
 mod view;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ModelEvent {
     #[allow(unused)]
     SaveGame { name: String },
@@ -20,8 +20,11 @@ pub enum ModelEvent {
     CreateBurn { entity: Entity, time: f64 },
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
     SetTarget { entity: Entity, target: Option<Entity> },
-    SetSlot { entity: Entity, slot_location: ShipSlotLocation, slot: ShipSlot },
-    CreateFireTorpedo { entity: Entity, slot_location: ShipSlotLocation, time: f64 },
+    SetFuelTank { entity: Entity, type_: Option<FuelTankType> },
+    SetEngine { entity: Entity, type_: Option<EngineType> },
+    SetTorpedoStorage { entity: Entity, type_: Option<TorpedoStorageType> },
+    SetTorpedoLauncher { entity: Entity, type_: Option<TorpedoLauncherType> },
+    CreateFireTorpedo { entity: Entity, time: f64 },
     AdjustFireTorpedo { entity: Entity, time: f64, amount: DVec2 },
     CreateGuidance { entity: Entity, time: f64, },
     CancelLastTimelineEvent { entity: Entity },
@@ -65,8 +68,11 @@ impl View {
                 ModelEvent::CreateBurn { entity, time } => create_burn(self, entity, time),
                 ModelEvent::AdjustBurn { entity, time, amount } => adjust_burn(self, entity, time, amount),
                 ModelEvent::SetTarget { entity, target } => set_target(self, entity, target),
-                ModelEvent::SetSlot { entity, slot_location, slot } => set_slot(self, entity, slot_location, slot),
-                ModelEvent::CreateFireTorpedo { entity, slot_location, time } => create_fire_torpedo(self, entity, slot_location, time),
+                ModelEvent::SetFuelTank { entity, type_ } => set_fuel_tank(self, entity, type_),
+                ModelEvent::SetEngine { entity, type_ } => set_engine(self, entity, type_),
+                ModelEvent::SetTorpedoStorage { entity, type_ } => set_torpedo_storage(self, entity, type_),
+                ModelEvent::SetTorpedoLauncher { entity, type_ } => set_torpedo_launcher(self, entity, type_),
+                ModelEvent::CreateFireTorpedo { entity, time } => create_fire_torpedo(self, entity, time),
                 ModelEvent::AdjustFireTorpedo { entity, time, amount } => adjust_fire_torpedo(self, entity, time, amount),
                 ModelEvent::CancelLastTimelineEvent { entity } => cancel_last_event(self, entity),
                 ModelEvent::CreateGuidance { entity, time } => enable_torpedo_guidance(self, entity, time),

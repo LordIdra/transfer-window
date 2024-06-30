@@ -3,7 +3,7 @@ use std::{collections::{HashMap, VecDeque}, fs};
 use nalgebra_glm::vec2;
 use serde::Deserialize;
 
-use crate::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{faction::Faction, ship::ShipClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -114,7 +114,7 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                     let path_component = PathComponent::default()
                         .with_segment(Segment::Orbit(orbit));
                     entity_builder = entity_builder.with_path_component(path_component);
-                    entity_builder = entity_builder.with_vessel_component(VesselComponent::new_ship(ShipClass::Frigate, Faction::Player));
+                    entity_builder = entity_builder.with_vessel_component(VesselComponent::new(VesselClass::Scout, Faction::Player));
                 }
             } else {
                 entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(data.mass, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(position)));

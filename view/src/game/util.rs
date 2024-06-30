@@ -1,7 +1,7 @@
 use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
 use thousands::Separable;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, ship::ShipClass, VesselComponent}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity};
 
 use super::{selected::util::BurnAdjustDirection, View};
 
@@ -180,13 +180,11 @@ pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
 }
 
 pub fn vessel_texture(vessel_component: &VesselComponent) -> &'static str {
-    match vessel_component {
-        VesselComponent::Ship(ship) => match ship.class() {
-            ShipClass::Scout => "vessel-icon-scout",
-            ShipClass::Frigate => "vessel-icon-frigate",
-        },
-        VesselComponent::Torpedo(_) => "vessel-icon-torpedo",
-        VesselComponent::Station(_) => "vessel-icon-station",
+    match vessel_component.class() {
+        VesselClass::Scout => "vessel-icon-scout",
+        VesselClass::Frigate => "vessel-icon-frigate",
+        VesselClass::Torpedo => "vessel-icon-torpedo",
+        VesselClass::Hub => "vessel-icon-hub",
     }
 }
 

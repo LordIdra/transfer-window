@@ -18,5 +18,5 @@ pub fn should_draw_dv(vessel_component: &VesselComponent) -> bool {
 }
 
 pub fn should_draw_torpedoes(vessel_component: &VesselComponent) -> bool {
-    vessel_component.has_torpedo_weapon()
+    vessel_component.has_torpedo_storage()
 }

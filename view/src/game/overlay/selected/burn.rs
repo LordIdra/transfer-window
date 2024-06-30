@@ -99,7 +99,7 @@ pub fn update(view: &View) {
 
     let vessel_component = view.model.vessel_component(entity);
     let burn = view.model.burn_starting_at_time(entity, time);
-    let max_dv = vessel_component.max_dv().unwrap();
+    let max_dv = vessel_component.max_dv();
     let start_dv = burn.rocket_equation_function().remaining_dv();
     let end_dv = burn.final_rocket_equation_function().remaining_dv();
     let duration = burn.duration();

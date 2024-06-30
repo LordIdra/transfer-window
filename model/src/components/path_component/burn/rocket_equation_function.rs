@@ -30,7 +30,7 @@ impl RocketEquationFunction {
     pub fn from_vessel_component(vessel_component: &VesselComponent) -> Self {
         let dry_mass_kg = vessel_component.dry_mass();
         let initial_fuel_mass_kg = vessel_component.fuel_kg();
-        let fuel_consumption_kg_per_second = vessel_component.fuel_kg_per_second().unwrap();
+        let fuel_consumption_kg_per_second = vessel_component.fuel_kg_per_second();
         let specific_impulse = vessel_component.specific_impulse().unwrap();
         RocketEquationFunction::new(dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, 0.0)
     }

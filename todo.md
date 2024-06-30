@@ -162,8 +162,6 @@
 [x] Torpedo launcher
 [x] Enhanced torpedo launcher
 [x] Close button for vessel editor
-
-# Stations
 [x] Add station vessel class (can't be edited, no engines)
 [x] Station icon
 [x] Docking ports
@@ -173,6 +171,10 @@
 [x] Fix section divider in UI
 [x] Resource transfer
 [x] Resource transfer can be cancelled
+[x] The vessel system is pretty insane, separate in TorpedoVessel etc traits or even option structs! (effectively mini ECS)
+[x] Vessel system still uses weird mix of single/multiple slot system
+
+# Stations
 [ ] Equipment has install time
 [ ] Equipment swapping UI
 [ ] Undocking disabled until swap complete
@@ -202,6 +204,9 @@
 [ ] Fog of war
 [ ] Passive/active radar
 [ ] Information networking
+
+[ ] Weapons UI redesign (it's shit)
+[ ] Weapon cooldown
 
 # Campaign
 [ ] Menu screen
@@ -253,10 +258,9 @@
 [ ] Log to multiple files
 
 # Technical debt tracker
-- The vessel system is pretty insane, separate in TorpedoVessel etc traits or even option structs! (effectively mini ECS)
-- Vessel system still uses weird mix of single/multiple slot system
 - Docking port drawing logic is horrible, needs more cleanup when we have more transfers maybe
 - Timeline drawing logic is not great
+- No end time lol
 
 # Artificial Intelligence
 - 3 independent neural networks
