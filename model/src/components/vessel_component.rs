@@ -105,6 +105,54 @@ impl VesselComponent {
         }
     }
 
+    pub fn max_torpedoes(&self) -> usize {
+        match self {
+            VesselComponent::Ship(ship) => ship.max_torpedoes(),
+            VesselComponent::Torpedo(_) => panic!("Attempt to get max torpedoes of torpedo"),
+            VesselComponent::Station(station) => station.max_torpedoes(),
+        }
+    }
+
+    pub fn torpedoes(&self) -> usize {
+        match self {
+            VesselComponent::Ship(ship) => ship.torpedoes(),
+            VesselComponent::Torpedo(_) => panic!("Attempt to get torpedoes of torpedo"),
+            VesselComponent::Station(station) => station.torpedoes(),
+        }
+    }
+
+    pub fn is_torpedoes_empty(&self) -> bool {
+        self.torpedoes() == 0
+    }
+
+    pub fn is_torpedoes_full(&self) -> bool {
+        self.torpedoes() == self.max_torpedoes()
+    }
+
+    pub fn increment_torpedoes(&mut self) {
+        match self {
+            VesselComponent::Ship(ship) => ship.increment_torpedoes(),
+            VesselComponent::Torpedo(_) => panic!("Attempt to increment torpedoes of torpedo"),
+            VesselComponent::Station(station) => station.increment_torpedoes(),
+        }
+    }
+
+    pub fn decrement_torpedoes(&mut self) {
+        match self {
+            VesselComponent::Ship(ship) => ship.decrement_torpedoes(),
+            VesselComponent::Torpedo(_) => panic!("Attempt decrement max torpedoes of torpedo"),
+            VesselComponent::Station(station) => station.decrement_torpedoes(),
+        }
+    }
+
+    pub fn is_fuel_empty(&self) -> bool {
+        self.fuel_kg() < 1.0e-3
+    }
+
+    pub fn is_fuel_full(&self) -> bool {
+        (self.max_fuel_kg() - self.fuel_kg()) < 1.0e-3
+    }
+
     pub fn max_dv(&self) -> Option<f64> {
         let initial_mass = self.dry_mass() + self.max_fuel_kg();
         let final_mass = self.dry_mass();
@@ -148,7 +196,7 @@ impl VesselComponent {
         match self {
             VesselComponent::Ship(ship) => ship.set_fuel_kg(new_fuel_kg),
             VesselComponent::Torpedo(torpedo) => torpedo.set_fuel_kg(new_fuel_kg),
-            VesselComponent::Station(_) => panic!("Attempt to set fuel of station"),
+            VesselComponent::Station(station) => station.set_fuel_kg(new_fuel_kg),
         }
     }
 
@@ -230,6 +278,10 @@ impl VesselComponent {
 
     pub fn has_engine(&self) -> bool {
         self.specific_impulse().is_some()
+    }
+
+    pub fn has_torpedo_weapon(&self) -> bool {
+        self.max_torpedoes() != 0
     }
 
     pub fn has_fuel_tank(&self) -> bool {

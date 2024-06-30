@@ -2,7 +2,7 @@
 use model::*;
 use log::debug;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::vessel_component::ship::ship_slot::{ShipSlot, ShipSlotLocation}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{ship::ship_slot::{ShipSlot, ShipSlotLocation}, station::{DockingPortLocation, ResourceTransferDirection}}, storage::entity_allocator::Entity};
 
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
@@ -28,6 +28,10 @@ pub enum ModelEvent {
     CancelCurrentSegment { entity: Entity },
     Dock { station: Entity, entity: Entity },
     Undock { station: Entity, entity: Entity },
+    StartFuelTransfer { station: Entity, location: DockingPortLocation, direction: ResourceTransferDirection },
+    StopFuelTransfer { station: Entity, location: DockingPortLocation },
+    StartTorpedoTransfer { station: Entity, location: DockingPortLocation, direction: ResourceTransferDirection },
+    StopTorpedoTransfer { station: Entity, location: DockingPortLocation },
 }
 
 #[derive(Debug)]
@@ -69,6 +73,10 @@ impl View {
                 ModelEvent::CancelCurrentSegment { entity } => cancel_current_segment(self, entity),
                 ModelEvent::Dock { station, entity } => dock(self, station, entity),
                 ModelEvent::Undock { station, entity } => undock(self, station, entity),
+                ModelEvent::StartFuelTransfer { station, location, direction } => start_fuel_transfer(self, station, location, direction),
+                ModelEvent::StopFuelTransfer { station, location } => stop_fuel_transfer(self, station, location),
+                ModelEvent::StartTorpedoTransfer { station, location, direction } => start_torpedo_transfer(self, station, location, direction),
+                ModelEvent::StopTorpedoTransfer { station, location } => stop_torpedo_transfer(self, station, location),
             }
         }
 

@@ -51,7 +51,7 @@ impl FireTorpedoEvent {
             .get_slot_mut(self.slot_location)
             .as_weapon_mut()
             .expect("Weapon slot does not contain a weapon");
-        weapon.type_mut().as_torpedo_mut().deplete();
+        weapon.type_mut().as_torpedo_mut().decrement_stockpile();
     }
 
     pub fn cancel(&self, model: &mut Model) {

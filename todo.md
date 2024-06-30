@@ -161,7 +161,7 @@
 [x] Booster engine (frigate+)
 [x] Torpedo launcher
 [x] Enhanced torpedo launcher
-[ ] Close button for vessel editor
+[x] Close button for vessel editor
 
 # Stations
 [x] Add station vessel class (can't be edited, no engines)
@@ -171,13 +171,37 @@
 [x] Undocking
 [x] Draw resources
 [x] Fix section divider in UI
-[ ] Resource transfer
-[ ] Resource transfer takes time
-[ ] Resource transfer can be cancelled
-[ ] Equipment swapping
+[x] Resource transfer
+[x] Resource transfer can be cancelled
 [ ] Equipment has install time
+[ ] Equipment swapping UI
 [ ] Undocking disabled until swap complete
 [ ] Swap can be cancelled
+
+# Vessel refactor
+[ ] Fuel facility
+[ ] Engine facility
+[ ] Torpedo launcher facility
+[ ] Torpedo storage facility
+[ ] Docking facility
+[ ] Class refactor
+[ ] Abstract mass + rocket equation out, may be tough to get working
+[ ] Vessel view refactor
+
+[ ] Redraw ships w/ more and smaller slots
+[ ] Energy generator facility
+[ ] Engine alternators, RTGs
+[ ] Energy storage facility
+[ ] Hull + facilities drain energy over time
+[ ] Solars require line of sight to sun
+
+[ ] Comms equipment
+[ ] Comms line overlay
+[ ] Comms routing algorithm based on line of sight
+
+[ ] Fog of war
+[ ] Passive/active radar
+[ ] Information networking
 
 # Campaign
 [ ] Menu screen
@@ -207,7 +231,9 @@
 
 # Backburner
 [ ] Equipment + torpedoes add mass
-[ ] Selected vessel's segments take priority over non-selected when selecting point
+[ ] Selected vessel's segments take priority over non-selected when selecting point????????????????????????????? maybe not
+[ ] More logical ordering in explorer
+[ ] More logical ordering of docking ports
 
 # Performance
 [ ] Texture atlas
@@ -225,6 +251,12 @@
 [ ] Website
 [ ] Add licenses
 [ ] Log to multiple files
+
+# Technical debt tracker
+- The vessel system is pretty insane, separate in TorpedoVessel etc traits or even option structs! (effectively mini ECS)
+- Vessel system still uses weird mix of single/multiple slot system
+- Docking port drawing logic is horrible, needs more cleanup when we have more transfers maybe
+- Timeline drawing logic is not great
 
 # Artificial Intelligence
 - 3 independent neural networks

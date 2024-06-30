@@ -1,4 +1,4 @@
-use crate::{components::{path_component::{orbit::Orbit, PathComponent}, vessel_component::station::{DockingPortLocation, DOCKING_DISTANCE, DOCKING_SPEED}, ComponentType}, storage::entity_allocator::Entity, Model};
+use crate::{components::{path_component::{orbit::Orbit, PathComponent}, vessel_component::station::{DockingPort, DockingPortLocation, DOCKING_DISTANCE, DOCKING_SPEED}, ComponentType}, storage::entity_allocator::Entity, Model};
 
 const EXTRA_UNDOCK_VELOCITY: f64 = 1.0;
 
@@ -30,7 +30,7 @@ impl Model {
             .unwrap()
             .docking_ports()
             .iter()
-            .find(|(_, docked_entity)| docked_entity.is_some_and(|entity| entity == docked))
+            .find(|(_, docking_port)| docking_port.is_some_and(|docking_port| docking_port.docked_entity() == docked))
             .map(|entry| *entry.0)
     }
 
@@ -74,5 +74,50 @@ impl Model {
 
     pub fn docked(&self, entity: Entity) -> bool {
         self.try_vessel_component(entity).is_some() && self.try_path_component(entity).is_none()
+    }
+
+    pub fn get_docking_port(&self, entity: Entity, location: DockingPortLocation) -> DockingPort {
+        self.vessel_component(entity)
+            .as_station()
+            .unwrap()
+            .docking_ports()
+            .get(&location)
+            .unwrap()
+            .unwrap()
+    }
+
+    pub fn get_docking_port_mut(&mut self, entity: Entity, location: DockingPortLocation) -> &mut DockingPort {
+        self.vessel_component_mut(entity)
+            .as_station_mut()
+            .unwrap()
+            .docking_ports_mut()
+            .get_mut(&location)
+            .unwrap()
+            .as_mut()
+            .unwrap()
+    }
+
+    pub fn can_transfer_fuel_to_docked(&self, entity: Entity, location: DockingPortLocation) -> bool {
+        let from = entity;
+        let to = self.get_docking_port(entity, location).docked_entity();
+        !self.vessel_component(from).is_fuel_empty() && !self.vessel_component(to).is_fuel_full()
+    }
+
+    pub fn can_transfer_fuel_from_docked(&self, entity: Entity, location: DockingPortLocation) -> bool {
+        let to = entity;
+        let from = self.get_docking_port(entity, location).docked_entity();
+        !self.vessel_component(from).is_fuel_empty() && !self.vessel_component(to).is_fuel_full()
+    }
+
+    pub fn can_transfer_torpedoes_to_docked(&self, entity: Entity, location: DockingPortLocation) -> bool {
+        let from = entity;
+        let to = self.get_docking_port(entity, location).docked_entity();
+        !self.vessel_component(from).is_torpedoes_empty() && !self.vessel_component(to).is_torpedoes_full()
+    }
+
+    pub fn can_transfer_torpedoes_from_docked(&self, entity: Entity, location: DockingPortLocation) -> bool {
+        let to = entity;
+        let from = self.get_docking_port(entity, location).docked_entity();
+        !self.vessel_component(from).is_torpedoes_empty() && !self.vessel_component(to).is_torpedoes_full()
     }
 }

@@ -77,6 +77,7 @@ impl Model {
         self.update_time(dt);
         self.update_timeline();
         self.update_target();
+        self.update_stations(dt);
         self.update_fuel();
         self.update_trajectory();
         self.update_guidance();

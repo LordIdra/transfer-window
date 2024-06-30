@@ -189,6 +189,18 @@ impl Ship {
         }
     }
 
+    pub fn increment_torpedoes(&mut self) {
+        match self.weapon_mut().expect("Attempt to set torpedoes on a ship that does not have torpedoes").type_mut() {
+            WeaponType::EnhancedTorpedo(torpedo) | WeaponType::Torpedo(torpedo) => torpedo.increment_stockpile(),
+        }
+    }
+
+    pub fn decrement_torpedoes(&mut self) {
+        match self.weapon_mut().expect("Attempt to set torpedoes on a ship that does not have torpedoes").type_mut() {
+            WeaponType::EnhancedTorpedo(torpedo) | WeaponType::Torpedo(torpedo) => torpedo.decrement_stockpile(),
+        }
+    }
+
     /// For now, we assume the ship only has one engine
     /// # Panics
     /// Panics if the ship does not have an engine slot
@@ -199,6 +211,32 @@ impl Ship {
             }
         }
         error!("A ship does not appear to have an engine slot");
+        panic!("Error recoverable but exiting before something bad happens")
+    }
+
+    /// For now, we assume the ship only has one weapon
+    /// # Panics
+    /// Panics if the ship does not have a weapon slot
+    pub fn weapon(&self) -> Option<&Weapon> {
+        for location in self.filled_slot_locations() {
+            if let ShipSlot::Weapon(weapon) = self.get_slot(location) {
+                return weapon.as_ref();
+            }
+        }
+        error!("A ship does not appear to have a weapon slot");
+        panic!("Error recoverable but exiting before something bad happens")
+    }
+
+    /// For now, we assume the ship only has one weapon
+    /// # Panics
+    /// Panics if the ship does not have a weapon slot
+    pub fn weapon_mut(&mut self) -> Option<&mut Weapon> {
+        for location in self.filled_slot_locations() {
+            if self.get_slot(location).is_weapon() {
+                return self.get_slot_mut(location).as_weapon_mut();
+            }
+        }
+        error!("A ship does not appear to have a weapon slot");
         panic!("Error recoverable but exiting before something bad happens")
     }
 

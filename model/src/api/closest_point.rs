@@ -166,8 +166,7 @@ impl Model {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
         for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
-            let parent_position = self.absolute_position(self.parent(entity).unwrap());
-            let point = point - parent_position;
+            let point = point - self.absolute_position(self.parent(entity).unwrap());
             for orbit in self.future_orbits(entity, observer) {
                 process_orbit(orbit, entity, point, max_distance, &mut closest_distance, &mut closest_point);
             }
@@ -181,8 +180,7 @@ impl Model {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
         for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
-            let parent_position = self.absolute_position(self.parent(entity).unwrap());
-            let point = point - parent_position;
+            let point = point - self.absolute_position(self.parent(entity).unwrap());
             for burn in self.future_burns(entity, observer) {
                 process_burn(burn, entity, point, max_distance, &mut closest_distance, &mut closest_point);
             }
@@ -196,8 +194,7 @@ impl Model {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
         for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
-            let parent_position = self.absolute_position(self.parent(entity).unwrap());
-            let point = point - parent_position;
+            let point = point - self.absolute_position(self.parent(entity).unwrap());
             for guidance in self.future_guidances(entity, observer) {
                 process_guidance(guidance, entity, point, max_distance, &mut closest_distance, &mut closest_point);
             }
