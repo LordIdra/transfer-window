@@ -24,7 +24,7 @@ impl SlotSelector {
 
     pub fn draw(&self, view: &View, ui: &mut Ui) -> bool {
         let slot_selector_size = epaint::Vec2::splat(SLOT_SELECTOR_SIZE);        
-        let image_button = ImageButton::new(view.resources.texture_image(self.texture.as_str()));
+        let image_button = ImageButton::new(view.resources.icon_image(self.texture.as_str()));
         let response = ui.add_sized(slot_selector_size, image_button);
         let clicked = response.clicked();
         styles::DefaultWindow::apply(&view.context);

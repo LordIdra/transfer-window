@@ -39,7 +39,7 @@ fn draw_slot_from_texture(view: &View, ui: &mut Ui, texture: &str, color: Color3
     
     styles::SlotEditor::apply(ui, size, color);
     ui.allocate_ui_at_rect(slot_rect, |ui| {
-        let slot_image = ImageButton::new(view.resources.texture_image(texture));
+        let slot_image = ImageButton::new(view.resources.icon_image(texture));
         if ui.add(slot_image).clicked() {
             on_slot_clicked(view, location);
         }
@@ -58,7 +58,7 @@ fn draw_slot(view: &View, ui: &mut Ui, slot: &Slot, location: SlotLocation, cent
 }
 
 fn draw_ship_underlay(view: &View, ui: &mut Ui, class: VesselClass) -> Response {
-    let texture = view.resources.texture_image(compute_texture_ship_underlay(&class));
+    let texture = view.resources.icon_image(compute_texture_ship_underlay(&class));
     let size = view.screen_rect.size() * UNDERLAY_SIZE_PROPORTION;
     ui.add(Image::new(texture).fit_to_exact_size(size))
 }

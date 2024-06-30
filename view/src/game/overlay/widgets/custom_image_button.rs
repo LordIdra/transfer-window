@@ -21,7 +21,7 @@ pub struct CustomCircularImageButton {
 impl CustomCircularImageButton {
     pub fn new(view: &View, texture_name: &str, size: f32) -> Self {
         let renderer = view.renderers.screen_texture_renderer();
-        let texture = view.resources.gl_texture(texture_name);
+        let texture = view.resources.gl_icon(texture_name);
         let screen_rect = view.screen_rect;
         let sense = Sense::union(Sense::click(), Sense::hover());
         let padding = 0.0;

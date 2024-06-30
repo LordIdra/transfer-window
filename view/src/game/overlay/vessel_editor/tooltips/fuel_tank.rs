@@ -20,7 +20,7 @@ pub fn show_tooltip(view: &View, ui: &mut Ui, fuel_tank: &Option<FuelTank>) {
 
     ui.label(RichText::new(name).strong().monospace().size(20.0));
     ui.horizontal(|ui| {
-        ui.image(view.resources.texture_image("fuel"));
+        ui.image(view.resources.icon_image("fuel"));
         ui.label(RichText::new("Capacity").monospace().strong());
         ui.label(format!("{} L", type_.capacity_litres()));
     });
