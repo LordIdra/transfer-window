@@ -173,6 +173,13 @@
 [x] Resource transfer can be cancelled
 [x] The vessel system is pretty insane, separate in TorpedoVessel etc traits or even option structs! (effectively mini ECS)
 [x] Vessel system still uses weird mix of single/multiple slot system
+[x] Fuel facility
+[x] Engine facility
+[x] Torpedo launcher facility
+[x] Torpedo storage facility
+[x] Docking facility
+[x] Class refactor
+[ ] Equipment + torpedoes add mass
 
 # Stations
 [ ] Equipment has install time
@@ -181,15 +188,6 @@
 [ ] Swap can be cancelled
 
 # Vessel refactor
-[ ] Fuel facility
-[ ] Engine facility
-[ ] Torpedo launcher facility
-[ ] Torpedo storage facility
-[ ] Docking facility
-[ ] Class refactor
-[ ] Abstract mass + rocket equation out, may be tough to get working
-[ ] Vessel view refactor
-
 [ ] Redraw ships w/ more and smaller slots
 [ ] Energy generator facility
 [ ] Engine alternators, RTGs
@@ -235,7 +233,6 @@
 [ ] Energy production/storage/consumption
 
 # Backburner
-[ ] Equipment + torpedoes add mass
 [ ] Selected vessel's segments take priority over non-selected when selecting point????????????????????????????? maybe not
 [ ] More logical ordering in explorer
 [ ] More logical ordering of docking ports

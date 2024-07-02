@@ -1,7 +1,7 @@
 use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
 use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction}, storage::entity_allocator::Entity};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_next, draw_previous, draw_select_vessel, draw_warp_to}, labels::{draw_altitude_at_time, draw_key, draw_orbits, draw_speed_at_time, draw_subtitle, draw_target_distance_at_time, draw_target_relative_speed_at_time, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_fire_torpedo, draw_next, draw_previous, draw_select_vessel, draw_warp_to}, labels::{draw_altitude_at_time, draw_key, draw_orbits, draw_speed_at_time, draw_subtitle, draw_target_distance_at_time, draw_target_relative_speed_at_time, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
 
 // use self::weapons::draw_weapons;
 
@@ -45,7 +45,14 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
                 let selected = Selected::EnableGuidance { entity, time };
                 view.add_view_event(ViewEvent::SetSelected(selected));
             }
+
+            if draw_fire_torpedo(view, ui, entity, time) {
+                view.add_model_event(ModelEvent::CreateFireTorpedo { entity, time });
+                let selected = Selected::FireTorpedo { entity, time, state: BurnState::Selected };
+                view.add_view_event(ViewEvent::SetSelected(selected));
+            }
         }
+
     });
 }
 
@@ -125,19 +132,4 @@ pub fn update(view: &View) {
         draw_orbit(view, ui, entity, time);
         draw_visual_timeline(view, ui, entity, time, true);
     });
-
-    // todo fix this shit
-    // let vessel_component = &view.model.vessel_component(entity);
-    // if let Some(ship) = vessel_component.as_ship() {
-    //     if Faction::Player.can_control(ship.faction()) && !ship.weapon_slots().is_empty() {
-    //         Window::new("Weapons")
-    //                 .title_bar(false)
-    //                 .resizable(false)
-    //                 .anchor(Align2::CENTER_BOTTOM, epaint::vec2(0.0, 0.0))
-    //                 .show(&view.context.clone(), |ui| {
-    //             let weapon_slots = ship.weapon_slots();
-    //             // draw_weapons(view, ui, entity, &weapon_slots, time);
-    //         });
-    //     }
-    // }
 }

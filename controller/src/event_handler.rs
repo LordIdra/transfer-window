@@ -3,7 +3,7 @@ use std::fs;
 use eframe::egui::{Context, ViewportCommand};
 use log::error;
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{class::VesselClass, engine::EngineType, faction::Faction, fuel_tank::FuelTankType, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{class::VesselClass, docking::DockingPortLocation, engine::EngineType, faction::Faction, fuel_tank::FuelTankType, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 use transfer_window_view::{game, Scene};
 
 use crate::Controller;
@@ -61,7 +61,17 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_vessel_component(vessel_component)
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    let vessel_component = VesselClass::Hub.build(Faction::Ally);
+    let vessel_component = VesselComponent::new(VesselClass::Frigate, Faction::Player)
+        .with_fuel_tank(FuelTankType::Medium)
+        .with_engine(EngineType::Efficient)
+        .with_torpedo_storage(TorpedoStorageType::Small)
+        .with_torpedo_launcher(TorpedoLauncherType::Enhanced);
+    let docked_player_frigate = model.allocate(EntityBuilder::default()
+        .with_name_component(NameComponent::new("Frigate".to_string()))
+        .with_vessel_component(vessel_component));
+
+    let mut vessel_component = VesselClass::Hub.build(Faction::Ally);
+    vessel_component.dock(DockingPortLocation::North, docked_player_frigate);
     let orbit = Orbit::circle(earth, vessel_component.mass(), model.mass(earth), vec2(0.11e9, 0.0), 0.0, OrbitDirection::AntiClockwise)
         .with_end_at(1.0e10);
     let _ally_hub = model.allocate(EntityBuilder::default()

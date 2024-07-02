@@ -1,5 +1,5 @@
 use eframe::egui::Ui;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{class::VesselClass, faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{class::VesselClass, faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent}}}, storage::entity_allocator::Entity};
 
 use crate::game::{util::{orbitable_texture, vessel_texture}, View};
 
@@ -93,6 +93,17 @@ pub fn draw_enable_guidance(view: &View, ui: &mut Ui, entity: Entity, time: f64)
         .with_enabled(enabled)
         .with_padding(5.0);
     ui.add_enabled(enabled, button).on_hover_text("Enable guidance").clicked()
+}
+
+pub fn draw_fire_torpedo(view: &View, ui: &mut Ui, entity: Entity, time: f64) -> bool {
+    if !FireTorpedoEvent::can_create_ever(&view.model, entity) {
+        return false;
+    }
+    let enabled = FireTorpedoEvent::can_create(&view.model, entity, time);
+    let button = CustomCircularImageButton::new(view, "fire-torpedo", 36.0)
+        .with_enabled(enabled)
+        .with_padding(5.0);
+    ui.add_enabled(enabled, button).on_hover_text("Fire torpedo").clicked()
 }
 
 pub fn draw_edit_vessel(view: &View, ui: &mut Ui) -> bool {

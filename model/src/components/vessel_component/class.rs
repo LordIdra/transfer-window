@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{docking::DockingType, engine::EngineType, faction::Faction, fuel_tank::FuelTankType, VesselComponent};
+use super::{docking::DockingType, engine::EngineType, faction::Faction, fuel_tank::FuelTankType, torpedo_storage::TorpedoStorageType, VesselComponent};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub enum VesselClass {
@@ -28,6 +28,7 @@ impl VesselClass {
                 .with_ghost(),
             VesselClass::Hub => VesselComponent::new(*self, faction)
                 .with_fuel_tank(FuelTankType::Hub)
+                .with_torpedo_storage(TorpedoStorageType::Hub)
                 .with_docking(DockingType::Quadruple),
             VesselClass::Scout | VesselClass::Frigate => VesselComponent::new(*self, faction),
         }

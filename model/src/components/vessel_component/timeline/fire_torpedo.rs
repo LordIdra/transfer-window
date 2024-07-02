@@ -72,10 +72,15 @@ impl FireTorpedoEvent {
         model.vessel_component(self.ghost).timeline().last_blocking_event().is_none()
     }
 
+    pub fn can_create_ever(model: &Model, entity: Entity) -> bool {
+        let vessel_component = &model.vessel_component(entity);
+        vessel_component.has_torpedo_storage()
+            && vessel_component.has_torpedo_launcher()
+    }
+
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         let vessel_component = &model.vessel_component(entity);
         vessel_component.timeline().is_time_after_last_blocking_event(time)
-            && vessel_component.has_torpedo_launcher()
             && vessel_component.final_torpedoes() != 0
     }
 
