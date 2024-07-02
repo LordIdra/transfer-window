@@ -10,10 +10,11 @@ uniform sampler2D texture_sampler;
 
 #define TAU 6.28318530718
 
+// This is magic, it is not to be touched at risk of sanity loss, world distortion, or learning bits of math you never knew
 vec2 otho_projection(vec2 tex_coords, float rotation_angle) {
     // Map the coordinate onto a hemisphere
     vec3 cart = vec3(tex_coords, sqrt(0.25 - tex_coords.x * tex_coords.x - tex_coords.y * tex_coords.y));
-    cart = cart.zxy; // WHY?? OPENGL, WHYYYY?{PWOP>K"FMP)JI*( HP_#H(PN$J"{PVWA<"MVwe"<l:}
+    cart = cart.zxy; // WHY?? OPENGL, WHYYYY????>:L{{PWOP>K"FMP)JI*( HP_#H(PN$J"{PVWA<"MVwe"<l:}
 
     // Convert the cartesian coordinates to spherical coordinates
     float theta = atan(cart.y, cart.x);
@@ -32,8 +33,7 @@ vec2 otho_projection(vec2 tex_coords, float rotation_angle) {
 }
 
 void main() {
-    vec2 tex_coords = otho_projection(v_tex_coord, rotation_angle + 1e-6);
-//    gl_FragColor = vec4(tex_coords, 0, 1);
+    vec2 tex_coords = otho_projection(v_tex_coord, rotation_angle);
     vec4 texture_color = texture(texture_sampler, tex_coords);
     float alpha = texture_color.a * v_alpha;
     gl_FragColor = vec4(texture_color.rgb * alpha, alpha);
