@@ -9,6 +9,7 @@ pub struct PlanetRenderer {
     vertex_array_object: VertexArrayObject,
     texture: glow::Texture,
     vertices: Vec<f32>,
+    rotation: f32
 }
 
 impl PlanetRenderer {
@@ -21,11 +22,16 @@ impl PlanetRenderer {
             VertexAttribute { index: 3, count: 2 }, // texture coordinates
         ]);
         let vertices = vec![];
-        Self { program, vertex_array_object, texture, vertices }
+        let rotation = 0.0;
+        Self { program, vertex_array_object, texture, vertices, rotation }
     }
     
     pub fn add_vertices(&mut self, vertices: &mut Vec<f32>) {
         self.vertices.append(vertices);
+    }
+    
+    pub fn set_rotation(&mut self, rotation: f32) {
+        self.rotation = rotation;
     }
 
     pub fn render(&mut self, gl: &Arc<Context>, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
@@ -37,6 +43,7 @@ impl PlanetRenderer {
         self.program.uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
         self.program.uniform_mat3(gl, "translation_matrix_upper", translation_matrices.0.as_slice());
         self.program.uniform_mat3(gl, "translation_matrix_lower", translation_matrices.1.as_slice());
+        self.program.uniform_float(gl, "rotation", self.rotation);
         self.vertex_array_object.draw(gl);
         self.vertices.clear();
     }

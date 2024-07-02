@@ -48,6 +48,10 @@ impl Renderers {
     pub fn add_object_vertices(&self, name: &str, vertices: &mut Vec<f32>) {
         self.object_renderers[name].lock().unwrap().add_vertices(vertices);
     }
+    
+    pub fn set_object_rotation(&self, name: &str, rotation: f32) {
+        self.object_renderers[name].lock().unwrap().set_rotation(rotation);
+    }
 
     pub fn add_segment_vertices(&self, vertices: &mut Vec<f32>) {
         self.segment_renderer.lock().unwrap().add_vertices(vertices);
