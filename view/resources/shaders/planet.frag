@@ -23,11 +23,12 @@ vec2 otho_projection(vec2 tex_coords, float rotation_angle) {
     float phi = atan(length(cart.xy), cart.z);
 
     // Rotate the sphere
-    theta += rotation_angle;
+    theta -= rotation_angle;
 
     // Normalize the spherical coordinates
-    theta = mod(mod(theta, TAU) + TAU, TAU);
-    phi = mod(mod(phi, TAU) + TAU, TAU);
+    // Doing this creates a 1-pixel wide seam, but not doing it seems to be fine
+    // theta = mod(mod(theta, TAU) + TAU, TAU);
+    // phi = mod(mod(phi, TAU) + TAU, TAU);
 
     // Since the texure is an equirectangular projection, we can map the
     // spherical coordinates directly to the texture coordinates
