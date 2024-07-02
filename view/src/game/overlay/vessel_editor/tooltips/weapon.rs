@@ -1,5 +1,5 @@
 use eframe::egui::{RichText, Ui};
-use transfer_window_model::components::vessel_component::system_slot::{weapon::{Weapon, WeaponType}, System};
+use transfer_window_model::components::vessel_component::ship::ship_slot::{weapon::{Weapon, WeaponType}, System};
 
 pub fn show_tooltip(ui: &mut Ui, weapon: &Option<Weapon>) {
     let Some(weapon) = weapon else {
@@ -8,7 +8,8 @@ pub fn show_tooltip(ui: &mut Ui, weapon: &Option<Weapon>) {
     };
 
     let name = match weapon.type_() {
-        WeaponType::Torpedo(_) => "Torpedo",
+        WeaponType::Torpedo(_) => "Torpedo Launcher",
+        WeaponType::EnhancedTorpedo(_) => "Enhanced Torpedo Launcher",
     };
 
     ui.label(RichText::new(name).strong().monospace().size(20.0));

@@ -1,7 +1,7 @@
 
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::{orbitable_component::OrbitableComponentPhysics, path_component::{orbit::Orbit, segment::Segment}, vessel_component::Faction}, storage::entity_allocator::Entity, Model};
+use crate::{components::{orbitable_component::OrbitableComponentPhysics, path_component::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment}, vessel_component::faction::Faction}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     /// NOT safe to call for orbitables
@@ -30,6 +30,28 @@ impl Model {
             }
         }
         orbits
+    }
+
+    /// NOT safe to call for orbitables
+    pub fn future_burns(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Burn> {
+        let mut burns = vec![];
+        for segment in self.future_segments(entity, observer) {
+            if let Some(burn) = segment.as_burn() {
+                burns.push(burn);
+            }
+        }
+        burns
+    }
+
+    /// NOT safe to call for orbitables
+    pub fn future_guidances(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Guidance> {
+        let mut guidances = vec![];
+        for segment in self.future_segments(entity, observer) {
+            if let Some(guidance) = segment.as_guidance() {
+                guidances.push(guidance);
+            }
+        }
+        guidances
     }
 
     pub fn current_segment(&self, entity: Entity) -> &Segment {
@@ -74,6 +96,18 @@ impl Model {
     /// Panics if there is no orbit at the given time
     pub fn orbit_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Orbit {
         self.segment_at_time(entity, time, observer).as_orbit().expect("No orbit exists at the given time")
+    }
+
+    /// # Panics
+    /// Panics if there is no burn at the given time
+    pub fn burn_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Burn {
+        self.segment_at_time(entity, time, observer).as_burn().expect("No burn exists at the given time")
+    }
+
+    /// # Panics
+    /// Panics if there is no burn at the given time
+    pub fn guidance_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Guidance {
+        self.segment_at_time(entity, time, observer).as_guidance().expect("No guidance exists at the given time")
     }
 
     pub fn parent(&self, entity: Entity) -> Option<Entity> {
@@ -225,5 +259,17 @@ impl Model {
 
     pub fn distance_at_time(&self, entity: Entity, other_entity: Entity, time: f64, observer: Option<Faction>) -> f64 {
         (self.absolute_position_at_time(entity, time, observer) - self.absolute_position_at_time(other_entity, time, observer)).magnitude()
+    }
+
+    pub fn relative_speed_at_time(&self, entity: Entity, other_entity: Entity, time: f64, observer: Option<Faction>) -> f64 {
+        (self.absolute_velocity_at_time(entity, time, observer) - self.absolute_velocity_at_time(other_entity, time, observer)).magnitude()
+    }
+
+    pub fn distance(&self, entity: Entity, other_entity: Entity) -> f64 {
+        (self.absolute_position(entity) - self.absolute_position(other_entity)).magnitude()
+    }
+
+    pub fn relative_speed(&self, entity: Entity, other_entity: Entity) -> f64 {
+        (self.absolute_velocity(entity) - self.absolute_velocity(other_entity)).magnitude()
     }
 }

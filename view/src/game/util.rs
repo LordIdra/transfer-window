@@ -1,7 +1,7 @@
 use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
 use thousands::Separable;
-use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, ship::ShipClass, VesselComponent}}, storage::entity_allocator::Entity};
 
 use super::{selected::util::BurnAdjustDirection, View};
 
@@ -104,6 +104,16 @@ pub fn format_time(time: f64) -> String {
     }
 }
 
+pub fn format_time_with_millis(time: f64) -> String {
+    if time < 1.0 {
+        format!("{time:.2}s")
+    } else if time < 10.0 {
+        format!("{time:.1}s")
+    } else {
+        format_time(time)
+    }
+}
+
 pub fn format_distance(distance: f64) -> String {
     if distance < 1_000.0 {
         format!("{} m", distance.round())
@@ -167,6 +177,25 @@ pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
         return true;
     };
     should_render_parent(view, parent)
+}
+
+pub fn vessel_texture(vessel_component: &VesselComponent) -> &'static str {
+    match vessel_component {
+        VesselComponent::Ship(ship) => match ship.class() {
+            ShipClass::Scout => "vessel-icon-scout",
+            ShipClass::Frigate => "vessel-icon-frigate",
+        },
+        VesselComponent::Torpedo(_) => "vessel-icon-torpedo",
+        VesselComponent::Station(_) => "vessel-icon-station",
+    }
+}
+
+pub fn orbitable_texture(type_: OrbitableType) -> &'static str {
+    match type_ {
+        OrbitableType::Star => "star",
+        OrbitableType::Planet => "planet",
+        OrbitableType::Moon => "moon",
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

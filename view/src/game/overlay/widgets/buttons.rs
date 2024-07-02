@@ -1,19 +1,17 @@
 use eframe::egui::Ui;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}, Faction, VesselClass}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}, VesselComponent}}, storage::entity_allocator::Entity};
 
-use crate::game::View;
+use crate::game::{util::{orbitable_texture, vessel_texture}, View};
 
 use super::custom_image_button::CustomCircularImageButton;
 
 pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
-    let class = view.model.vessel_component(entity).class();
-    let icon = match class {
-        VesselClass::Torpedo => "vessel-icon-torpedo",
-        VesselClass::Light => "vessel-icon-light",
-    };
-    let tooltip = match class {
-        VesselClass::Torpedo => "Select torpedo",
-        VesselClass::Light => "Select vessel",
+    let vessel_component = view.model.vessel_component(entity);
+    let icon = vessel_texture(vessel_component);
+    let tooltip = match vessel_component {
+        VesselComponent::Torpedo(_) => "Select torpedo",
+        VesselComponent::Ship(_) => "Select ship",
+        VesselComponent::Station(_) => "Select station",
     };
     let button = CustomCircularImageButton::new(view, icon, 36.0)
         .with_padding(8.0);
@@ -22,11 +20,7 @@ pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
 
 pub fn draw_select_orbitable(view: &View, ui: &mut Ui, entity: Entity) -> bool {
     let type_ = view.model.orbitable_component(entity).type_();
-    let icon = match type_ {
-        OrbitableType::Star => "star",
-        OrbitableType::Planet => "planet",
-        OrbitableType::Moon => "moon",
-    };
+    let icon = orbitable_texture(type_);
     let tooltip = match type_ {
         OrbitableType::Star => "Select star",
         OrbitableType::Planet => "Select planet",
@@ -100,22 +94,40 @@ pub fn draw_enable_guidance(view: &View, ui: &mut Ui, entity: Entity, time: f64)
     ui.add_enabled(enabled, button).on_hover_text("Enable guidance").clicked()
 }
 
-pub fn draw_edit_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
-    let enabled = view.model.can_edit(entity);
+pub fn draw_edit_vessel(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "edit", 36.0)
-        .with_padding(8.0)
-        .with_enabled(enabled);
-    ui.add_enabled(enabled, button).on_hover_text("Edit").clicked()
+        .with_padding(8.0);
+    ui.add(button).on_hover_text("Edit").clicked()
 }
 
 pub fn draw_cancel_burn(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "cancel", 36.0)
         .with_padding(8.0);
-    ui.add(button).on_hover_text("Cancel current burn").clicked()
+    ui.add(button).on_hover_text("Cancel burn").clicked()
 }
 
 pub fn draw_cancel_guidance(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "cancel", 36.0)
         .with_padding(8.0);
-    ui.add(button).on_hover_text("Cancel current guidance").clicked()
+    ui.add(button).on_hover_text("Cancel guidance").clicked()
+}
+
+pub fn draw_focus(view: &View, ui: &mut Ui) -> bool {
+    let button = CustomCircularImageButton::new(view, "focus", 36.0)
+        .with_padding(8.0);
+    ui.add(button).on_hover_text("Focus").clicked()
+}
+
+pub fn draw_dock(view: &View, ui: &mut Ui, entity: Entity) -> bool {
+    let enabled = view.model.can_dock(entity);
+    let button = CustomCircularImageButton::new(view, "dock", 36.0)
+        .with_enabled(enabled)
+        .with_padding(8.0);
+    ui.add_enabled(enabled, button).on_hover_text("Dock").clicked()
+}
+
+pub fn draw_undock(view: &View, ui: &mut Ui) -> bool {
+    let button = CustomCircularImageButton::new(view, "undock", 36.0)
+        .with_padding(8.0);
+    ui.add(button).on_hover_text("Undock").clicked()
 }

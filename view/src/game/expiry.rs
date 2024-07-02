@@ -1,5 +1,5 @@
 use log::trace;
-use transfer_window_model::components::vessel_component::Faction;
+use transfer_window_model::components::vessel_component::faction::Faction;
 
 use super::{selected::Selected, util::{should_render, should_render_at_time, ApsisType}, View};
 
@@ -18,7 +18,7 @@ pub fn update(view: &mut View) {
     // Remove selected if expired
     if let Some(time) = view.selected.time() {
         if time < view.model.time() {
-            trace!("Selected expired at time={time}");
+            trace!("Selected expired at time = {time} with model time = {}", view.model.time());
             view.selected = Selected::None;
         }
     }

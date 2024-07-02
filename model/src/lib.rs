@@ -76,9 +76,11 @@ impl Model {
         self.update_warp(dt);
         self.update_time(dt);
         self.update_timeline();
+        self.update_target();
+        self.update_stations(dt);
         self.update_fuel();
-        self.update_guidance();
         self.update_trajectory();
+        self.update_guidance();
     }
 
     pub fn entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {

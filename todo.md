@@ -145,16 +145,66 @@
 [x] Tooltips for speed on warp arrows
 [x] Investigate/handle crashes at model/src/api/trajectories/fast_solver/bounding/ellipse.rs:26:102
 [x] Handle ITP failure crashes
-[ ] Allow selecting burn + guidance points?
-[ ] Explorer tree
+[x] Persistent selected state (doesn't deselect on time changed)
+[x] Allow selecting burn + guidance points?
+[x] Fix backward adjustment
+[x] Explorer tree
+[x] Fix very low/high eccentricity orbits...
+[x] Fix the weird thing where you can modify torpedo trajectory after intercept
+[x] Scout
+[x] Frigate
+[x] Tiny fuel tank
+[x] Small fuel tank
+[x] Medium fuel tank (frigate+)
+[x] Regular engine
+[x] Efficient engine (frigate+)
+[x] Booster engine (frigate+)
+[x] Torpedo launcher
+[x] Enhanced torpedo launcher
+[x] Close button for vessel editor
+
+# Stations
+[x] Add station vessel class (can't be edited, no engines)
+[x] Station icon
+[x] Docking ports
+[x] Docking
+[x] Undocking
+[x] Draw resources
+[x] Fix section divider in UI
+[x] Resource transfer
+[x] Resource transfer can be cancelled
+[ ] Equipment has install time
+[ ] Equipment swapping UI
+[ ] Undocking disabled until swap complete
+[ ] Swap can be cancelled
+
+# Vessel refactor
+[ ] Fuel facility
+[ ] Engine facility
+[ ] Torpedo launcher facility
+[ ] Torpedo storage facility
+[ ] Docking facility
+[ ] Class refactor
+[ ] Abstract mass + rocket equation out, may be tough to get working
+[ ] Vessel view refactor
+
+[ ] Redraw ships w/ more and smaller slots
+[ ] Energy generator facility
+[ ] Engine alternators, RTGs
+[ ] Energy storage facility
+[ ] Hull + facilities drain energy over time
+[ ] Solars require line of sight to sun
+
+[ ] Comms equipment
+[ ] Comms line overlay
+[ ] Comms routing algorithm based on line of sight
+
+[ ] Fog of war
+[ ] Passive/active radar
+[ ] Information networking
 
 # Campaign
 [ ] Menu screen
-[ ] Stations (stations have resources which can be transferred)
-[ ] Can only change equipment at stations
-- Satellite class
-- Trainer class
-- Scout class
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
@@ -168,15 +218,6 @@
 [ ] Proportional guidance
 [ ] Integration techniques (euler RK4 etc)
 
-# Stations
-[ ] Add station vessel class (can't be edited)
-[ ] Station icon
-[ ] Station-grade equipment (can't be added to normal vessels)
-[ ] Docking
-[ ] Resource transfer
-[ ] Undocking
-
-
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?
 [ ] Collisions with planets (nearly forgot about that lmao)
@@ -189,19 +230,36 @@
 [ ] Energy production/storage/consumption
 
 # Backburner
-[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
-[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
-[ ] Fix the weird thing where you can modify torpedo trajectory etc after intercept
-[ ] Persistent selected state (doesn't deselect on time changed)
+[ ] Equipment + torpedoes add mass
+[ ] Selected vessel's segments take priority over non-selected when selecting point????????????????????????????? maybe not
+[ ] More logical ordering in explorer
+[ ] More logical ordering of docking ports
+
+# Performance
+[ ] Texture atlas
 [ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
-[ ] Fix egui flickering
-[ ] Very low/high eccentricity orbits...
+[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
+[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
+[ ] Smaller screen texture renderer framebuffer
 
 # Before release
 [ ] Versioning!
 [ ] Icon/branding
-[ ] Dev mode compiles in save/load buttons
+[ ] Dev mode compiles in debug menu
 [ ] Profiling + performance testing on different devices
 [ ] Test compatibility on different devices
 [ ] Website
 [ ] Add licenses
+[ ] Log to multiple files
+
+# Technical debt tracker
+- The vessel system is pretty insane, separate in TorpedoVessel etc traits or even option structs! (effectively mini ECS)
+- Vessel system still uses weird mix of single/multiple slot system
+- Docking port drawing logic is horrible, needs more cleanup when we have more transfers maybe
+- Timeline drawing logic is not great
+
+# Artificial Intelligence
+- 3 independent neural networks
+- targeting
+- navigation
+- guidance

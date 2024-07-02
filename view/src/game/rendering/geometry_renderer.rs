@@ -29,6 +29,8 @@ impl GeometryRenderer {
     }
 
     pub fn render(&mut self, gl: &Arc<Context>, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Geometry render");
         self.vertex_array_object.data(gl, &self.vertices);
         self.program.use_program(gl);
         self.program.uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
@@ -39,6 +41,8 @@ impl GeometryRenderer {
     }
 
     pub fn render_lines(&mut self, gl: &Arc<Context>, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Geometry render lines");
         self.vertex_array_object.data(gl, &self.vertices);
         self.program.use_program(gl);
         self.program.uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());

@@ -1,20 +1,22 @@
-use eframe::{egui::{Align, Align2, Layout, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::system_slot::SlotLocation, storage::entity_allocator::Entity};
+use eframe::{egui::{Align, Align2, Color32, Layout, RichText, Ui, Window}, epaint};
+use transfer_window_model::{components::vessel_component::ship::ship_slot::ShipSlotLocation, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, View};
 
-use self::{slot_editor::SlotEditor, vessel::draw_vessel_editor};
+use self::{slot_editor::ShipSlotEditor, ship::draw_vessel_editor};
+
+use super::widgets::custom_image_button::CustomCircularImageButton;
 
 mod slot_editor;
 mod tooltips;
 mod util;
-mod vessel;
+mod ship;
 
 
 #[derive(Debug, Clone)]
 pub struct VesselEditor {
     entity: Entity,
-    slot_editor: Option<SlotLocation>,
+    slot_editor: Option<ShipSlotLocation>,
 }
 
 impl VesselEditor {
@@ -26,7 +28,7 @@ impl VesselEditor {
 /// Returns whether the close button was clicked
 fn draw_header(view: &View, ui: &mut Ui, entity: Entity) {
     ui.with_layout(Layout::left_to_right(Align::Min), |ui| {
-        let name = view.model.name_component(entity).name().to_uppercase();
+        let name = view.model.name_component(entity).name();
         ui.label(RichText::new(name).strong().size(32.0));
     });
 }
@@ -38,7 +40,7 @@ pub fn update(view: &View) {
         return;
     };
 
-    if !view.model.can_edit(vessel_editor.entity) {
+    if !view.model.docked(vessel_editor.entity) {
         view.add_view_event(ViewEvent::SetVesselEditor(None));
         return;
     }
@@ -50,16 +52,33 @@ pub fn update(view: &View) {
             .resizable(false)
             .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
             .show(&view.context.clone(), |ui| {
-        draw_header(view, ui, vessel_editor.entity);
-        let rect = draw_vessel_editor(view, ui, &vessel_name, vessel_editor.entity);
+
+        let rect = ui.horizontal_top(|ui| {
+            let rect = ui.vertical(|ui| {
+                draw_header(view, ui, vessel_editor.entity);
+                draw_vessel_editor(view, ui, &vessel_name, vessel_editor.entity)
+            }).inner;
+
+            let button = CustomCircularImageButton::new(view, "cancel", 36.0)
+                .with_padding(12.0)
+                .with_normal_color(Color32::from_rgb(60, 60, 60))
+                .with_hover_color(Color32::from_rgb(80, 80, 80));
+            if ui.add(button).on_hover_text("Close editor").clicked() {
+                view.add_view_event(ViewEvent::SetVesselEditor(None));
+            }
+
+            rect
+        }).inner;
+
         let center = rect.center();
         let scalar = rect.size().x;
 
         if let Some(slot_location) = vessel_editor.slot_editor {
             let vessel_component = view.model.vessel_component(vessel_editor.entity);
-            let slot = vessel_component.slots().get(slot_location);
-            let vessel_class = view.model.vessel_component(vessel_editor.entity).class();
-            SlotEditor::new(vessel_editor.entity, vessel_class, slot_location, slot).draw(view, &vessel_name, slot_location, center, scalar);
+            let ship = vessel_component.as_ship().unwrap();
+            let slot = ship.get_slot(slot_location);
+            let vessel_class = ship.class();
+            ShipSlotEditor::new(vessel_editor.entity, vessel_class, slot_location, slot).draw(view, &vessel_name, slot_location, center, scalar);
         }
     });
 }

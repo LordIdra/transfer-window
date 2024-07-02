@@ -3,7 +3,7 @@ use std::fs;
 use eframe::egui::{Context, ViewportCommand};
 use log::error;
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{system_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::{torpedo::Torpedo, WeaponType}, Slot, SlotLocation}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{faction::Faction, ship::{ship_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, ShipSlot, ShipSlotLocation}, ShipClass}, station::StationClass, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 use transfer_window_view::{game, Scene};
 
 use crate::Controller;
@@ -37,33 +37,55 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_name_component(NameComponent::new("Moon".to_string()))
         .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
 
-    let orbit = Orbit::circle(earth, VesselClass::Light.mass(), 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let orbit = Orbit::circle(earth, ShipClass::Scout.mass(), 5.9722e24, vec2(0.08e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let spacecraft_0 = model.allocate(EntityBuilder::default()
+        .with_name_component(NameComponent::new("Scout".to_string()))
+        .with_vessel_component(VesselComponent::new_ship(ShipClass::Scout, Faction::Player))
+        .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
+
+    let orbit = Orbit::circle(earth, ShipClass::Frigate.mass(), 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let spacecraft_1 = model.allocate(EntityBuilder::default()
-        .with_name_component(NameComponent::new("Spacecraft 1".to_string()))
-        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Player))
+        .with_name_component(NameComponent::new("Frigate".to_string()))
+        .with_vessel_component(VesselComponent::new_ship(ShipClass::Frigate, Faction::Player))
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    let orbit = Orbit::circle(earth, VesselClass::Light.mass(), 5.9722e24, vec2(0.2e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let orbit = Orbit::circle(earth, StationClass::Hub.mass(), 5.9722e24, vec2(0.11e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let _station = model.allocate(EntityBuilder::default()
+        .with_name_component(NameComponent::new("Hub".to_string()))
+        .with_vessel_component(VesselComponent::new_station(StationClass::Hub, Faction::Ally))
+        .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
+
+    let orbit = Orbit::circle(earth, ShipClass::Frigate.mass(), 5.9722e24, vec2(0.2e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let spacecraft_2 = model.allocate(EntityBuilder::default()
-        .with_name_component(NameComponent::new("Spacecraft 2".to_string()))
-        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Enemy))
+        .with_name_component(NameComponent::new("Enemy Frigate".to_string()))
+        .with_vessel_component(VesselComponent::new_ship(ShipClass::Frigate, Faction::Enemy))
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    let orbit = Orbit::circle(moon, VesselClass::Light.mass(), 0.07346e24, vec2(0.3e8, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let orbit = Orbit::circle(moon, ShipClass::Frigate.mass(), 0.07346e24, vec2(0.3e8, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let _spacecraft_3 = model.allocate(EntityBuilder::default()
-        .with_name_component(NameComponent::new("Spacecraft 3".to_string()))
-        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Ally))
+        .with_name_component(NameComponent::new("Ally Frigate".to_string()))
+        .with_vessel_component(VesselComponent::new_ship(ShipClass::Frigate, Faction::Ally))
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    model.set_slot(spacecraft_2, SlotLocation::Back, Slot::new_engine(EngineType::Efficient));
-    model.set_slot(spacecraft_2, SlotLocation::Middle, Slot::new_fuel_tank(FuelTankType::Large));
-    model.set_slot(spacecraft_2, SlotLocation::Front, Slot::new_weapon(WeaponType::Torpedo(Torpedo::new())));
+    model.set_slot(spacecraft_0, ShipSlotLocation::Back, ShipSlot::new_engine(EngineType::Regular));
+    model.set_slot(spacecraft_0, ShipSlotLocation::Middle, ShipSlot::new_fuel_tank(FuelTankType::Small));
+    model.recompute_entire_trajectory(spacecraft_0);
+
+    model.set_slot(spacecraft_1, ShipSlotLocation::Back, ShipSlot::new_engine(EngineType::Efficient));
+    model.set_slot(spacecraft_1, ShipSlotLocation::Middle, ShipSlot::new_fuel_tank(FuelTankType::Medium));
+    model.set_slot(spacecraft_1, ShipSlotLocation::Front, ShipSlot::new_weapon(WeaponType::new_enhanced_torpedo()));
+    model.recompute_entire_trajectory(spacecraft_1);
+
+    model.set_slot(spacecraft_2, ShipSlotLocation::Back, ShipSlot::new_engine(EngineType::Efficient));
+    model.set_slot(spacecraft_2, ShipSlotLocation::Middle, ShipSlot::new_fuel_tank(FuelTankType::Medium));
+    model.set_slot(spacecraft_2, ShipSlotLocation::Front, ShipSlot::new_weapon(WeaponType::new_torpedo()));
+    model.recompute_entire_trajectory(spacecraft_2);
 
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, spacecraft_2, 200.0));
     model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);
     model.vessel_component_mut(spacecraft_2).timeline_mut().last_event().unwrap().as_start_burn().unwrap().adjust(&mut model, vec2(300.0, 50.0));
 
-    let fire_torpedo_event = FireTorpedoEvent::new(&mut model, spacecraft_2, 100.0, SlotLocation::Front);
+    let fire_torpedo_event = FireTorpedoEvent::new(&mut model, spacecraft_2, 100.0, ShipSlotLocation::Front);
     let torpedo = fire_torpedo_event.ghost();
     let event = TimelineEvent::FireTorpedo(fire_torpedo_event);
     model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);

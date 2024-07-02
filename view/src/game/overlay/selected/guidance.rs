@@ -1,9 +1,9 @@
 use eframe::{egui::{Align2, Ui, Window}, epaint};
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::draw_select_vessel, custom_image_button::CustomCircularImageButton, labels::{draw_time_until, draw_title}}, selected::Selected, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::draw_select_vessel, custom_image_button::CustomCircularImageButton, labels::{draw_subtitle, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
-use super::{burn::draw_burn_info, vessel::visual_timeline::draw_visual_timeline};
+use super::{burn::draw_burn_labels, vessel::visual_timeline::draw_visual_timeline};
 
 fn draw_controls(view: &View, ui: &mut Ui, time: f64, entity: Entity) {
     ui.horizontal(|ui| {
@@ -67,7 +67,8 @@ pub fn update(view: &View) {
         draw_title(ui, "Guidance");
         draw_time_until(view, ui, time);
         draw_controls(view, ui, time, entity);
-        draw_burn_info(view, ui, max_dv, start_dv, end_dv, duration);
+        draw_subtitle(ui, "Guidance");
+        draw_burn_labels(view, ui, max_dv, start_dv, end_dv, duration);
         draw_visual_timeline(view, ui, entity, time, false);
     });
 }

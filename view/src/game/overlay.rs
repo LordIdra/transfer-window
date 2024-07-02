@@ -4,6 +4,7 @@ use crate::styles;
 
 use super::View;
 
+mod explorer;
 mod fps;
 mod right_click_menu;
 mod scale;
@@ -19,6 +20,7 @@ pub fn draw(view: &View) {
 
     styles::DefaultWindow::apply(&view.context);
 
+    explorer::update(view);
     fps::update(view);
     scale::update(view);
     time::update(view);

@@ -1,15 +1,13 @@
 use eframe::egui::{Align2, Ui, Window};
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::vessel_component::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, View}, styles};
 
-use super::widgets::custom_image_button::CustomCircularImageButton;
+use super::widgets::{buttons, custom_image_button::CustomCircularImageButton};
 
 fn draw_focus(view: &View, ui: &mut Ui, entity: Entity) {
-    let button = CustomCircularImageButton::new(view, "focus", 30.0)
-        .with_padding(3.0);
-    if ui.add(button).on_hover_text("Focus").clicked() {
+    if buttons::draw_focus(view, ui) {
         view.add_view_event(ViewEvent::ResetCameraPanning);
         view.add_view_event(ViewEvent::SetCameraFocus(entity));
         view.add_view_event(ViewEvent::HideRightClickMenu);
@@ -19,8 +17,8 @@ fn draw_focus(view: &View, ui: &mut Ui, entity: Entity) {
 fn draw_set_target(view: &View, ui: &mut Ui, right_clicked: Entity, selected: Entity) {
     let is_already_target = view.model.target(selected) == Some(right_clicked);
     if is_already_target {
-        let button = CustomCircularImageButton::new(view, "unset-target", 30.0)
-            .with_padding(4.0);
+        let button = CustomCircularImageButton::new(view, "unset-target", 36.0)
+            .with_padding(8.0);
         if ui.add(button).on_hover_text("Unset target").clicked() {
             view.add_model_event(ModelEvent::SetTarget { 
                 entity: selected, 
@@ -30,9 +28,9 @@ fn draw_set_target(view: &View, ui: &mut Ui, right_clicked: Entity, selected: En
         }
     } else {
         let enabled = selected != right_clicked;
-        let button = CustomCircularImageButton::new(view, "set-target", 30.0)
+        let button = CustomCircularImageButton::new(view, "set-target", 36.0)
             .with_enabled(enabled)
-            .with_padding(4.0);
+            .with_padding(8.0);
         if ui.add_enabled(enabled, button)
                 .on_hover_text("Set target")
                 .clicked() {

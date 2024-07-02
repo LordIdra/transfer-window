@@ -1,8 +1,8 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::{Faction, VesselClass}, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
 
-use crate::game::{events::ViewEvent, selected::Selected, View};
+use crate::game::{events::ViewEvent, selected::Selected, util::vessel_texture, View};
 
 use super::Icon;
 
@@ -15,7 +15,7 @@ pub struct Vessel {
 impl Vessel {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(vec![ComponentType::VesselComponent]) {
+        for entity in view.entities_should_render(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
             if !view.model.vessel_component(entity).is_ghost() {
                 let icon = Self { entity };
                 icons.push(Box::new(icon) as Box<dyn Icon>);
@@ -27,10 +27,7 @@ impl Vessel {
 
 impl Icon for Vessel {
     fn texture(&self, view: &View) -> String {
-        let mut base_name = match view.model.vessel_component(self.entity).class() {
-            VesselClass::Torpedo => "vessel-icon-torpedo",
-            VesselClass::Light => "vessel-icon-light",
-        }.to_string();
+        let mut base_name = vessel_texture(view.model.vessel_component(self.entity)).to_string();
         if let Some(target) = view.selected.target(&view.model) {
             let selected_faction = view.model.vessel_component(view.selected.entity(&view.model).unwrap()).faction();
             if target == self.entity && Faction::Player.has_intel_for(selected_faction) {
@@ -54,7 +51,7 @@ impl Icon for Vessel {
     }
 
     fn radius(&self, _view: &View) -> f64 {
-        10.0
+        15.0
     }
 
     fn priorities(&self, view: &View) -> [u64; 4] {

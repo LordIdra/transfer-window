@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{Faction, VesselClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{faction::Faction, ship::ShipClass, VesselComponent}}, storage::entity_builder::EntityBuilder, Model, SEGMENTS_TO_PREDICT};
 
 /// This example was taken from insanity-1 (note insanity-1 case may have changed from time of writing)
 #[test]
@@ -32,7 +32,7 @@ fn test_prediction() {
     let orbit = Orbit::new(earth, vessel_mass, earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Player))
+        .with_vessel_component(VesselComponent::new_ship(ShipClass::Frigate, Faction::Player))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
     model.recompute_trajectory(vessel);
@@ -42,7 +42,7 @@ fn test_prediction() {
     // + 1 to account for the last segment which will have a time of 0
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
     
-    let encounter_times = vec![1452880.5996859074, 1453237.8732705116, 1756031.4693295956, 1759789.8763918877];
+    let encounter_times = [1_452_880.599_685_907_4, 1_453_237.873_270_511_6, 1_756_031.469_329_595_6, 1_759_789.876_391_887_7];
 
     for i in 0..segments.len()-1 {
         assert_eq!(segments[i].end_time(), segments[i+1].start_time());
@@ -88,7 +88,7 @@ fn test_prediction_with_burn() {
     let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 10000.0, 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new(VesselClass::Light, Faction::Player))
+        .with_vessel_component(VesselComponent::new_ship(ShipClass::Frigate, Faction::Player))
         .with_path_component(PathComponent::default()
             .with_segment(Segment::Orbit(orbit))));
 
@@ -114,7 +114,7 @@ fn test_prediction_with_burn() {
 
     assert_eq!(segments.len(), SEGMENTS_TO_PREDICT + 1);
 
-    let encounter_times = vec![1451640.0092875957, 1453650.030605793, 1756813.440374136, 1760025.6886267662];
+    let encounter_times = [1_451_640.009_287_595_7, 1_453_650.030_605_793, 1_756_813.440_374_136, 1_760_025.688_626_766_2];
 
     for i in 3..segments.len()-1 {
         assert_eq!(segments[i].end_time(), segments[i+1].start_time());

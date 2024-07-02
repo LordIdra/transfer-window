@@ -34,7 +34,9 @@ pub fn update(view: &View) {
                     | Selected::Approach { .. }
                     | Selected::Encounter { .. }
                     | Selected::Intercept { .. }
-                    | Selected::Point { .. } => (),
+                    | Selected::BurnPoint { .. }
+                    | Selected::GuidancePoint { .. }
+                    | Selected::OrbitPoint { .. } => (),
                 Selected::Burn { entity, .. }
                     | Selected::FireTorpedo { entity, .. } 
                     | Selected::EnableGuidance { entity, .. } => {

@@ -3,7 +3,7 @@ use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::vessel_component::Faction, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity, Model};
 
 use self::guidance_point::GuidancePoint;
 
@@ -61,7 +61,7 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, factio
         if distance_prime_at_delta_time(0.0).is_sign_negative() && distance_prime_at_delta_time(GUIDANCE_TIME_STEP).is_sign_positive() {
             // Distance derivative sign flips, so we have a minimum distance within GUIDANCE_TIME_STEP
             match itp(&distance_prime_at_delta_time, 0.0, GUIDANCE_TIME_STEP) {
-                Err(err) => error!("{}", err),
+                Err(err) => error!("Error while checking for intercept: {}", err),
                 Ok(intercept_delta_time) => {
                     let intercept_distance = distance_at_delta_time(intercept_delta_time);
                     if will_intercept(intercept_distance) {

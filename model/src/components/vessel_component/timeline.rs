@@ -8,7 +8,7 @@ use crate::Model;
 
 use self::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent};
 
-use super::system_slot::SlotLocation;
+use super::ship::ship_slot::ShipSlotLocation;
 
 pub mod intercept;
 pub mod enable_guidance;
@@ -164,7 +164,7 @@ impl Timeline {
             .cloned()
     }
 
-    pub fn depleted_torpedoes(&self, slot_location :SlotLocation) -> usize {
+    pub fn depleted_torpedoes(&self, slot_location: ShipSlotLocation) -> usize {
         self.events.iter()
             .filter(|event| event.as_fire_torpedo().is_some_and(|fire_torpedo| fire_torpedo.slot_location() == slot_location))
             .count()

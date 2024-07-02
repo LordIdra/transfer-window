@@ -1,11 +1,11 @@
 use eframe::{egui::{Align2, Color32, Grid, Ui, Window}, epaint};
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, buttons::draw_select_vessel, custom_image::CustomImage, custom_image_button::CustomCircularImageButton, labels::{draw_key, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::Selected, util::format_time, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, buttons::draw_select_vessel, custom_image::CustomImage, custom_image_button::CustomCircularImageButton, labels::{draw_key, draw_time_until, draw_title, draw_value}}, selected::Selected, util::format_time_with_millis, View}, styles};
 
 use super::vessel::visual_timeline::draw_visual_timeline;
 
-pub fn draw_burn_info(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
+pub fn draw_burn_labels(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
     let burnt_dv = start_dv - end_dv;
 
     let start_dv_proportion = (start_dv / max_dv) as f32;
@@ -15,17 +15,17 @@ pub fn draw_burn_info(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_
     let end_bar = FilledBar::new(Color32::WHITE, end_dv_proportion);
 
     ui.horizontal(|ui| {
+        draw_key(ui, "ΔV");
         draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::DARK_GRAY, vec![start_bar, end_bar]);
     });
 
-    draw_subtitle(ui, "Info");
     Grid::new("DV grid").show(ui, |ui| {
         ui.horizontal(|ui| {
             let image = CustomImage::new(view, "duration", 20.0);
             ui.add(image);
             draw_key(ui, "Duration");
         });
-        draw_value(ui, &format_time(duration));
+        draw_value(ui, &format_time_with_millis(duration));
         ui.end_row();
 
         ui.horizontal(|ui| {
@@ -82,7 +82,6 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
     });
 }
 
-
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update burn");
@@ -99,7 +98,7 @@ pub fn update(view: &View) {
     }
 
     let vessel_component = view.model.vessel_component(entity);
-    let burn = view.model.path_component(entity).future_segment_starting_at_time(time).unwrap().as_burn().unwrap();
+    let burn = view.model.burn_starting_at_time(entity, time);
     let max_dv = vessel_component.max_dv().unwrap();
     let start_dv = burn.rocket_equation_function().remaining_dv();
     let end_dv = burn.final_rocket_equation_function().remaining_dv();
@@ -113,7 +112,7 @@ pub fn update(view: &View) {
         draw_title(ui, "Burn");
         draw_time_until(view, ui, time);
         draw_controls(ui, view, time, entity);
-        draw_burn_info(view, ui, max_dv, start_dv, end_dv, duration);
+        draw_burn_labels(view, ui, max_dv, start_dv, end_dv, duration);
         draw_visual_timeline(view, ui, entity, time, false);
     });
 }

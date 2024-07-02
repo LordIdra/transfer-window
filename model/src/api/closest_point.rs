@@ -4,7 +4,7 @@ use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::{path_component::orbit::Orbit, vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
+use crate::{components::{path_component::{burn::Burn, guidance::Guidance, orbit::Orbit}, vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
 
 /// Returns the closest point to `point` on the given orbit if it is less than `radius` away from the orbit
 /// Returns none if the closest distance to `point` is further than the radius
@@ -49,9 +49,7 @@ fn find_closest_point_on_orbit(orbit: &Orbit, point: DVec2, max_distance: f64) -
     None
 }
 
-fn process_orbit(model: &Model, orbit: &Orbit, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
-    let parent_position = model.absolute_position(orbit.parent());
-    let point = point - parent_position;
+fn process_orbit(orbit: &Orbit, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
     let Some(closest_position) = find_closest_point_on_orbit(orbit, point, max_distance) else {
         return;
     };
@@ -87,17 +85,118 @@ fn process_orbit(model: &Model, orbit: &Orbit, entity: Entity, point: DVec2, max
     }
 }
 
+fn itp_to_find_turning_point(initial_points: &[(f64, f64)], derivative: impl Fn(f64) -> f64, distance: impl Fn(f64) -> f64, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>, entity: Entity) {
+    // Find any pairs of points where the distance derivative flips from negative to positive or vice versa
+    // This gives us all the minima/maxima on the burn
+    // When a pair is found, use the ITP solver to find the time of the minimum/maximum
+    let (mut previous_time, mut previous_distance_derivative) = initial_points.first().unwrap();
+    for (current_time, current_distance_derivative) in initial_points.iter().skip(1) {
+        let time = if previous_distance_derivative.is_sign_negative() && current_distance_derivative.is_sign_positive() {
+            Some(itp(&derivative, previous_time, *current_time))
+        } else if previous_distance_derivative.is_sign_positive() && current_distance_derivative.is_sign_negative() {
+            Some(itp(&derivative, *current_time, previous_time))
+        } else {
+            None
+        };
+        if let Some(time) = time {
+            match time {
+                Ok(time) => {
+                    let distance = distance(time);
+                    if distance < max_distance && distance < *closest_distance {
+                        *closest_distance = distance;
+                        *closest_point = Some((entity, time));
+                    }
+                },
+                Err(err) => error!("Error while computing closest point: {}", err),
+            }
+        }
+        previous_time = *current_time;
+        previous_distance_derivative = *current_distance_derivative;
+    }
+}
+
+fn process_burn(burn: &Burn, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
+    if burn.duration() < 0.03 {
+        return;
+    }
+
+    let distance = |time: f64| (burn.point_at_time(time).position() - point).magnitude();
+    let derivative = |time: f64| (distance(time + 0.0001) - distance(time)) / 0.0001;
+
+    // Sample 10 evenly distributed points from burn start to end, finding their derivatives
+    let mut initial_points = vec![];
+    for i in 0..=10 {
+        let mut time = burn.start_point().time() + (i as f64 / 10.0) * burn.duration();
+        if i == 10 {
+            // Derivative calculations would otherwise go beyond end of guidance
+            time -= 0.0001;
+        }
+        initial_points.push((time, derivative(time)));
+    }
+
+    itp_to_find_turning_point(&initial_points, derivative, distance, max_distance, closest_distance, closest_point, entity);
+}
+
+fn process_guidance(guidance: &Guidance, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
+    if guidance.duration() < 0.03 {
+        return;
+    }
+
+    let distance = |time: f64| (guidance.point_at_time(time).position() - point).magnitude();
+    let derivative = |time: f64| (distance(time + 0.0001) - distance(time)) / 0.0001;
+
+    // Sample 10 evenly distributed points from burn start to end, finding their derivatives
+    let mut initial_points = vec![];
+    for i in 0..=10 {
+        let mut time = guidance.start_point().time() + (i as f64 / 10.0) * guidance.duration();
+        if i == 10 {
+            // Derivative calculations would otherwise go beyond end of guidance
+            time -= 0.0001;
+        }
+        initial_points.push((time, derivative(time)));
+    }
+
+    itp_to_find_turning_point(&initial_points, derivative, distance, max_distance, closest_distance, closest_point, entity);
+}
+
 impl Model {
-    /// Returns the entity and time of the closest point on ANY vessel segment provided the closest
+    /// Returns the entity and time of the closest point on ANY vessel orbit provided the closest
     /// distance from the point to a segment is less than `max_distance.`
-    /// Short circuits; if there are multiple points, the first one found is returned
-    /// Also uses the perceived trajectories, not real ones (ie faction dependan)
-    pub fn closest_point_on_any_trajectory(&self, point: DVec2, max_distance: f64, observer: Option<Faction>) -> Option<(Entity, f64)> {
+    pub fn closest_orbit_point(&self, point: DVec2, max_distance: f64, observer: Option<Faction>) -> Option<(Entity, f64)> {
         let mut closest_point = None;
         let mut closest_distance = f64::MAX;
         for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
-            for orbit in &self.future_orbits(entity, observer) {
-                process_orbit(self, orbit, entity, point, max_distance, &mut closest_distance, &mut closest_point);
+            let point = point - self.absolute_position(self.parent(entity).unwrap());
+            for orbit in self.future_orbits(entity, observer) {
+                process_orbit(orbit, entity, point, max_distance, &mut closest_distance, &mut closest_point);
+            }
+        }
+        closest_point
+    }
+
+    /// Returns the entity and time of the closest point on ANY vessel burn provided the closest
+    /// distance from the point to a segment is less than `max_distance.`
+    pub fn closest_burn_point(&self, point: DVec2, max_distance: f64, observer: Option<Faction>) -> Option<(Entity, f64)> {
+        let mut closest_point = None;
+        let mut closest_distance = f64::MAX;
+        for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
+            let point = point - self.absolute_position(self.parent(entity).unwrap());
+            for burn in self.future_burns(entity, observer) {
+                process_burn(burn, entity, point, max_distance, &mut closest_distance, &mut closest_point);
+            }
+        }
+        closest_point
+    }
+
+    /// Returns the entity and time of the closest point on ANY vessel burn provided the closest
+    /// distance from the point to a segment is less than `max_distance.`
+    pub fn closest_guidance_point(&self, point: DVec2, max_distance: f64, observer: Option<Faction>) -> Option<(Entity, f64)> {
+        let mut closest_point = None;
+        let mut closest_distance = f64::MAX;
+        for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
+            let point = point - self.absolute_position(self.parent(entity).unwrap());
+            for guidance in self.future_guidances(entity, observer) {
+                process_guidance(guidance, entity, point, max_distance, &mut closest_distance, &mut closest_point);
             }
         }
         closest_point

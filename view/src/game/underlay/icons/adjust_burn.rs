@@ -111,8 +111,8 @@ impl Icon for AdjustBurn {
     }
 
     fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
-        if let Selected::Burn { entity, time, state: _} = &view.selected {
-            if pointer.primary_down() {
+        if let Selected::Burn { entity, time, state } = &view.selected {
+            if !state.is_dragging() && pointer.primary_down() {
                 trace!("Started dragging to adjust burn {:?}", self.direction);
                 let state = BurnState::Dragging(self.direction);
                 let selected = Selected::Burn { entity: *entity, time: *time, state };

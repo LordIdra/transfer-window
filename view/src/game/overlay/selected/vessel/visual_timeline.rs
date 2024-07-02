@@ -1,9 +1,9 @@
 #![allow(clippy::match_same_arms)]
 
 use eframe::egui::{Color32, Frame, RichText, Ui};
-use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::{timeline::TimelineEvent, Faction}}, storage::entity_allocator::Entity};
+use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::{timeline::TimelineEvent, faction::Faction}}, storage::entity_allocator::Entity};
 
-use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImage, labels::{draw_subtitle, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
+use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImage, labels::{draw_subtitle, draw_value}, util::advance_cursor_to}, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
 
 enum VisualTimelineEvent {
     TimelineEvent(TimelineEvent),
@@ -105,9 +105,9 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::Apsis { type_, time, distance: _ } => Some(Selected::Apsis { type_: *type_, entity, time: *time }),
             VisualTimelineEvent::Approach { type_, target, time, distance: _ } => Some(Selected::Approach { type_: *type_, entity, target: *target, time: *time }),
             VisualTimelineEvent::Encounter { type_, time, from, to } => Some(Selected::Encounter { type_: *type_, entity, time: *time, from: *from, to: *to }),
-            VisualTimelineEvent::Point { .. } => None,
-            VisualTimelineEvent::BurnEnd { .. } => None,
-            VisualTimelineEvent::GuidanceEnd { .. } => None,
+            VisualTimelineEvent::Point { .. } 
+                | VisualTimelineEvent::BurnEnd { .. } 
+                | VisualTimelineEvent::GuidanceEnd { .. } => None,
         }
     }
 
@@ -120,7 +120,9 @@ impl VisualTimelineEvent {
             Selected::None => false,
             Selected::Orbitable(_) => false,
             Selected::Vessel(_) => false,
-            Selected::Point { .. } => matches!(self, VisualTimelineEvent::Point { .. }),
+            Selected::BurnPoint { .. } 
+                | Selected::GuidancePoint { .. } 
+                | Selected::OrbitPoint { .. } => matches!(self, VisualTimelineEvent::Point { .. }),
             Selected::Apsis { type_, time, .. } => {
                 match self {
                     // calculations can produce slightly different times when an apsis is calculated
@@ -216,14 +218,6 @@ fn generate_burn_guidance_end(view: &View, entity: Entity, events: &mut Vec<Visu
     }
 }
 
-fn advance_cursor_to(ui: &mut Ui, x: f32) {
-    let width = x - ui.cursor().left();
-    let mut rect = ui.cursor();
-    rect.set_width(width);
-    rect.set_height(0.0);
-    ui.advance_cursor_after_rect(rect);
-}
-
 pub fn draw_visual_timeline(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_center_time_point: bool) {
     let mut events = vec![];
     let faction = view.model.vessel_component(entity).faction();
@@ -282,7 +276,6 @@ fn draw_event(view: &View, ui: &mut Ui, event: &VisualTimelineEvent, entity: Ent
 
         draw_value(ui, &event.name(view));
         advance_cursor_to(ui, 320.0);
-        ui.end_row();
     });
 
     let response = frame.allocate_space(ui);

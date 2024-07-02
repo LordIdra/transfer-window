@@ -1,5 +1,5 @@
 use eframe::egui::{Grid, RichText, Ui};
-use transfer_window_model::components::vessel_component::system_slot::{engine::{Engine, EngineType}, System};
+use transfer_window_model::components::vessel_component::ship::ship_slot::{engine::{Engine, EngineType}, System};
 
 use crate::game::View;
 
@@ -11,9 +11,9 @@ pub fn show_tooltip(view: &View, ui: &mut Ui, engine: &Option<Engine>) {
 
     let type_ = engine.type_();
     let name = match type_ {
-        EngineType::Torpedo => unreachable!(),
+        EngineType::Regular => "Regular Engine",
         EngineType::Efficient => "Efficient Engine",
-        EngineType::HighThrust => "High Thrust Engine",
+        EngineType::Booster => "Booster Engine",
     };
 
 

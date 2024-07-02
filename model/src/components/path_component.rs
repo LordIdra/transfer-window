@@ -252,6 +252,14 @@ impl PathComponent {
         &self.perceived_segments
     }
 
+    pub fn current_perceived_segment(&self) -> &Segment {
+        self.perceived_segments.first().unwrap()
+    }
+
+    pub fn current_perceived_segment_mut(&mut self) -> &mut Segment {
+        self.perceived_segments.first_mut().unwrap()
+    }
+
     /// Returns the first segment it finds matching the time
     /// If the time is exactly on the border between two segments,
     /// returns the first one

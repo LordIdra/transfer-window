@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::{util::BurnState, Selected}, util::should_render_at_time, View};
 
@@ -16,7 +16,7 @@ pub struct Burn {
 impl Burn {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.model.entities(vec![ComponentType::VesselComponent]) {
+        for entity in view.model.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
             let faction = view.model.vessel_component(entity).faction();
             if !Faction::Player.has_intel_for(faction) {
                 continue;

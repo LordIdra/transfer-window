@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
-use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::{api::encounters::EncounterType, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_select_vessel, draw_warp_to}, labels::{draw_encounter_from, draw_encounter_to, draw_subtitle, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
@@ -31,7 +31,7 @@ fn draw_info(ui: &mut Ui, view: &View, from: transfer_window_model::storage::ent
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update encounter");
-    let Selected::Encounter { type_: _, entity, time, from, to } = view.selected.clone() else {
+    let Selected::Encounter { type_, entity, time, from, to } = view.selected.clone() else {
         return;
     };
 
@@ -40,7 +40,11 @@ pub fn update(view: &View) {
             .resizable(false)
             .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
             .show(&view.context.clone(), |ui| {
-        draw_title(ui, "Encounter");//todo
+        let title = match type_ {
+            EncounterType::Entrance =>  view.model.name_component(to).name() + " Entrance",
+            EncounterType::Exit => view.model.name_component(from).name() + " Exit",
+        };
+        draw_title(ui, &title);
         draw_time_until(view, ui, time);
         draw_controls(ui, view, entity, time);
         draw_info(ui, view, from, to);
