@@ -1,9 +1,10 @@
-use crate::components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent as PathComponent, vessel_component::VesselComponent};
+use crate::components::{name_component::NameComponent, orbitable_component::OrbitableComponent, atmosphere_component::AtmosphereComponent, path_component::PathComponent as PathComponent, vessel_component::VesselComponent};
 
 #[derive(Debug, Default)]
 pub struct EntityBuilder {
     pub name_component: Option<NameComponent>,
     pub orbitable_component: Option<OrbitableComponent>,
+    pub atmosphere_component: Option<AtmosphereComponent>,
     pub path_component: Option<PathComponent>,
     pub vessel_component: Option<VesselComponent>,
 }
@@ -18,6 +19,11 @@ impl EntityBuilder {
 
     pub fn with_orbitable_component(mut self, component: OrbitableComponent) -> Self {
         self.orbitable_component = Some(component);
+        self
+    }
+
+    pub fn with_atmosphere_component(mut self, component: AtmosphereComponent) -> Self {
+        self.atmosphere_component = Some(component);
         self
     }
 

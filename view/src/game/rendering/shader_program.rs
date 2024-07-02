@@ -83,6 +83,11 @@ impl ShaderProgram {
         unsafe { gl.uniform_2_f32(Some(&Self::location(self, gl, name)), x, y); } 
     }
 
+    pub fn uniform_vec4(&self, gl: &Arc<Context>, name: &str, x: f32, y: f32, z: f32, w: f32) {
+        self.use_program(gl);
+        unsafe { gl.uniform_4_f32(Some(&Self::location(self, gl, name)), x, y, z, w); }
+    }
+
     pub fn uniform_mat3(&self, gl: &Arc<Context>,name: &str, v: &[f32]) {
         self.use_program(gl);
         unsafe { gl.uniform_matrix_3_f32_slice(Some(&Self::location(self, gl, name)), false, v); }

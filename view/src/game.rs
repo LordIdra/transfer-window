@@ -54,7 +54,7 @@ impl View {
         if let Some(focus) = focus {
             camera.set_focus(focus, model.absolute_position(focus));
         }
-        let renderers = Renderers::new(&resources, &gl, context.screen_rect());
+        let renderers = Renderers::new(&resources, &gl, &model, context.screen_rect());
         let selected = Selected::None;
         let right_click_menu = None;
         let vessel_editor = None;

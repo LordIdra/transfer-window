@@ -39,8 +39,15 @@ pub fn draw(view: &View) {
         let position = view.model.absolute_position(entity);
         let orbitable = view.model.orbitable_component(entity);
         let name = view.model.name_component(entity).name().to_lowercase();
+        
         let mut vertices = compute_celestial_object_vertices(position, orbitable.radius());
         view.renderers.add_object_vertices(&name, &mut vertices);
         view.renderers.set_object_rotation(&name, orbitable.rotation_angle() as f32);
+        
+        if let Some(atmosphere) = view.model.try_atmosphere_component(entity) {
+            let atmosphere_radius = orbitable.radius() + atmosphere.height() * orbitable.radius();
+            let mut vertices = compute_celestial_object_vertices(position, atmosphere_radius);
+            view.renderers.add_atmosphere_vertices(&name, &mut vertices);
+        }
     }
 }

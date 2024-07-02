@@ -4,8 +4,7 @@ use api::{explosion::Explosion, time::TimeStep};
 use components::vessel_component::VesselComponent;
 use serde::{Deserialize, Serialize};
 use systems::update_warp::TimeWarp;
-
-use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
+use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, atmosphere_component::AtmosphereComponent, path_component::PathComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
 pub const SEGMENTS_TO_PREDICT: usize = 3;
 
@@ -21,6 +20,7 @@ pub struct Model {
     entity_allocator: EntityAllocator,
     name_components: ComponentStorage<NameComponent>,
     orbitable_components: ComponentStorage<OrbitableComponent>,
+    atmosphere_components: ComponentStorage<AtmosphereComponent>,
     path_components: ComponentStorage<PathComponent>,
     vessel_components: ComponentStorage<VesselComponent>,
     time: f64,
@@ -35,6 +35,7 @@ impl Default for Model {
             entity_allocator: EntityAllocator::default(),
             name_components: ComponentStorage::default(),
             orbitable_components: ComponentStorage::default(),
+            atmosphere_components: ComponentStorage::default(),
             path_components: ComponentStorage::default(),
             vessel_components: ComponentStorage::default(),
             time: 0.0,
@@ -90,6 +91,7 @@ impl Model {
             let other_entities = match component_type {
                 ComponentType::NameComponent => self.name_components.entities(),
                 ComponentType::OrbitableComponent => self.orbitable_components.entities(),
+                ComponentType::AtmosphereComponent => self.atmosphere_components.entities(),
                 ComponentType::PathComponent => self.path_components.entities(),
                 ComponentType::VesselComponent => self.vessel_components.entities(),
             };
@@ -102,12 +104,14 @@ impl Model {
         let EntityBuilder {
             name_component,
             orbitable_component,
+            atmosphere_component,
             path_component,
             vessel_component,
         } = entity_builder;
         let entity = self.entity_allocator.allocate();
         self.name_components.set(entity, name_component);
         self.orbitable_components.set(entity, orbitable_component);
+        self.atmosphere_components.set(entity, atmosphere_component);
         self.path_components.set(entity, path_component);
         self.vessel_components.set(entity, vessel_component);
         entity
