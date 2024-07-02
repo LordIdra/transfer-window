@@ -11,8 +11,7 @@ fn compute_celestial_object_vertices(absolute_position: DVec2, radius: f64) -> V
     let mut previous_location = absolute_position + vec2(scaled_radius, 0.0);
     for i in 1..=sides { // 1..=sides to make sure we fill in the gap between the last location and first location, wrapping back round
         let angle = (i as f64 / sides as f64) * TAU; // both i and sides must be cast to prevent integer division problems
-        let new_uv = vec2(f64::cos(angle), f64::sin(angle));
-        let new_location = absolute_position + new_uv * scaled_radius;
+        let new_location = absolute_position + vec2(f64::cos(angle), f64::sin(angle)) * scaled_radius;
         add_textured_triangle(
             &mut vertices,
             absolute_position,
