@@ -13,6 +13,7 @@ uniform sampler2D texture_sampler;
 // This is magic, it is not to be touched at risk of sanity loss, world distortion,
 // or learning bits of math you never knew
 vec2 otho_projection(vec2 tex_coords, float rotation_angle) {
+    // https://math.stackexchange.com/questions/2357999/mapping-a-circle-to-a-hemisphere
     // Map the coordinate onto a hemisphere
     vec3 cart = vec3(tex_coords, sqrt(0.25 - tex_coords.x * tex_coords.x - tex_coords.y * tex_coords.y));
     cart = cart.zxy; // swizzler

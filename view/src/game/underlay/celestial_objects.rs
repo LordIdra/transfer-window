@@ -37,10 +37,10 @@ pub fn draw(view: &View) {
     let _span = tracy_client::span!("Draw celestial objects");
     for entity in view.entities_should_render(vec![ComponentType::OrbitableComponent]) {
         let position = view.model.absolute_position(entity);
-        let radius = view.model.orbitable_component(entity).radius();
+        let orbitable = view.model.orbitable_component(entity);
         let name = view.model.name_component(entity).name().to_lowercase();
-        let mut vertices = compute_celestial_object_vertices(position, radius);
+        let mut vertices = compute_celestial_object_vertices(position, orbitable.radius());
         view.renderers.add_object_vertices(&name, &mut vertices);
-        view.renderers.set_object_rotation(&name, 2.0); // TODO add rotation
+        view.renderers.set_object_rotation(&name, orbitable.rotation_angle() as f32);
     }
 }
