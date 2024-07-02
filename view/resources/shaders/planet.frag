@@ -12,8 +12,8 @@ uniform sampler2D texture_sampler;
 
 vec2 otho_projection(vec2 tex_coords, float rotation_angle) {
     // Map the coordinate onto a hemisphere
-    vec3 cart = vec3(tex_coords, sqrt(1.0 - tex_coords.x * tex_coords.x - tex_coords.y * tex_coords.y));
-    //cart = cart.zxy;
+    vec3 cart = vec3(tex_coords, sqrt(1.0 - dot(tex_coords, tex_coords)));
+    cart = cart.zxy; // WHY?? OPENGL, WHYYYY?>???>?>:>{"^(!$&%^!(@*&%$)!@$^%&!)@$
 
     // Convert the cartesian coordinates to spherical coordinates
     float theta = atan(cart.y, cart.x);
@@ -28,7 +28,7 @@ vec2 otho_projection(vec2 tex_coords, float rotation_angle) {
 
     // Since the texure is an equirectangular projection, we can map the
     // spherical coordinates directly to the texture coordinates
-    return vec2(theta / TAU, phi / (TAU / 6));
+    return vec2(theta / (TAU / 4), phi / (TAU / 6));
 }
 
 void main() {
