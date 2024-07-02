@@ -8,6 +8,7 @@ use super::{selected::util::BurnAdjustDirection, View};
 pub const BURN_OFFSET: f64 = 40.0;
 const MIN_SOI_PIXELS: f64 = 30.0;
 
+#[allow(dead_code)] // You never know when you might need this function
 pub fn add_triangle(vertices: &mut Vec<f32>, v1: DVec2, v2: DVec2, v3: DVec2, color: Rgba) {
     let v1 = dvec2_to_f32_tuple(v1);
     let v2 = dvec2_to_f32_tuple(v2);

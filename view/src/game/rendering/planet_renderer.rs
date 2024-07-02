@@ -35,6 +35,8 @@ impl PlanetRenderer {
     }
 
     pub fn render(&mut self, gl: &Arc<Context>, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Planet render");
         self.vertex_array_object.data(gl, &self.vertices);
         unsafe {
             gl.bind_texture(TEXTURE_2D, Some(self.texture));

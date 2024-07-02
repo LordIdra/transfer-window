@@ -28,6 +28,7 @@ impl GeometryRenderer {
         self.vertices.append(vertices);
     }
 
+    #[allow(dead_code)]
     pub fn render(&mut self, gl: &Arc<Context>, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Geometry render");
