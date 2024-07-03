@@ -4,7 +4,7 @@ use transfer_window_model::components::ComponentType;
 
 use crate::game::{util::add_textured_triangle, View};
 
-fn compute_celestial_object_vertices(absolute_position: DVec2, radius: f64) -> Vec<f32> {
+fn compute_celestial_object_vertices(absolute_position: DVec2, radius: f64, alpha: f32) -> Vec<f32> {
     let scaled_radius = radius;
     let mut vertices = vec![];
     let sides = 128;
@@ -17,7 +17,7 @@ fn compute_celestial_object_vertices(absolute_position: DVec2, radius: f64) -> V
             absolute_position,
             previous_location,
             new_location,
-            1.0,
+            alpha,
             vec2(0.0, 0.0),
             vert_to_uv(previous_location, absolute_position, scaled_radius),
             vert_to_uv(new_location, absolute_position, scaled_radius),
@@ -40,13 +40,17 @@ pub fn draw(view: &View) {
         let orbitable = view.model.orbitable_component(entity);
         let name = view.model.name_component(entity).name().to_lowercase();
         
-        let mut vertices = compute_celestial_object_vertices(position, orbitable.radius());
+        let mut vertices = compute_celestial_object_vertices(position, orbitable.radius(), 1.0);
         view.renderers.add_object_vertices(&name, &mut vertices);
         view.renderers.set_object_rotation(&name, orbitable.rotation_angle() as f32);
         
         if let Some(atmosphere) = view.model.try_atmosphere_component(entity) {
             let atmosphere_radius = orbitable.radius() + atmosphere.height() * orbitable.radius();
-            let mut vertices = compute_celestial_object_vertices(position, atmosphere_radius);
+            let mut vertices = compute_celestial_object_vertices(
+                position,
+                atmosphere_radius,
+                atmosphere.density() as f32
+            );
             view.renderers.add_atmosphere_vertices(&name, &mut vertices);
         }
     }

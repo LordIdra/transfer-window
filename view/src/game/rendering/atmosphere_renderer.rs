@@ -25,13 +25,7 @@ impl AtmosphereRenderer {
         ]);
         let vertices = vec![];
         let height = atmosphere.height() as f32;
-        let atmo_color = atmosphere.color();
-        let color = Rgba::from_rgba_premultiplied(
-            atmo_color.r(),
-            atmo_color.g(),
-            atmo_color.b(),
-            atmosphere.density() as f32
-        );
+        let color = atmosphere.color();
         Self { program, vertex_array_object, vertices, height, color }
     }
     
