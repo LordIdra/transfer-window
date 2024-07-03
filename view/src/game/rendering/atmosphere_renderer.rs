@@ -32,7 +32,6 @@ impl AtmosphereRenderer {
             atmo_color.b(),
             atmosphere.density() as f32
         );
-        println!("Atmosphere color: {:?}", color);
         Self { program, vertex_array_object, vertices, height, color }
     }
     
