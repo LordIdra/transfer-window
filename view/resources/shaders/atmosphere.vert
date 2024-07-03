@@ -8,12 +8,14 @@ out float v_alpha;
 out vec2 v_tex_coord;
 out float v_height;
 out vec4 v_color;
+out float v_falloff;
 
 uniform mat3 zoom_matrix;
 uniform mat3 translation_matrix_upper;
 uniform mat3 translation_matrix_lower;
 uniform float height;
 uniform vec4 color;
+uniform float falloff;
 
 void main() {
     vec3 position_upper = zoom_matrix * translation_matrix_upper * vec3(x.x, y.x, 1.0);
@@ -24,4 +26,5 @@ void main() {
     v_tex_coord = texture_coordinate;
     v_height = height;
     v_color = color;
+    v_falloff = falloff;
 }

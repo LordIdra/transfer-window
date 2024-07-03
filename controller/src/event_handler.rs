@@ -25,14 +25,15 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
 
     let sun = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Sun".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(1_988_400e24, 695_700e3, 25.05, 0.0, OrbitableType::Star, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(1_988_400e24, 695_700e3, 25.05, 0.0, OrbitableType::Star, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0))))
+        .with_atmosphere_component(AtmosphereComponent::new(Rgba::from_rgb(1.0, 0.745, 0.341), 4.0, 0.5, 2.0)));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
     let orbit = Orbit::new(sun, 5.9722e24, 1_988_400e24, vec2(147.095e9, 0.0), vec2(0.0, 30.29e3), 0.0).with_end_at(1.0e10);
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(5.9722e24, 6.371e6, 0.99727, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit))))
-        .with_atmosphere_component(AtmosphereComponent::new(Rgba::from_rgb(0.529, 0.808, 0.922), 2.0, 0.1)));
+        .with_atmosphere_component(AtmosphereComponent::new(Rgba::from_rgb(0.529, 0.808, 0.922), 2.0, 0.1, 6.0)));
 
     // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
     let orbit = Orbit::new(earth, 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, -1.082e3), 0.0).with_end_at(1.0e10);

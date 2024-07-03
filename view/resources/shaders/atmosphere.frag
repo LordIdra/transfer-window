@@ -6,13 +6,14 @@ in float v_alpha;
 in vec2 v_tex_coord;
 in float v_height;
 in vec4 v_color;
+in float v_falloff;
 
 // 32 is a good amount for lower-end hardware, below 32 artifacts start to become really noticeable
 // I like 64, 128 is also good for computers with dedicated GPUs
 #define STEPS 64
 
 float atmo_density(float height) {
-    return (1 - height) * exp(height * -6);
+    return (1 - height) * exp(-v_falloff * height);
 }
 
 float calc_z(vec2 coords, float r) {

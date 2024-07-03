@@ -11,7 +11,8 @@ pub struct AtmosphereRenderer {
     vertex_array_object: VertexArrayObject,
     vertices: Vec<f32>,
     height: f32,
-    color: Rgba
+    color: Rgba,
+    falloff: f32,
 }
 
 impl AtmosphereRenderer {
@@ -26,7 +27,8 @@ impl AtmosphereRenderer {
         let vertices = vec![];
         let height = atmosphere.height() as f32;
         let color = atmosphere.color();
-        Self { program, vertex_array_object, vertices, height, color }
+        let falloff = atmosphere.falloff() as f32;
+        Self { program, vertex_array_object, vertices, height, color, falloff }
     }
     
     pub fn add_vertices(&mut self, vertices: &mut Vec<f32>) {
@@ -50,6 +52,7 @@ impl AtmosphereRenderer {
             self.color.b(),
             self.color.a()
         );
+        self.program.uniform_float(gl, "falloff", self.falloff);
         self.vertex_array_object.draw(gl);
         self.vertices.clear();
     }
