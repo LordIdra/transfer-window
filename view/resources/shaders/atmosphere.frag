@@ -1,6 +1,6 @@
 #version 330 core
 
-precision highp float;
+precision mediump float;
 
 in float v_alpha;
 in vec2 v_tex_coord;
@@ -9,10 +9,8 @@ in vec4 v_color;
 
 #define TAU 6.28318530718
 
-float atmo_density(float height, float r) {
-    float inside = exp(5 * (r - .5));
-    float outside = (1.5 - r) * exp(-18 * (r - .5));
-    return min(inside, outside);
+float atmo_density(float height) {
+    return (1 - height) * exp(height * -2);
 }
 
 float calc_z(vec2 coords, float r) {
@@ -20,8 +18,16 @@ float calc_z(vec2 coords, float r) {
 }
 
 void main() {
-    vec2 start_coord = v_tex_coord * (1 + v_height);
-    float alpha = atmo_density(v_height, length(start_coord));
-    float final_alpha = alpha;
+    vec2 start = v_tex_coord * (1 + v_height) * 2;
+    float alpha = 0;
+    float step_size = v_height / 256.0;
+    vec3 position = vec3(start, calc_z(start, 1 + v_height));
+    float distance = length(position);
+    while (distance > 1 && distance < 1.1 + v_height) {
+        alpha += atmo_density((distance - 1) / v_height) * step_size;
+        position.z -= step_size;
+        distance = length(position);
+    }
+    float final_alpha = alpha * v_alpha * v_color.a;
     gl_FragColor = vec4(v_color.rgb * final_alpha, final_alpha);
 }
