@@ -103,8 +103,8 @@ impl OrbitableComponent {
         self.rotation_angle
     }
     
-    pub fn rotation_angle_mut(&mut self) -> &mut f64 {
-        &mut self.rotation_angle
+    pub fn set_rotation_angle(&mut self, rotation_angle: f64) {
+        self.rotation_angle = rotation_angle;
     }
 
     pub fn type_(&self) -> OrbitableType {
