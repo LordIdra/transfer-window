@@ -45,7 +45,7 @@ pub struct Resources {
 impl Resources {
     pub fn new(context: &egui::Context, gl: &Arc<glow::Context>) -> Self {
         info!("Loading resources");
-        let textures = directory_entries("view/resources/textures".to_string())
+        let textures = directory_entries("view/resources/final_textures".to_string())
             .into_iter()
             .map(|entry| (entry_name(&entry), entry))
             .map(|entry| (entry.0, Texture::new(context, gl, &entry.1)))

@@ -1,7 +1,7 @@
 use eframe::egui::{self, Color32, Grid, Image, ImageButton, Pos2, Rect, Response, RichText, Ui};
 use transfer_window_model::{components::{path_component::burn::rocket_equation_function::RocketEquationFunction, vessel_component::{class::VesselClass, VesselComponent}}, storage::entity_allocator::Entity};
 
-use crate::{game::{events::ViewEvent, View}, styles};
+use crate::{game::{events::ViewEvent, overlay::slot_textures::TexturedSlot, View}, styles};
 
 use super::{util::{compute_slot_locations, compute_slot_size}, SlotType};
 
@@ -49,7 +49,12 @@ fn draw_slot_from_texture(view: &View, ui: &mut Ui, texture: &str, color: Color3
 }
 
 fn draw_slot(view: &View, ui: &mut Ui, vessel_component: &VesselComponent, type_: SlotType, center: Pos2, size: f32, translation: f32) {
-    let texture = compute_texture_ship_underlay(vessel_component.class());
+    let texture = match type_ {
+        SlotType::FuelTank => vessel_component.fuel_tank_type().map(|x| x.texture()),
+        SlotType::Engine => vessel_component.engine_type().map(|x| x.texture()),
+        SlotType::TorpedoStorage => vessel_component.torpedo_storage_type().map(|x| x.texture()),
+        SlotType::TorpedoLauncher => vessel_component.torpedo_launcher_type().map(|x| x.texture()),
+    }.unwrap_or("blank-slot");
     let color = match type_ {
         SlotType::Engine => ENGINE_SLOT_COLOR,
         SlotType::FuelTank => FUEL_TANK_SLOT_COLOR,

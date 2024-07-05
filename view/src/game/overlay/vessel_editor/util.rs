@@ -6,7 +6,7 @@ use super::SlotType;
 
 pub fn compute_slot_size(vessel_class: VesselClass) -> f32 {
     match vessel_class {
-        VesselClass::Frigate | VesselClass::Scout => 0.113,
+        VesselClass::Frigate | VesselClass::Scout => 0.08, //0.113,
         VesselClass::Torpedo | VesselClass::Hub => unreachable!(),
     }
 }

@@ -141,6 +141,10 @@ impl VesselComponent {
         self.fuel_tank.is_some()
     }
 
+    pub fn fuel_tank_type(&self) -> Option<FuelTankType> {
+        self.fuel_tank.as_ref().map(FuelTank::type_)
+    }
+
     pub fn set_fuel_tank(&mut self, type_: Option<FuelTankType>) {
         self.fuel_tank = type_.map(FuelTank::new);
     }
@@ -209,6 +213,10 @@ impl VesselComponent {
         self.engine.is_some()
     }
 
+    pub fn engine_type(&self) -> Option<EngineType> {
+        self.engine.as_ref().map(Engine::type_)
+    }
+
     pub fn set_engine(&mut self, type_: Option<EngineType>) {
         self.engine = type_.map(Engine::new);
     }
@@ -253,6 +261,10 @@ impl VesselComponent {
     // ------------------------
     pub fn has_torpedo_storage(&self) -> bool {
         self.torpedo_storage.is_some()
+    }
+
+    pub fn torpedo_storage_type(&self) -> Option<TorpedoStorageType> {
+        self.torpedo_storage.as_ref().map(TorpedoStorage::type_)
     }
 
     pub fn set_torpedo_storage(&mut self, type_: Option<TorpedoStorageType>) {
@@ -306,6 +318,10 @@ impl VesselComponent {
         self.torpedo_launcher.is_some()
     }
 
+    pub fn torpedo_launcher_type(&self) -> Option<TorpedoLauncherType> {
+        self.torpedo_launcher.as_ref().map(TorpedoLauncher::type_)
+    }
+
     pub fn set_torpedo_launcher(&mut self, type_: Option<TorpedoLauncherType>) {
         self.torpedo_launcher = type_.map(TorpedoLauncher::new);
     }
@@ -315,6 +331,10 @@ impl VesselComponent {
     // ------------------------
     pub fn has_docking(&self) -> bool {
         self.docking.is_some()
+    }
+
+    pub fn docking_type(&self) -> Option<DockingType> {
+        self.docking.as_ref().map(Docking::type_)
     }
 
     pub fn set_docking(&mut self, type_: Option<DockingType>) {

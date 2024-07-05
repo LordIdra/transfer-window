@@ -184,6 +184,7 @@ impl DockingPort {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Docking {
+    type_: DockingType,
     docking_ports: HashMap<DockingPortLocation, DockingPort>,
 }
 
@@ -193,7 +194,11 @@ impl Docking {
             .into_iter()
             .map(|location| (location, DockingPort::default()))
             .collect();
-        Self { docking_ports }
+        Self { type_, docking_ports }
+    }
+
+    pub fn type_(&self) -> DockingType {
+        self.type_
     }
 
     pub fn docking_ports(&self) -> &HashMap<DockingPortLocation, DockingPort> {

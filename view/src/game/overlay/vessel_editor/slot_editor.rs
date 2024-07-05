@@ -23,8 +23,8 @@ impl ShipSlotEditorItem {
     pub fn draw(&self, view: &View, ui: &mut Ui) -> bool {
         let slot_selector_size = epaint::Vec2::splat(SLOT_SELECTOR_SIZE);        
         let button = CustomCircularImageButton::new(view, self.texture, 60.0)
-            .with_normal_color(Color32::from_rgba_premultiplied(40, 40, 40, 170))
-            .with_hover_color(Color32::from_rgba_premultiplied(70, 70, 70, 220))
+            .with_normal_color(Color32::from_rgba_premultiplied(40, 40, 40, 220))
+            .with_hover_color(Color32::from_rgba_premultiplied(70, 70, 70, 250))
             .with_padding(8.0);
         let response = ui.add_sized(slot_selector_size, button);
         let clicked = response.clicked();
