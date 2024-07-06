@@ -179,7 +179,7 @@
 [x] Torpedo storage facility
 [x] Docking facility
 [x] Class refactor
-[ ] Equipment + torpedoes add mass
+[ ] Equipment (+ torpedoes?) add mass
 
 # Stations
 [ ] Equipment has install time
