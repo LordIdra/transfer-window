@@ -1,4 +1,4 @@
-use std::{fs::File, fs::create_dir_all, sync::Arc, time::Instant};
+use std::{error::Error, fs::{create_dir_all, File}, sync::Arc, time::Instant};
 
 use eframe::{egui::{Context, Key, ViewportBuilder, ViewportCommand}, glow::{self, HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VERSION}, run_native, App, CreationContext, Frame, NativeOptions};
 use event_handler::{load_game, new_game, quit};
@@ -8,6 +8,8 @@ use tracing_subscriber::{fmt::Layer, layer::SubscriberExt, util::SubscriberInitE
 use transfer_window_view::{controller_events::ControllerEvent, menu, resources::Resources, Scene};
 
 mod event_handler;
+
+type DynError = Box<dyn Error + Send + Sync>; // why didn't egui just make this public?
 
 struct Controller {
     gl: Arc<glow::Context>,
@@ -23,7 +25,7 @@ fn log_gl_info(gl: &Arc<glow::Context>) {
 }
 
 impl Controller {
-    pub fn init(creation_context: &CreationContext) -> Box<dyn eframe::App> {
+    pub fn init(creation_context: &CreationContext) -> Result<Box<dyn App>, DynError> {
         info!("Initialising controller");
 
         log_gl_info(creation_context.gl.as_ref().unwrap());
@@ -35,7 +37,7 @@ impl Controller {
         let resources = Arc::new(Resources::new(&creation_context.egui_ctx, creation_context.gl.as_ref().unwrap()));
         let view = Scene::Menu(menu::View::default());
         let last_frame = Instant::now();
-        Box::new(Self { gl, resources, scene: view, last_frame })
+        Ok(Box::new(Self { gl, resources, scene: view, last_frame }))
     }
 
     fn handle_events(&mut self, mut events: Vec<ControllerEvent>, context: &Context) {

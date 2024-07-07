@@ -2,23 +2,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum TorpedoStorageType {
-    Tiny,
-    Small,
+    TorpedoStorage1,
+    TorpedoStorage2,
     Hub,
 }
 
 impl TorpedoStorageType {
     pub fn ship_types() -> [Self; 2] {
         [
-            TorpedoStorageType::Tiny,
-            TorpedoStorageType::Small,
+            TorpedoStorageType::TorpedoStorage1,
+            TorpedoStorageType::TorpedoStorage2,
         ]
     }
 
     pub fn capacity(&self) -> usize {
         match self {
-            TorpedoStorageType::Tiny => 1,
-            TorpedoStorageType::Small => 3,
+            TorpedoStorageType::TorpedoStorage1 => 1,
+            TorpedoStorageType::TorpedoStorage2 => 3,
             TorpedoStorageType::Hub => 10,
         }
     }

@@ -179,6 +179,8 @@
 [x] Torpedo storage facility
 [x] Docking facility
 [x] Class refactor
+[x] Redraw ships w/ more and smaller slots
+[x] Weapons UI redesign (it's shit)
 [ ] Equipment (+ torpedoes?) add mass
 
 # Stations
@@ -188,22 +190,11 @@
 [ ] Swap can be cancelled
 
 # Vessel refactor
-[ ] Redraw ships w/ more and smaller slots
 [ ] Energy generator facility
-[ ] Engine alternators, RTGs
 [ ] Energy storage facility
 [ ] Hull + facilities drain energy over time
 [ ] Solars require line of sight to sun
-
-[ ] Comms equipment
-[ ] Comms line overlay
-[ ] Comms routing algorithm based on line of sight
-
-[ ] Fog of war
-[ ] Passive/active radar
-[ ] Information networking
-
-[ ] Weapons UI redesign (it's shit)
+[ ] Compute energy at time (hard with solars maybe)
 [ ] Weapon cooldown
 
 # Campaign
@@ -220,6 +211,7 @@
 [ ] Rocket fuels overview
 [ ] Proportional guidance
 [ ] Integration techniques (euler RK4 etc)
+[ ] Joules, watts, energy
 
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?
@@ -255,12 +247,23 @@
 [ ] Log to multiple files
 
 # Technical debt tracker
-- Docking port drawing logic is horrible, needs more cleanup when we have more transfers maybe
-- Timeline drawing logic is not great
-- No end time lol
+- Docking port view logic is horrible, needs more cleanup when we have more transfers maybe
+- Timeline view logic is not great
+- Hardcoded end time lol
 
+### SPECULATION AREA ###
 # Artificial Intelligence
 - 3 independent neural networks
 - targeting
 - navigation
 - guidance
+
+# Comms
+- Comms equipment
+- Comms line overlay
+- Comms routing algorithm based on line of sight
+
+# Radar
+- Fog of war
+- Passive/active radar
+- Information networking

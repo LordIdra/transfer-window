@@ -2,15 +2,15 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum TorpedoLauncherType {
-    Simple,
-    Enhanced,
+    TorpedoLauncher1,
+    TorpedoLauncher2,
 }
 
 impl TorpedoLauncherType {
     pub fn ship_types() -> [Self; 2] {
         [
-            TorpedoLauncherType::Simple,
-            TorpedoLauncherType::Enhanced,
+            TorpedoLauncherType::TorpedoLauncher1,
+            TorpedoLauncherType::TorpedoLauncher2,
         ]
     }
 }

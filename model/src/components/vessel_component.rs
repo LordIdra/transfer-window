@@ -1,10 +1,12 @@
 use std::collections::HashMap;
 
+use battery::{Battery, BatteryType};
 use class::VesselClass;
 use docking::{Docking, DockingPort, DockingPortLocation, DockingType};
 use engine::{Engine, EngineType};
 use faction::Faction;
 use fuel_tank::{FuelTank, FuelTankType};
+use generator::{Generator, GeneratorType};
 use log::error;
 use serde::{Deserialize, Serialize};
 use timeline::Timeline;
@@ -14,11 +16,13 @@ use crate::storage::entity_allocator::Entity;
 
 use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
+pub mod battery;
 pub mod class;
 pub mod docking;
 pub mod engine;
 pub mod faction;
 pub mod fuel_tank;
+pub mod generator;
 pub mod timeline;
 pub mod torpedo_launcher;
 pub mod torpedo_storage;
@@ -33,6 +37,8 @@ pub struct VesselComponent {
     target: Option<Entity>,
     fuel_tank: Option<FuelTank>,
     engine: Option<Engine>,
+    generator: Option<Generator>,
+    battery: Option<Battery>,
     torpedo_storage: Option<TorpedoStorage>,
     torpedo_launcher: Option<TorpedoLauncher>,
     docking: Option<Docking>,
@@ -45,10 +51,12 @@ impl VesselComponent {
         let target = None;
         let fuel_tank = None;
         let engine = None;
+        let generator = None;
+        let battery = None;
         let torpedo_storage = None;
         let torpedo_launcher = None;
         let docking = None;
-        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, torpedo_storage, torpedo_launcher, docking }
+        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, generator, battery, torpedo_storage, torpedo_launcher, docking }
     }
 
     // ------------------------
@@ -257,6 +265,36 @@ impl VesselComponent {
     }
 
     // ------------------------
+    // Generator
+    // ------------------------
+    pub fn has_generator(&self) -> bool {
+        self.generator.is_some()
+    }
+
+    pub fn generator_type(&self) -> Option<GeneratorType> {
+        self.generator.as_ref().map(Generator::type_)
+    }
+
+    pub fn set_generator(&mut self, type_: Option<GeneratorType>) {
+        self.generator = type_.map(Generator::new);
+    }
+
+    // ------------------------
+    // Battery
+    // ------------------------
+    pub fn has_battery(&self) -> bool {
+        self.battery.is_some()
+    }
+
+    pub fn battery_type(&self) -> Option<BatteryType> {
+        self.battery.as_ref().map(Battery::type_)
+    }
+
+    pub fn set_battery(&mut self, type_: Option<BatteryType>) {
+        self.battery = type_.map(Battery::new);
+    }
+
+    // ------------------------
     // Torpedo storage
     // ------------------------
     pub fn has_torpedo_storage(&self) -> bool {
@@ -364,7 +402,7 @@ impl VesselComponent {
     }
 
     pub fn can_dock(&self) -> bool {
-        self.class.can_dock()
+        self.class.dockable()
     }
 
     pub fn dock(&mut self, location: DockingPortLocation, entity: Entity) {

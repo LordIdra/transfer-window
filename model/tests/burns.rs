@@ -10,7 +10,7 @@ fn test_burn_without_engine_or_fuel_tank() {
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = VesselClass::Frigate;
+    let class = VesselClass::Scout1;
     let orbit = Orbit::new(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
@@ -19,7 +19,7 @@ fn test_burn_without_engine_or_fuel_tank() {
 
     assert!(!StartBurnEvent::can_create_ever(&model, vessel));
 
-    model.vessel_component_mut(vessel).set_fuel_tank(Some(FuelTankType::Small));
+    model.vessel_component_mut(vessel).set_fuel_tank(Some(FuelTankType::FuelTank2));
     model.vessel_component_mut(vessel).set_engine(Some(EngineType::Regular));
 
     assert!(StartBurnEvent::can_create_ever(&model, vessel));
@@ -34,9 +34,9 @@ fn test_create_burn_with_zero_dv() {
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = VesselClass::Frigate;
+    let class = VesselClass::Scout1;
     let vessel_component = class.build(Faction::Player)
-        .with_fuel_tank(FuelTankType::Small)
+        .with_fuel_tank(FuelTankType::FuelTank2)
         .with_engine(EngineType::Regular);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
@@ -79,8 +79,8 @@ fn test_create_and_adjust_burn() {
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = VesselClass::Frigate;
-    let fuel_tank = FuelTankType::Small;
+    let class = VesselClass::Scout1;
+    let fuel_tank = FuelTankType::FuelTank2;
     let engine = EngineType::Booster;
     let vessel_component = class.build(Faction::Player)
         .with_fuel_tank(fuel_tank)

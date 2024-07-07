@@ -1,5 +1,5 @@
 use eframe::egui::Ui;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{class::VesselClass, faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent}}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent}}}, storage::entity_allocator::Entity};
 
 use crate::game::{util::{orbitable_texture, vessel_texture}, View};
 
@@ -8,12 +8,7 @@ use super::custom_image_button::CustomCircularImageButton;
 pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
     let vessel_component = view.model.vessel_component(entity);
     let icon = vessel_texture(vessel_component);
-    let tooltip = "Select ".to_string() + match vessel_component.class() {
-        VesselClass::Torpedo => "Torpedo",
-        VesselClass::Hub => "Hub",
-        VesselClass::Scout => "Scout",
-        VesselClass::Frigate => "Frigate",
-    };
+    let tooltip = "Select ".to_string() + vessel_component.class().name();
     let button = CustomCircularImageButton::new(view, icon, 36.0)
         .with_padding(8.0);
     ui.add(button).on_hover_text(tooltip).clicked()

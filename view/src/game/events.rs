@@ -2,7 +2,7 @@
 use model::*;
 use log::debug;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{battery::BatteryType, docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, generator::GeneratorType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
@@ -22,6 +22,8 @@ pub enum ModelEvent {
     SetTarget { entity: Entity, target: Option<Entity> },
     SetFuelTank { entity: Entity, type_: Option<FuelTankType> },
     SetEngine { entity: Entity, type_: Option<EngineType> },
+    SetGenerator { entity: Entity, type_: Option<GeneratorType> },
+    SetBattery { entity: Entity, type_: Option<BatteryType> },
     SetTorpedoStorage { entity: Entity, type_: Option<TorpedoStorageType> },
     SetTorpedoLauncher { entity: Entity, type_: Option<TorpedoLauncherType> },
     CreateFireTorpedo { entity: Entity, time: f64 },
@@ -70,6 +72,8 @@ impl View {
                 ModelEvent::SetTarget { entity, target } => set_target(self, entity, target),
                 ModelEvent::SetFuelTank { entity, type_ } => set_fuel_tank(self, entity, type_),
                 ModelEvent::SetEngine { entity, type_ } => set_engine(self, entity, type_),
+                ModelEvent::SetGenerator { entity, type_ } => set_generator(self, entity, type_),
+                ModelEvent::SetBattery { entity, type_ } => set_battery(self, entity, type_),
                 ModelEvent::SetTorpedoStorage { entity, type_ } => set_torpedo_storage(self, entity, type_),
                 ModelEvent::SetTorpedoLauncher { entity, type_ } => set_torpedo_launcher(self, entity, type_),
                 ModelEvent::CreateFireTorpedo { entity, time } => create_fire_torpedo(self, entity, time),

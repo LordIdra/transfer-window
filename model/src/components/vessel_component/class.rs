@@ -6,8 +6,10 @@ use super::{docking::DockingType, engine::EngineType, faction::Faction, fuel_tan
 pub enum VesselClass {
     Torpedo,
     Hub,
-    Scout,
-    Frigate,
+    Scout1,
+    Scout2,
+    Frigate1,
+    Frigate2,
 }
 
 impl VesselClass {
@@ -15,8 +17,10 @@ impl VesselClass {
         match self {
             VesselClass::Torpedo => "Torpedo",
             VesselClass::Hub => "Hub",
-            VesselClass::Scout => "Scout",
-            VesselClass::Frigate => "Frigate",
+            VesselClass::Scout1 => "Scout I",
+            VesselClass::Scout2 => "Scout II",
+            VesselClass::Frigate1 => "Frigate I",
+            VesselClass::Frigate2 => "Frigate II",
         }
     }
 
@@ -30,7 +34,7 @@ impl VesselClass {
                 .with_fuel_tank(FuelTankType::Hub)
                 .with_torpedo_storage(TorpedoStorageType::Hub)
                 .with_docking(DockingType::Quadruple),
-            VesselClass::Scout | VesselClass::Frigate => VesselComponent::new(*self, faction),
+            VesselClass::Scout1 | VesselClass::Scout2 | VesselClass::Frigate1 | VesselClass::Frigate2 => VesselComponent::new(*self, faction),
         }
     }
 
@@ -38,8 +42,10 @@ impl VesselClass {
         match self {
             VesselClass::Torpedo => 2.0e3,
             VesselClass::Hub => 160.0e3,
-            VesselClass::Scout => 10.0e3,
-            VesselClass::Frigate => 25.0e3,
+            VesselClass::Scout1 => 20.0e3,
+            VesselClass::Scout2 => 24.0e3,
+            VesselClass::Frigate1 => 60.0e3,
+            VesselClass::Frigate2 => 72.0e3,
         }
     }
 
@@ -47,17 +53,17 @@ impl VesselClass {
         matches!(self, VesselClass::Torpedo)
     }
 
-    pub fn can_dock(&self) -> bool {
+    pub fn dockable(&self) -> bool {
         match self {
             VesselClass::Torpedo | VesselClass::Hub => false,
-            VesselClass::Scout | VesselClass::Frigate => true,
+            VesselClass::Scout1 | VesselClass::Scout2 | VesselClass::Frigate1 | VesselClass::Frigate2 => true,
         }
     }
 
     pub fn editable(&self) -> bool {
         match self {
             VesselClass::Torpedo | VesselClass::Hub => false,
-            VesselClass::Scout | VesselClass::Frigate => true,
+            VesselClass::Scout1 | VesselClass::Scout2 | VesselClass::Frigate1 | VesselClass::Frigate2 => true,
         }
     }
 }

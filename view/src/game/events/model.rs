@@ -2,7 +2,7 @@ use std::fs;
 
 use log::error;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{battery::BatteryType, docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, generator::GeneratorType, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 
@@ -83,6 +83,18 @@ pub fn set_engine(view: &mut View, entity: Entity, type_: Option<EngineType>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Set slot");
     view.model.vessel_component_mut(entity).set_engine(type_);
+}
+
+pub fn set_generator(view: &mut View, entity: Entity, type_: Option<GeneratorType>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Set slot");
+    view.model.vessel_component_mut(entity).set_generator(type_);
+}
+
+pub fn set_battery(view: &mut View, entity: Entity, type_: Option<BatteryType>) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Set slot");
+    view.model.vessel_component_mut(entity).set_battery(type_);
 }
 
 pub fn set_torpedo_storage(view: &mut View, entity: Entity, type_: Option<TorpedoStorageType>) {

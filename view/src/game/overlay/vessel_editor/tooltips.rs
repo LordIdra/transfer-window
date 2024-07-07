@@ -1,7 +1,7 @@
 use eframe::egui::{Grid, RichText, Ui};
-use transfer_window_model::components::vessel_component::{engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType};
+use transfer_window_model::components::vessel_component::{battery::BatteryType, engine::EngineType, fuel_tank::FuelTankType, generator::GeneratorType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType};
 
-use crate::game::View;
+use crate::game::{util::{format_joules, format_watts}, View};
 
 pub type TooltipFn = Box<dyn Fn(&View, &mut Ui)>;
 
@@ -55,9 +55,10 @@ pub fn show_tooltip_fuel_tank(type_: Option<FuelTankType>) -> TooltipFn {
         };
 
         let name = match type_ {
-            FuelTankType::Tiny => "Tiny Fuel Tank",
-            FuelTankType::Small => "Small Fuel Tank",
-            FuelTankType::Medium => "Medium Fuel Tank",
+            FuelTankType::FuelTank1 => "Fuel Tank I",
+            FuelTankType::FuelTank2 => "Fuel Tank II",
+            FuelTankType::FuelTank3 => "Fuel Tank III",
+            FuelTankType::FuelTank4 => "Fuel Tank IV",
             FuelTankType::Torpedo | FuelTankType::Hub => unreachable!(),
         };
 
@@ -70,6 +71,52 @@ pub fn show_tooltip_fuel_tank(type_: Option<FuelTankType>) -> TooltipFn {
     })
 }
 
+pub fn show_tooltip_generator(type_: Option<GeneratorType>) -> TooltipFn {
+    Box::new(move |view: &View, ui: &mut Ui| {
+        let Some(type_) = type_ else {
+            ui.label(RichText::new("None").strong().monospace().size(20.0));
+            return;
+        };
+
+        let name = match type_ {
+            GeneratorType::SolarPanel1 => "Solar Panel I",
+            GeneratorType::SolarPanel2 => "Solar Panel II",
+            GeneratorType::FissionReactor => "Fission Reactor",
+            GeneratorType::HubGenerator => unreachable!(),
+        };
+
+        ui.label(RichText::new(name).strong().monospace().size(20.0));
+        ui.horizontal(|ui| {
+            ui.image(view.resources.texture_image("power"));
+            ui.label(RichText::new("Power Output").monospace().strong());
+            ui.label(format!("{} W", format_watts(type_.power_output_watts())));
+        });
+    })
+}
+
+pub fn show_tooltip_battery(type_: Option<BatteryType>) -> TooltipFn {
+    Box::new(move |view: &View, ui: &mut Ui| {
+        let Some(type_) = type_ else {
+            ui.label(RichText::new("None").strong().monospace().size(20.0));
+            return;
+        };
+
+        let name = match type_ {
+            BatteryType::Battery1 => "Battery I",
+            BatteryType::Battery2 => "Battery II",
+            BatteryType::Battery3 => "Battery III",
+            BatteryType::BatteryHub => unreachable!(),
+        };
+
+        ui.label(RichText::new(name).strong().monospace().size(20.0));
+        ui.horizontal(|ui| {
+            ui.image(view.resources.texture_image("power"));
+            ui.label(RichText::new("Capacity").monospace().strong());
+            ui.label(format!("{} J", format_joules(type_.capacity_joules())));
+        });
+    })
+}
+
 pub fn show_tooltip_torpedo_storage(type_: Option<TorpedoStorageType>) -> TooltipFn {
     Box::new(move |view: &View, ui: &mut Ui| {
         let Some(type_) = type_ else {
@@ -78,8 +125,8 @@ pub fn show_tooltip_torpedo_storage(type_: Option<TorpedoStorageType>) -> Toolti
         };
 
         let name = match type_ {
-            TorpedoStorageType::Tiny => "Tiny Torpedo Storage",
-            TorpedoStorageType::Small => "Small Torpedo Storage",
+            TorpedoStorageType::TorpedoStorage1 => "Tiny Torpedo Storage",
+            TorpedoStorageType::TorpedoStorage2 => "Small Torpedo Storage",
             TorpedoStorageType::Hub => unreachable!(),
         };
 
@@ -102,8 +149,8 @@ pub fn show_tooltip_torpedo_launcher(type_: Option<TorpedoLauncherType>) -> Tool
         };
 
         let name = match type_ {
-            TorpedoLauncherType::Simple => "Simple Torpedo Launcher",
-            TorpedoLauncherType::Enhanced => "Enhanced Torpedo Launcher",
+            TorpedoLauncherType::TorpedoLauncher1 => "Torpedo Launcher I",
+            TorpedoLauncherType::TorpedoLauncher2 => "Torpedo Launcher II",
         };
 
         ui.label(RichText::new(name).strong().monospace().size(20.0));

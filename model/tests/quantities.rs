@@ -38,7 +38,7 @@ fn test_trajectory_position() {
     let orbit = Orbit::circle(planet, 1.0e3, 1.0e16, vessel_position, 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let path_component = PathComponent::new_with_orbit(orbit.clone());
     let vessel = model.allocate(EntityBuilder::default()
-        .with_vessel_component(VesselComponent::new(VesselClass::Frigate, Faction::Player))
+        .with_vessel_component(VesselComponent::new(VesselClass::Frigate1, Faction::Player))
         .with_path_component(path_component));
 
 
@@ -65,7 +65,7 @@ fn test_trajectory_velocity() {
     let orbit = Orbit::circle(planet, 1.0e3, 1.0e16, vessel_position, 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let path_component = PathComponent::new_with_orbit(orbit.clone());
     let vessel = model.allocate(EntityBuilder::default()
-        .with_vessel_component(VesselComponent::new(VesselClass::Frigate, Faction::Player))
+        .with_vessel_component(VesselComponent::new(VesselClass::Frigate1, Faction::Player))
         .with_path_component(path_component));
 
     let expected = orbit.velocity_from_theta(0.0);

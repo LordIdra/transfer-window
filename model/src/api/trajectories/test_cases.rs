@@ -114,7 +114,7 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                     let path_component = PathComponent::default()
                         .with_segment(Segment::Orbit(orbit));
                     entity_builder = entity_builder.with_path_component(path_component);
-                    entity_builder = entity_builder.with_vessel_component(VesselComponent::new(VesselClass::Scout, Faction::Player));
+                    entity_builder = entity_builder.with_vessel_component(VesselComponent::new(VesselClass::Scout1, Faction::Player));
                 }
             } else {
                 entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(data.mass, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(position)));

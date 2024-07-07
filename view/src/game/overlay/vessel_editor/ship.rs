@@ -1,20 +1,18 @@
-use eframe::egui::{self, Color32, Grid, Image, ImageButton, Pos2, Rect, Response, RichText, Ui};
+use eframe::egui::{self, Color32, Grid, Image, Pos2, Rect, Response, RichText, Ui, Vec2};
 use transfer_window_model::{components::{path_component::burn::rocket_equation_function::RocketEquationFunction, vessel_component::{class::VesselClass, VesselComponent}}, storage::entity_allocator::Entity};
 
-use crate::{game::{events::ViewEvent, overlay::slot_textures::TexturedSlot, View}, styles};
+use crate::{game::{events::ViewEvent, overlay::{slot_textures::TexturedSlot, widgets::custom_image_button::CustomCircularImageButton}, View}, styles};
 
-use super::{util::{compute_slot_locations, compute_slot_size}, SlotType};
+use super::{util::{compute_slot_locations, SLOT_SIZE}, SlotType};
 
-const UNDERLAY_SIZE_PROPORTION: f32 = 0.7;
-const FUEL_TANK_SLOT_COLOR: Color32 = Color32::from_rgb(240, 200, 0);
-const ENGINE_SLOT_COLOR: Color32 = Color32::from_rgb(2, 192, 240);
-const TORPEDO_STORAGE_SLOT_COLOR: Color32 = Color32::from_rgb(255, 90, 90);
-const TORPEDO_LAUNCHER_SLOT_COLOR: Color32 = Color32::from_rgb(212, 11, 24);
+const UNDERLAY_SIZE_PROPORTION: f32 = 0.9;
 
 fn compute_texture_ship_underlay(class: VesselClass) -> &'static str {
     match class {
-        VesselClass::Scout => "ship-scout",
-        VesselClass::Frigate => "ship-frigate",
+        VesselClass::Scout1 => "scout-1",
+        VesselClass::Scout2 => "scout-2",
+        VesselClass::Frigate1 => "frigate-1",
+        VesselClass::Frigate2 => "frigate-2",
         VesselClass::Torpedo | VesselClass::Hub => unreachable!(),
     }
 }
@@ -34,35 +32,32 @@ fn on_slot_clicked(view: &View, type_: SlotType) {
 }
 
 #[allow(clippy::too_many_arguments)]
-fn draw_slot_from_texture(view: &View, ui: &mut Ui, texture: &str, color: Color32, type_: SlotType, center: Pos2, size: f32, translation: f32) {
-    let slot_position = center + egui::vec2(translation, 0.0);
+fn draw_slot_from_texture(view: &View, ui: &mut Ui, texture: &str, color: Color32, type_: SlotType, center: Pos2, size: f32, translation: Vec2) {
+    let slot_position = center + translation;
     let slot_size = egui::Vec2::splat(size);
     let slot_rect = Rect::from_center_size(slot_position, slot_size);
     
     styles::SlotEditor::apply(ui, size, color);
     ui.allocate_ui_at_rect(slot_rect, |ui| {
-        let slot_image = ImageButton::new(view.resources.texture_image(texture));
+        let slot_image = CustomCircularImageButton::new(view, texture, size)
+            .with_normal_color(Color32::TRANSPARENT)
+            .with_hover_color(Color32::from_rgba_unmultiplied(30, 30, 30, 120));
         if ui.add(slot_image).clicked() {
             on_slot_clicked(view, type_);
         }
 });
 }
 
-fn draw_slot(view: &View, ui: &mut Ui, vessel_component: &VesselComponent, type_: SlotType, center: Pos2, size: f32, translation: f32) {
+fn draw_slot(view: &View, ui: &mut Ui, vessel_component: &VesselComponent, type_: SlotType, center: Pos2, size: f32, translation: Vec2) {
     let texture = match type_ {
-        SlotType::FuelTank => vessel_component.fuel_tank_type().map(|x| x.texture()),
-        SlotType::Engine => vessel_component.engine_type().map(|x| x.texture()),
-        SlotType::TorpedoStorage => vessel_component.torpedo_storage_type().map(|x| x.texture()),
-        SlotType::TorpedoLauncher => vessel_component.torpedo_launcher_type().map(|x| x.texture()),
-    }.unwrap_or("blank-slot");
-    let color = match type_ {
-        SlotType::Engine => ENGINE_SLOT_COLOR,
-        SlotType::FuelTank => FUEL_TANK_SLOT_COLOR,
-        SlotType::TorpedoStorage => TORPEDO_STORAGE_SLOT_COLOR,
-        SlotType::TorpedoLauncher => TORPEDO_LAUNCHER_SLOT_COLOR,
-        
+        SlotType::Engine => vessel_component.engine_type().map(|x| x.texture()).unwrap_or("silhouette-engine"),
+        SlotType::FuelTank => vessel_component.fuel_tank_type().map(|x| x.texture()).unwrap_or("silhouette-fuel-tank"),
+        SlotType::Generator => vessel_component.generator_type().map(|x| x.texture()).unwrap_or("silhouette-generator"),
+        SlotType::Battery => vessel_component.battery_type().map(|x| x.texture()).unwrap_or("silhouette-battery"),
+        SlotType::TorpedoStorage => vessel_component.torpedo_storage_type().map(|x| x.texture()).unwrap_or("silhouette-torpedo-storage"),
+        SlotType::TorpedoLauncher => vessel_component.torpedo_launcher_type().map(|x| x.texture()).unwrap_or("silhouette-torpedo-launcher"),
     };
-
+    let color = Color32::from_rgb(200, 200, 200);
     draw_slot_from_texture(view, ui, texture, color, type_, center, size, translation);
 }
 
@@ -125,7 +120,7 @@ pub fn draw_vessel_editor(view: &View, ui: &mut Ui, vessel_name: &str, entity: E
         let response = draw_ship_underlay(view, ui, vessel_component.class());
         let center = response.rect.center();
         let size = response.rect.size();
-        let slot_size = compute_slot_size(vessel_component.class()) * size.x;
+        let slot_size = SLOT_SIZE * size.x;
         for (type_, translation) in compute_slot_locations(vessel_component.class()) {
             draw_slot(view, ui, vessel_component, type_, center, slot_size, translation * size.x);
         }

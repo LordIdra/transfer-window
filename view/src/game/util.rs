@@ -142,6 +142,42 @@ pub fn format_speed(speed: f64) -> String {
     }
 }
 
+pub fn format_watts(watts: f64) -> String {
+    if watts < 1_000.0 {
+        format!("{} W", watts.round())
+    } else if watts < 10_000.0 {
+        format!("{:.3} kW", (watts / 1_000.0))
+    } else if watts < 100_000.0 {
+        format!("{:.2} kW", (watts / 1_000.0))
+    } else {
+        format!("{:.1} kW", (watts / 1_000.0))
+    }
+}
+
+pub fn format_joules(joules: f64) -> String {
+    if joules < 1_000.0 {
+        format!("{} J", joules.round())
+    } else if joules < 10_000.0 {
+        format!("{:.3} kJ", (joules / 1000.0))
+    } else if joules < 100_000.0 {
+        format!("{:.2} kJ", (joules / 1000.0))
+    } else if joules < 1_000_000.0 {
+        format!("{:.1} kJ", (joules / 1000.0))
+    } else if joules < 10_000_000.0 {
+        format!("{:.3} MJ", (joules / 1000.0))
+    } else if joules < 100_000_000.0 {
+        format!("{:.2} MJ", (joules / 1000.0))
+    } else if joules < 1_000_000_000.0 {
+        format!("{:.1} MJ", (joules / 1000.0))
+    } else if joules < 10_000_000_000.0 {
+        format!("{:.3} GJ", (joules / 1000.0))
+    } else if joules < 100_000_000_000.0 {
+        format!("{:.2} GJ", (joules / 1000.0))
+    } else {
+        format!("{:.1} GJ", (joules / 1000.0))
+    }
+}
+
 pub fn compute_burn_arrow_position(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
     let burn = view.model.burn_starting_at_time(entity, time);
     let burn_position = view.model.absolute_position(burn.parent()) + burn.start_point().position();
@@ -181,8 +217,10 @@ pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
 
 pub fn vessel_texture(vessel_component: &VesselComponent) -> &'static str {
     match vessel_component.class() {
-        VesselClass::Scout => "vessel-icon-scout",
-        VesselClass::Frigate => "vessel-icon-frigate",
+        VesselClass::Scout1 => "vessel-icon-scout-1",
+        VesselClass::Scout2 => "vessel-icon-scout-2",
+        VesselClass::Frigate1 => "vessel-icon-frigate-1",
+        VesselClass::Frigate2 => "vessel-icon-frigate-2",
         VesselClass::Torpedo => "vessel-icon-torpedo",
         VesselClass::Hub => "vessel-icon-hub",
     }
