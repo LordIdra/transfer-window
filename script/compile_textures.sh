@@ -26,6 +26,14 @@ bloom_ship() {
     rm "$blur_image"
 }
 
+bloom_menu() {
+    image="$root/view/resources/final_textures/${1%.*}.png"
+    blur_image="$root/view/resources/final_textures/blur_${1%.*}.png"
+    convert "$image" -channel RGBA -gaussian-blur 0x2 "$blur_image"
+    convert "$image" "$blur_image" -compose screen -composite "$image"
+    rm "$blur_image"
+}
+
 export_and_bloom_system() {
     export_image "$1"
     bloom_system "$1"
@@ -36,21 +44,33 @@ export_and_bloom_ship() {
     bloom_ship "$1"
 }
 
-cd "$root/view/resources/textures/system" || exit
-N=8 # https://unix.stackexchange.com/questions/103920/parallelize-a-bash-for-loop
-(
-    for file in *.drawio; do
-        ((i=i%N)); ((i++==0)) && wait
-        [ -f "$file" ] || break
-        export_and_bloom_system "$file" &
-    done
-)
-wait
+export_and_bloom_menu() {
+    export_image "$1"
+    bloom_menu "$1"
+}
 
-cd "$root/view/resources/textures/ship" || exit
+# cd "$root/view/resources/textures/system" || exit
+# N=8 # https://unix.stackexchange.com/questions/103920/parallelize-a-bash-for-loop
+# (
+#     for file in *.drawio; do
+#         ((i=i%N)); ((i++==0)) && wait
+#         [ -f "$file" ] || break
+#         export_and_bloom_system "$file" &
+#     done
+# )
+# wait
+
+# cd "$root/view/resources/textures/ship" || exit
+# for file in *.drawio; do
+#     [ -f "$file" ] || break
+#     export_and_bloom_ship "$file" &
+# done
+# wait
+
+cd "$root/view/resources/textures/menu" || exit
 for file in *.drawio; do
     [ -f "$file" ] || break
-    export_and_bloom_ship "$file" &
+    export_and_bloom_menu "$file" &
 done
 wait
 

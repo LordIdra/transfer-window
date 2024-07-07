@@ -185,11 +185,43 @@
 [x] Equipment adds mass
 [x] More logical ordering of docking ports
 [x] More logical ordering in explorer
+[x] Menu screen
 
 # Campaign
-[ ] Menu screen
+[ ] Vessel constructor
+[ ] Orbitable constructor
+[ ] Storyteller crate
+[ ] Storyteller triggers
+[ ] Storyteller events
+[ ] Storyteller objectives
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
+
+Chapter 1: Intro
+- 01 Welcome
+  - welcome, simulation environment
+  - adjust simulation speed
+  - orbit explanation with ships flying faster and faster
+- 02 Orbits
+  - more in-depth explanation of orbits
+  - periapsis, apoapsis
+  - notice spacecraft getting closer to earth goes much faster
+  - comparison of higher and lower orbits speed
+  - warp to point, pause
+- 03 Burns
+  - create a burn and get closer to earth
+  - circularise orbit
+- 04 Translunar
+  - get an intercept with the moon
+- 05 Moon Orbit
+  - orbit the moon and come back into LEO
+- 06 Rendezvous
+  - dock with a station
+- 07 Destroy
+  - destroy a dummy target
+- 08 Evade
+  - evade enemies torpedo
+  - the end time for real life
 
 ## Optional Levels
 [ ] Scientific notation
