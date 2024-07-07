@@ -85,10 +85,8 @@ impl FireTorpedoEvent {
             if event.time + cooldown > time {
                 return false;
             }
-        } else {
-            if model.time + vessel_component.torpedo_launcher.as_ref().unwrap().time_to_reload() > time {
-                return false;
-            }
+        } else if model.time + vessel_component.torpedo_launcher.as_ref().unwrap().time_to_reload() > time {
+            return false;
         }
         vessel_component.timeline().is_time_after_last_blocking_event(time)
             && vessel_component.final_torpedoes() != 0

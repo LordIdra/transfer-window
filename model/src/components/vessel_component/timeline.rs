@@ -158,7 +158,7 @@ impl Timeline {
     pub fn last_fire_torpedo_event(&self) -> Option<FireTorpedoEvent> {
         self.events.iter()
             .rev()
-            .find_map(|event| event.as_fire_torpedo())
+            .find_map(TimelineEvent::as_fire_torpedo)
             .clone()
     }
 

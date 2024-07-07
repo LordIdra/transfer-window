@@ -7,6 +7,7 @@ use super::SlotType;
 
 pub const SLOT_SIZE: f32 = 0.06;
 
+#[allow(clippy::match_same_arms)]
 pub fn compute_slot_locations(vessel_class: VesselClass) -> BTreeMap<SlotType, Vec2> {
     match vessel_class {
         VesselClass::Scout1 => vec![

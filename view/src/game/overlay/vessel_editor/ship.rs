@@ -50,10 +50,10 @@ fn draw_slot_from_texture(view: &View, ui: &mut Ui, texture: &str, color: Color3
 
 fn draw_slot(view: &View, ui: &mut Ui, vessel_component: &VesselComponent, type_: SlotType, center: Pos2, size: f32, translation: Vec2) {
     let texture = match type_ {
-        SlotType::Engine => vessel_component.engine_type().map(|x| x.texture()).unwrap_or("silhouette-engine"),
-        SlotType::FuelTank => vessel_component.fuel_tank_type().map(|x| x.texture()).unwrap_or("silhouette-fuel-tank"),
-        SlotType::TorpedoStorage => vessel_component.torpedo_storage_type().map(|x| x.texture()).unwrap_or("silhouette-torpedo-storage"),
-        SlotType::TorpedoLauncher => vessel_component.torpedo_launcher_type().map(|x| x.texture()).unwrap_or("silhouette-torpedo-launcher"),
+        SlotType::Engine => vessel_component.engine_type().map_or("silhouette-engine", |x| x.texture()),
+        SlotType::FuelTank => vessel_component.fuel_tank_type().map_or("silhouette-fuel-tank", |x| x.texture()),
+        SlotType::TorpedoStorage => vessel_component.torpedo_storage_type().map_or("silhouette-torpedo-storage", |x| x.texture()),
+        SlotType::TorpedoLauncher => vessel_component.torpedo_launcher_type().map_or("silhouette-torpedo-launcher", |x| x.texture()),
     };
     let color = Color32::from_rgb(200, 200, 200);
     draw_slot_from_texture(view, ui, texture, color, type_, center, size, translation);

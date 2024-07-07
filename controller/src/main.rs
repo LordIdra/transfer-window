@@ -25,6 +25,7 @@ fn log_gl_info(gl: &Arc<glow::Context>) {
 }
 
 impl Controller {
+    #[allow(clippy::unnecessary_wraps)]
     pub fn init(creation_context: &CreationContext) -> Result<Box<dyn App>, DynError> {
         info!("Initialising controller");
 

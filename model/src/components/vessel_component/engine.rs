@@ -19,6 +19,7 @@ impl EngineType {
         ]
     }
 
+    #[allow(clippy::match_same_arms)]
     pub fn fuel_kg_per_second(&self) -> f64 {
         match self {
             EngineType::Torpedo => 7.0,

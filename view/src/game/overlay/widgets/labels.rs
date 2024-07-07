@@ -95,7 +95,7 @@ pub fn draw_torpedo_launcher(view: &View, ui: &mut Ui, entity: Entity) {
     } else {
         draw_value(ui, &format_time(cooldown));
     }
-    ui.end_row()
+    ui.end_row();
 }
 
 pub fn draw_orbits(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
