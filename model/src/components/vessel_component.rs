@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use class::VesselClass;
 use docking::{Docking, DockingPort, DockingPortLocation, DockingType};
@@ -353,11 +353,11 @@ impl VesselComponent {
         self.docking = type_.map(Docking::new);
     }
 
-    pub fn docking_ports(&self) -> Option<&HashMap<DockingPortLocation, DockingPort>> {
+    pub fn docking_ports(&self) -> Option<&BTreeMap<DockingPortLocation, DockingPort>> {
         Some(self.docking.as_ref()?.docking_ports())
     }
 
-    pub fn docking_ports_mut(&mut self) -> Option<&mut HashMap<DockingPortLocation, DockingPort>> {
+    pub fn docking_ports_mut(&mut self) -> Option<&mut BTreeMap<DockingPortLocation, DockingPort>> {
         Some(self.docking.as_mut()?.docking_ports_mut())
     }
 

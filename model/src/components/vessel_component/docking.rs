@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +9,7 @@ pub const DOCKING_SPEED: f64 = 10.0;
 pub const FUEL_TRANSFER_RATE: f64 = 0.1;
 pub const TORPEDO_TRANSFER_TIME: f64 = 1800.0;
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum DockingPortLocation {
     North,
     East,
@@ -191,7 +191,7 @@ impl DockingPort {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Docking {
     type_: DockingType,
-    docking_ports: HashMap<DockingPortLocation, DockingPort>,
+    docking_ports: BTreeMap<DockingPortLocation, DockingPort>,
 }
 
 impl Docking {
@@ -207,11 +207,11 @@ impl Docking {
         self.type_
     }
 
-    pub fn docking_ports(&self) -> &HashMap<DockingPortLocation, DockingPort> {
+    pub fn docking_ports(&self) -> &BTreeMap<DockingPortLocation, DockingPort> {
         &self.docking_ports
     }
 
-    pub fn docking_ports_mut(&mut self) -> &mut HashMap<DockingPortLocation, DockingPort> {
+    pub fn docking_ports_mut(&mut self) -> &mut BTreeMap<DockingPortLocation, DockingPort> {
         &mut self.docking_ports
     }
 

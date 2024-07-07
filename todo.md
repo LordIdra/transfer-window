@@ -183,6 +183,8 @@
 [x] Weapons UI redesign (it's shit)
 [x] Weapon cooldown
 [x] Equipment adds mass
+[x] More logical ordering of docking ports
+[x] More logical ordering in explorer
 
 # Campaign
 [ ] Menu screen
@@ -210,11 +212,6 @@
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumption
-
-# Backburner
-[ ] Selected vessel's segments take priority over non-selected when selecting point????????????????????????????? maybe not
-[ ] More logical ordering in explorer
-[ ] More logical ordering of docking ports
 
 # Performance
 [ ] Texture atlas
