@@ -79,12 +79,14 @@ fn test_create_and_adjust_burn() {
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = VesselClass::Scout1;
     let fuel_tank = FuelTankType::FuelTank2;
     let engine = EngineType::Booster;
-    let vessel_component = class.build(Faction::Player)
+    let vessel_component = VesselClass::Scout1.build(Faction::Player)
         .with_fuel_tank(fuel_tank)
         .with_engine(engine);
+    dbg!(vessel_component.dry_mass());
+    let vessel_component_dry_mass = vessel_component.dry_mass();
+    let vessel_component_fuel_mass = vessel_component.fuel_kg();
     let orbit = Orbit::circle(earth, vessel_component.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
@@ -119,8 +121,8 @@ fn test_create_and_adjust_burn() {
     let test_time = start_time + duration / 2.0;
     let mass_at_time = model.mass_at_time(vessel, test_time, None);
     let rocket_equation_function = RocketEquationFunction::new(
-        class.mass(),
-        fuel_tank.capacity_kg(),
+        vessel_component_dry_mass,
+        vessel_component_fuel_mass,
         engine.fuel_kg_per_second(),
         engine.specific_impulse(),
         duration / 2.0);
@@ -133,8 +135,8 @@ fn test_create_and_adjust_burn() {
     let mass_before = model.mass_at_time(vessel, start_time - 0.1, None);
     let mass_after = model.mass_at_time(vessel, end_time + 0.1, None);
     let rocket_equation_function = RocketEquationFunction::new(
-        class.mass(),
-        fuel_tank.capacity_kg(),
+        vessel_component_dry_mass,
+        vessel_component_fuel_mass,
         engine.fuel_kg_per_second(),
         engine.specific_impulse(),
         duration);

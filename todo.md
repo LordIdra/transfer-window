@@ -181,8 +181,8 @@
 [x] Class refactor
 [x] Redraw ships w/ more and smaller slots
 [x] Weapons UI redesign (it's shit)
+[x] Weapon cooldown
 [ ] Equipment adds mass
-[ ] Weapon cooldown
 
 # Campaign
 [ ] Menu screen
