@@ -61,9 +61,9 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_vessel_component(vessel_component)
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
-    let vessel_component = VesselComponent::new(VesselClass::Frigate2, Faction::Player);
+    let vessel_component = VesselComponent::new(VesselClass::Frigate1, Faction::Player);
     let docked_player_spacecraft = model.allocate(EntityBuilder::default()
-        .with_name_component(NameComponent::new("Scout I".to_string()))
+        .with_name_component(NameComponent::new("Terence".to_string()))
         .with_vessel_component(vessel_component));
 
     let mut vessel_component = VesselClass::Hub.build(Faction::Ally);
@@ -96,8 +96,8 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
 
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, spacecraft_2, 200.0));
-    model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);
-    model.vessel_component_mut(spacecraft_2).timeline_mut().last_event().unwrap().as_start_burn().unwrap().adjust(&mut model, vec2(300.0, 50.0));
+    model.vessel_component_mut(spacecraft_2).timeline_mut().add(event.clone());
+    model.timeline_event_at_time(spacecraft_2, event.time()).as_start_burn().unwrap().adjust(&mut model, vec2(300.0, 50.0));
 
     let fire_torpedo_event = FireTorpedoEvent::new(&mut model, spacecraft_2, 100.0);
     let torpedo = fire_torpedo_event.ghost();
@@ -105,8 +105,8 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
     model.vessel_component_mut(spacecraft_2).timeline_mut().add(event);
     
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, torpedo, 130.0));
-    model.vessel_component_mut(torpedo).timeline_mut().add(event);
-    model.vessel_component_mut(torpedo).timeline_mut().last_event().unwrap().as_start_burn().unwrap().adjust(&mut model, vec2(-353.0, 50.0));
+    model.vessel_component_mut(torpedo).timeline_mut().add(event.clone());
+    model.timeline_event_at_time(spacecraft_2, event.time()).as_start_burn().unwrap().adjust(&mut model, vec2(-353.0, 50.0));
 
     model.update(0.1);
 

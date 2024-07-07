@@ -52,8 +52,6 @@ fn draw_slot(view: &View, ui: &mut Ui, vessel_component: &VesselComponent, type_
     let texture = match type_ {
         SlotType::Engine => vessel_component.engine_type().map(|x| x.texture()).unwrap_or("silhouette-engine"),
         SlotType::FuelTank => vessel_component.fuel_tank_type().map(|x| x.texture()).unwrap_or("silhouette-fuel-tank"),
-        SlotType::Generator => vessel_component.generator_type().map(|x| x.texture()).unwrap_or("silhouette-generator"),
-        SlotType::Battery => vessel_component.battery_type().map(|x| x.texture()).unwrap_or("silhouette-battery"),
         SlotType::TorpedoStorage => vessel_component.torpedo_storage_type().map(|x| x.texture()).unwrap_or("silhouette-torpedo-storage"),
         SlotType::TorpedoLauncher => vessel_component.torpedo_launcher_type().map(|x| x.texture()).unwrap_or("silhouette-torpedo-launcher"),
     };

@@ -1,9 +1,9 @@
 use eframe::{egui::{Align2, Color32, Id, LayerId, Order, Pos2, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::{battery::BatteryType, class::VesselClass, engine::EngineType, fuel_tank::FuelTankType, generator::GeneratorType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{class::VesselClass, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{slot_textures::TexturedSlot, widgets::custom_image_button::CustomCircularImageButton}, View}, styles};
 
-use super::{tooltips::{show_tooltip_battery, show_tooltip_engine, show_tooltip_fuel_tank, show_tooltip_generator, show_tooltip_torpedo_launcher, show_tooltip_torpedo_storage, TooltipFn}, util::{compute_slot_locations, SLOT_SIZE}, SlotType};
+use super::{tooltips::{show_tooltip_engine, show_tooltip_fuel_tank, show_tooltip_torpedo_launcher, show_tooltip_torpedo_storage, TooltipFn}, util::{compute_slot_locations, SLOT_SIZE}, SlotType};
 
 /// With respect to the size of the slot
 const SLOT_SELECTOR_HEIGHT_PROPORTION: f32 = 0.6;
@@ -69,30 +69,6 @@ impl ShipSlotEditor {
                     let texture = engine.texture();
                     let add_on_click = ModelEvent::SetEngine { entity, type_: Some(engine) };
                     let tooltip = show_tooltip_engine(Some(engine));
-                    selectors.push(ShipSlotEditorItem::new(texture, add_on_click, tooltip));
-                }
-            }
-
-            SlotType::Generator => {
-                let add_on_click = ModelEvent::SetGenerator { entity, type_: None };
-                let tooltip = show_tooltip_generator(None);
-                selectors.push(ShipSlotEditorItem::new("clear-slot", add_on_click, tooltip));
-                for generator in GeneratorType::ship_types() {
-                    let texture = generator.texture();
-                    let add_on_click = ModelEvent::SetGenerator { entity, type_: Some(generator) };
-                    let tooltip = show_tooltip_generator(Some(generator));
-                    selectors.push(ShipSlotEditorItem::new(texture, add_on_click, tooltip));
-                }
-            }
-
-            SlotType::Battery => {
-                let add_on_click = ModelEvent::SetBattery { entity, type_: None };
-                let tooltip = show_tooltip_battery(None);
-                selectors.push(ShipSlotEditorItem::new("clear-slot", add_on_click, tooltip));
-                for battery in BatteryType::ship_types() {
-                    let texture = battery.texture();
-                    let add_on_click = ModelEvent::SetBattery { entity, type_: Some(battery) };
-                    let tooltip = show_tooltip_battery(Some(battery));
                     selectors.push(ShipSlotEditorItem::new(texture, add_on_click, tooltip));
                 }
             }

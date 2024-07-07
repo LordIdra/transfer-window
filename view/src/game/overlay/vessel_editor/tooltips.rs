@@ -1,7 +1,7 @@
 use eframe::egui::{Grid, RichText, Ui};
-use transfer_window_model::components::vessel_component::{battery::BatteryType, engine::EngineType, fuel_tank::FuelTankType, generator::GeneratorType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType};
+use transfer_window_model::components::vessel_component::{engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType};
 
-use crate::game::{util::{format_joules, format_watts}, View};
+use crate::game::View;
 
 pub type TooltipFn = Box<dyn Fn(&View, &mut Ui)>;
 
@@ -67,52 +67,6 @@ pub fn show_tooltip_fuel_tank(type_: Option<FuelTankType>) -> TooltipFn {
             ui.image(view.resources.texture_image("fuel"));
             ui.label(RichText::new("Capacity").monospace().strong());
             ui.label(format!("{} L", type_.capacity_litres()));
-        });
-    })
-}
-
-pub fn show_tooltip_generator(type_: Option<GeneratorType>) -> TooltipFn {
-    Box::new(move |view: &View, ui: &mut Ui| {
-        let Some(type_) = type_ else {
-            ui.label(RichText::new("None").strong().monospace().size(20.0));
-            return;
-        };
-
-        let name = match type_ {
-            GeneratorType::SolarPanel1 => "Solar Panel I",
-            GeneratorType::SolarPanel2 => "Solar Panel II",
-            GeneratorType::FissionReactor => "Fission Reactor",
-            GeneratorType::HubGenerator => unreachable!(),
-        };
-
-        ui.label(RichText::new(name).strong().monospace().size(20.0));
-        ui.horizontal(|ui| {
-            ui.image(view.resources.texture_image("power"));
-            ui.label(RichText::new("Power Output").monospace().strong());
-            ui.label(format!("{} W", format_watts(type_.power_output_watts())));
-        });
-    })
-}
-
-pub fn show_tooltip_battery(type_: Option<BatteryType>) -> TooltipFn {
-    Box::new(move |view: &View, ui: &mut Ui| {
-        let Some(type_) = type_ else {
-            ui.label(RichText::new("None").strong().monospace().size(20.0));
-            return;
-        };
-
-        let name = match type_ {
-            BatteryType::Battery1 => "Battery I",
-            BatteryType::Battery2 => "Battery II",
-            BatteryType::Battery3 => "Battery III",
-            BatteryType::BatteryHub => unreachable!(),
-        };
-
-        ui.label(RichText::new(name).strong().monospace().size(20.0));
-        ui.horizontal(|ui| {
-            ui.image(view.resources.texture_image("power"));
-            ui.label(RichText::new("Capacity").monospace().strong());
-            ui.label(format!("{} J", format_joules(type_.capacity_joules())));
         });
     })
 }

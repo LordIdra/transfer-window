@@ -190,11 +190,6 @@
 [ ] Swap can be cancelled
 
 # Vessel refactor
-[ ] Energy generator facility
-[ ] Energy storage facility
-[ ] Hull + facilities drain energy over time
-[ ] Solars require line of sight to sun
-[ ] Compute energy at time (hard with solars maybe)
 [ ] Weapon cooldown
 
 # Campaign

@@ -16,8 +16,6 @@ mod ship;
 enum SlotType {
     Engine,
     FuelTank,
-    Generator,
-    Battery,
     TorpedoStorage,
     TorpedoLauncher,
 }
