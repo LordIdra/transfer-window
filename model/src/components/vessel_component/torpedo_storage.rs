@@ -32,7 +32,7 @@ pub struct TorpedoStorage {
 
 impl TorpedoStorage {
     pub fn new(type_: TorpedoStorageType) -> TorpedoStorage {
-        let torpedoes = type_.capacity() / 2;
+        let torpedoes = type_.capacity();
         TorpedoStorage {
             type_,
             torpedoes

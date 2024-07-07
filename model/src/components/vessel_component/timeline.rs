@@ -155,6 +155,13 @@ impl Timeline {
         self.events.back().cloned()
     }
 
+    pub fn last_fire_torpedo_event(&self) -> Option<FireTorpedoEvent> {
+        self.events.iter()
+            .rev()
+            .find_map(|event| event.as_fire_torpedo())
+            .clone()
+    }
+
     pub fn last_blocking_event(&self) -> Option<TimelineEvent> {
         self.events.iter()
             .rev()

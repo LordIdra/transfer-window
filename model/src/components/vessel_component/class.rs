@@ -41,7 +41,7 @@ impl VesselClass {
     pub fn mass(&self) -> f64 {
         match self {
             VesselClass::Torpedo => 2.0e3,
-            VesselClass::Hub => 160.0e3,
+            VesselClass::Hub => 380.0e3,
             VesselClass::Scout1 => 20.0e3,
             VesselClass::Scout2 => 24.0e3,
             VesselClass::Frigate1 => 60.0e3,

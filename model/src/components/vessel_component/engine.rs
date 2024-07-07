@@ -22,18 +22,18 @@ impl EngineType {
     pub fn fuel_kg_per_second(&self) -> f64 {
         match self {
             EngineType::Torpedo => 7.0,
-            EngineType::Regular => 10.0,
-            EngineType::Efficient => 5.0,
-            EngineType::Booster => 30.0,
+            EngineType::Regular => 15.0,
+            EngineType::Efficient => 7.0,
+            EngineType::Booster => 60.0,
         }
     }
 
     pub fn thrust_newtons(&self) -> f64 {
         match self {
             EngineType::Torpedo => 15_000.0,
-            EngineType::Regular => 25_000.0,
+            EngineType::Regular => 35_000.0,
             EngineType::Efficient => 18_000.0,
-            EngineType::Booster => 80_000.0,
+            EngineType::Booster => 160_000.0,
         }
     }
 

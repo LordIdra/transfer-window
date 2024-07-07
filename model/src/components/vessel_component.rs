@@ -326,6 +326,14 @@ impl VesselComponent {
         self.torpedo_launcher = type_.map(TorpedoLauncher::new);
     }
 
+    pub fn step_torpedo_launcher(&mut self, dt: f64) {
+        self.torpedo_launcher.as_mut().unwrap().step_time_to_reload(dt);
+    }
+
+    pub fn torpedo_launcher_time_to_reload(&self) -> f64 {
+        self.torpedo_launcher.as_ref().unwrap().time_to_reload()
+    }
+
     // ------------------------
     // Docking
     // ------------------------

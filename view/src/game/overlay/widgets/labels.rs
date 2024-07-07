@@ -1,4 +1,4 @@
-use eframe::egui::{Grid, RichText, Ui};
+use eframe::egui::{Color32, Grid, RichText, Ui};
 use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
 
 use crate::game::{util::{format_distance, format_speed, format_time}, View};
@@ -14,6 +14,10 @@ pub fn draw_key(ui: &mut Ui, text: &str) {
 
 pub fn draw_value(ui: &mut Ui, text: &str) {
     ui.label(RichText::new(text).size(12.0));
+}
+
+pub fn draw_value_with_color(ui: &mut Ui, text: &str, color: Color32) {
+    ui.label(RichText::new(text).color(color).size(12.0));
 }
 
 pub fn draw_title(ui: &mut Ui, name: &str) {
@@ -81,6 +85,19 @@ pub fn draw_target_relative_speed(view: &View, ui: &mut Ui, entity: Entity) {
     ui.end_row();
 }
 
+pub fn draw_torpedo_launcher(view: &View, ui: &mut Ui, entity: Entity) {
+    draw_key(ui, "Torpedo launcher");
+    let cooldown = view.model.vessel_component(entity).torpedo_launcher_time_to_reload();
+    if view.model.vessel_component(entity).torpedoes() == 0 {
+        draw_value_with_color(ui, "Empty", Color32::from_rgb(255, 100, 100));
+    } else if cooldown == 0.0 {
+        draw_value_with_color(ui, "Ready", Color32::from_rgb(100, 255, 100));
+    } else {
+        draw_value(ui, &format_time(cooldown));
+    }
+    ui.end_row()
+}
+
 pub fn draw_orbits(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
     let Some(period) = orbit.period() else {
@@ -114,6 +131,9 @@ pub fn draw_info(view: &View, ui: &mut Ui, name: &str, entity: Entity) {
         if view.model.vessel_component(entity).target().is_some() {
             draw_target_distance(view, ui, entity);
             draw_target_relative_speed(view, ui, entity);
+        }
+        if view.model.vessel_component(entity).has_torpedo_launcher() {
+            draw_torpedo_launcher(view, ui, entity);
         }
     });
 }

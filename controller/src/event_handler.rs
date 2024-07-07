@@ -106,7 +106,7 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
     
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, torpedo, 130.0));
     model.vessel_component_mut(torpedo).timeline_mut().add(event.clone());
-    model.timeline_event_at_time(spacecraft_2, event.time()).as_start_burn().unwrap().adjust(&mut model, vec2(-353.0, 50.0));
+    model.timeline_event_at_time(torpedo, event.time()).as_start_burn().unwrap().adjust(&mut model, vec2(-353.0, 50.0));
 
     model.update(0.1);
 

@@ -181,15 +181,7 @@
 [x] Class refactor
 [x] Redraw ships w/ more and smaller slots
 [x] Weapons UI redesign (it's shit)
-[ ] Equipment (+ torpedoes?) add mass
-
-# Stations
-[ ] Equipment has install time
-[ ] Equipment swapping UI
-[ ] Undocking disabled until swap complete
-[ ] Swap can be cancelled
-
-# Vessel refactor
+[ ] Equipment adds mass
 [ ] Weapon cooldown
 
 # Campaign
