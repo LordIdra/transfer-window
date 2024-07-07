@@ -28,6 +28,7 @@ impl CustomImage {
         Self { renderer, texture, screen_rect, width, height, sense, padding, alpha }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn new_from_parts(renderer: Arc<Mutex<ScreenTextureRenderer>>, texture: glow::Texture, screen_rect: Rect, width: f32, height: f32, sense: Sense, padding: f32, alpha: f32) -> Self {
         Self { renderer, texture, screen_rect, width, height, sense, padding, alpha }
     }

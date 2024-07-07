@@ -11,6 +11,7 @@ pub enum EngineType {
 }
 
 impl EngineType {
+    #[allow(clippy::match_same_arms)]
     pub fn mass(&self) -> f64 {
         match self {
             EngineType::Torpedo => 2.0e3,
