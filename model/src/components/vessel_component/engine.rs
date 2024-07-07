@@ -11,6 +11,15 @@ pub enum EngineType {
 }
 
 impl EngineType {
+    pub fn mass(&self) -> f64 {
+        match self {
+            EngineType::Torpedo => 2.0e3,
+            EngineType::Regular => 4.0e3,
+            EngineType::Efficient => 7.0e3,
+            EngineType::Booster => 7.0e3,
+        }
+    }
+
     pub fn ship_types() -> [Self; 3] {
         [
             EngineType::Regular,

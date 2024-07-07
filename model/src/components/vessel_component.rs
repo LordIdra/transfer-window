@@ -196,6 +196,10 @@ impl VesselComponent {
     // ------------------------
     pub fn dry_mass(&self) -> f64 {
         self.class.mass()
+            + self.fuel_tank.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.engine.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.torpedo_storage.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.torpedo_launcher.as_ref().map_or(0.0, |x| x.type_().mass())
     }
 
     pub fn wet_mass(&self) -> f64 {

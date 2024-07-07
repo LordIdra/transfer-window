@@ -7,6 +7,13 @@ pub enum TorpedoLauncherType {
 }
 
 impl TorpedoLauncherType {
+    pub fn mass(&self) -> f64 {
+        match self {
+            TorpedoLauncherType::TorpedoLauncher1 => 2.0e3,
+            TorpedoLauncherType::TorpedoLauncher2 => 5.0e3,
+        }
+    }
+
     pub fn ship_types() -> [Self; 2] {
         [
             TorpedoLauncherType::TorpedoLauncher1,

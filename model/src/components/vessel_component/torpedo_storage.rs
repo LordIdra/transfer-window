@@ -8,6 +8,14 @@ pub enum TorpedoStorageType {
 }
 
 impl TorpedoStorageType {
+    pub fn mass(&self) -> f64 {
+        match self {
+            TorpedoStorageType::TorpedoStorage1 => 5.0e3,
+            TorpedoStorageType::TorpedoStorage2 => 10.0e3,
+            TorpedoStorageType::Hub => 15.0,
+        }
+    }
+
     pub fn ship_types() -> [Self; 2] {
         [
             TorpedoStorageType::TorpedoStorage1,

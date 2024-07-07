@@ -13,6 +13,17 @@ pub enum FuelTankType {
 }
 
 impl FuelTankType {
+    pub fn mass(&self) -> f64 {
+        match self {
+            FuelTankType::Torpedo => 0.5e3,
+            FuelTankType::Hub => 10.0e3,
+            FuelTankType::FuelTank1 => 0.7e3,
+            FuelTankType::FuelTank2 => 1.0e3,
+            FuelTankType::FuelTank3 => 1.2e3,
+            FuelTankType::FuelTank4 => 1.3e3,
+        }
+    }
+
     pub fn ship_types() -> [Self; 4] {
         [
             FuelTankType::FuelTank1, 

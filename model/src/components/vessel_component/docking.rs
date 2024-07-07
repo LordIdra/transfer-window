@@ -39,6 +39,12 @@ impl DockingType {
             DockingType::Quadruple => vec![DockingPortLocation::North, DockingPortLocation::East, DockingPortLocation::South, DockingPortLocation::West],
         }
     }
+
+    pub fn mass(&self) -> f64 {
+        match self {
+            DockingType::Quadruple => 20.0e3,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
