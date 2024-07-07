@@ -187,7 +187,12 @@
 [x] More logical ordering in explorer
 [x] Menu screen
 
-# Campaign
+
+
+# ------------------------------------ #
+# CAMPAIGN PLANNING AREA
+# ------------------------------------ #
+# Backend
 [ ] Vessel constructor
 [ ] Orbitable constructor
 [ ] Storyteller crate
@@ -197,6 +202,7 @@
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
+# Levels
 Chapter 1: Intro
 - 01 Welcome
   - welcome, simulation environment
@@ -234,7 +240,29 @@ Chapter 1: Intro
 [ ] Integration techniques (euler RK4 etc)
 [ ] Joules, watts, energy
 
-# Bigger picture
+
+
+# ------------------------------------ #
+# TECHNICAL AREA
+# ------------------------------------ #
+# Performance
+[ ] Texture atlas
+[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
+[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
+[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
+[ ] Smaller screen texture renderer framebuffer
+
+# Technical debt tracker
+- Docking port view logic is horrible, needs more cleanup when we have more transfers maybe
+- Timeline view logic is not great
+- Hardcoded end time lol
+
+
+
+# ------------------------------------ #
+# PROJECTS AREA
+# ------------------------------------ #
+# Projects
 [ ] Planet textures/generation, atmosphere shaders?
 [ ] Collisions with planets (nearly forgot about that lmao)
 [ ] Ballistic weaponry
@@ -244,13 +272,6 @@ Chapter 1: Intro
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumption
-
-# Performance
-[ ] Texture atlas
-[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
-[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
-[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
-[ ] Smaller screen texture renderer framebuffer
 
 # Before release
 [ ] Versioning!
@@ -262,12 +283,11 @@ Chapter 1: Intro
 [ ] Add licenses
 [ ] Log to multiple files
 
-# Technical debt tracker
-- Docking port view logic is horrible, needs more cleanup when we have more transfers maybe
-- Timeline view logic is not great
-- Hardcoded end time lol
 
-### SPECULATION AREA ###
+
+# ------------------------------------ #
+# SPECULATION AREA
+# ------------------------------------ #
 # Artificial Intelligence
 - 3 independent neural networks
 - targeting
