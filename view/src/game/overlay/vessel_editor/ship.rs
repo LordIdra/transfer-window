@@ -60,7 +60,7 @@ fn draw_slot(view: &View, ui: &mut Ui, vessel_component: &VesselComponent, type_
 }
 
 fn draw_ship_underlay(view: &View, ui: &mut Ui, class: VesselClass) -> Response {
-    let texture = view.resources.icon_image(compute_texture_ship_underlay(class));
+    let texture = view.resources.texture_image(compute_texture_ship_underlay(class));
     let size = view.screen_rect.size() * UNDERLAY_SIZE_PROPORTION;
     ui.add(Image::new(texture).fit_to_exact_size(size))
 }

@@ -8,7 +8,7 @@ use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_
 impl CustomImage {
     pub fn new_menu(view: &View, texture_name: &str, width: f32, height: f32) -> Self {
         let renderer = view.screen_texture_renderer.clone();
-        let texture = view.resources.gl_icon(texture_name);
+        let texture = view.resources.gl_texture(texture_name);
         let screen_rect = view.screen_rect;
         let sense = Sense::union(Sense::click(), Sense::hover());
         let padding = 0.0;

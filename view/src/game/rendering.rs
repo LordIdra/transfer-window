@@ -38,7 +38,7 @@ impl Renderers {
         let render_pipeline = Arc::new(Mutex::new(RenderPipeline::new(gl, screen_rect)));
         let object_renderers = resources.build_planet_renderers(gl);
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
-        let icon_renderers = resources.build_icon_renderers(gl);
+        let icon_renderers = resources.build_texture_renderers(gl);
         let screen_texture_renderer = Arc::new(Mutex::new(ScreenTextureRenderer::new(gl, screen_rect)));
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
