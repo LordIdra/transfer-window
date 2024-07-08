@@ -1,97 +1,116 @@
 use eframe::{egui::{Align2, Color32, Id, LayerId, Order, Pos2, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::ship::{ship_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, ShipSlot, ShipSlotLocation}, ShipClass}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::{class::VesselClass, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{slot_textures::TexturedSlot, widgets::custom_image_button::CustomCircularImageButton}, View}, styles};
 
-use super::{tooltips::show_tooltip, util::{compute_slot_locations, compute_slot_size}};
+use super::{tooltips::{show_tooltip_engine, show_tooltip_fuel_tank, show_tooltip_torpedo_launcher, show_tooltip_torpedo_storage, TooltipFn}, util::{compute_slot_locations, compute_slot_size}, SlotType};
 
 /// With respect to the size of the slot
 const SLOT_SELECTOR_HEIGHT_PROPORTION: f32 = 0.5;
 const SLOT_SELECTOR_SIZE: f32 = 50.0;
 
-
-
-/// 1 individual item that could be equipped in the slot
-struct ShipSlotSelector {
-    texture: String,
-    slot: ShipSlot,
+struct ShipSlotEditorItem {
+    texture: &'static str,
+    add_on_click: ModelEvent,
+    show_tooltip: TooltipFn,
 }
 
-impl ShipSlotSelector {
-    pub fn new(texture: String, slot: ShipSlot) -> Self {
-        Self { texture, slot }
+impl ShipSlotEditorItem {
+    fn new(texture: &'static str, add_on_click: ModelEvent, show_tooltip: TooltipFn) -> Self {
+        Self { texture, add_on_click, show_tooltip }
     }
-
+    
     pub fn draw(&self, view: &View, ui: &mut Ui) -> bool {
         let slot_selector_size = epaint::Vec2::splat(SLOT_SELECTOR_SIZE);        
-        let button = CustomCircularImageButton::new(view, &self.texture, 60.0)
-            .with_normal_color(Color32::from_rgba_premultiplied(40, 40, 40, 170))
-            .with_hover_color(Color32::from_rgba_premultiplied(70, 70, 70, 220))
+        let button = CustomCircularImageButton::new(view, self.texture, 60.0)
+            .with_normal_color(Color32::from_rgba_premultiplied(40, 40, 40, 220))
+            .with_hover_color(Color32::from_rgba_premultiplied(70, 70, 70, 250))
             .with_padding(8.0);
         let response = ui.add_sized(slot_selector_size, button);
         let clicked = response.clicked();
+        if clicked {
+            view.add_model_event(self.add_on_click.clone());
+        }
         styles::DefaultWindow::apply(&view.context);
         response.on_hover_ui(|ui| { 
-            show_tooltip(view, ui, &self.slot);
+            (self.show_tooltip)(view, ui);
         });
         styles::SlotSelectorWindow::apply(&view.context);
         clicked
     }
 }
 
-/// All the selectors together
 pub struct ShipSlotEditor {
-    entity: Entity,
-    ship_class: ShipClass,
-    location: ShipSlotLocation,
-    selectors: Vec<ShipSlotSelector>,
+    vessel_class: VesselClass,
+    selectors: Vec<ShipSlotEditorItem>,
 }
 
 impl ShipSlotEditor {
-    pub fn new(entity: Entity, ship_class: ShipClass, location: ShipSlotLocation, slot: &ShipSlot) -> Self {
+    pub fn new(entity: Entity, vessel_class: VesselClass, type_: SlotType) -> Self {
         let mut selectors = vec![];
-        match slot {
-            ShipSlot::Weapon(_) => {
-                selectors.push(ShipSlotSelector::new("clear-slot".to_string(), ShipSlot::Weapon(None)));
-                for type_ in WeaponType::types() {
-                    let texture = type_.texture().to_string();
-                    let slot = ShipSlot::new_weapon(type_);
-                    selectors.push(ShipSlotSelector::new(texture, slot));
+        match type_ {
+            SlotType::FuelTank => {
+                let add_on_click = ModelEvent::SetFuelTank { entity, type_: None };
+                let tooltip = show_tooltip_fuel_tank(None);
+                selectors.push(ShipSlotEditorItem::new("clear-slot", add_on_click, tooltip));
+                for fuel_tank in FuelTankType::ship_types() {
+                    let texture = fuel_tank.texture();
+                    let add_on_click = ModelEvent::SetFuelTank { entity, type_: Some(fuel_tank) };
+                    let tooltip = show_tooltip_fuel_tank(Some(fuel_tank));
+                    selectors.push(ShipSlotEditorItem::new(texture, add_on_click, tooltip));
                 }
             }
 
-            ShipSlot::FuelTank(_) => {
-                selectors.push(ShipSlotSelector::new("clear-slot".to_string(), ShipSlot::FuelTank(None)));
-                for type_ in FuelTankType::types() {
-                    let texture = type_.texture().to_string();
-                    let slot = ShipSlot::new_fuel_tank(type_);
-                    selectors.push(ShipSlotSelector::new(texture, slot));
+            SlotType::Engine => {
+                let add_on_click = ModelEvent::SetEngine { entity, type_: None };
+                let tooltip = show_tooltip_engine(None);
+                selectors.push(ShipSlotEditorItem::new("clear-slot", add_on_click, tooltip));
+                for engine in EngineType::ship_types() {
+                    let texture = engine.texture();
+                    let add_on_click = ModelEvent::SetEngine { entity, type_: Some(engine) };
+                    let tooltip = show_tooltip_engine(Some(engine));
+                    selectors.push(ShipSlotEditorItem::new(texture, add_on_click, tooltip));
                 }
             }
 
-            ShipSlot::Engine(_) => {
-                selectors.push(ShipSlotSelector::new("clear-slot".to_string(), ShipSlot::Engine(None)));
-                for type_ in EngineType::types() {
-                    let texture = type_.texture().to_string();
-                    let slot = ShipSlot::new_engine(type_);
-                    selectors.push(ShipSlotSelector::new(texture, slot));
+            SlotType::TorpedoStorage => {
+                let add_on_click = ModelEvent::SetTorpedoStorage { entity, type_: None };
+                let tooltip = show_tooltip_torpedo_storage(None);
+                selectors.push(ShipSlotEditorItem::new("clear-slot", add_on_click, tooltip));
+                for torpedo_storage in TorpedoStorageType::ship_types() {
+                    let texture = torpedo_storage.texture();
+                    let add_on_click = ModelEvent::SetTorpedoStorage { entity, type_: Some(torpedo_storage) };
+                    let tooltip = show_tooltip_torpedo_storage(Some(torpedo_storage));
+                    selectors.push(ShipSlotEditorItem::new(texture, add_on_click, tooltip));
+                }
+            }
+
+            SlotType::TorpedoLauncher => {
+                let add_on_click = ModelEvent::SetTorpedoLauncher { entity, type_: None };
+                let tooltip = show_tooltip_torpedo_launcher(None);
+                selectors.push(ShipSlotEditorItem::new("clear-slot", add_on_click, tooltip));
+                for torpedo_launcher in TorpedoLauncherType::ship_types() {
+                    let texture = torpedo_launcher.texture();
+                    let add_on_click = ModelEvent::SetTorpedoLauncher { entity, type_: Some(torpedo_launcher) };
+                    let tooltip = show_tooltip_torpedo_launcher(Some(torpedo_launcher));
+                    selectors.push(ShipSlotEditorItem::new(texture, add_on_click, tooltip));
                 }
             }
         };
 
-        ShipSlotEditor { entity, ship_class, location, selectors }
+        ShipSlotEditor { vessel_class, selectors }
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn draw(&self, view: &View, vessel_name: &str, slot_location: ShipSlotLocation, slot_center: Pos2, scalar: f32) {
-        let slot_translation = scalar * compute_slot_locations(self.ship_class)
-            .get(&self.location)
+    pub fn draw(&self, view: &View, vessel_name: &str, type_: SlotType, slot_center: Pos2, scalar: f32) {
+        let slot_translation = scalar * compute_slot_locations(self.vessel_class)
+            .get(&type_)
             .expect("Slot editor location does not exist");
         let slot_selector_center = slot_center + epaint::vec2(
             slot_translation, 
-            -SLOT_SELECTOR_HEIGHT_PROPORTION * compute_slot_size(self.ship_class) * scalar);
+            -SLOT_SELECTOR_HEIGHT_PROPORTION * compute_slot_size(self.vessel_class) * scalar);
         let mut should_close = false;
-        let name = format!("Slot selector - {vessel_name} - {slot_location:?}");
+        let name = format!("Slot selector - {vessel_name} - {type_:?}");
         let id = Id::new(name.clone());
         
         styles::SlotSelectorWindow::apply(&view.context);
@@ -108,7 +127,6 @@ impl ShipSlotEditor {
             ui.horizontal(|ui| {
                 for selector in &self.selectors {
                     if selector.draw(view, ui) {
-                        view.add_model_event(ModelEvent::SetSlot { entity: self.entity, slot_location: self.location, slot: selector.slot.clone() });
                         should_close = true;
                     }
                 }

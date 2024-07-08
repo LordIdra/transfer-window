@@ -46,7 +46,7 @@ pub struct Resources {
 impl Resources {
     pub fn new(context: &egui::Context, gl: &Arc<glow::Context>) -> Self {
         info!("Loading resources");
-        let icons = directory_entries("view/resources/textures/icons".to_string())
+        let icons = directory_entries("view/resources/final_textures".to_string())
             .into_iter()
             .map(|entry| (entry_name(&entry), entry))
             .map(|entry| (entry.0, Texture::new(context, gl, &entry.1)))
@@ -61,14 +61,14 @@ impl Resources {
 
     /// # Panics
     /// Panics if the texture does not exist
-    #[allow(unused)] 
+    #[allow(unused)]
     pub fn icon_image(&self, name: &str) -> ImageSource {
         self.icons.get(name)
             .unwrap_or_else(|| panic!("Icon {name} does not exist"))
             .image
             .clone()
     }
-    
+
     /// # Panics
     /// Panics if the texture does not exist
     #[allow(unused)]
@@ -88,7 +88,7 @@ impl Resources {
             .gl_texture
             .texture()
     }
-    
+
     /// # Panics
     /// Panics if the texture does not exist
     #[allow(unused)]
@@ -109,7 +109,7 @@ impl Resources {
         }
         icon_renderers
     }
-    
+
     pub fn build_planet_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<PlanetRenderer>>> {
         info!("Building renderers");
         let mut planet_renderers = HashMap::new();

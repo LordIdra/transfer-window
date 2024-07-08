@@ -54,7 +54,7 @@ pub fn update(view: &View) {
     }
 
     let guidance = view.model.path_component(entity).future_segment_starting_at_time(time).unwrap().as_guidance().unwrap();
-    let max_dv = view.model.vessel_component(entity).max_dv().unwrap();
+    let max_dv = view.model.vessel_component(entity).max_dv();
     let start_dv = guidance.rocket_equation_function().remaining_dv();
     let end_dv = guidance.final_rocket_equation_function().remaining_dv();
     let duration = guidance.duration();

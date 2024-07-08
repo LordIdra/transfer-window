@@ -46,7 +46,7 @@ pub fn update(view: &View) {
     let fire_torpedo_event = view.model.fire_torpedo_event_at_time(entity, time).unwrap();
     let vessel_component = view.model.vessel_component(fire_torpedo_event.ghost());
     let burn = view.model.burn_starting_at_time(fire_torpedo_event.ghost(), fire_torpedo_event.burn_time());
-    let max_dv = vessel_component.max_dv().unwrap();
+    let max_dv = vessel_component.max_dv();
     let start_dv = burn.rocket_equation_function().remaining_dv();
     let end_dv = burn.final_rocket_equation_function().remaining_dv();
     let duration = burn.duration();

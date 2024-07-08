@@ -1,5 +1,5 @@
 use eframe::egui::Ui;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, start_burn::StartBurnEvent}, VesselComponent}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{class::VesselClass, faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent}}}, storage::entity_allocator::Entity};
 
 use crate::game::{util::{orbitable_texture, vessel_texture}, View};
 
@@ -8,10 +8,11 @@ use super::custom_image_button::CustomCircularImageButton;
 pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
     let vessel_component = view.model.vessel_component(entity);
     let icon = vessel_texture(vessel_component);
-    let tooltip = match vessel_component {
-        VesselComponent::Torpedo(_) => "Select torpedo",
-        VesselComponent::Ship(_) => "Select ship",
-        VesselComponent::Station(_) => "Select station",
+    let tooltip = "Select ".to_string() + match vessel_component.class() {
+        VesselClass::Torpedo => "Torpedo",
+        VesselClass::Hub => "Hub",
+        VesselClass::Scout => "Scout",
+        VesselClass::Frigate => "Frigate",
     };
     let button = CustomCircularImageButton::new(view, icon, 36.0)
         .with_padding(8.0);
@@ -92,6 +93,17 @@ pub fn draw_enable_guidance(view: &View, ui: &mut Ui, entity: Entity, time: f64)
         .with_enabled(enabled)
         .with_padding(5.0);
     ui.add_enabled(enabled, button).on_hover_text("Enable guidance").clicked()
+}
+
+pub fn draw_fire_torpedo(view: &View, ui: &mut Ui, entity: Entity, time: f64) -> bool {
+    if !FireTorpedoEvent::can_create_ever(&view.model, entity) {
+        return false;
+    }
+    let enabled = FireTorpedoEvent::can_create(&view.model, entity, time);
+    let button = CustomCircularImageButton::new(view, "fire-torpedo", 36.0)
+        .with_enabled(enabled)
+        .with_padding(5.0);
+    ui.add_enabled(enabled, button).on_hover_text("Fire torpedo").clicked()
 }
 
 pub fn draw_edit_vessel(view: &View, ui: &mut Ui) -> bool {

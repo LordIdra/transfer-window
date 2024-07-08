@@ -21,7 +21,7 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
 
 fn draw_guidance(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     let guidance = view.model.guidance_at_time(entity, time, Some(Faction::Player));
-    let max_dv = view.model.vessel_component(entity).max_dv().unwrap();
+    let max_dv = view.model.vessel_component(entity).max_dv();
     let start_dv = guidance.rocket_equation_function().remaining_dv();
     let end_dv = guidance.final_rocket_equation_function().remaining_dv();
     let duration = guidance.duration();

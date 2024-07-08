@@ -10,14 +10,8 @@ pub enum Faction {
 impl Faction {
     pub fn has_intel_for(self, other: Self) -> bool {
         match self {
-            Faction::Player | Faction::Ally => match other {
-                Faction::Player | Faction::Ally => true,
-                Faction::Enemy => false,
-            }
-            Faction::Enemy => match other {
-                Faction::Player | Faction::Ally => false,
-                Faction::Enemy => true,
-            }
+            Faction::Player | Faction::Ally => !matches!(other, Faction::Enemy),
+            Faction::Enemy => matches!(other, Faction::Enemy)
         }
     }
 
