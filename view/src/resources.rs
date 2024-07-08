@@ -4,7 +4,7 @@ use eframe::{egui::{self, ImageSource}, glow};
 use image::GenericImageView;
 use log::{info, trace};
 
-use crate::game::rendering::{texture, texture_renderer::TextureRenderer};
+use crate::game::rendering::{texture, texture_renderer::TextureRenderer, celestial_object_renderer::CelestialObjectRenderer};
 
 fn directory_entries(directory: String) -> Vec<DirEntry> {
     fs::read_dir(directory)
@@ -14,7 +14,7 @@ fn directory_entries(directory: String) -> Vec<DirEntry> {
 }
 
 fn entry_name(entry: &DirEntry) -> String {
-    entry.file_name().into_string().unwrap().split('.').next().unwrap().to_string()
+    entry.file_name().into_string().unwrap().replace(".png", "")
 }
 
 struct Texture {
@@ -55,7 +55,8 @@ impl Resources {
 
     /// # Panics
     /// Panics if the texture does not exist
-    #[allow(unused)] pub fn texture_image(&self, name: &str) -> ImageSource {
+    #[allow(unused)]
+    pub fn texture_image(&self, name: &str) -> ImageSource {
         self.textures.get(name)
             .unwrap_or_else(|| panic!("Texture {name} does not exist"))
             .image
@@ -72,15 +73,30 @@ impl Resources {
             .texture()
     }
 
-    pub fn build_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
+    pub fn build_texture_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
         info!("Building renderers");
         let mut texture_renderers = HashMap::new();
         for (texture_name, texture) in &self.textures {
-            trace!("Building renderer for {}", texture_name);
-            let texture_renderer = TextureRenderer::new(gl, texture.gl_texture.texture());
-            texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(texture_renderer)));
+            trace!("Building texture renderer for {}", texture_name);
+            let renderer = TextureRenderer::new(gl, texture.gl_texture.texture());
+            texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
         }
         texture_renderers
+    }
+
+    pub fn build_celestial_object_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<CelestialObjectRenderer>>> {
+        info!("Building renderers");
+        let mut celestial_object_renderers = HashMap::new();
+        for (texture_name, texture) in &self.textures {
+            if !texture_name.ends_with(".celestial_object") {
+                continue;
+            }
+            let texture_name = texture_name.trim_end_matches(".celestial_object");
+            trace!("Building celestial_object renderer for {}", texture_name);
+            let renderer = CelestialObjectRenderer::new(gl, texture.gl_texture.texture());
+            celestial_object_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
+        }
+        celestial_object_renderers
     }
 
     pub fn destroy(&self, gl: &Arc<glow::Context>) {
