@@ -3,25 +3,25 @@ use crate::game::events::{ModelEvent, ViewEvent};
 use super::{action::Action, story_event::StoryEvent, transition::Transition};
 
 pub struct State {
+    name: &'static str,
     transitions: Vec<Transition>,
     actions: Vec<Box<dyn Action>>,
 }
 
-impl Default for State {
-    fn default() -> Self {
-        let transitions = vec![];
-        let actions = vec![];
-        State { transitions, actions }
-    }
-}
 
 impl State {
-    pub fn with_transition(mut self, transition: Transition) -> Self {
+    pub fn new(name: &'static str) -> Self {
+        let transitions = vec![];
+        let actions = vec![];
+        State { name, transitions, actions }
+    }
+
+    pub fn transition(mut self, transition: Transition) -> Self {
         self.transitions.push(transition);
         self
     }
 
-    pub fn with_action(mut self, action: Box<dyn Action>) -> Self {
+    pub fn action(mut self, action: Box<dyn Action>) -> Self {
         self.actions.push(action);
         self
     }
@@ -33,6 +33,10 @@ impl State {
     #[cfg(test)]
     pub fn transitions(&self) -> &[Transition] {
         &self.transitions
+    }
+
+    pub fn name(&self) -> &'static str {
+        self.name
     }
 
     pub fn trigger(&self) -> (Vec<ModelEvent>, Vec<ViewEvent>) {

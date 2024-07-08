@@ -19,10 +19,15 @@ pub struct Story {
 }
 
 impl Story {
-    pub fn new(mut states: HashMap<&'static str, State>, root: &'static str) -> Self {
-        states.insert("uninitialized", State::default().with_transition(Transition::new(root, NoneCondition::new())));
+    pub fn new(root: &'static str) -> Self {
+        let mut states = HashMap::new();
+        states.insert("uninitialized", State::new("uninitialized").transition(Transition::new(root, NoneCondition::new())));
         let state = "uninitialized";
         Self { states, state }
+    }
+
+    pub(super) fn add(&mut self, state: State) {
+        self.states.insert(state.name(), state);
     }
 
     fn state(&self) -> &State {

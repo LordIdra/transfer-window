@@ -186,6 +186,9 @@
 [x] More logical ordering of docking ports
 [x] More logical ordering in explorer
 [x] Menu screen
+[x] Storyteller triggers
+[x] Storyteller events
+[x] Storyteller dialogue
 
 
 
@@ -195,9 +198,6 @@
 # Backend
 [ ] Vessel constructor
 [ ] Orbitable constructor
-[ ] Storyteller crate
-[ ] Storyteller triggers
-[ ] Storyteller events
 [ ] Storyteller objectives
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction

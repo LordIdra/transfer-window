@@ -52,7 +52,7 @@ pub enum ViewEvent {
     IconHovered,
     ToggleRightClickMenu(Entity),
     HideRightClickMenu,
-    ShowDialogue { character: &'static str, text: &'static str },
+    ShowDialogue(Dialogue),
     CloseDialogue,
 }
 
@@ -112,7 +112,7 @@ impl View {
                 ViewEvent::IconHovered => self.pointer_over_icon = true,
                 ViewEvent::ToggleRightClickMenu(entity) => self.toggle_right_click_menu(entity),
                 ViewEvent::HideRightClickMenu => self.right_click_menu = None,
-                ViewEvent::ShowDialogue { character, text } => self.dialogue = Some(Dialogue::new(character, text)),
+                ViewEvent::ShowDialogue(dialogue) => self.dialogue = Some(dialogue),
                 ViewEvent::CloseDialogue => self.dialogue = None,
             }
         }
