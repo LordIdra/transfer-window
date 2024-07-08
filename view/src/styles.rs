@@ -161,3 +161,24 @@ impl SelectedMenuButton {
         };
     }
 }
+
+pub struct DialogueWindow;
+
+impl DialogueWindow {
+    pub fn apply(context: &Context) {
+        context.set_style(Style {
+            visuals: Visuals {
+                window_fill: Color32::from_rgba_unmultiplied(0, 0, 30, 255),
+                window_stroke: Stroke::new(2.0, Color32::from_rgba_unmultiplied(10, 10, 50, 255)),
+                window_shadow: Shadow::NONE,
+                window_rounding: Rounding::same(5.0),
+                ..Default::default()
+            },
+            interaction: Interaction {
+                selectable_labels: false,
+                ..Default::default()
+            },
+            ..Default::default()
+        });
+    }
+}

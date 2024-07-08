@@ -4,6 +4,8 @@ use log::debug;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
+use crate::game::overlay::dialogue::Dialogue;
+
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
 mod model;
@@ -50,10 +52,17 @@ pub enum ViewEvent {
     IconHovered,
     ToggleRightClickMenu(Entity),
     HideRightClickMenu,
+    ShowDialogue { character: &'static str, text: &'static str },
+    CloseDialogue,
 }
 
 impl View {
     pub(crate) fn handle_events(&mut self) {
+        let (new_model_events, new_view_events) = self.story.update(&self.story_events.lock().unwrap());
+        self.model_events.lock().unwrap().extend(new_model_events);
+        self.view_events.lock().unwrap().extend(new_view_events);
+        self.story_events.lock().unwrap().clear();
+
         let model_events = self.model_events.clone();
         let mut model_events = model_events.lock().unwrap();
         model_events.reverse(); // process in the order they were added
@@ -103,6 +112,8 @@ impl View {
                 ViewEvent::IconHovered => self.pointer_over_icon = true,
                 ViewEvent::ToggleRightClickMenu(entity) => self.toggle_right_click_menu(entity),
                 ViewEvent::HideRightClickMenu => self.right_click_menu = None,
+                ViewEvent::ShowDialogue { character, text } => self.dialogue = Some(Dialogue::new(character, text)),
+                ViewEvent::CloseDialogue => self.dialogue = None,
             }
         }
     }

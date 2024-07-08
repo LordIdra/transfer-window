@@ -4,6 +4,7 @@ use crate::styles;
 
 use super::View;
 
+pub mod dialogue;
 mod explorer;
 mod fps;
 mod right_click_menu;
@@ -27,9 +28,11 @@ pub fn draw(view: &View) {
     selected::update(view);
     right_click_menu::update(view);
 
+    styles::DialogueWindow::apply(&view.context);
+    dialogue::update(view);
+    view.context.set_style(Style::default());
+
     styles::VesselEditor::apply(&view.context);
-
     vessel_editor::update(view);
-
     view.context.set_style(Style::default());
 }

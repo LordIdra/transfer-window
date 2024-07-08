@@ -37,7 +37,7 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
         .with_end_at(1.0e10);
     let moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3, 27.321667, 0.0, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
+        .with_orbitable_component(OrbitableComponent::new(0.07346e24, 1737.4e3, 27.321_667, 0.0, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
 
     let vessel_component = VesselComponent::new(VesselClass::Scout2, Faction::Player)
         .with_fuel_tank(FuelTankType::FuelTank1)

@@ -3,7 +3,9 @@ use std::{collections::HashSet, sync::{Arc, Mutex}};
 use eframe::{egui::{Context, Pos2, Rect}, glow, Frame};
 use events::{ModelEvent, ViewEvent};
 use nalgebra_glm::DVec2;
+use overlay::dialogue::Dialogue;
 use rendering::Renderers;
+use storyteller::{stories::story_01_welcome, story::{story_event::StoryEvent, Story}};
 use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
 use util::{should_render, should_render_at_time};
 
@@ -20,23 +22,27 @@ mod misc;
 pub(crate) mod overlay;
 pub(crate) mod rendering;
 mod selected;
+mod storyteller;
 mod underlay;
 mod util;
 
 pub struct View {
     gl: Arc<glow::Context>,
     model: Model,
+    story: Story,
     context: Context,
     previous_screen_rect: Rect,
     screen_rect: Rect,
     model_events: Arc<Mutex<Vec<ModelEvent>>>,
     view_events: Arc<Mutex<Vec<ViewEvent>>>,
+    story_events: Arc<Mutex<Vec<StoryEvent>>>,
     camera: Camera,
     resources: Arc<Resources>,
     renderers: Renderers,
     selected: Selected,
     right_click_menu: Option<Entity>,
     vessel_editor: Option<VesselEditor>,
+    dialogue: Option<Dialogue>,
     frame_history: FrameHistory,
     debug_window_open: bool,
     debug_window_tab: DebugWindowTab,
@@ -46,10 +52,12 @@ pub struct View {
 
 impl View {
     pub fn new(gl: Arc<glow::Context>, model: Model, context: Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
+        let story = story_01_welcome::build();
         let previous_screen_rect = context.screen_rect();
         let screen_rect = context.screen_rect();
         let model_events = Arc::new(Mutex::new(vec![]));
         let view_events = Arc::new(Mutex::new(vec![]));
+        let story_events = Arc::new(Mutex::new(vec![]));
         let mut camera = Camera::new();
         if let Some(focus) = focus {
             camera.set_focus(focus, model.absolute_position(focus));
@@ -58,12 +66,13 @@ impl View {
         let selected = Selected::None;
         let right_click_menu = None;
         let vessel_editor = None;
+        let dialogue = None;
         let frame_history = FrameHistory::default();
         let debug_window_open = false;
         let debug_window_tab = DebugWindowTab::Model;
         let pointer_over_ui = false;
         let pointer_over_icon = false;
-        Self { gl, model, context, previous_screen_rect, screen_rect, model_events, view_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon }
+        Self { gl, model, story, context, previous_screen_rect, screen_rect, model_events, view_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon }
     }
 
     fn update_camera_focus_position(&mut self) {
@@ -111,6 +120,10 @@ impl View {
 
     pub(crate) fn add_view_event(&self, event: ViewEvent) {
         self.view_events.lock().unwrap().push(event);
+    }
+
+    pub(crate) fn add_story_event(&self, event: StoryEvent) {
+        self.story_events.lock().unwrap().push(event);
     }
 
     fn is_selected(&self, entity: Entity) -> bool {
