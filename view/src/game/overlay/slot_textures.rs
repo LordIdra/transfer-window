@@ -18,9 +18,10 @@ impl TexturedSlot for EngineType {
 impl TexturedSlot for FuelTankType {
     fn texture(&self) -> &'static str {
         match self {
-            FuelTankType::Tiny => "tank-tiny",
-            FuelTankType::Small => "tank-small",
-            FuelTankType::Medium => "tank-medium",
+            FuelTankType::FuelTank1 => "fuel-tank-1",
+            FuelTankType::FuelTank2 => "fuel-tank-2",
+            FuelTankType::FuelTank3 => "fuel-tank-3",
+            FuelTankType::FuelTank4 => "fuel-tank-4",
             FuelTankType::Torpedo => panic!("Attempt to get torpedo fuel tank texture"),
             FuelTankType::Hub => panic!("Attempt to get hub fuel tank texture"),
         }
@@ -30,8 +31,8 @@ impl TexturedSlot for FuelTankType {
 impl TexturedSlot for TorpedoStorageType {
     fn texture(&self) -> &'static str {
         match self {
-            TorpedoStorageType::Tiny => "torpedo-storage-tiny",
-            TorpedoStorageType::Small => "torpedo-storage-small",
+            TorpedoStorageType::TorpedoStorage1 => "torpedo-storage-1",
+            TorpedoStorageType::TorpedoStorage2 => "torpedo-storage-2",
             TorpedoStorageType::Hub => panic!("Attempt to get hub torpedo storage texture"),
         }
     }
@@ -40,8 +41,8 @@ impl TexturedSlot for TorpedoStorageType {
 impl TexturedSlot for TorpedoLauncherType {
     fn texture(&self) -> &'static str {
         match self {
-            TorpedoLauncherType::Simple => "torpedo-launcher-simple",
-            TorpedoLauncherType::Enhanced => "torpedo-launcher-enhanced",
+            TorpedoLauncherType::TorpedoLauncher1 => "torpedo-launcher-1",
+            TorpedoLauncherType::TorpedoLauncher2 => "torpedo-launcher-2",
         }
     }
 }

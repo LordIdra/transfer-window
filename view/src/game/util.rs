@@ -182,8 +182,10 @@ pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
 
 pub fn vessel_texture(vessel_component: &VesselComponent) -> &'static str {
     match vessel_component.class() {
-        VesselClass::Scout => "vessel-icon-scout",
-        VesselClass::Frigate => "vessel-icon-frigate",
+        VesselClass::Scout1 => "vessel-icon-scout-1",
+        VesselClass::Scout2 => "vessel-icon-scout-2",
+        VesselClass::Frigate1 => "vessel-icon-frigate-1",
+        VesselClass::Frigate2 => "vessel-icon-frigate-2",
         VesselClass::Torpedo => "vessel-icon-torpedo",
         VesselClass::Hub => "vessel-icon-hub",
     }

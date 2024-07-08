@@ -55,9 +55,10 @@ pub fn show_tooltip_fuel_tank(type_: Option<FuelTankType>) -> TooltipFn {
         };
 
         let name = match type_ {
-            FuelTankType::Tiny => "Tiny Fuel Tank",
-            FuelTankType::Small => "Small Fuel Tank",
-            FuelTankType::Medium => "Medium Fuel Tank",
+            FuelTankType::FuelTank1 => "Fuel Tank I",
+            FuelTankType::FuelTank2 => "Fuel Tank II",
+            FuelTankType::FuelTank3 => "Fuel Tank III",
+            FuelTankType::FuelTank4 => "Fuel Tank IV",
             FuelTankType::Torpedo | FuelTankType::Hub => unreachable!(),
         };
 
@@ -78,8 +79,8 @@ pub fn show_tooltip_torpedo_storage(type_: Option<TorpedoStorageType>) -> Toolti
         };
 
         let name = match type_ {
-            TorpedoStorageType::Tiny => "Tiny Torpedo Storage",
-            TorpedoStorageType::Small => "Small Torpedo Storage",
+            TorpedoStorageType::TorpedoStorage1 => "Tiny Torpedo Storage",
+            TorpedoStorageType::TorpedoStorage2 => "Small Torpedo Storage",
             TorpedoStorageType::Hub => unreachable!(),
         };
 
@@ -102,8 +103,8 @@ pub fn show_tooltip_torpedo_launcher(type_: Option<TorpedoLauncherType>) -> Tool
         };
 
         let name = match type_ {
-            TorpedoLauncherType::Simple => "Simple Torpedo Launcher",
-            TorpedoLauncherType::Enhanced => "Enhanced Torpedo Launcher",
+            TorpedoLauncherType::TorpedoLauncher1 => "Torpedo Launcher I",
+            TorpedoLauncherType::TorpedoLauncher2 => "Torpedo Launcher II",
         };
 
         ui.label(RichText::new(name).strong().monospace().size(20.0));

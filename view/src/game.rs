@@ -11,13 +11,13 @@ use crate::{controller_events::ControllerEvent, resources::Resources};
 
 use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, selected::Selected};
 
-mod camera;
+pub(crate) mod camera;
 mod debug;
 mod events;
 mod expiry;
 mod frame_history;
 mod misc;
-mod overlay;
+pub(crate) mod overlay;
 pub(crate) mod rendering;
 mod selected;
 mod underlay;

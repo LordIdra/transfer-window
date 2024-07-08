@@ -3,11 +3,11 @@ use transfer_window_model::{components::vessel_component::{class::VesselClass, e
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{slot_textures::TexturedSlot, widgets::custom_image_button::CustomCircularImageButton}, View}, styles};
 
-use super::{tooltips::{show_tooltip_engine, show_tooltip_fuel_tank, show_tooltip_torpedo_launcher, show_tooltip_torpedo_storage, TooltipFn}, util::{compute_slot_locations, compute_slot_size}, SlotType};
+use super::{tooltips::{show_tooltip_engine, show_tooltip_fuel_tank, show_tooltip_torpedo_launcher, show_tooltip_torpedo_storage, TooltipFn}, util::{compute_slot_locations, SLOT_SIZE}, SlotType};
 
 /// With respect to the size of the slot
-const SLOT_SELECTOR_HEIGHT_PROPORTION: f32 = 0.5;
-const SLOT_SELECTOR_SIZE: f32 = 50.0;
+const SLOT_SELECTOR_HEIGHT_PROPORTION: f32 = 0.6;
+const SLOT_SELECTOR_SIZE: f32 = 80.0;
 
 struct ShipSlotEditorItem {
     texture: &'static str,
@@ -22,9 +22,9 @@ impl ShipSlotEditorItem {
     
     pub fn draw(&self, view: &View, ui: &mut Ui) -> bool {
         let slot_selector_size = epaint::Vec2::splat(SLOT_SELECTOR_SIZE);        
-        let button = CustomCircularImageButton::new(view, self.texture, 60.0)
-            .with_normal_color(Color32::from_rgba_premultiplied(40, 40, 40, 220))
-            .with_hover_color(Color32::from_rgba_premultiplied(70, 70, 70, 250))
+        let button = CustomCircularImageButton::new(view, self.texture, SLOT_SELECTOR_SIZE + 10.0)
+            .with_normal_color(Color32::from_rgba_premultiplied(40, 40, 40, 240))
+            .with_hover_color(Color32::from_rgba_premultiplied(70, 70, 70, 255))
             .with_padding(8.0);
         let response = ui.add_sized(slot_selector_size, button);
         let clicked = response.clicked();
@@ -103,12 +103,10 @@ impl ShipSlotEditor {
 
     #[allow(clippy::too_many_arguments)]
     pub fn draw(&self, view: &View, vessel_name: &str, type_: SlotType, slot_center: Pos2, scalar: f32) {
-        let slot_translation = scalar * compute_slot_locations(self.vessel_class)
+        let slot_translation = scalar * *compute_slot_locations(self.vessel_class)
             .get(&type_)
             .expect("Slot editor location does not exist");
-        let slot_selector_center = slot_center + epaint::vec2(
-            slot_translation, 
-            -SLOT_SELECTOR_HEIGHT_PROPORTION * compute_slot_size(self.vessel_class) * scalar);
+        let slot_selector_center = slot_center + slot_translation + epaint::vec2(0.0, -SLOT_SELECTOR_HEIGHT_PROPORTION * SLOT_SIZE * scalar);
         let mut should_close = false;
         let name = format!("Slot selector - {vessel_name} - {type_:?}");
         let id = Id::new(name.clone());

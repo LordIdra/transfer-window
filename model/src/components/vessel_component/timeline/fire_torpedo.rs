@@ -43,9 +43,9 @@ impl FireTorpedoEvent {
     /// # Panics
     /// Panics if the weapon slot requested does not in fact contain a weapon or is not a torpedo
     pub fn execute(&self, model: &mut Model) {
-        let vessel_component = model.vessel_component_mut(self.ghost);
-        vessel_component.unset_ghost();
-        vessel_component.decrement_torpedoes();
+        model.vessel_component_mut(self.ghost).unset_ghost();
+        model.vessel_component_mut(self.fire_from).decrement_torpedoes();
+        model.vessel_component_mut(self.fire_from).torpedo_launcher.as_mut().unwrap().reset_time_to_reload();
     }
 
     pub fn cancel(&self, model: &mut Model) {
@@ -80,6 +80,14 @@ impl FireTorpedoEvent {
 
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         let vessel_component = &model.vessel_component(entity);
+        let cooldown = vessel_component.torpedo_launcher.as_ref().unwrap().type_().cooldown();
+        if let Some(event) = vessel_component.timeline.last_fire_torpedo_event() {
+            if event.time + cooldown > time {
+                return false;
+            }
+        } else if model.time + vessel_component.torpedo_launcher.as_ref().unwrap().time_to_reload() > time {
+            return false;
+        }
         vessel_component.timeline().is_time_after_last_blocking_event(time)
             && vessel_component.final_torpedoes() != 0
     }

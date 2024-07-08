@@ -2,23 +2,31 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum TorpedoStorageType {
-    Tiny,
-    Small,
+    TorpedoStorage1,
+    TorpedoStorage2,
     Hub,
 }
 
 impl TorpedoStorageType {
+    pub fn mass(&self) -> f64 {
+        match self {
+            TorpedoStorageType::TorpedoStorage1 => 5.0e3,
+            TorpedoStorageType::TorpedoStorage2 => 10.0e3,
+            TorpedoStorageType::Hub => 15.0,
+        }
+    }
+
     pub fn ship_types() -> [Self; 2] {
         [
-            TorpedoStorageType::Tiny,
-            TorpedoStorageType::Small,
+            TorpedoStorageType::TorpedoStorage1,
+            TorpedoStorageType::TorpedoStorage2,
         ]
     }
 
     pub fn capacity(&self) -> usize {
         match self {
-            TorpedoStorageType::Tiny => 1,
-            TorpedoStorageType::Small => 3,
+            TorpedoStorageType::TorpedoStorage1 => 1,
+            TorpedoStorageType::TorpedoStorage2 => 3,
             TorpedoStorageType::Hub => 10,
         }
     }
@@ -32,7 +40,7 @@ pub struct TorpedoStorage {
 
 impl TorpedoStorage {
     pub fn new(type_: TorpedoStorageType) -> TorpedoStorage {
-        let torpedoes = type_.capacity() / 2;
+        let torpedoes = type_.capacity();
         TorpedoStorage {
             type_,
             torpedoes

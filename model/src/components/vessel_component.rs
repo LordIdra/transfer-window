@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use class::VesselClass;
 use docking::{Docking, DockingPort, DockingPortLocation, DockingType};
@@ -196,6 +196,10 @@ impl VesselComponent {
     // ------------------------
     pub fn dry_mass(&self) -> f64 {
         self.class.mass()
+            + self.fuel_tank.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.engine.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.torpedo_storage.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.torpedo_launcher.as_ref().map_or(0.0, |x| x.type_().mass())
     }
 
     pub fn wet_mass(&self) -> f64 {
@@ -326,6 +330,14 @@ impl VesselComponent {
         self.torpedo_launcher = type_.map(TorpedoLauncher::new);
     }
 
+    pub fn step_torpedo_launcher(&mut self, dt: f64) {
+        self.torpedo_launcher.as_mut().unwrap().step_time_to_reload(dt);
+    }
+
+    pub fn torpedo_launcher_time_to_reload(&self) -> f64 {
+        self.torpedo_launcher.as_ref().unwrap().time_to_reload()
+    }
+
     // ------------------------
     // Docking
     // ------------------------
@@ -341,11 +353,11 @@ impl VesselComponent {
         self.docking = type_.map(Docking::new);
     }
 
-    pub fn docking_ports(&self) -> Option<&HashMap<DockingPortLocation, DockingPort>> {
+    pub fn docking_ports(&self) -> Option<&BTreeMap<DockingPortLocation, DockingPort>> {
         Some(self.docking.as_ref()?.docking_ports())
     }
 
-    pub fn docking_ports_mut(&mut self) -> Option<&mut HashMap<DockingPortLocation, DockingPort>> {
+    pub fn docking_ports_mut(&mut self) -> Option<&mut BTreeMap<DockingPortLocation, DockingPort>> {
         Some(self.docking.as_mut()?.docking_ports_mut())
     }
 
@@ -364,7 +376,7 @@ impl VesselComponent {
     }
 
     pub fn can_dock(&self) -> bool {
-        self.class.can_dock()
+        self.class.dockable()
     }
 
     pub fn dock(&mut self, location: DockingPortLocation, entity: Entity) {

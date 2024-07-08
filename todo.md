@@ -179,37 +179,49 @@
 [x] Torpedo storage facility
 [x] Docking facility
 [x] Class refactor
-[ ] Equipment + torpedoes add mass
-
-# Stations
-[ ] Equipment has install time
-[ ] Equipment swapping UI
-[ ] Undocking disabled until swap complete
-[ ] Swap can be cancelled
-
-# Vessel refactor
-[ ] Redraw ships w/ more and smaller slots
-[ ] Energy generator facility
-[ ] Engine alternators, RTGs
-[ ] Energy storage facility
-[ ] Hull + facilities drain energy over time
-[ ] Solars require line of sight to sun
-
-[ ] Comms equipment
-[ ] Comms line overlay
-[ ] Comms routing algorithm based on line of sight
-
-[ ] Fog of war
-[ ] Passive/active radar
-[ ] Information networking
-
-[ ] Weapons UI redesign (it's shit)
-[ ] Weapon cooldown
+[x] Redraw ships w/ more and smaller slots
+[x] Weapons UI redesign (it's shit)
+[x] Weapon cooldown
+[x] Equipment adds mass
+[x] More logical ordering of docking ports
+[x] More logical ordering in explorer
+[x] Menu screen
 
 # Campaign
-[ ] Menu screen
+[ ] Vessel constructor
+[ ] Orbitable constructor
+[ ] Storyteller crate
+[ ] Storyteller triggers
+[ ] Storyteller events
+[ ] Storyteller objectives
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
+
+Chapter 1: Intro
+- 01 Welcome
+  - welcome, simulation environment
+  - adjust simulation speed
+  - orbit explanation with ships flying faster and faster
+- 02 Orbits
+  - more in-depth explanation of orbits
+  - periapsis, apoapsis
+  - notice spacecraft getting closer to earth goes much faster
+  - comparison of higher and lower orbits speed
+  - warp to point, pause
+- 03 Burns
+  - create a burn and get closer to earth
+  - circularise orbit
+- 04 Translunar
+  - get an intercept with the moon
+- 05 Moon Orbit
+  - orbit the moon and come back into LEO
+- 06 Rendezvous
+  - dock with a station
+- 07 Destroy
+  - destroy a dummy target
+- 08 Evade
+  - evade enemies torpedo
+  - the end time for real life
 
 ## Optional Levels
 [ ] Scientific notation
@@ -220,6 +232,7 @@
 [ ] Rocket fuels overview
 [ ] Proportional guidance
 [ ] Integration techniques (euler RK4 etc)
+[ ] Joules, watts, energy
 
 # Bigger picture
 [ ] Planet textures/generation, atmosphere shaders?
@@ -231,11 +244,6 @@
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumption
-
-# Backburner
-[ ] Selected vessel's segments take priority over non-selected when selecting point????????????????????????????? maybe not
-[ ] More logical ordering in explorer
-[ ] More logical ordering of docking ports
 
 # Performance
 [ ] Texture atlas
@@ -255,12 +263,23 @@
 [ ] Log to multiple files
 
 # Technical debt tracker
-- Docking port drawing logic is horrible, needs more cleanup when we have more transfers maybe
-- Timeline drawing logic is not great
-- No end time lol
+- Docking port view logic is horrible, needs more cleanup when we have more transfers maybe
+- Timeline view logic is not great
+- Hardcoded end time lol
 
+### SPECULATION AREA ###
 # Artificial Intelligence
 - 3 independent neural networks
 - targeting
 - navigation
 - guidance
+
+# Comms
+- Comms equipment
+- Comms line overlay
+- Comms routing algorithm based on line of sight
+
+# Radar
+- Fog of war
+- Passive/active radar
+- Information networking

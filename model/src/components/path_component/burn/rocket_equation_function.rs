@@ -13,7 +13,7 @@ use crate::components::{path_component::orbit::scary_math::STANDARD_GRAVITY, ves
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RocketEquationFunction {
     dry_mass_kg: f64,
-    /// Fuel mass at burn_time = 0
+    /// Fuel mass at `burn_time` = 0
     initial_fuel_mass_kg: f64,
     fuel_consumption_kg_per_second: f64,
     specific_impulse: f64,

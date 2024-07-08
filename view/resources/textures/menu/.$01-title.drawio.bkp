@@ -1,0 +1,19 @@
+<mxfile host="Electron" modified="2024-07-07T22:22:27.473Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.5.3 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="0q1vieDXn_Q44NOJ-3tq" version="24.5.3" type="device">
+  <diagram name="Page-1" id="bXB1TlRVmh4tXXcqfVWb">
+    <mxGraphModel dx="627" dy="386" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4jaimjrkmNb17FsZ9HsX-2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="340" y="300" width="430" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="Heeshr9j2n27mW7Kai5F-1" value="INTRO" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=80;fontFamily=Courier New;fontStyle=1;fontColor=#00F008;" vertex="1" parent="1">
+          <mxGeometry x="360" y="320" width="390" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="Heeshr9j2n27mW7Kai5F-3" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;CHAPTER 1&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=30;fontFamily=Courier New;fontStyle=1;fontColor=#008709;" vertex="1" parent="1">
+          <mxGeometry x="370" y="390" width="390" height="37" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

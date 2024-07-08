@@ -14,8 +14,8 @@ mod ship;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum SlotType {
-    FuelTank,
     Engine,
+    FuelTank,
     TorpedoStorage,
     TorpedoLauncher,
 }
