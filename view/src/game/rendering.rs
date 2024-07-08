@@ -27,7 +27,7 @@ pub struct Renderers {
     render_pipeline: Arc<Mutex<RenderPipeline>>,
     object_renderers: HashMap<String, Arc<Mutex<PlanetRenderer>>>,
     segment_renderer: Arc<Mutex<GeometryRenderer>>,
-    icon_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
+    texture_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
     screen_texture_renderer: Arc<Mutex<ScreenTextureRenderer>>,
     explosion_renderers: Arc<Mutex<Vec<ExplosionRenderer>>>,
 }
@@ -38,11 +38,11 @@ impl Renderers {
         let render_pipeline = Arc::new(Mutex::new(RenderPipeline::new(gl, screen_rect)));
         let object_renderers = resources.build_planet_renderers(gl);
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
-        let icon_renderers = resources.build_texture_renderers(gl);
+        let texture_renderers = resources.build_texture_renderers(gl);
         let screen_texture_renderer = Arc::new(Mutex::new(ScreenTextureRenderer::new(gl, screen_rect)));
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
-        Self { render_pipeline, object_renderers, segment_renderer, icon_renderers, screen_texture_renderer, explosion_renderers }
+        Self { render_pipeline, object_renderers, segment_renderer, texture_renderers, screen_texture_renderer, explosion_renderers }
     }
 
     pub fn add_object_vertices(&self, name: &str, vertices: &mut Vec<f32>) {
@@ -58,7 +58,7 @@ impl Renderers {
     }
 
     pub fn add_texture_vertices(&self, texture: &str, vertices: &mut Vec<f32>) {
-        let Some(renderer) = self.icon_renderers.get(texture) else {
+        let Some(renderer) = self.texture_renderers.get(texture) else {
             error!("Texture {} does not exist", texture);
             return;
         };
@@ -72,7 +72,7 @@ impl Renderers {
     pub fn destroy(&mut self, gl: &Arc<glow::Context>) {
         self.render_pipeline.lock().unwrap().destroy(gl);
         self.segment_renderer.lock().unwrap().destroy(gl);
-        for renderer in self.icon_renderers.values() {
+        for renderer in self.texture_renderers.values() {
             renderer.lock().unwrap().destroy(gl);
         }
         for renderer in self.object_renderers.values() {
@@ -93,7 +93,7 @@ pub fn update(view: &View) {
     let render_pipeline = view.renderers.render_pipeline.clone();
     let object_renderers = view.renderers.object_renderers.clone();
     let segment_renderer = view.renderers.segment_renderer.clone();
-    let texture_renderers = view.renderers.icon_renderers.clone();
+    let texture_renderers = view.renderers.texture_renderers.clone();
     let explosion_renderers = view.renderers.explosion_renderers.clone();
     let time = view.model.time();
     let zoom = view.camera.zoom();
