@@ -101,8 +101,8 @@ impl Resources {
 
     pub fn destroy(&self, gl: &Arc<glow::Context>) {
         info!("Destroying textures");
-        for icon in self.textures.values() {
-            icon.gl_texture.destroy(gl);
+        for texture in self.textures.values() {
+            texture.gl_texture.destroy(gl);
         }
     }
 }
