@@ -108,7 +108,7 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                 let orbit = Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0);
 
                 if data.orbitable {
-                    let orbitable_component = OrbitableComponent::new(data.mass, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)));
+                    let orbitable_component = OrbitableComponent::new(data.mass, 0.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)));
                     entity_builder = entity_builder.with_orbitable_component(orbitable_component);
                 } else {
                     let path_component = PathComponent::default()
@@ -117,7 +117,7 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                     entity_builder = entity_builder.with_vessel_component(VesselComponent::new(VesselClass::Scout1, Faction::Player));
                 }
             } else {
-                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(data.mass, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(position)));
+                entity_builder = entity_builder.with_orbitable_component(OrbitableComponent::new(data.mass, 0.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(position)));
             }
 
             let entity = model.allocate(entity_builder);

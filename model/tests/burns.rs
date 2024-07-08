@@ -8,7 +8,7 @@ fn test_burn_without_engine_or_fuel_tank() {
     let earth_mass = 5.972e24;
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
     let class = VesselClass::Scout1;
     let orbit = Orbit::new(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
@@ -32,7 +32,7 @@ fn test_create_burn_with_zero_dv() {
     let earth_mass = 5.972e24;
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
     let class = VesselClass::Scout1;
     let vessel_component = class.build(Faction::Player)
@@ -77,7 +77,7 @@ fn test_create_and_adjust_burn() {
     let earth_mass = 5.972e24;
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
     let fuel_tank = FuelTankType::FuelTank2;
     let engine = EngineType::Booster;

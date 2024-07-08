@@ -51,13 +51,16 @@ impl OrbitableComponentPhysics {
 pub struct OrbitableComponent {
     mass: f64,
     radius: f64,
+    rotation_period: f64,
+    rotation_angle: f64,
     type_: OrbitableType,
     physics: OrbitableComponentPhysics,
 }
 
 impl OrbitableComponent {
-    pub fn new(mass: f64, radius: f64, type_: OrbitableType, physics: OrbitableComponentPhysics) -> Self {
-        Self { mass, radius, type_, physics }
+    pub fn new(mass: f64, radius: f64, rotation_period_in_days: f64, rotation_angle: f64, type_: OrbitableType, physics: OrbitableComponentPhysics) -> Self {
+        let rotation_period = rotation_period_in_days * 24.0 * 60.0 * 60.0;
+        Self { mass, radius, rotation_period, rotation_angle, type_, physics }
     }
 
     pub fn mass(&self) -> f64 {
@@ -90,6 +93,18 @@ impl OrbitableComponent {
             OrbitableComponentPhysics::Stationary(_) => None,
             OrbitableComponentPhysics::Orbit(segment) => Some(segment.as_orbit_mut().unwrap()),
         }
+    }
+    
+    pub fn rotation_period_in_secs(&self) -> f64 {
+        self.rotation_period
+    }
+    
+    pub fn rotation_angle(&self) -> f64 {
+        self.rotation_angle
+    }
+    
+    pub fn set_rotation_angle(&mut self, rotation_angle: f64) {
+        self.rotation_angle = rotation_angle;
     }
 
     pub fn type_(&self) -> OrbitableType {

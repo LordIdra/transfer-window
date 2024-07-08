@@ -90,7 +90,7 @@ fn draw_ship_stats(ui: &mut Ui, vessel_component: &VesselComponent, vessel_name:
 
                 if vessel_component.has_engine() {
                     let rocket_equation_function = RocketEquationFunction::new(
-                        vessel_component.dry_mass(), vessel_component.fuel_capacity_kg(), 
+                        vessel_component.dry_mass(), vessel_component.fuel_capacity_kg(),
                         vessel_component.fuel_kg_per_second(), vessel_component.specific_impulse().unwrap(), 0.0);
 
                     ui.label(RichText::new("Max ΔV").monospace().strong());
