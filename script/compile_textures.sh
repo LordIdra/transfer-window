@@ -77,5 +77,5 @@ export_and_bloom_menu() {
 cd "$root/view/resources/textures/icon" || exit
 cp ./*.png "$root/view/resources/final_textures"
 
-cd "$root/view/resources/textures/planet" || exit
+cd "$root/view/resources/textures/celestial_object" || exit
 cp ./*.png "$root/view/resources/final_textures"

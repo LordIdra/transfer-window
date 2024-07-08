@@ -4,7 +4,7 @@ use eframe::glow::{Context, HasContext, TEXTURE_2D};
 use nalgebra_glm::Mat3;
 use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 
-pub struct PlanetRenderer {
+pub struct CelestialObjectRenderer {
     program: ShaderProgram,
     vertex_array_object: VertexArrayObject,
     texture: glow::Texture,
@@ -12,9 +12,9 @@ pub struct PlanetRenderer {
     rotation: f32
 }
 
-impl PlanetRenderer {
+impl CelestialObjectRenderer {
     pub fn new(gl: &Arc<Context>, texture: glow::Texture) -> Self {
-        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/planet.vert"), include_str!("../../../resources/shaders/planet.frag"));
+        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/celestial_object.vert"), include_str!("../../../resources/shaders/celestial_object.frag"));
         let vertex_array_object = VertexArrayObject::new(gl, vec![
             VertexAttribute { index: 0, count: 2 }, // x
             VertexAttribute { index: 1, count: 2 }, // y

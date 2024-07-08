@@ -4,7 +4,7 @@ use eframe::{egui::{self, ImageSource}, glow};
 use image::GenericImageView;
 use log::{info, trace};
 
-use crate::game::rendering::{texture, texture_renderer::TextureRenderer, planet_renderer::PlanetRenderer};
+use crate::game::rendering::{texture, texture_renderer::TextureRenderer, celestial_object_renderer::CelestialObjectRenderer};
 
 fn directory_entries(directory: String) -> Vec<DirEntry> {
     fs::read_dir(directory)
@@ -84,20 +84,19 @@ impl Resources {
         texture_renderers
     }
 
-    pub fn build_planet_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<PlanetRenderer>>> {
+    pub fn build_celestial_object_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<CelestialObjectRenderer>>> {
         info!("Building renderers");
-        let mut planet_renderers = HashMap::new();
+        let mut celestial_object_renderers = HashMap::new();
         for (texture_name, texture) in &self.textures {
-            dbg!(texture_name);
-            if !texture_name.ends_with(".planet") {
+            if !texture_name.ends_with(".celestial_object") {
                 continue;
             }
-            let texture_name = texture_name.trim_end_matches(".planet");
-            trace!("Building planet renderer for {}", texture_name);
-            let renderer = PlanetRenderer::new(gl, texture.gl_texture.texture());
-            planet_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
+            let texture_name = texture_name.trim_end_matches(".celestial_object");
+            trace!("Building celestial_object renderer for {}", texture_name);
+            let renderer = CelestialObjectRenderer::new(gl, texture.gl_texture.texture());
+            celestial_object_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
         }
-        planet_renderers
+        celestial_object_renderers
     }
 
     pub fn destroy(&self, gl: &Arc<glow::Context>) {
