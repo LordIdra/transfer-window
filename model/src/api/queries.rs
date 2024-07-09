@@ -275,4 +275,8 @@ impl Model {
     pub fn relative_speed(&self, entity: Entity, other_entity: Entity) -> f64 {
         (self.absolute_velocity(entity) - self.absolute_velocity(other_entity)).magnitude()
     }
+
+    pub fn target(&self, entity: Entity) -> Option<Entity> {
+        self.try_vessel_component(entity)?.target()
+    }
 }

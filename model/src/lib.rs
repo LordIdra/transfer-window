@@ -1,8 +1,9 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, sync::Mutex};
 
 use api::{explosion::Explosion, time::TimeStep};
 use components::vessel_component::VesselComponent;
 use serde::{Deserialize, Serialize};
+use story_event::StoryEvent;
 use systems::update_warp::TimeWarp;
 use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, atmosphere_component::AtmosphereComponent, path_component::PathComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
@@ -12,6 +13,7 @@ pub mod components;
 mod debug;
 pub mod api;
 pub mod storage;
+pub mod story_event;
 mod systems;
 mod util;
 
@@ -23,6 +25,7 @@ pub struct Model {
     atmosphere_components: ComponentStorage<AtmosphereComponent>,
     path_components: ComponentStorage<PathComponent>,
     vessel_components: ComponentStorage<VesselComponent>,
+    story_events: Mutex<Vec<StoryEvent>>,
     time: f64,
     time_step: TimeStep,
     warp: Option<TimeWarp>,
@@ -38,6 +41,7 @@ impl Default for Model {
             atmosphere_components: ComponentStorage::default(),
             path_components: ComponentStorage::default(),
             vessel_components: ComponentStorage::default(),
+            story_events: Mutex::new(vec![]),
             time: 0.0,
             time_step: TimeStep::Level{ level: 1, paused: false },
             warp: None,
@@ -70,9 +74,10 @@ impl Model {
         }
     }
 
-    pub fn update(&mut self, dt: f64) {
+    pub fn update(&mut self, dt: f64) -> Vec<StoryEvent> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Model update");
+        self.story_events = Mutex::new(vec![]);
         self.explosions_started_this_frame.clear();
         self.update_warp(dt);
         self.update_time(dt);
@@ -84,6 +89,7 @@ impl Model {
         self.update_fuel();
         self.update_trajectory();
         self.update_guidance();
+        self.story_events.lock().unwrap().clone()
     }
 
     pub fn entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
@@ -129,9 +135,9 @@ impl Model {
     pub fn entity_exists(&self, entity: Entity) -> bool {
         self.entity_allocator.entities().contains(&entity)
     }
-    
-    pub fn warp(&self) -> Option<&TimeWarp> {
-        self.warp.as_ref()
+
+    pub fn add_story_event(&self, event: StoryEvent) {
+        self.story_events.lock().unwrap().push(event);
     }
 }
 

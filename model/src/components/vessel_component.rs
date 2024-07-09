@@ -24,7 +24,7 @@ pub mod torpedo_launcher;
 pub mod torpedo_storage;
 
 /// Must have `MassComponent` and (if undocked) `PathComponent`
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct VesselComponent {
     class: VesselClass,
     faction: Faction,

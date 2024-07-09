@@ -13,7 +13,7 @@ pub mod orbit;
 pub mod segment;
 
 /// Must have `MassComponent`, cannot have `StationaryComponent`
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 pub struct PathComponent {
     past_segments: Vec<Segment>,
     future_segments: VecDeque<Segment>,

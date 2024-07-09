@@ -49,7 +49,7 @@ impl Controller {
             debug!("Handling controller event {:?}", event);
             match event {
                 ControllerEvent::Quit => quit(context),
-                ControllerEvent::NewGame => new_game(self, context),
+                ControllerEvent::NewGame { story_builder } => new_game(self, context, story_builder),
                 ControllerEvent::LoadGame { name } => load_game(self, context, name.as_str()),
             }
         }
