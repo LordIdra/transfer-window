@@ -1,6 +1,6 @@
 use crate::components::{name_component::NameComponent, orbitable_component::OrbitableComponent, atmosphere_component::AtmosphereComponent, path_component::PathComponent as PathComponent, vessel_component::VesselComponent};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default)]
 pub struct EntityBuilder {
     pub name_component: Option<NameComponent>,
     pub orbitable_component: Option<OrbitableComponent>,

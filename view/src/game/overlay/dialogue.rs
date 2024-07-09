@@ -1,7 +1,6 @@
-use eframe::egui::{Color32, CursorIcon, Pos2, Response, RichText, Ui, Window};
-use transfer_window_model::story_event::StoryEvent;
+use eframe::egui::{Color32, CursorIcon, Pos2, Response, RichText, Ui, Widget, Window};
 
-use crate::{game::View, styles};
+use crate::{game::{storyteller::story::story_event::StoryEvent, View}, styles};
 
 use super::widgets::custom_image::CustomImage;
 
@@ -9,44 +8,32 @@ use super::widgets::custom_image::CustomImage;
 enum DialogueComponent {
     Normal(&'static str),
     Bold(&'static str),
-    Image(&'static str),
 }
 
 #[derive(Debug, Clone)]
 pub struct Dialogue {
     character: &'static str,
     components: Vec<DialogueComponent>,
-    has_continue: bool,
 }
 
 impl Dialogue {
     pub fn new(character: &'static str) -> Self {
         let components = vec![];
-        let has_continue = false;
-        Self { character, components, has_continue }
+        Self { character, components }
     }
 
     pub fn normal(mut self, text: &'static str ) -> Self {
         self.components.push(DialogueComponent::Normal(text));
         self
     }
-
     pub fn bold(mut self, text: &'static str ) -> Self {
         self.components.push(DialogueComponent::Bold(text));
         self
     }
+}
 
-    pub fn image(mut self, text: &'static str ) -> Self {
-        self.components.push(DialogueComponent::Image(text));
-        self
-    }
-
-    pub fn with_continue(mut self) -> Self {
-        self.has_continue = true;
-        self
-    }
-
-    pub fn draw(self, view: &View, ui: &mut Ui) -> Response {
+impl Widget for Dialogue {
+    fn ui(self, ui: &mut Ui) -> Response {
         // https://github.com/emilk/egui/blob/master/crates/egui_demo_lib/src/demo/code_editor.rs
         ui.horizontal_wrapped(|ui| {
             ui.spacing_mut().item_spacing.x = 0.0;
@@ -54,13 +41,11 @@ impl Dialogue {
                 match component {
                     DialogueComponent::Normal(text) => ui.label(RichText::new(*text).monospace().color(Color32::WHITE)),
                     DialogueComponent::Bold(text) => ui.label(RichText::new(*text).monospace().color(Color32::GOLD)),
-                    DialogueComponent::Image(texture) => ui.add(CustomImage::new(view, &texture, 10.0)),
                 };
             }
         }).response
     }
 }
-
 
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
@@ -69,8 +54,6 @@ pub fn update(view: &View) {
     let Some(dialogue) = view.dialogue.clone() else {
         return;
     };
-
-    let has_continue = dialogue.has_continue;
 
     Window::new("Dialogue")
             .resizable(false)
@@ -86,24 +69,22 @@ pub fn update(view: &View) {
                 ui.add(CustomImage::new(view, &(dialogue.character.to_string() + ".character"), 100.0));
                 ui.vertical(|ui| {
                     ui.set_width(350.0);
-                    dialogue.draw(view, ui);
+                    ui.add(dialogue);
                 });
                 ui.add_space(7.0);
             });
     
-            if has_continue {
-                ui.vertical_centered(|ui| {
-                    ui.add_space(20.0);
-                    styles::DialogueContinueButton::apply(ui);
-                    let response = ui.button("Continue");
-                    if response.hovered() {
-                        view.context.set_cursor_icon(CursorIcon::PointingHand);
-                    }
-                    if response.clicked() {
-                        view.add_story_event(StoryEvent::ClickContinue);
-                    }
-                });
-            }
+            ui.vertical_centered(|ui| {
+                ui.add_space(20.0);
+                styles::DialogueContinueButton::apply(ui);
+                let response = ui.button("Continue");
+                if response.hovered() {
+                    view.context.set_cursor_icon(CursorIcon::PointingHand);
+                }
+                if response.clicked() {
+                    view.add_story_event(StoryEvent::ClickContinueEvent);
+                }
+            });
         });
     });
 }

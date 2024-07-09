@@ -23,7 +23,7 @@ impl Camera {
             focus: None,
             focus_position: vec2(0.0, 0.0),
             panning: vec2(0.0, 0.0),
-            zoom: 0.00003,
+            zoom: 0.00001,
         }
     }
 

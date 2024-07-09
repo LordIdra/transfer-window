@@ -188,7 +188,7 @@ impl DockingPort {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Docking {
     type_: DockingType,
     docking_ports: BTreeMap<DockingPortLocation, DockingPort>,

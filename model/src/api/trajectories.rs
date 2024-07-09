@@ -2,7 +2,7 @@ use encounter::EncounterType;
 use fast_solver::{calculate_entrance_encounter, calculate_exit_encounter};
 use log::{error, trace};
 
-use crate::{components::path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use crate::{components::path_component::{orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
 
 use self::fast_solver::{apply_encounter, solver::find_next_encounter};
 
@@ -127,13 +127,5 @@ impl Model {
         }
 
         segments
-    }
-
-    pub(crate) fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
-        if let Some(rocket_equation_function) = self.path_component(entity).final_rocket_equation_function() {
-            return rocket_equation_function;
-        }
-
-        RocketEquationFunction::from_vessel_component(self.vessel_component(entity))
     }
 }

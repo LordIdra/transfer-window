@@ -3562,7 +3562,6 @@ dependencies = [
  "kurbo",
  "log",
  "nalgebra-glm",
- "serde",
  "tracy-client",
 ]
 

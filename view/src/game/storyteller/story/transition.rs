@@ -1,26 +1,25 @@
-use transfer_window_model::story_event::StoryEvent;
-
-use super::condition::Condition;
+use super::{condition::Condition, story_event::StoryEvent};
 
 pub struct Transition {
     to: &'static str,
-    condition: Condition,
+    condition: Box<dyn Condition>,
 }
 
 impl Transition {
-    pub fn new(to: &'static str, condition: Condition) -> Self {
+    pub fn new(to: &'static str, condition: Box<dyn Condition>) -> Self {
         Self { to, condition }
     }
 
-    pub fn can_transition(&self, events: &Vec<StoryEvent>) -> bool {
-        self.condition.met(events)
+    pub fn try_transition(&self, events: &Vec<StoryEvent>) -> Option<&'static str> {
+        if self.condition.met(events) {
+            Some(self.to)
+        } else {
+            None
+        }
     }
     
-    pub fn to(&self) -> &'static str {
+    #[cfg(test)]
+    pub fn to(&self) -> &str {
         self.to
-    }
-
-    pub fn objective(&self) -> Option<&'static str> {
-        self.condition.get_objective()
     }
 }

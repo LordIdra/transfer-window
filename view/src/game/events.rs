@@ -1,10 +1,10 @@
 #[allow(clippy::wildcard_imports)]
+use model::*;
 use log::debug;
-use log::error;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{api::builder::VesselBuilder, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity, story_event::StoryEvent};
+use transfer_window_model::{components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
-use crate::game::overlay::{dialogue::Dialogue, objectives::Objective};
+use crate::game::overlay::dialogue::Dialogue;
 
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
@@ -19,7 +19,6 @@ pub enum ModelEvent {
     IncreaseTimeStepLevel,
     DecreaseTimeStepLevel,
     StartWarp { end_time: f64 },
-    BuildVessel { vessel_builder: VesselBuilder },
     CreateBurn { entity: Entity, time: f64 },
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
     SetTarget { entity: Entity, target: Option<Entity> },
@@ -55,13 +54,11 @@ pub enum ViewEvent {
     HideRightClickMenu,
     ShowDialogue(Dialogue),
     CloseDialogue,
-    StartObjective(&'static str),
-    FinishObjective(&'static str),
 }
 
 impl View {
     pub(crate) fn handle_events(&mut self) {
-        let (new_model_events, new_view_events) = self.story.update(&self.model, &self.story_events.lock().unwrap());
+        let (new_model_events, new_view_events) = self.story.update(&self.story_events.lock().unwrap());
         self.model_events.lock().unwrap().extend(new_model_events);
         self.view_events.lock().unwrap().extend(new_view_events);
         self.story_events.lock().unwrap().clear();
@@ -72,30 +69,29 @@ impl View {
         while let Some(event) = model_events.pop() {
             debug!("Handling model event {:?}", event);
             match event {
-                ModelEvent::SaveGame { name } => self.save_game(name.as_str()),
-                ModelEvent::TogglePaused => self.toggle_paused(),
-                ModelEvent::IncreaseTimeStepLevel => self.increase_time_step_level(),
-                ModelEvent::DecreaseTimeStepLevel => self.decrease_time_step_level(),
-                ModelEvent::StartWarp { end_time } => self.start_warp(end_time),
-                ModelEvent::BuildVessel { vessel_builder } => self.build_vessel(vessel_builder),
-                ModelEvent::CreateBurn { entity, time } => self.create_burn(entity, time),
-                ModelEvent::AdjustBurn { entity, time, amount } => self.adjust_burn(entity, time, amount),
-                ModelEvent::SetTarget { entity, target } => self.set_target(entity, target),
-                ModelEvent::SetFuelTank { entity, type_ } => self.set_fuel_tank(entity, type_),
-                ModelEvent::SetEngine { entity, type_ } => self.set_engine(entity, type_),
-                ModelEvent::SetTorpedoStorage { entity, type_ } => self.set_torpedo_storage(entity, type_),
-                ModelEvent::SetTorpedoLauncher { entity, type_ } => self.set_torpedo_launcher(entity, type_),
-                ModelEvent::CreateFireTorpedo { entity, time } => self.create_fire_torpedo(entity, time),
-                ModelEvent::AdjustFireTorpedo { entity, time, amount } => self.adjust_fire_torpedo(entity, time, amount),
-                ModelEvent::CancelLastTimelineEvent { entity } => self.cancel_last_event(entity),
-                ModelEvent::CreateGuidance { entity, time } => self.enable_torpedo_guidance(entity, time),
-                ModelEvent::CancelCurrentSegment { entity } => self.cancel_current_segment(entity),
-                ModelEvent::Dock { station, entity } => self.dock(station, entity),
-                ModelEvent::Undock { station, entity } => self.undock(station, entity),
-                ModelEvent::StartFuelTransfer { station, location, direction } => self.start_fuel_transfer(station, location, direction),
-                ModelEvent::StopFuelTransfer { station, location } => self.stop_fuel_transfer(station, location),
-                ModelEvent::StartTorpedoTransfer { station, location, direction } => self.start_torpedo_transfer(station, location, direction),
-                ModelEvent::StopTorpedoTransfer { station, location } => self.stop_torpedo_transfer(station, location),
+                ModelEvent::SaveGame { name } => save_game(self, name.as_str()),
+                ModelEvent::TogglePaused => toggle_paused(self),
+                ModelEvent::IncreaseTimeStepLevel => increase_time_step_level(self),
+                ModelEvent::DecreaseTimeStepLevel => decrease_time_step_level(self),
+                ModelEvent::StartWarp { end_time } => start_warp(self, end_time),
+                ModelEvent::CreateBurn { entity, time } => create_burn(self, entity, time),
+                ModelEvent::AdjustBurn { entity, time, amount } => adjust_burn(self, entity, time, amount),
+                ModelEvent::SetTarget { entity, target } => set_target(self, entity, target),
+                ModelEvent::SetFuelTank { entity, type_ } => set_fuel_tank(self, entity, type_),
+                ModelEvent::SetEngine { entity, type_ } => set_engine(self, entity, type_),
+                ModelEvent::SetTorpedoStorage { entity, type_ } => set_torpedo_storage(self, entity, type_),
+                ModelEvent::SetTorpedoLauncher { entity, type_ } => set_torpedo_launcher(self, entity, type_),
+                ModelEvent::CreateFireTorpedo { entity, time } => create_fire_torpedo(self, entity, time),
+                ModelEvent::AdjustFireTorpedo { entity, time, amount } => adjust_fire_torpedo(self, entity, time, amount),
+                ModelEvent::CancelLastTimelineEvent { entity } => cancel_last_event(self, entity),
+                ModelEvent::CreateGuidance { entity, time } => enable_torpedo_guidance(self, entity, time),
+                ModelEvent::CancelCurrentSegment { entity } => cancel_current_segment(self, entity),
+                ModelEvent::Dock { station, entity } => dock(self, station, entity),
+                ModelEvent::Undock { station, entity } => undock(self, station, entity),
+                ModelEvent::StartFuelTransfer { station, location, direction } => start_fuel_transfer(self, station, location, direction),
+                ModelEvent::StopFuelTransfer { station, location } => stop_fuel_transfer(self, station, location),
+                ModelEvent::StartTorpedoTransfer { station, location, direction } => start_torpedo_transfer(self, station, location, direction),
+                ModelEvent::StopTorpedoTransfer { station, location } => stop_torpedo_transfer(self, station, location),
             }
         }
 
@@ -108,10 +104,7 @@ impl View {
                 ViewEvent::ResetCameraPanning => self.camera.reset_panning(),
                 ViewEvent::PanCamera(amount) => self.camera.pan(amount),
                 ViewEvent::SetCameraZoom(zoom) => self.camera.set_zoom(zoom),
-                ViewEvent::SetCameraFocus(focus) => {
-                    self.add_story_event(StoryEvent::ChangeFocus(focus));
-                    self.camera.set_focus(focus, self.model.absolute_position(focus))
-                },
+                ViewEvent::SetCameraFocus(focus) => self.camera.set_focus(focus, self.model.absolute_position(focus)),
                 ViewEvent::SetSelected(selected) => self.selected = selected,
                 ViewEvent::SetVesselEditor(vessel_editor) => self.vessel_editor = vessel_editor,
                 ViewEvent::SetDebugWindowOpen(debug_window_open) => self.debug_window_open = debug_window_open,
@@ -121,12 +114,6 @@ impl View {
                 ViewEvent::HideRightClickMenu => self.right_click_menu = None,
                 ViewEvent::ShowDialogue(dialogue) => self.dialogue = Some(dialogue),
                 ViewEvent::CloseDialogue => self.dialogue = None,
-                ViewEvent::StartObjective(objective) => self.objectives.push(Objective::new(objective)),
-                ViewEvent::FinishObjective(objective) => {
-                    self.objectives.iter_mut()
-                        .find(|x| x.objective() == objective)
-                        .map_or_else(|| error!("Attempt to complete nonexistent objective {}", objective), |objective| objective.set_complete());
-                },
             }
         }
     }
