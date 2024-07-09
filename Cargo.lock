@@ -973,15 +973,6 @@ checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
 
 [[package]]
 name = "ecolor"
-version = "0.27.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20930a432bbd57a6d55e07976089708d4893f3d556cf42a0d79e9e321fa73b10"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "ecolor"
 version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e6b451ff1143f6de0f33fc7f1b68fecfd2c7de06e104de96c4514de3f5396f8"
@@ -1188,7 +1179,7 @@ dependencies = [
  "ab_glyph",
  "ahash",
  "bytemuck",
- "ecolor 0.28.1",
+ "ecolor",
  "emath",
  "log",
  "nohash-hasher",
@@ -3595,7 +3586,7 @@ dependencies = [
 name = "transfer-window-model"
 version = "0.1.0"
 dependencies = [
- "ecolor 0.27.2",
+ "ecolor",
  "lazy_static",
  "log",
  "nalgebra-glm",
