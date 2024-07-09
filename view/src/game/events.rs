@@ -59,7 +59,7 @@ pub enum ViewEvent {
     CloseDialogue,
     StartObjective(&'static str),
     FinishObjective(&'static str),
-    FinishLevel,
+    FinishLevel(String),
 }
 
 impl View {
@@ -132,7 +132,7 @@ impl View {
                         .find(|x| x.objective() == objective)
                         .map_or_else(|| error!("Attempt to complete nonexistent objective {}", objective), Objective::set_complete);
                 },
-                ViewEvent::FinishLevel => self.add_controller_event(ControllerEvent::LoadMenu),
+                ViewEvent::FinishLevel(level) => self.add_controller_event(ControllerEvent::FinishLevel { level }),
             }
         }
     }

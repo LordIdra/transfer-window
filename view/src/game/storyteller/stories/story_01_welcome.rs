@@ -9,6 +9,10 @@ use super::StoryBuilder;
 pub struct Story01Welcome;
 
 impl StoryBuilder for Story01Welcome {
+    fn prerequisite(&self) -> Option<String> {
+        None
+    }
+
     fn build(&self) -> (Model, Story, Option<Entity>) {
         let mut model = Model::default();
 
@@ -232,7 +236,7 @@ impl StoryBuilder for Story01Welcome {
         );
 
         story.add("end", |_model: &Model| State::default()
-            .action(FinishLevelAction::new()));
+            .action(FinishLevelAction::new("1-01".to_string())));
 
         (model, story, Some(centralia))
     }

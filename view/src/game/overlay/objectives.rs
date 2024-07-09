@@ -42,9 +42,9 @@ impl Objective {
     pub fn draw(&self, view: &View, ui: &mut Ui) {
         ui.horizontal(|ui| {
             let texture = if self.complete {
-                "objective-incomplete"
-            } else { 
                 "objective-complete"
+            } else { 
+                "objective-incomplete"
             };
             ui.add(CustomImage::new(view, texture, 12.0).with_alpha(self.opacity));
             ui.label(RichText::new(self.objective)

@@ -10,6 +10,7 @@ pub mod story_01_welcome;
 // https://stackoverflow.com/questions/50017987/cant-clone-vecboxtrait-because-trait-cannot-be-made-into-an-object
 
 pub trait StoryBuilder: StoryBuilderClone + Debug {
+    fn prerequisite(&self) -> Option<String>;
     fn build(&self) -> (Model, Story, Option<Entity>);
 }
 

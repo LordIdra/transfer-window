@@ -1,19 +1,22 @@
 use std::{error::Error, fs::{create_dir_all, File}, sync::Arc, time::Instant};
 
+use completed_levels::CompletedLevels;
 use eframe::{egui::{Context, Key, ViewportBuilder, ViewportCommand}, glow::{self, HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VERSION}, run_native, App, CreationContext, Frame, NativeOptions};
-use event_handler::{load_game, load_menu, new_game, quit};
+use event_handler::{load_game, finish_level, new_game, quit};
 use log::{debug, info};
 use sysinfo::System;
 use tracing_subscriber::{fmt::Layer, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 use transfer_window_view::{controller_events::ControllerEvent, menu, resources::Resources, Scene};
 
 mod event_handler;
+mod completed_levels;
 
 type DynError = Box<dyn Error + Send + Sync>; // why didn't egui just make this public?
 
 struct Controller {
     gl: Arc<glow::Context>,
     resources: Arc<Resources>,
+    completed_levels: CompletedLevels,
     scene: Scene,
     last_frame: Instant,
     load_menu: bool, // menu loading must occur RIGHT AT THE BEGINNING of a frame before any updates
@@ -40,7 +43,8 @@ impl Controller {
         let view = Scene::Menu(menu::View::new(resources.clone(), &creation_context.egui_ctx, gl.clone()));
         let last_frame = Instant::now();
         let load_menu = false;
-        Ok(Box::new(Self { gl, resources, scene: view, last_frame, load_menu }))
+        let completed_levels = CompletedLevels::load();
+        Ok(Box::new(Self { gl, resources, scene: view, last_frame, load_menu, completed_levels }))
     }
 
     fn handle_events(&mut self, mut events: Vec<ControllerEvent>, context: &Context) {
@@ -53,7 +57,7 @@ impl Controller {
                 ControllerEvent::Quit => quit(context),
                 ControllerEvent::NewGame { story_builder } => new_game(self, context, &*story_builder),
                 ControllerEvent::LoadGame { name } => load_game(self, context, name.as_str()),
-                ControllerEvent::LoadMenu => load_menu(self),
+                ControllerEvent::FinishLevel { level } => finish_level(self, level),
             }
         }
     }
@@ -74,7 +78,7 @@ impl App for Controller {
 
         let events = match &mut self.scene {
             Scene::Game(view) => view.update(context, frame, dt),
-            Scene::Menu(view) => view.update(context),
+            Scene::Menu(view) => view.update(context, self.completed_levels.get()),
         };
 
         self.handle_events(events, context);
@@ -98,7 +102,7 @@ impl Drop for Controller {
 fn setup_logging() {
     // A layer that logs events to a file.
     create_dir_all("log").expect("Failed to create log directory");
-    let file = File::create("log/latest.log").expect("Failed to create file");
+    let file = File::create("data/log/latest.log").expect("Failed to create file");
     let layer = Layer::new().compact()
         .with_ansi(false)
         .with_writer(Arc::new(file));

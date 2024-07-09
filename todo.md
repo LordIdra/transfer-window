@@ -189,6 +189,10 @@
 [x] Storyteller triggers
 [x] Storyteller events
 [x] Storyteller dialogue
+[x] 01 Welcome
+[x] Vessel constructor
+[x] Orbitable constructor
+[x] Storyteller objectives
 
 
 
@@ -196,28 +200,24 @@
 # CAMPAIGN PLANNING AREA
 # ------------------------------------ #
 # Backend
-[ ] Vessel constructor
-[ ] Orbitable constructor
-[ ] Storyteller objectives
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
 # Levels
 Chapter 1: Intro
-- 01 Welcome
-  - welcome, simulation environment
-  - adjust simulation speed
-  - orbit explanation with ships flying faster and faster
-- 02 Orbits
-  - more in-depth explanation of orbits
+[ ] Hide aspects of UI?
+[ ] persist completed levels
+[ ] different texture for completed/locked levels
+[ ] 02 Orbits
   - periapsis, apoapsis
-  - notice spacecraft getting closer to earth goes much faster
   - comparison of higher and lower orbits speed
   - warp to point, pause
+  - hyperbolic orbits
 - 03 Burns
   - create a burn and get closer to earth
   - circularise orbit
 - 04 Translunar
+  - spheres of influence
   - get an intercept with the moon
 - 05 Moon Orbit
   - orbit the moon and come back into LEO

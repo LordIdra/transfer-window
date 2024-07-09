@@ -25,7 +25,7 @@ pub fn new_game(controller: &mut Controller, context: &Context, story_builder: &
 pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Load game");
-    let serialized = fs::read_to_string("saves/".to_string() + name + ".json");
+    let serialized = fs::read_to_string("data/saves/".to_string() + name + ".json");
     let Ok(serialized) = serialized else {
         error!("Failed to handle load game; error while loading file: {}", serialized.err().unwrap());
         return;
@@ -40,9 +40,11 @@ pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
     controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, Story::empty(), context.clone(), controller.resources.clone(), None));
 }
 
-pub fn load_menu(controller: &mut Controller) {
+pub fn finish_level(controller: &mut Controller, level: String) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Load menu");
 
     controller.load_menu = true;
+    controller.completed_levels.add(level);
+    controller.completed_levels.save()
 }

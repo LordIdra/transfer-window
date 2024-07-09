@@ -18,7 +18,7 @@ impl View {
             return;
         };
 
-        if let Err(error) = fs::write("saves/".to_string() + name + ".json", serialized) {
+        if let Err(error) = fs::write("data/saves/".to_string() + name + ".json", serialized) {
             error!("Failed to handle save_game; error while saving: {}", error);
         }
     }
