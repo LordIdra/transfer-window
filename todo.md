@@ -213,7 +213,7 @@ Chapter 1: Intro
   - periapsis, apoapsis
   - comparison of higher and lower orbits speed
   - warp to point, pause
-  - hyperbolic orbits
+  - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
 - 03 Burns
   - create a burn and get closer to earth
   - circularise orbit

@@ -50,7 +50,7 @@ impl View {
 
         ui.allocate_ui_at_rect(rect, |ui| {
             if completed_levels.contains(&level) {
-                level += "-complete"
+                level += "-complete";
             }
             let mut image = CustomImage::new_menu(self, &level, 300.0, 150.0);
             if !hovered {
@@ -65,7 +65,7 @@ impl View {
         ui.add_space(10.0);
     }
 
-    pub fn update(&mut self, context: &Context, completed_levels: HashSet<String>) -> Vec<ControllerEvent> {
+    pub fn update(&mut self, context: &Context, completed_levels: &HashSet<String>) -> Vec<ControllerEvent> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("View update");
 
@@ -104,8 +104,8 @@ impl View {
                 ui.vertical(|ui| {
                     ui.add(CustomImage::new_menu(self, "title-1", 215.0, 70.0));
                     ui.horizontal(|ui| {
-                        self.draw_level(context, ui, &mut events, &completed_levels, "1-01", Box::new(Story01Welcome));
-                        self.draw_level(context, ui, &mut events, &completed_levels, "1-02", Box::new(Story01Welcome));
+                        self.draw_level(context, ui, &mut events, completed_levels, "1-01", Box::new(Story01Welcome));
+                        self.draw_level(context, ui, &mut events, completed_levels, "1-02", Box::new(Story01Welcome));
                     });
                     // ui.add_space(15.0);
                     // ui.horizontal(|ui| {

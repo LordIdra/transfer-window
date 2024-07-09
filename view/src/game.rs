@@ -28,17 +28,17 @@ mod underlay;
 mod util;
 
 pub struct ViewConfig {
-    apsis_icons: bool,
-    selected: bool,
-    explorer: bool,
+    draw_apsis_icons: bool,
+    can_select: bool,
+    draw_explorer: bool,
 }
 
 impl Default for ViewConfig {
     fn default() -> Self {
         Self { 
-            apsis_icons: true, 
-            selected: true, 
-            explorer: true 
+            draw_apsis_icons: true, 
+            can_select: true, 
+            draw_explorer: true 
         }
     }
 }

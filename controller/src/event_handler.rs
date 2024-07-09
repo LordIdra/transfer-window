@@ -48,5 +48,5 @@ pub fn finish_level(controller: &mut Controller, level: String) {
 
     controller.load_menu = true;
     controller.completed_levels.add(level);
-    controller.completed_levels.save()
+    controller.completed_levels.save();
 }

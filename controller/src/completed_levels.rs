@@ -22,7 +22,7 @@ impl CompletedLevels {
             Ok(completed_levels) => completed_levels,
             Err(error) => {
                 error!("FAILED TO DESERIALIZE COMPLETED LEVELS: {}", error.to_string());
-                return Self::default();
+                Self::default()
             },
         }
     }
@@ -39,7 +39,7 @@ impl CompletedLevels {
         self.0.insert(level);
     }
 
-    pub fn get(&self) -> HashSet<String> {
-        self.0.clone()
+    pub fn get(&self) -> &HashSet<String> {
+        &self.0
     }
 }

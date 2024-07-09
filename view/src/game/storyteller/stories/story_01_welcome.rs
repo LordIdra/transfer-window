@@ -239,9 +239,9 @@ impl StoryBuilder for Story01Welcome {
             .action(FinishLevelAction::new("1-01".to_string())));
 
         let view_config = ViewConfig {
-            apsis_icons: false,
-            selected: false,
-            explorer: false,
+            draw_apsis_icons: false,
+            can_select: false,
+            draw_explorer: false,
         };
 
         (model, story, view_config, Some(centralia))

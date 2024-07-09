@@ -118,8 +118,8 @@ impl View {
                     self.camera.set_focus(focus, self.model.absolute_position(focus));
                 },
                 ViewEvent::SetSelected(selected) => {
-                    if self.config.selected {
-                        self.selected = selected
+                    if self.config.can_select {
+                        self.selected = selected;
                     }
                 }
                 ViewEvent::SetVesselEditor(vessel_editor) => self.vessel_editor = vessel_editor,
