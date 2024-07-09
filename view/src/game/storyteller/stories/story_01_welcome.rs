@@ -63,7 +63,7 @@ impl StoryBuilder for Story01Welcome {
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
                     .normal("Let's start with camera movement.\n")
-                    .normal("- ").bold("Right cick and drag ").normal("to move the camera\n")
+                    .normal("- ").bold("Right click and drag ").normal("to move the camera\n")
                     .normal("- ").bold("Scroll ").normal("to zoom in and out\n")
                     .normal("Try it now.")
                     .with_continue()
@@ -100,7 +100,7 @@ impl StoryBuilder for Story01Welcome {
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
                         .normal("Try speeding up and slowing down time using the ")
-                        .bold("+\n").normal("and ").bold("= ")
+                        .bold("+\n").normal("and ").bold("- ")
                         .normal("keys. Warp forward until the ship has completed at least one orbit.")
                     )
                 )
