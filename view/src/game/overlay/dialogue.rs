@@ -52,8 +52,8 @@ impl Dialogue {
             ui.spacing_mut().item_spacing.x = 0.0;
             for component in &self.components {
                 match component {
-                    DialogueComponent::Normal(text) => ui.label(RichText::new(*text).monospace().color(Color32::WHITE)),
-                    DialogueComponent::Bold(text) => ui.label(RichText::new(*text).monospace().color(Color32::GOLD)),
+                    DialogueComponent::Normal(text) => ui.label(RichText::new(*text).size(14.0).color(Color32::WHITE)),
+                    DialogueComponent::Bold(text) => ui.label(RichText::new(*text).size(14.0).color(Color32::GOLD)),
                     DialogueComponent::Image(texture) => ui.add(CustomImage::new(view, texture, 10.0)),
                 };
             }
@@ -96,7 +96,7 @@ pub fn update(view: &View) {
                 ui.vertical_centered(|ui| {
                     ui.add_space(20.0);
                     styles::DialogueContinueButton::apply(ui);
-                    let response = ui.button("Continue");
+                    let response = ui.button(RichText::new("Continue").strong().monospace().size(12.0));
                     if response.hovered() {
                         view.context.set_cursor_icon(CursorIcon::PointingHand);
                     }

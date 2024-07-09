@@ -50,7 +50,11 @@ pub fn update(view: &View) {
             if view.vessel_editor.is_some() {
                 view.add_view_event(ViewEvent::SetVesselEditor(None));
             } else {
-                view.add_view_event(ViewEvent::SetSelected(Selected::None));
+                if matches!(view.selected, Selected::None) {
+                    view.add_view_event(ViewEvent::ToggleExitModal);
+                } else {
+                    view.add_view_event(ViewEvent::SetSelected(Selected::None));
+                }
             }
         }
     });

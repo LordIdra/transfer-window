@@ -274,6 +274,7 @@ Chapter 1: Intro
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumption
+[ ] Main menu background GIFs
 
 # Before release
 [ ] Versioning!

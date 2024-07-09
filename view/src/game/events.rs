@@ -60,6 +60,8 @@ pub enum ViewEvent {
     StartObjective(&'static str),
     FinishObjective(&'static str),
     FinishLevel(String),
+    ExitLevel,
+    ToggleExitModal,
 }
 
 impl View {
@@ -136,7 +138,9 @@ impl View {
                         .find(|x| x.objective() == objective)
                         .map_or_else(|| error!("Attempt to complete nonexistent objective {}", objective), Objective::set_complete);
                 },
+                ViewEvent::ExitLevel => self.add_controller_event(ControllerEvent::ExitLevel),
                 ViewEvent::FinishLevel(level) => self.add_controller_event(ControllerEvent::FinishLevel { level }),
+                ViewEvent::ToggleExitModal => self.exit_modal_open = !self.exit_modal_open,
             }
         }
     }

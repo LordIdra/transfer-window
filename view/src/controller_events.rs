@@ -6,4 +6,5 @@ pub enum ControllerEvent {
     Quit,
     LoadGame { name: String },
     FinishLevel { level: String },
+    ExitLevel,
 }

@@ -44,9 +44,16 @@ pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
 
 pub fn finish_level(controller: &mut Controller, level: String) {
     #[cfg(feature = "profiling")]
-    let _span = tracy_client::span!("Load menu");
+    let _span = tracy_client::span!("Finish level");
 
     controller.load_menu = true;
     controller.completed_levels.add(level);
     controller.completed_levels.save();
+}
+
+pub fn exit_level(controller: &mut Controller) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Exit level");
+
+    controller.load_menu = true;
 }

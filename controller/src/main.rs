@@ -2,7 +2,7 @@ use std::{error::Error, fs::{create_dir_all, File}, sync::Arc, time::Instant};
 
 use completed_levels::CompletedLevels;
 use eframe::{egui::{Context, Key, ViewportBuilder, ViewportCommand}, glow::{self, HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VERSION}, run_native, App, CreationContext, Frame, NativeOptions};
-use event_handler::{load_game, finish_level, new_game, quit};
+use event_handler::{exit_level, finish_level, load_game, new_game, quit};
 use log::{debug, info};
 use sysinfo::System;
 use tracing_subscriber::{fmt::Layer, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
@@ -58,6 +58,7 @@ impl Controller {
                 ControllerEvent::NewGame { story_builder } => new_game(self, context, &*story_builder),
                 ControllerEvent::LoadGame { name } => load_game(self, context, name.as_str()),
                 ControllerEvent::FinishLevel { level } => finish_level(self, level),
+                ControllerEvent::ExitLevel => exit_level(self),
             }
         }
     }
