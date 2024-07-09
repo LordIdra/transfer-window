@@ -126,7 +126,7 @@ impl TimelineEvent {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 pub struct Timeline {
     events: VecDeque<TimelineEvent>,
 }

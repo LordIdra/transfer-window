@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 use eframe::{egui::{CentralPanel, Context, CursorIcon, Key, Rect, Sense, Ui, Vec2, Window}, glow};
 use log::trace;
 
-use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer}, resources::Resources};
+use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer, storyteller::stories::{story_01_welcome::Story01Welcome, StoryBuilder}}, resources::Resources};
 
 impl CustomImage {
     pub fn new_menu(view: &View, texture_name: &str, width: f32, height: f32) -> Self {
@@ -35,12 +35,12 @@ impl View {
         Self { gl, previous_screen_rect, screen_rect, resources, screen_texture_renderer, debug_window_open }
     }
 
-    fn draw_level(&self, context: &Context, ui: &mut Ui, events: &mut Vec<ControllerEvent>, level: &str) {
+    fn draw_level(&self, context: &Context, ui: &mut Ui, events: &mut Vec<ControllerEvent>, level: &str, story_builder: Box<dyn StoryBuilder>) {
         let (rect, _) = ui.allocate_exact_size(Vec2::new(300.0, 150.0), Sense::click());
         let hovered = ui.rect_contains_pointer(rect);
         let clicked = hovered && ui.input(|input| input.pointer.primary_clicked());
         if clicked {
-            events.push(ControllerEvent::NewGame);
+            events.push(ControllerEvent::NewGame { story_builder });
         }
         if hovered {
             context.set_cursor_icon(CursorIcon::PointingHand);
@@ -96,18 +96,18 @@ impl View {
                 ui.vertical(|ui| {
                     ui.add(CustomImage::new_menu(self, "title-1", 215.0, 70.0));
                     ui.horizontal(|ui| {
-                        self.draw_level(context, ui, &mut events, "01-welcome");
-                        self.draw_level(context, ui, &mut events, "02-orbits");
-                        self.draw_level(context, ui, &mut events, "01-welcome");
-                        self.draw_level(context, ui, &mut events, "02-orbits");
+                        self.draw_level(context, ui, &mut events, "01-welcome", Box::new(Story01Welcome::default()));
+                        // self.draw_level(context, ui, &mut events, "02-orbits");
+                        // self.draw_level(context, ui, &mut events, "01-welcome");
+                        // self.draw_level(context, ui, &mut events, "02-orbits");
                     });
-                    ui.add_space(15.0);
-                    ui.horizontal(|ui| {
-                        self.draw_level(context, ui, &mut events, "01-welcome");
-                        self.draw_level(context, ui, &mut events, "02-orbits");
-                        self.draw_level(context, ui, &mut events, "01-welcome");
-                        self.draw_level(context, ui, &mut events, "02-orbits");
-                    });
+                    // ui.add_space(15.0);
+                    // ui.horizontal(|ui| {
+                        // self.draw_level(context, ui, &mut events, "01-welcome");
+                        // self.draw_level(context, ui, &mut events, "02-orbits");
+                        // self.draw_level(context, ui, &mut events, "01-welcome");
+                        // self.draw_level(context, ui, &mut events, "02-orbits");
+                    // });
                 })
             })
         });
