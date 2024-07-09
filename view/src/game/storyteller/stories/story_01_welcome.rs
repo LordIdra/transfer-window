@@ -160,7 +160,7 @@ impl StoryBuilder for Story01Welcome {
             .transition(Transition::new("orbit-shapes", Condition::click_continue()))
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
-                    .normal("An orbit occurs when an object falls towards another object due to gravity, but never hits the surface because it's travelling too fast.")
+                    .normal("This ship is in orbit around Centralia. That means it's constantly falling towards Centralia due to gravity, but never hits the surface because it's travelling too fast. It's a bit like falling sideways so fast that you never hit the ground.")
                     .with_continue()
                 )
             )

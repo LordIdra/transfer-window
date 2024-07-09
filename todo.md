@@ -273,7 +273,7 @@ Chapter 1: Intro
 [ ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
-[ ] Energy production/storage/consumption
+[ ] Energy production/storage/consumptiongit pull
 [ ] Main menu background GIFs
 
 # Before release
