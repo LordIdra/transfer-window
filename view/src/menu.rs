@@ -96,7 +96,7 @@ impl View {
                 ui.vertical(|ui| {
                     ui.add(CustomImage::new_menu(self, "title-1", 215.0, 70.0));
                     ui.horizontal(|ui| {
-                        self.draw_level(context, ui, &mut events, "01-welcome", Box::new(Story01Welcome::default()));
+                        self.draw_level(context, ui, &mut events, "01-welcome", Box::new(Story01Welcome));
                         // self.draw_level(context, ui, &mut events, "02-orbits");
                         // self.draw_level(context, ui, &mut events, "01-welcome");
                         // self.draw_level(context, ui, &mut events, "02-orbits");

@@ -1,7 +1,7 @@
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use crate::{systems::update_warp::TimeWarp, Model};
+use crate::{story_event::StoryEvent, systems::update_warp::TimeWarp, Model};
 
 pub const WARP_STOP_BEFORE_TARGET_SECONDS: f64 = 5.0;
 
@@ -13,7 +13,7 @@ pub const TIME_STEP_LEVELS: [f64; 13] = [
     31_536_000.0 // 1y
 ];
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TimeStep {
     Level { level: i32, paused: bool }, // Starts at level 1 for 1x speed
     Warp { speed: f64, paused: bool },
@@ -21,7 +21,7 @@ pub enum TimeStep {
 
 impl TimeStep {
     pub fn time_step(&self) -> f64 {
-        if self.is_paused() {
+        if self.paused() {
             return 0.0;
         }
 
@@ -31,7 +31,7 @@ impl TimeStep {
         }
     }
 
-    pub fn is_paused(&self) -> bool {
+    pub fn paused(&self) -> bool {
         match self {
             TimeStep::Warp { speed: _, paused } | TimeStep::Level { level: _, paused } => *paused,
         }
@@ -80,6 +80,9 @@ impl TimeStep {
 impl Model {
     pub fn toggle_paused(&mut self) {
         self.time_step.toggle_paused();
+        if self.time_step.paused() {
+            self.add_story_event(StoryEvent::Paused);
+        }
     }
 
     pub fn increase_time_step_level(&mut self) {
@@ -88,6 +91,10 @@ impl Model {
 
     pub fn decrease_time_step_level(&mut self) {
         self.time_step.decrease_level();
+    }
+
+    pub fn set_time_step(&mut self, time_step: TimeStep) {
+        self.time_step = time_step;
     }
 
     pub fn start_warp(&mut self, end_time: f64) {

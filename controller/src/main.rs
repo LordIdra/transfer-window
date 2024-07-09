@@ -1,7 +1,7 @@
 use std::{error::Error, fs::{create_dir_all, File}, sync::Arc, time::Instant};
 
 use eframe::{egui::{Context, Key, ViewportBuilder, ViewportCommand}, glow::{self, HasContext, RENDERER, SHADING_LANGUAGE_VERSION, VERSION}, run_native, App, CreationContext, Frame, NativeOptions};
-use event_handler::{load_game, new_game, quit};
+use event_handler::{load_game, load_menu, new_game, quit};
 use log::{debug, info};
 use sysinfo::System;
 use tracing_subscriber::{fmt::Layer, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
@@ -16,6 +16,7 @@ struct Controller {
     resources: Arc<Resources>,
     scene: Scene,
     last_frame: Instant,
+    load_menu: bool, // menu loading must occur RIGHT AT THE BEGINNING of a frame before any updates
 }
 
 fn log_gl_info(gl: &Arc<glow::Context>) {
@@ -38,7 +39,8 @@ impl Controller {
         let resources = Arc::new(Resources::new(&creation_context.egui_ctx, &gl));
         let view = Scene::Menu(menu::View::new(resources.clone(), &creation_context.egui_ctx, gl.clone()));
         let last_frame = Instant::now();
-        Ok(Box::new(Self { gl, resources, scene: view, last_frame }))
+        let load_menu = false;
+        Ok(Box::new(Self { gl, resources, scene: view, last_frame, load_menu }))
     }
 
     fn handle_events(&mut self, mut events: Vec<ControllerEvent>, context: &Context) {
@@ -49,8 +51,9 @@ impl Controller {
             debug!("Handling controller event {:?}", event);
             match event {
                 ControllerEvent::Quit => quit(context),
-                ControllerEvent::NewGame { story_builder } => new_game(self, context, story_builder),
+                ControllerEvent::NewGame { story_builder } => new_game(self, context, &*story_builder),
                 ControllerEvent::LoadGame { name } => load_game(self, context, name.as_str()),
+                ControllerEvent::LoadMenu => load_menu(self),
             }
         }
     }
@@ -63,6 +66,11 @@ impl App for Controller {
         
         let dt = self.last_frame.elapsed().as_secs_f64();
         self.last_frame = Instant::now();
+
+        if self.load_menu {
+            self.scene = Scene::Menu(menu::View::new(self.resources.clone(), context, self.gl.clone()));
+            self.load_menu = false;
+        }
 
         let events = match &mut self.scene {
             Scene::Game(view) => view.update(context, frame, dt),

@@ -84,7 +84,6 @@ fn test_create_and_adjust_burn() {
     let vessel_component = VesselClass::Scout1.build(Faction::Player)
         .with_fuel_tank(fuel_tank)
         .with_engine(engine);
-    dbg!(vessel_component.dry_mass());
     let vessel_component_dry_mass = vessel_component.dry_mass();
     let vessel_component_fuel_mass = vessel_component.fuel_kg();
     let orbit = Orbit::circle(earth, vessel_component.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);

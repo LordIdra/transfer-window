@@ -7,4 +7,5 @@ pub enum StoryEvent {
     ClickContinue,
     NewTime(f64),
     ChangeFocus(Entity),
+    Paused,
 }

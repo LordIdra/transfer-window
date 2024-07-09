@@ -34,6 +34,7 @@ pub struct View {
     context: Context,
     previous_screen_rect: Rect,
     screen_rect: Rect,
+    controller_events: Arc<Mutex<Vec<ControllerEvent>>>,
     model_events: Arc<Mutex<Vec<ModelEvent>>>,
     view_events: Arc<Mutex<Vec<ViewEvent>>>,
     story_events: Arc<Mutex<Vec<StoryEvent>>>,
@@ -56,6 +57,7 @@ impl View {
     pub fn new(gl: Arc<glow::Context>, model: Model, story: Story, context: Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
         let previous_screen_rect = context.screen_rect();
         let screen_rect = context.screen_rect();
+        let controller_events = Arc::new(Mutex::new(vec![]));
         let model_events = Arc::new(Mutex::new(vec![]));
         let view_events = Arc::new(Mutex::new(vec![]));
         let story_events = Arc::new(Mutex::new(vec![]));
@@ -74,7 +76,7 @@ impl View {
         let pointer_over_ui = false;
         let pointer_over_icon = false;
         let objectives = vec![];
-        Self { gl, model, story, context, previous_screen_rect, screen_rect, model_events, view_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon, objectives }
+        Self { gl, model, story, context, previous_screen_rect, screen_rect, controller_events, model_events, view_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon, objectives }
     }
 
     fn update_camera_focus_position(&mut self) {
@@ -102,6 +104,7 @@ impl View {
     pub fn update(&mut self, context: &Context, frame: &Frame, dt: f64) -> Vec<ControllerEvent> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("View update");
+        self.controller_events.lock().unwrap().clear();
         self.context = context.clone();
         self.previous_screen_rect = self.screen_rect;
         self.screen_rect = self.context.screen_rect();
@@ -114,7 +117,11 @@ impl View {
         self.handle_events();
         self.story_events.lock().unwrap().extend(self.model.update(dt));
         expiry::update(self);
-        vec![]
+        self.controller_events.lock().unwrap().clone()
+    }
+
+    pub(crate) fn add_controller_event(&self, event: ControllerEvent) {
+        self.controller_events.lock().unwrap().push(event);
     }
     
     pub(crate) fn add_model_event(&self, event: ModelEvent) {

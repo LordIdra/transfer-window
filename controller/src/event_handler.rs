@@ -14,7 +14,7 @@ pub fn quit(context: &Context) {
     context.send_viewport_cmd(ViewportCommand::Close);
 }
 
-pub fn new_game(controller: &mut Controller, context: &Context, story_builder: Box<dyn StoryBuilder>) {
+pub fn new_game(controller: &mut Controller, context: &Context, story_builder: &dyn StoryBuilder) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("New game");
 
@@ -38,4 +38,11 @@ pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
     };
 
     controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, Story::empty(), context.clone(), controller.resources.clone(), None));
+}
+
+pub fn load_menu(controller: &mut Controller) {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Load menu");
+
+    controller.load_menu = true;
 }
