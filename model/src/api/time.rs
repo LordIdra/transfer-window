@@ -105,4 +105,8 @@ impl Model {
     pub fn can_warp_to(&self, time: f64) -> bool {
         (time - self.time()).abs() > WARP_STOP_BEFORE_TARGET_SECONDS
     }
+
+    pub fn warp(&self) -> Option<&TimeWarp> {
+        self.warp.as_ref()
+    }
 }

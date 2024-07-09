@@ -1,7 +1,7 @@
 use ecolor::Rgba;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AtmosphereComponent {
     color: Rgba,
     density: f64,

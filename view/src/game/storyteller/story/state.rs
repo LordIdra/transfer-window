@@ -1,23 +1,33 @@
+use transfer_window_model::{story_event::StoryEvent, Model};
+
 use crate::game::events::{ModelEvent, ViewEvent};
 
-use super::{action::Action, story_event::StoryEvent, transition::Transition};
+use super::{action::Action, transition::Transition};
 
+pub struct StateCreator {
+    factory: Box<dyn Fn(&Model) -> State>,
+}
+
+impl StateCreator {
+    pub fn new(factory: Box<dyn Fn(&Model) -> State>) -> Self {
+        Self { factory }
+    }
+
+    pub fn create(&self, model: &Model) -> State {
+        (self.factory)(model)
+    }
+}
+
+#[derive(Default)]
 pub struct State {
-    name: &'static str,
-    transitions: Vec<Transition>,
+    transition: Option<Transition>,
     actions: Vec<Box<dyn Action>>,
 }
 
 
 impl State {
-    pub fn new(name: &'static str) -> Self {
-        let transitions = vec![];
-        let actions = vec![];
-        State { name, transitions, actions }
-    }
-
     pub fn transition(mut self, transition: Transition) -> Self {
-        self.transitions.push(transition);
+        self.transition = Some(transition);
         self
     }
 
@@ -26,22 +36,22 @@ impl State {
         self
     }
 
-    pub fn try_transition(&self, events: &Vec<StoryEvent>) -> Option<&'static str> {
-        self.transitions.iter().find_map(|transition| transition.try_transition(events))
-    }
-    
-    #[cfg(test)]
-    pub fn transitions(&self) -> &[Transition] {
-        &self.transitions
-    }
-
-    pub fn name(&self) -> &'static str {
-        self.name
+    pub fn try_transition(&self, events: &Vec<StoryEvent>) -> Option<(&'static str, Option<&'static str>)> {
+        if self.transition.as_ref().is_some_and(|transition| transition.can_transition(events)) {
+            Some((self.transition.as_ref().unwrap().to(), self.transition.as_ref().unwrap().objective()))
+        } else {
+            None
+        }
     }
 
     pub fn trigger(&self) -> (Vec<ModelEvent>, Vec<ViewEvent>) {
         let mut model_events = vec![];
         let mut view_events = vec![];
+        if let Some(transition) = &self.transition {
+            if let Some(objective) = transition.objective() {
+                view_events.push(ViewEvent::StartObjective(objective));
+            }
+        }
         for action in &self.actions {
             let (new_model_events, new_view_events) = action.trigger();
             model_events.extend(new_model_events);

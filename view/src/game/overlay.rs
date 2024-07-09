@@ -7,6 +7,7 @@ use super::View;
 pub mod dialogue;
 mod explorer;
 mod fps;
+pub mod objectives;
 mod right_click_menu;
 mod scale;
 mod selected;
@@ -23,6 +24,7 @@ pub fn draw(view: &View) {
 
     explorer::update(view);
     fps::update(view);
+    objectives::update(view);
     scale::update(view);
     time::update(view);
     selected::update(view);
