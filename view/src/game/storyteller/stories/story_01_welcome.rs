@@ -96,7 +96,7 @@ impl StoryBuilder for Story01Welcome {
             let ship_period = model.current_segment(ship).as_orbit().unwrap().period().unwrap();
             let time = model.time() + ship_period;
             State::default()
-                .transition(Transition::new("pause", Condition::time(time).objective("Warp forwards one orbit")))
+                .transition(Transition::new("pause", Condition::time(time).objective("Warp forwards one orbitaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa safigeuigew egwuigenew")))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
                         .normal("Try speeding up and slowing down time using the ")
