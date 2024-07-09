@@ -3,16 +3,17 @@ use std::{collections::HashSet, sync::{Arc, Mutex}};
 use eframe::{egui::{Context, Pos2, Rect}, glow, Frame};
 use events::{ModelEvent, ViewEvent};
 use nalgebra_glm::DVec2;
-use overlay::dialogue::Dialogue;
+use overlay::{dialogue::Dialogue, objectives::Objective};
 use rendering::Renderers;
-use storyteller::{stories::story_01_welcome, story::{story_event::StoryEvent, Story}};
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, Model};
+use storyteller::story::Story;
+use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, story_event::StoryEvent, Model};
 use util::{should_render, should_render_at_time};
 
 use crate::{controller_events::ControllerEvent, resources::Resources};
 
 use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, selected::Selected};
 
+mod animation;
 pub(crate) mod camera;
 mod debug;
 mod events;
@@ -22,7 +23,7 @@ mod misc;
 pub(crate) mod overlay;
 pub(crate) mod rendering;
 mod selected;
-mod storyteller;
+pub mod storyteller;
 mod underlay;
 mod util;
 
@@ -48,11 +49,11 @@ pub struct View {
     debug_window_tab: DebugWindowTab,
     pointer_over_ui: bool,
     pointer_over_icon: bool,
+    objectives: Vec<Objective>,
 }
 
 impl View {
-    pub fn new(gl: Arc<glow::Context>, model: Model, context: Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
-        let story = story_01_welcome::build();
+    pub fn new(gl: Arc<glow::Context>, model: Model, story: Story, context: Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
         let previous_screen_rect = context.screen_rect();
         let screen_rect = context.screen_rect();
         let model_events = Arc::new(Mutex::new(vec![]));
@@ -72,7 +73,8 @@ impl View {
         let debug_window_tab = DebugWindowTab::Model;
         let pointer_over_ui = false;
         let pointer_over_icon = false;
-        Self { gl, model, story, context, previous_screen_rect, screen_rect, model_events, view_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon }
+        let objectives = vec![];
+        Self { gl, model, story, context, previous_screen_rect, screen_rect, model_events, view_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon, objectives }
     }
 
     fn update_camera_focus_position(&mut self) {
@@ -104,12 +106,13 @@ impl View {
         self.previous_screen_rect = self.screen_rect;
         self.screen_rect = self.context.screen_rect();
         self.frame_history.update(self.context.input(|i| i.time), frame.info().cpu_usage);
+        self.update_animation(dt);
         self.update_camera_focus_position();
         self.draw_ui();
         self.post_draw_ui();
         self.draw_underlay();
         self.handle_events();
-        self.model.update(dt);
+        self.story_events.lock().unwrap().extend(self.model.update(dt));
         expiry::update(self);
         vec![]
     }

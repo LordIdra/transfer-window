@@ -10,7 +10,7 @@ pub enum OrbitableType {
     Moon,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum OrbitableComponentPhysics {
     Stationary(DVec2),
     Orbit(Segment), // stored as a segment because you can go from Segment to &Orbit but not vice versa
@@ -47,7 +47,7 @@ impl OrbitableComponentPhysics {
 }
 
 /// Must have `MassComponent`
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OrbitableComponent {
     mass: f64,
     radius: f64,

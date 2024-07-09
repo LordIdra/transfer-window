@@ -264,6 +264,7 @@ Chapter 1: Intro
 # ------------------------------------ #
 # Projects
 [ ] Planet textures/generation, atmosphere shaders?
+[ ] Proper planet texture sourcing
 [ ] Collisions with planets (nearly forgot about that lmao)
 [ ] Ballistic weaponry
 [ ] Point defense
