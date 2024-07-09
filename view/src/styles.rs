@@ -129,18 +129,18 @@ impl SlotEditor {
     }
 }
 
-pub struct WeaponSlotButton;
+pub struct SelectedMenuButton;
 
-impl WeaponSlotButton {
+impl SelectedMenuButton {
     pub fn apply(ui: &mut Ui) {
-        let default_color = Color32::from_rgba_unmultiplied(40, 40, 40, 220);
-        let hovered_color = Color32::from_rgba_unmultiplied(60, 60, 60, 220);
-        let selected_color = Color32::from_rgba_unmultiplied(80, 80, 80, 220);
+        let default_color = Color32::from_rgba_unmultiplied(0, 0, 0, 0);
+        let hovered_color = Color32::from_rgba_unmultiplied(40, 40, 40, 220);
+        let selected_color = Color32::from_rgba_unmultiplied(60, 60, 60, 220);
 
         let bg_stroke = Stroke::NONE;
-        let rounding = Rounding::same(15.0);
+        let rounding = Rounding::same(20.0);
         let fg_stroke = Stroke::NONE;
-        let expansion = 0.0;
+        let expansion = 2.0;
 
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: default_color,
@@ -162,18 +162,43 @@ impl WeaponSlotButton {
     }
 }
 
-pub struct SelectedMenuButton;
+pub struct DialogueWindow;
 
-impl SelectedMenuButton {
+impl DialogueWindow {
+    pub fn apply(context: &Context) {
+        context.set_style(Style {
+            visuals: Visuals {
+                window_fill: Color32::from_rgba_unmultiplied(30, 30, 40, 255),
+                window_stroke: Stroke::NONE,
+                window_shadow: Shadow::NONE,
+                window_rounding: Rounding::same(15.0),
+                ..Default::default()
+            },
+            spacing: Spacing {
+                window_margin: Margin::same(10.0),
+                ..Spacing::default()
+            },
+            interaction: Interaction {
+                selectable_labels: false,
+                ..Default::default()
+            },
+            ..Default::default()
+        });
+    }
+}
+
+pub struct DialogueContinueButton;
+
+impl DialogueContinueButton {
     pub fn apply(ui: &mut Ui) {
-        let default_color = Color32::from_rgba_unmultiplied(0, 0, 0, 0);
-        let hovered_color = Color32::from_rgba_unmultiplied(40, 40, 40, 220);
-        let selected_color = Color32::from_rgba_unmultiplied(60, 60, 60, 220);
+        let default_color = Color32::from_rgba_unmultiplied(60, 60, 100, 255);
+        let hovered_color = Color32::from_rgba_unmultiplied(80, 80, 120, 255);
+        let selected_color = Color32::from_rgba_unmultiplied(100, 100, 140, 255);
 
         let bg_stroke = Stroke::NONE;
-        let rounding = Rounding::same(20.0);
-        let fg_stroke = Stroke::NONE;
-        let expansion = 2.0;
+        let rounding = Rounding::same(5.0);
+        let fg_stroke = Stroke::new(4.0, Color32::WHITE);
+        let expansion = 5.0;
 
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: default_color,

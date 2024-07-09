@@ -56,7 +56,7 @@ impl Model {
     pub(crate) fn create_guidance(&mut self, entity: Entity, time: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Create guidance");
-        assert!(self.vessel_component_mut(entity).as_torpedo().is_some());
+        assert!(self.vessel_component_mut(entity).class().is_torpedo());
 
         let target = self.vessel_component(entity).target()
             .expect("Cannot enable guidance on torpedo without a target");

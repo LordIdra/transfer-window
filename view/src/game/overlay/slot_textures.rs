@@ -1,53 +1,48 @@
-use transfer_window_model::components::vessel_component::ship::ship_slot::{engine::EngineType, fuel_tank::FuelTankType, weapon::WeaponType, ShipSlot, System};
+use transfer_window_model::components::vessel_component::{engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType};
 
 pub trait TexturedSlot {
-    fn texture(&self) -> &str;
+    fn texture(&self) -> &'static str;
 }
 
 impl TexturedSlot for EngineType {
-    fn texture(&self) -> &str {
+    fn texture(&self) -> &'static str {
         match self {
             EngineType::Regular => "engine-regular",
             EngineType::Efficient => "engine-efficient",
             EngineType::Booster => "engine-booster",
+            EngineType::Torpedo => panic!("Attempt to get torpedo engine texture"),
         }
     }
 }
 
 impl TexturedSlot for FuelTankType {
-    fn texture(&self) -> &str {
+    fn texture(&self) -> &'static str {
         match self {
-            FuelTankType::Tiny => "tank-tiny",
-            FuelTankType::Small => "tank-small",
-            FuelTankType::Medium => "tank-medium",
+            FuelTankType::FuelTank1 => "fuel-tank-1",
+            FuelTankType::FuelTank2 => "fuel-tank-2",
+            FuelTankType::FuelTank3 => "fuel-tank-3",
+            FuelTankType::FuelTank4 => "fuel-tank-4",
+            FuelTankType::Torpedo => panic!("Attempt to get torpedo fuel tank texture"),
+            FuelTankType::Hub => panic!("Attempt to get hub fuel tank texture"),
         }
     }
 }
 
-impl TexturedSlot for WeaponType {
-    fn texture(&self) -> &str {
+impl TexturedSlot for TorpedoStorageType {
+    fn texture(&self) -> &'static str {
         match self {
-            WeaponType::Torpedo(_) => "torpedo",
-            WeaponType::EnhancedTorpedo(_) => "enhanced-torpedo",
+            TorpedoStorageType::TorpedoStorage1 => "torpedo-storage-1",
+            TorpedoStorageType::TorpedoStorage2 => "torpedo-storage-2",
+            TorpedoStorageType::Hub => panic!("Attempt to get hub torpedo storage texture"),
         }
     }
 }
 
-impl TexturedSlot for ShipSlot {
-    fn texture(&self) -> &str {
+impl TexturedSlot for TorpedoLauncherType {
+    fn texture(&self) -> &'static str {
         match self {
-            ShipSlot::Weapon(weapon) => match weapon {
-                None => "blank-slot",
-                Some(weapon) => weapon.type_().texture(),
-            },
-            ShipSlot::FuelTank(fuel_tank) => match fuel_tank {
-                None => "blank-slot",
-                Some(fuel_tank) => fuel_tank.type_().texture(),
-            },
-            ShipSlot::Engine(engine) => match engine {
-                None => "blank-slot",
-                Some(engine) => engine.type_().texture(),
-            },
+            TorpedoLauncherType::TorpedoLauncher1 => "torpedo-launcher-1",
+            TorpedoLauncherType::TorpedoLauncher2 => "torpedo-launcher-2",
         }
     }
 }

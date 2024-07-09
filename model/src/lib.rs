@@ -80,6 +80,7 @@ impl Model {
         self.update_objects();
         self.update_target();
         self.update_stations(dt);
+        self.update_launcher_cooldown(dt);
         self.update_fuel();
         self.update_trajectory();
         self.update_guidance();

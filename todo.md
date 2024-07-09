@@ -162,8 +162,6 @@
 [x] Torpedo launcher
 [x] Enhanced torpedo launcher
 [x] Close button for vessel editor
-
-# Stations
 [x] Add station vessel class (can't be edited, no engines)
 [x] Station icon
 [x] Docking ports
@@ -173,40 +171,63 @@
 [x] Fix section divider in UI
 [x] Resource transfer
 [x] Resource transfer can be cancelled
-[ ] Equipment has install time
-[ ] Equipment swapping UI
-[ ] Undocking disabled until swap complete
-[ ] Swap can be cancelled
+[x] The vessel system is pretty insane, separate in TorpedoVessel etc traits or even option structs! (effectively mini ECS)
+[x] Vessel system still uses weird mix of single/multiple slot system
+[x] Fuel facility
+[x] Engine facility
+[x] Torpedo launcher facility
+[x] Torpedo storage facility
+[x] Docking facility
+[x] Class refactor
+[x] Redraw ships w/ more and smaller slots
+[x] Weapons UI redesign (it's shit)
+[x] Weapon cooldown
+[x] Equipment adds mass
+[x] More logical ordering of docking ports
+[x] More logical ordering in explorer
+[x] Menu screen
+[x] Storyteller triggers
+[x] Storyteller events
+[x] Storyteller dialogue
 
-# Vessel refactor
-[ ] Fuel facility
-[ ] Engine facility
-[ ] Torpedo launcher facility
-[ ] Torpedo storage facility
-[ ] Docking facility
-[ ] Class refactor
-[ ] Abstract mass + rocket equation out, may be tough to get working
-[ ] Vessel view refactor
 
-[ ] Redraw ships w/ more and smaller slots
-[ ] Energy generator facility
-[ ] Engine alternators, RTGs
-[ ] Energy storage facility
-[ ] Hull + facilities drain energy over time
-[ ] Solars require line of sight to sun
 
-[ ] Comms equipment
-[ ] Comms line overlay
-[ ] Comms routing algorithm based on line of sight
-
-[ ] Fog of war
-[ ] Passive/active radar
-[ ] Information networking
-
-# Campaign
-[ ] Menu screen
+# ------------------------------------ #
+# CAMPAIGN PLANNING AREA
+# ------------------------------------ #
+# Backend
+[ ] Vessel constructor
+[ ] Orbitable constructor
+[ ] Storyteller objectives
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
+
+# Levels
+Chapter 1: Intro
+- 01 Welcome
+  - welcome, simulation environment
+  - adjust simulation speed
+  - orbit explanation with ships flying faster and faster
+- 02 Orbits
+  - more in-depth explanation of orbits
+  - periapsis, apoapsis
+  - notice spacecraft getting closer to earth goes much faster
+  - comparison of higher and lower orbits speed
+  - warp to point, pause
+- 03 Burns
+  - create a burn and get closer to earth
+  - circularise orbit
+- 04 Translunar
+  - get an intercept with the moon
+- 05 Moon Orbit
+  - orbit the moon and come back into LEO
+- 06 Rendezvous
+  - dock with a station
+- 07 Destroy
+  - destroy a dummy target
+- 08 Evade
+  - evade enemies torpedo
+  - the end time for real life
 
 ## Optional Levels
 [ ] Scientific notation
@@ -217,8 +238,31 @@
 [ ] Rocket fuels overview
 [ ] Proportional guidance
 [ ] Integration techniques (euler RK4 etc)
+[ ] Joules, watts, energy
 
-# Bigger picture
+
+
+# ------------------------------------ #
+# TECHNICAL AREA
+# ------------------------------------ #
+# Performance
+[ ] Texture atlas
+[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
+[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
+[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
+[ ] Smaller screen texture renderer framebuffer
+
+# Technical debt tracker
+- Docking port view logic is horrible, needs more cleanup when we have more transfers maybe
+- Timeline view logic is not great
+- Hardcoded end time lol
+
+
+
+# ------------------------------------ #
+# PROJECTS AREA
+# ------------------------------------ #
+# Projects
 [ ] Planet textures/generation, atmosphere shaders?
 [ ] Collisions with planets (nearly forgot about that lmao)
 [ ] Ballistic weaponry
@@ -228,19 +272,6 @@
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumption
-
-# Backburner
-[ ] Equipment + torpedoes add mass
-[ ] Selected vessel's segments take priority over non-selected when selecting point????????????????????????????? maybe not
-[ ] More logical ordering in explorer
-[ ] More logical ordering of docking ports
-
-# Performance
-[ ] Texture atlas
-[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
-[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
-[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
-[ ] Smaller screen texture renderer framebuffer
 
 # Before release
 [ ] Versioning!
@@ -252,14 +283,23 @@
 [ ] Add licenses
 [ ] Log to multiple files
 
-# Technical debt tracker
-- The vessel system is pretty insane, separate in TorpedoVessel etc traits or even option structs! (effectively mini ECS)
-- Vessel system still uses weird mix of single/multiple slot system
-- Docking port drawing logic is horrible, needs more cleanup when we have more transfers maybe
-- Timeline drawing logic is not great
 
+
+# ------------------------------------ #
+# SPECULATION AREA
+# ------------------------------------ #
 # Artificial Intelligence
 - 3 independent neural networks
 - targeting
 - navigation
 - guidance
+
+# Comms
+- Comms equipment
+- Comms line overlay
+- Comms routing algorithm based on line of sight
+
+# Radar
+- Fog of war
+- Passive/active radar
+- Information networking

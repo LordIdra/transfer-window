@@ -21,7 +21,7 @@ fn update_zoom(view: &View, latest_mouse_position: Pos2, scroll_delta: egui::Vec
         -(latest_mouse_position.x as f64 - (screen_size.x / 2.0)),
             latest_mouse_position.y as f64 - (screen_size.y / 2.0));
 
-    let actual_new_zoom = f64::max(MIN_ZOOM, f64::min(MAX_ZOOM, new_zoom));
+    let actual_new_zoom = new_zoom.clamp(MIN_ZOOM, MAX_ZOOM);
     let actual_delta_zoom = (view.camera.zoom() - actual_new_zoom) / actual_new_zoom;
 
     view.add_view_event(ViewEvent::PanCamera(mouse_position * actual_delta_zoom));

@@ -1,5 +1,5 @@
 use eframe::{egui::{Align, Align2, Color32, Layout, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::ship::ship_slot::ShipSlotLocation, storage::entity_allocator::Entity};
+use transfer_window_model::storage::entity_allocator::Entity;
 
 use crate::game::{events::ViewEvent, View};
 
@@ -12,11 +12,18 @@ mod tooltips;
 mod util;
 mod ship;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum SlotType {
+    Engine,
+    FuelTank,
+    TorpedoStorage,
+    TorpedoLauncher,
+}
 
 #[derive(Debug, Clone)]
 pub struct VesselEditor {
     entity: Entity,
-    slot_editor: Option<ShipSlotLocation>,
+    slot_editor: Option<SlotType>,
 }
 
 impl VesselEditor {
@@ -73,12 +80,10 @@ pub fn update(view: &View) {
         let center = rect.center();
         let scalar = rect.size().x;
 
-        if let Some(slot_location) = vessel_editor.slot_editor {
+        if let Some(slot_type) = vessel_editor.slot_editor {
             let vessel_component = view.model.vessel_component(vessel_editor.entity);
-            let ship = vessel_component.as_ship().unwrap();
-            let slot = ship.get_slot(slot_location);
-            let vessel_class = ship.class();
-            ShipSlotEditor::new(vessel_editor.entity, vessel_class, slot_location, slot).draw(view, &vessel_name, slot_location, center, scalar);
+            let class = vessel_component.class();
+            ShipSlotEditor::new(vessel_editor.entity, class, slot_type).draw(view, &vessel_name, slot_type, center, scalar);
         }
     });
 }

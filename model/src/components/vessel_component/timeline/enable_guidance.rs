@@ -39,7 +39,7 @@ impl EnableGuidanceEvent {
     }
 
     pub fn can_create_ever(model: &Model, entity: Entity) -> bool {
-        model.vessel_component(entity).as_torpedo().is_some()
+        model.vessel_component(entity).class().is_torpedo()
     }
 
     #[allow(clippy::missing_panics_doc)]

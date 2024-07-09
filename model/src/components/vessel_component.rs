@@ -1,147 +1,179 @@
-use faction::Faction;
-use serde::{Deserialize, Serialize};
-use ship::{Ship, ShipClass};
-use station::{Station, StationClass};
-use timeline::Timeline;
-use torpedo::Torpedo;
+use std::collections::BTreeMap;
 
+use class::VesselClass;
+use docking::{Docking, DockingPort, DockingPortLocation, DockingType};
+use engine::{Engine, EngineType};
+use faction::Faction;
+use fuel_tank::{FuelTank, FuelTankType};
+use log::error;
+use serde::{Deserialize, Serialize};
+use timeline::Timeline;
+use torpedo_launcher::{TorpedoLauncher, TorpedoLauncherType};
+use torpedo_storage::{TorpedoStorage, TorpedoStorageType};
 use crate::storage::entity_allocator::Entity;
 
 use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
 
+pub mod class;
+pub mod docking;
+pub mod engine;
 pub mod faction;
-pub mod ship;
-pub mod station;
+pub mod fuel_tank;
 pub mod timeline;
-mod torpedo;
+pub mod torpedo_launcher;
+pub mod torpedo_storage;
 
-/// Must have `MassComponent` and `PathComponent`
+/// Must have `MassComponent` and (if undocked) `PathComponent`
 #[derive(Debug, Serialize, Deserialize)]
-pub enum VesselComponent {
-    Ship(Ship),
-    Torpedo(Torpedo),
-    Station(Station),
+pub struct VesselComponent {
+    class: VesselClass,
+    faction: Faction,
+    is_ghost: bool,
+    timeline: Timeline,
+    target: Option<Entity>,
+    fuel_tank: Option<FuelTank>,
+    engine: Option<Engine>,
+    torpedo_storage: Option<TorpedoStorage>,
+    torpedo_launcher: Option<TorpedoLauncher>,
+    docking: Option<Docking>,
 }
 
-#[allow(clippy::new_without_default)]
 impl VesselComponent {
-    pub fn new_ship(class: ShipClass, faction: Faction) -> Self {
-        Self::Ship(Ship::new(class, faction))
+    pub fn new(class: VesselClass, faction: Faction) -> Self {
+        let is_ghost = false;
+        let timeline = Timeline::default();
+        let target = None;
+        let fuel_tank = None;
+        let engine = None;
+        let torpedo_storage = None;
+        let torpedo_launcher = None;
+        let docking = None;
+        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, torpedo_storage, torpedo_launcher, docking }
     }
 
-    pub fn new_torpedo(faction: Faction) -> Self {
-        Self::Torpedo(Torpedo::new(faction))
+    // ------------------------
+    // Builders
+    // ------------------------
+    pub fn with_fuel_tank(mut self, type_: FuelTankType) -> Self {
+        self.set_fuel_tank(Some(type_));
+        self
     }
 
-    pub fn new_station(class: StationClass, faction: Faction) -> Self {
-        Self::Station(Station::new(class, faction))
+    pub fn with_engine(mut self, type_: EngineType) -> Self {
+        self.set_engine(Some(type_));
+        self
     }
 
-    pub fn set_target(&mut self, target: Option<Entity>) {
-        match self {
-            VesselComponent::Ship(ship) => ship.set_target(target),
-            VesselComponent::Torpedo(torpedo) => torpedo.set_target(target),
-            VesselComponent::Station(station) => station.set_target(target),
-        }
-    }
-    
-    pub fn target(&self) -> Option<Entity> {
-        match self {
-            VesselComponent::Ship(ship) => ship.target(),
-            VesselComponent::Torpedo(torpedo) => torpedo.target(),
-            VesselComponent::Station(station) => station.target(),
-        }
+    pub fn with_torpedo_storage(mut self, type_: TorpedoStorageType) -> Self {
+        self.set_torpedo_storage(Some(type_));
+        self
     }
 
-    pub fn has_target(&self) -> bool {
-        self.target().is_some()
+    pub fn with_torpedo_launcher(mut self, type_: TorpedoLauncherType) -> Self {
+        self.set_torpedo_launcher(Some(type_));
+        self
+    }
+
+    pub fn with_docking(mut self, type_: DockingType) -> Self {
+        self.set_docking(Some(type_));
+        self
+    }
+
+    // ------------------------
+    // Non-component getters
+    // ------------------------
+    pub fn with_ghost(mut self) -> Self {
+        self.is_ghost = true;
+        self
+    }
+
+    pub fn unset_ghost(&mut self) {
+        self.is_ghost = false;
+    }
+
+    pub fn class(&self) -> VesselClass {
+        self.class
     }
 
     pub fn faction(&self) -> Faction {
-        match self {
-            VesselComponent::Ship(ship) => ship.faction(),
-            VesselComponent::Torpedo(torpedo) => torpedo.faction(),
-            VesselComponent::Station(station) => station.faction(),
+        self.faction
+    }
+
+    pub fn is_editable(&self) -> bool {
+        self.class.editable()
+    }
+
+    pub fn is_ghost(&self) -> bool {
+        self.is_ghost
+    }
+
+    pub fn timeline(&self) -> &Timeline {
+        &self.timeline
+    }
+
+    pub fn timeline_mut(&mut self) -> &mut Timeline {
+        &mut self.timeline
+    }
+
+    pub(crate) fn should_recompute_trajectory(&self) -> bool {
+        !(self.class().is_torpedo() && self.timeline().last_event().is_some_and(|event| event.is_intercept()))
+    }
+    
+    // ------------------------
+    // Target
+    // ------------------------
+    pub fn has_target(&self) -> bool {
+        self.target.is_some()
+    }
+
+    pub fn target(&self) -> Option<Entity> {
+        self.target
+    }
+
+    pub fn set_target(&mut self, target: Option<Entity>) {
+        self.target = target;
+    }
+
+    // ------------------------
+    // Fuel tank
+    // ------------------------
+    pub fn has_fuel_tank(&self) -> bool {
+        self.fuel_tank.is_some()
+    }
+
+    pub fn fuel_tank_type(&self) -> Option<FuelTankType> {
+        self.fuel_tank.as_ref().map(FuelTank::type_)
+    }
+
+    pub fn set_fuel_tank(&mut self, type_: Option<FuelTankType>) {
+        self.fuel_tank = type_.map(FuelTank::new);
+    }
+
+    pub fn fuel_capacity_litres(&self) -> f64 {
+        match &self.fuel_tank {
+            Some(fuel_tank) => fuel_tank.capacity_litres(),
+            None => 0.0,
         }
     }
 
-    pub fn dry_mass(&self) -> f64 {
-        match self {
-            VesselComponent::Ship(ship) => ship.dry_mass(),
-            VesselComponent::Torpedo(_) => Torpedo::dry_mass(),
-            VesselComponent::Station(station) => station.dry_mass(),
+    pub fn fuel_capacity_kg(&self) -> f64 {
+        match &self.fuel_tank {
+            Some(fuel_tank) => fuel_tank.capacity_kg(),
+            None => 0.0,
         }
     }
 
-    pub fn wet_mass(&self) -> f64 {
-        match self {
-            VesselComponent::Ship(ship) => ship.wet_mass(),
-            VesselComponent::Torpedo(_) => Torpedo::wet_mass(),
-            VesselComponent::Station(station) => station.wet_mass(),
+    pub fn fuel_litres(&self) -> f64 {
+        match &self.fuel_tank {
+            Some(fuel_tank) => fuel_tank.fuel_litres(),
+            None => 0.0,
         }
     }
 
-    pub fn mass(&self) -> f64 {
-        match self {
-            VesselComponent::Ship(ship) => ship.mass(),
-            VesselComponent::Torpedo(torpedo) => torpedo.mass(),
-            VesselComponent::Station(station) => station.mass(),
-        }
-    }
-
-    pub fn max_fuel_litres(&self) -> f64 {
-        match self {
-            VesselComponent::Ship(ship) => ship.max_fuel_litres(),
-            VesselComponent::Torpedo(_) => Torpedo::max_fuel_litres(),
-            VesselComponent::Station(station) => station.max_fuel_litres(),
-        }
-    }
-
-    pub fn max_fuel_kg(&self) -> f64 {
-        match self {
-            VesselComponent::Ship(ship) => ship.max_fuel_kg(),
-            VesselComponent::Torpedo(_) => Torpedo::max_fuel_kg(),
-            VesselComponent::Station(station) => station.max_fuel_kg(),
-        }
-    }
-
-    pub fn max_torpedoes(&self) -> usize {
-        match self {
-            VesselComponent::Ship(ship) => ship.max_torpedoes(),
-            VesselComponent::Torpedo(_) => panic!("Attempt to get max torpedoes of torpedo"),
-            VesselComponent::Station(station) => station.max_torpedoes(),
-        }
-    }
-
-    pub fn torpedoes(&self) -> usize {
-        match self {
-            VesselComponent::Ship(ship) => ship.torpedoes(),
-            VesselComponent::Torpedo(_) => panic!("Attempt to get torpedoes of torpedo"),
-            VesselComponent::Station(station) => station.torpedoes(),
-        }
-    }
-
-    pub fn is_torpedoes_empty(&self) -> bool {
-        self.torpedoes() == 0
-    }
-
-    pub fn is_torpedoes_full(&self) -> bool {
-        self.torpedoes() == self.max_torpedoes()
-    }
-
-    pub fn increment_torpedoes(&mut self) {
-        match self {
-            VesselComponent::Ship(ship) => ship.increment_torpedoes(),
-            VesselComponent::Torpedo(_) => panic!("Attempt to increment torpedoes of torpedo"),
-            VesselComponent::Station(station) => station.increment_torpedoes(),
-        }
-    }
-
-    pub fn decrement_torpedoes(&mut self) {
-        match self {
-            VesselComponent::Ship(ship) => ship.decrement_torpedoes(),
-            VesselComponent::Torpedo(_) => panic!("Attempt decrement max torpedoes of torpedo"),
-            VesselComponent::Station(station) => station.decrement_torpedoes(),
+    pub fn fuel_kg(&self) -> f64 {
+        match &self.fuel_tank {
+            Some(fuel_tank) => fuel_tank.fuel_kg(),
+            None => 0.0,
         }
     }
 
@@ -150,155 +182,208 @@ impl VesselComponent {
     }
 
     pub fn is_fuel_full(&self) -> bool {
-        (self.max_fuel_kg() - self.fuel_kg()) < 1.0e-3
-    }
-
-    pub fn max_dv(&self) -> Option<f64> {
-        let initial_mass = self.dry_mass() + self.max_fuel_kg();
-        let final_mass = self.dry_mass();
-        let isp = self.specific_impulse()?;
-        Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
-    }
-
-    pub fn fuel_litres(&self) -> f64 {
-        match self {
-            VesselComponent::Ship(ship) => ship.fuel_litres(),
-            VesselComponent::Torpedo(torpedo) => torpedo.fuel_litres(),
-            VesselComponent::Station(station) => station.fuel_litres(),
-        }
-    }
-
-    pub fn specific_impulse(&self) -> Option<f64> {
-        match self {
-            VesselComponent::Ship(ship) => ship.specific_impulse(),
-            VesselComponent::Torpedo(_) => Some(Torpedo::specific_impulse()),
-            VesselComponent::Station(station) => station.specific_impulse(),
-        }
-    }
-
-    pub fn fuel_kg_per_second(&self) -> Option<f64> {
-        match self {
-            VesselComponent::Ship(ship) => ship.fuel_kg_per_second(),
-            VesselComponent::Torpedo(_) => Some(Torpedo::fuel_kg_per_second()),
-            VesselComponent::Station(station) => station.fuel_kg_per_second(),
-        }
-    }
-
-    pub fn fuel_kg(&self) -> f64 {
-        match self {
-            VesselComponent::Ship(ship) => ship.fuel_kg(),
-            VesselComponent::Torpedo(torpedo) => torpedo.fuel_kg(),
-            VesselComponent::Station(station) => station.fuel_kg(),
-        }
+        (self.fuel_capacity_kg() - self.fuel_kg()) < 1.0e-3
     }
 
     pub fn set_fuel_kg(&mut self, new_fuel_kg: f64) {
-        match self {
-            VesselComponent::Ship(ship) => ship.set_fuel_kg(new_fuel_kg),
-            VesselComponent::Torpedo(torpedo) => torpedo.set_fuel_kg(new_fuel_kg),
-            VesselComponent::Station(station) => station.set_fuel_kg(new_fuel_kg),
-        }
+        self.fuel_tank.as_mut()
+            .expect("Attempt to set fuel on vessel without fuel tank")
+            .set_fuel_kg(new_fuel_kg);
     }
 
-    pub fn dv(&self) -> Option<f64> {
-        let initial_mass = self.mass();
-        let final_mass = self.dry_mass();
-        let isp = self.specific_impulse()?;
-        Some(isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass))
+    // ------------------------
+    // Mass
+    // ------------------------
+    pub fn dry_mass(&self) -> f64 {
+        self.class.mass()
+            + self.fuel_tank.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.engine.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.torpedo_storage.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.torpedo_launcher.as_ref().map_or(0.0, |x| x.type_().mass())
     }
 
-    pub fn can_edit_ever(&self) -> bool {
-        match self {
-            VesselComponent::Ship(_) => true,
-            VesselComponent::Torpedo(_) | VesselComponent::Station(_) => false,
-        }
+    pub fn wet_mass(&self) -> f64 {
+        self.dry_mass() + self.fuel_capacity_kg()
     }
 
-    pub fn timeline(&self) -> &Timeline {
-        match self {
-            VesselComponent::Ship(ship) => ship.timeline(),
-            VesselComponent::Torpedo(torpedo) => torpedo.timeline(),
-            VesselComponent::Station(station) => station.timeline(),
-        }
+    pub fn mass(&self) -> f64 {
+        self.dry_mass() + self.fuel_kg()
     }
 
-    pub fn timeline_mut(&mut self) -> &mut Timeline {
-        match self {
-            VesselComponent::Ship(ship) => ship.timeline_mut(),
-            VesselComponent::Torpedo(torpedo) => torpedo.timeline_mut(),
-            VesselComponent::Station(station) => station.timeline_mut(),
-        }
-    }
-
-    pub(crate) fn should_recompute_trajectory(&self) -> bool {
-        !(self.as_torpedo().is_some() && self.timeline().last_event().is_some_and(|event| event.is_intercept()))
-    }
-
-    pub fn as_ship(&self) -> Option<&Ship> {
-        match self {
-            VesselComponent::Ship(ref ship) => Some(ship),
-            VesselComponent::Torpedo(_) | VesselComponent::Station(_) => None,
-        }
-    }
-
-    pub fn as_ship_mut(&mut self) -> Option<&mut Ship> {
-        match self {
-            VesselComponent::Ship(ref mut ship) => Some(ship),
-            VesselComponent::Torpedo(_) | VesselComponent::Station(_) => None,
-        }
-    }
-
-    pub fn as_torpedo(&self) -> Option<&Torpedo> {
-        match self {
-            VesselComponent::Ship(_) | VesselComponent::Station(_) => None,
-            VesselComponent::Torpedo(ref torpedo) => Some(torpedo),
-        }
-    }
-
-    pub fn as_torpedo_mut(&mut self) -> Option<&mut Torpedo> {
-        match self {
-            VesselComponent::Ship(_) | VesselComponent::Station(_) => None,
-            VesselComponent::Torpedo(ref mut torpedo) => Some(torpedo),
-        }
-    }
-
-    pub fn as_station(&self) -> Option<&Station> {
-        match self {
-            VesselComponent::Ship(_) | VesselComponent::Torpedo(_)  => None,
-            VesselComponent::Station(ref station) => Some(station),
-        }
-    }
-
-    pub fn as_station_mut(&mut self) -> Option<&mut Station> {
-        match self {
-            VesselComponent::Ship(_) | VesselComponent::Torpedo(_)  => None,
-            VesselComponent::Station(ref mut station) => Some(station),
-        }
-    }
-
+    // ------------------------
+    // Engine
+    // ------------------------
     pub fn has_engine(&self) -> bool {
-        self.specific_impulse().is_some()
+        self.engine.is_some()
     }
 
-    pub fn has_torpedo_weapon(&self) -> bool {
-        self.max_torpedoes() != 0
+    pub fn engine_type(&self) -> Option<EngineType> {
+        self.engine.as_ref().map(Engine::type_)
     }
 
-    pub fn has_fuel_tank(&self) -> bool {
-        self.max_fuel_kg() != 0.0
+    pub fn set_engine(&mut self, type_: Option<EngineType>) {
+        self.engine = type_.map(Engine::new);
     }
 
-    pub fn is_ghost(&self) -> bool {
-        match self {
-            VesselComponent::Ship(_) | VesselComponent::Station(_) => false,
-            VesselComponent::Torpedo(torpedo) => torpedo.is_ghost(),
+    pub fn specific_impulse(&self) -> Option<f64> {
+        self.engine.as_ref().map(Engine::specific_impulse)
+    }
+
+    pub fn fuel_kg_per_second(&self) -> f64 {
+        match &self.engine {
+            Some(engine) => engine.fuel_kg_per_second(),
+            None => 0.0,
         }
+    }
+
+    pub fn max_dv(&self) -> f64 {
+        match &self.engine {
+            Some(engine) => {
+                let initial_mass = self.dry_mass() + self.fuel_capacity_kg();
+                let final_mass = self.dry_mass();
+                let isp = engine.specific_impulse();
+                isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass)
+            },
+            None => 0.0,
+        }
+    }
+
+    pub fn dv(&self) -> f64 {
+        match &self.engine {
+            Some(engine) => {
+                let initial_mass = self.mass();
+                let final_mass = self.dry_mass();
+                let isp = engine.specific_impulse();
+                isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass)
+            },
+            None =>0.0,
+        }
+    }
+
+    // ------------------------
+    // Torpedo storage
+    // ------------------------
+    pub fn has_torpedo_storage(&self) -> bool {
+        self.torpedo_storage.is_some()
+    }
+
+    pub fn torpedo_storage_type(&self) -> Option<TorpedoStorageType> {
+        self.torpedo_storage.as_ref().map(TorpedoStorage::type_)
+    }
+
+    pub fn set_torpedo_storage(&mut self, type_: Option<TorpedoStorageType>) {
+        self.torpedo_storage = type_.map(TorpedoStorage::new);
+    }
+
+    pub fn torpedo_capacity(&self) -> usize {
+        match &self.torpedo_storage {
+            Some(torpedo_storage) => torpedo_storage.capacity(),
+            None => 0,
+        }
+    }
+
+    pub fn torpedoes(&self) -> usize {
+        match &self.torpedo_storage {
+            Some(torpedo_storage) => torpedo_storage.torpedoes(),
+            None => 0,
+        }
+    }
+
+    pub fn final_torpedoes(&self) -> usize { 
+        self.torpedoes() - self.timeline().depleted_torpedoes()
+    }
+
+    pub fn is_torpedoes_empty(&self) -> bool {
+        self.torpedoes() == 0
+    }
+
+    pub fn is_torpedoes_full(&self) -> bool {
+        self.torpedoes() == self.torpedo_capacity()
+    }
+
+    pub fn increment_torpedoes(&mut self) {
+        match &mut self.torpedo_storage {
+            Some(torpedo_storage) => torpedo_storage.increment(),
+            None => error!("Attempt to increment torpedoes on vessel without a torpedo storage"),
+        }
+    }
+
+    pub fn decrement_torpedoes(&mut self) {
+        match &mut self.torpedo_storage {
+            Some(torpedo_storage) => torpedo_storage.decrement(),
+            None => error!("Attempt to decrement torpedoes on vessel without a torpedo storage"),
+        }
+    }
+
+    // ------------------------
+    // Torpedo launcher
+    // ------------------------
+    pub fn has_torpedo_launcher(&self) -> bool {
+        self.torpedo_launcher.is_some()
+    }
+
+    pub fn torpedo_launcher_type(&self) -> Option<TorpedoLauncherType> {
+        self.torpedo_launcher.as_ref().map(TorpedoLauncher::type_)
+    }
+
+    pub fn set_torpedo_launcher(&mut self, type_: Option<TorpedoLauncherType>) {
+        self.torpedo_launcher = type_.map(TorpedoLauncher::new);
+    }
+
+    pub fn step_torpedo_launcher(&mut self, dt: f64) {
+        self.torpedo_launcher.as_mut().unwrap().step_time_to_reload(dt);
+    }
+
+    pub fn torpedo_launcher_time_to_reload(&self) -> f64 {
+        self.torpedo_launcher.as_ref().unwrap().time_to_reload()
+    }
+
+    // ------------------------
+    // Docking
+    // ------------------------
+    pub fn has_docking(&self) -> bool {
+        self.docking.is_some()
+    }
+
+    pub fn docking_type(&self) -> Option<DockingType> {
+        self.docking.as_ref().map(Docking::type_)
+    }
+
+    pub fn set_docking(&mut self, type_: Option<DockingType>) {
+        self.docking = type_.map(Docking::new);
+    }
+
+    pub fn docking_ports(&self) -> Option<&BTreeMap<DockingPortLocation, DockingPort>> {
+        Some(self.docking.as_ref()?.docking_ports())
+    }
+
+    pub fn docking_ports_mut(&mut self) -> Option<&mut BTreeMap<DockingPortLocation, DockingPort>> {
+        Some(self.docking.as_mut()?.docking_ports_mut())
+    }
+
+    pub fn docking_port(&mut self, location: DockingPortLocation) -> &DockingPort {
+        self.docking_ports()
+            .expect("Attempt to get docking port on vessel without docking ports")
+            .get(&location)
+            .expect("No docking port at the requested location")
+    }
+
+    pub fn docking_port_mut(&mut self, location: DockingPortLocation) -> &mut DockingPort {
+        self.docking_ports_mut()
+            .expect("Attempt to get docking port on vessel without docking ports")
+            .get_mut(&location)
+            .expect("No docking port at the requested location")
     }
 
     pub fn can_dock(&self) -> bool {
-        match self {
-            VesselComponent::Ship(_) => true,
-            VesselComponent::Torpedo(_) | VesselComponent::Station(_) => false,
-        }
+        self.class.dockable()
+    }
+
+    pub fn dock(&mut self, location: DockingPortLocation, entity: Entity) {
+        self.docking.as_mut().expect("Attempt to dock to vessel without docking ports").dock(location, entity);
+    }
+
+    pub fn undock(&mut self, location: DockingPortLocation) {
+        self.docking.as_mut().expect("Attempt to dock to vessel without docking ports").undock(location);
     }
 }

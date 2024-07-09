@@ -4,7 +4,7 @@ use eframe::{egui::{self, ImageSource}, glow};
 use image::GenericImageView;
 use log::{info, trace};
 
-use crate::game::rendering::{texture, texture_renderer::TextureRenderer, planet_renderer::PlanetRenderer};
+use crate::game::rendering::{texture, texture_renderer::TextureRenderer, celestial_object_renderer::CelestialObjectRenderer};
 
 fn directory_entries(directory: String) -> Vec<DirEntry> {
     fs::read_dir(directory)
@@ -14,7 +14,7 @@ fn directory_entries(directory: String) -> Vec<DirEntry> {
 }
 
 fn entry_name(entry: &DirEntry) -> String {
-    entry.file_name().into_string().unwrap().split('.').next().unwrap().to_string()
+    entry.file_name().into_string().unwrap().replace(".png", "")
 }
 
 struct Texture {
@@ -39,42 +39,26 @@ impl Texture {
 
 /// Loads all textures in the resources folder upon initialization
 pub struct Resources {
-    icons: HashMap<String, Texture>,
-    planets: HashMap<String, Texture>,
+    textures: HashMap<String, Texture>,
 }
 
 impl Resources {
     pub fn new(context: &egui::Context, gl: &Arc<glow::Context>) -> Self {
         info!("Loading resources");
-        let icons = directory_entries("view/resources/textures/icons".to_string())
+        let textures = directory_entries("view/resources/final_textures".to_string())
             .into_iter()
             .map(|entry| (entry_name(&entry), entry))
             .map(|entry| (entry.0, Texture::new(context, gl, &entry.1)))
             .collect();
-        let planets = directory_entries("view/resources/textures/planets".to_string())
-            .into_iter()
-            .map(|entry| (entry_name(&entry), entry))
-            .map(|entry| (entry.0, Texture::new(context, gl, &entry.1)))
-            .collect();
-        Resources { icons, planets }
+        Resources { textures }
     }
 
     /// # Panics
     /// Panics if the texture does not exist
-    #[allow(unused)] 
-    pub fn icon_image(&self, name: &str) -> ImageSource {
-        self.icons.get(name)
-            .unwrap_or_else(|| panic!("Icon {name} does not exist"))
-            .image
-            .clone()
-    }
-    
-    /// # Panics
-    /// Panics if the texture does not exist
     #[allow(unused)]
-    pub fn planet_image(&self, name: &str) -> ImageSource {
-        self.planets.get(name)
-            .unwrap_or_else(|| panic!("Planet texture {name} does not exist"))
+    pub fn texture_image(&self, name: &str) -> ImageSource {
+        self.textures.get(name)
+            .unwrap_or_else(|| panic!("Texture {name} does not exist"))
             .image
             .clone()
     }
@@ -82,52 +66,43 @@ impl Resources {
     /// # Panics
     /// Panics if the texture does not exist
     #[allow(unused)]
-    pub fn gl_icon(&self, name: &str) -> glow::Texture {
-        self.icons.get(name)
-            .unwrap_or_else(|| panic!("Icon {name} does not exist"))
-            .gl_texture
-            .texture()
-    }
-    
-    /// # Panics
-    /// Panics if the texture does not exist
-    #[allow(unused)]
-    pub fn gl_planet(&self, name: &str) -> glow::Texture {
-        self.planets.get(name)
-            .unwrap_or_else(|| panic!("Planet texture {name} does not exist"))
+    pub fn gl_texture(&self, name: &str) -> glow::Texture {
+        self.textures.get(name)
+            .unwrap_or_else(|| panic!("Texture {name} does not exist"))
             .gl_texture
             .texture()
     }
 
-    pub fn build_icon_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
+    pub fn build_texture_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
         info!("Building renderers");
-        let mut icon_renderers = HashMap::new();
-        for (texture_name, texture) in &self.icons {
-            trace!("Building renderer for {}", texture_name);
+        let mut texture_renderers = HashMap::new();
+        for (texture_name, texture) in &self.textures {
+            trace!("Building texture renderer for {}", texture_name);
             let renderer = TextureRenderer::new(gl, texture.gl_texture.texture());
-            icon_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
+            texture_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
         }
-        icon_renderers
+        texture_renderers
     }
-    
-    pub fn build_planet_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<PlanetRenderer>>> {
+
+    pub fn build_celestial_object_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<CelestialObjectRenderer>>> {
         info!("Building renderers");
-        let mut planet_renderers = HashMap::new();
-        for (texture_name, texture) in &self.planets {
-            trace!("Building renderer for {}", texture_name);
-            let renderer = PlanetRenderer::new(gl, texture.gl_texture.texture());
-            planet_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
+        let mut celestial_object_renderers = HashMap::new();
+        for (texture_name, texture) in &self.textures {
+            if !texture_name.ends_with(".celestial_object") {
+                continue;
+            }
+            let texture_name = texture_name.trim_end_matches(".celestial_object");
+            trace!("Building celestial_object renderer for {}", texture_name);
+            let renderer = CelestialObjectRenderer::new(gl, texture.gl_texture.texture());
+            celestial_object_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
         }
-        planet_renderers
+        celestial_object_renderers
     }
 
     pub fn destroy(&self, gl: &Arc<glow::Context>) {
         info!("Destroying textures");
-        for icon in self.icons.values() {
-            icon.gl_texture.destroy(gl);
-        }
-        for planet in self.planets.values() {
-            planet.gl_texture.destroy(gl);
+        for texture in self.textures.values() {
+            texture.gl_texture.destroy(gl);
         }
     }
 }

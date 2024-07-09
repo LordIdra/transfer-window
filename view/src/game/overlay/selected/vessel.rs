@@ -10,7 +10,7 @@ pub mod visual_timeline;
 
 pub fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent, color: Color32) {
     let remaining_fuel = vessel_component.fuel_litres();
-    let max_fuel = vessel_component.max_fuel_litres();
+    let max_fuel = vessel_component.fuel_capacity_litres();
     let fuel_proportion = (remaining_fuel / max_fuel) as f32;
 
     draw_key(ui, "Fuel");
@@ -19,8 +19,8 @@ pub fn draw_fuel(ui: &mut Ui, vessel_component: &VesselComponent, color: Color32
 }
 
 pub fn draw_dv(ui: &mut Ui, vessel_component: &VesselComponent, color: Color32) {
-    let remaining_dv = vessel_component.dv().unwrap();
-    let max_dv = vessel_component.max_dv().unwrap();
+    let remaining_dv = vessel_component.dv();
+    let max_dv = vessel_component.max_dv();
     let dv_proportion = (remaining_dv / max_dv) as f32;
 
     draw_key(ui, "ΔV");
@@ -29,7 +29,7 @@ pub fn draw_dv(ui: &mut Ui, vessel_component: &VesselComponent, color: Color32) 
 }
 
 pub fn draw_torpedoes(ui: &mut Ui, vessel_component: &VesselComponent, color: Color32) {
-    let max_torpedoes = vessel_component.max_torpedoes();
+    let max_torpedoes = vessel_component.torpedo_capacity();
     let torpedoes = vessel_component.torpedoes();
     let dv_proportion = torpedoes as f32 / max_torpedoes as f32;
 
@@ -118,8 +118,8 @@ pub fn update(view: &View) {
 
         if has_intel {
             draw_resources(ui, vessel_component, &name);
-            if let VesselComponent::Station(station) = view.model.vessel_component(entity) {
-                draw_docking(view, ui, entity, station);
+            if view.model.vessel_component(entity).has_docking() {
+                draw_docking(view, ui, entity);
             }
         }
 

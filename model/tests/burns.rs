@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::{faction::Faction, ship::{ship_slot::{engine::EngineType, fuel_tank::FuelTankType, ShipSlot, ShipSlotLocation}, ShipClass}, timeline::{start_burn::StartBurnEvent, TimelineEvent}, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, PathComponent}, vessel_component::{class::VesselClass, engine::EngineType, faction::Faction, fuel_tank::FuelTankType, timeline::{start_burn::StartBurnEvent, TimelineEvent}}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_burn_without_engine_or_fuel_tank() {
@@ -8,24 +8,19 @@ fn test_burn_without_engine_or_fuel_tank() {
     let earth_mass = 5.972e24;
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = ShipClass::Frigate;
+    let class = VesselClass::Scout1;
     let orbit = Orbit::new(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new_ship(class, Faction::Player))
+        .with_vessel_component(class.build(Faction::Player))
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
     assert!(!StartBurnEvent::can_create_ever(&model, vessel));
 
-    let engine = ShipSlot::new_engine(EngineType::Efficient);
-    model.set_slot(vessel, ShipSlotLocation::Back, engine);
-
-    assert!(!StartBurnEvent::can_create_ever(&model, vessel));
-
-    let fuel_tank = ShipSlot::new_fuel_tank(FuelTankType::Small);
-    model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
+    model.vessel_component_mut(vessel).set_fuel_tank(Some(FuelTankType::FuelTank2));
+    model.vessel_component_mut(vessel).set_engine(Some(EngineType::Regular));
 
     assert!(StartBurnEvent::can_create_ever(&model, vessel));
 }
@@ -37,22 +32,18 @@ fn test_create_burn_with_zero_dv() {
     let earth_mass = 5.972e24;
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = ShipClass::Frigate;
+    let class = VesselClass::Scout1;
+    let vessel_component = class.build(Faction::Player)
+        .with_fuel_tank(FuelTankType::FuelTank2)
+        .with_engine(EngineType::Regular);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new_ship(class, Faction::Player))
-        .with_path_component(PathComponent::default()));
-    let orbit = Orbit::circle(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
-    model.path_component_mut(vessel).add_segment(Segment::Orbit(orbit));
-
+        .with_path_component(PathComponent::new_with_orbit(Orbit::circle(earth, vessel_component.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10)))
+        .with_vessel_component(vessel_component));
+    
     model.update(0.01);
-
-    let engine = ShipSlot::new_engine(EngineType::Efficient);
-    model.set_slot(vessel, ShipSlotLocation::Back, engine);
-    let fuel_tank = ShipSlot::new_fuel_tank(FuelTankType::Small);
-    model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
     
     assert!(StartBurnEvent::can_create_ever(&model, vessel));
 
@@ -86,23 +77,23 @@ fn test_create_and_adjust_burn() {
     let earth_mass = 5.972e24;
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
 
-    let class = ShipClass::Frigate;
-    let orbit = Orbit::circle(earth, class.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
+    let fuel_tank = FuelTankType::FuelTank2;
+    let engine = EngineType::Booster;
+    let vessel_component = VesselClass::Scout1.build(Faction::Player)
+        .with_fuel_tank(fuel_tank)
+        .with_engine(engine);
+    dbg!(vessel_component.dry_mass());
+    let vessel_component_dry_mass = vessel_component.dry_mass();
+    let vessel_component_fuel_mass = vessel_component.fuel_kg();
+    let orbit = Orbit::circle(earth, vessel_component.mass(), earth_mass, vec2(0.01041e9, 0.0), 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
-        .with_vessel_component(VesselComponent::new_ship(class, Faction::Player))
+        .with_vessel_component(vessel_component)
         .with_path_component(PathComponent::new_with_orbit(orbit)));
 
     model.update(0.01);
-
-    let engine_type = EngineType::Booster;
-    let engine = ShipSlot::new_engine(engine_type.clone());
-    model.set_slot(vessel, ShipSlotLocation::Back, engine);
-    let fuel_tank_type = FuelTankType::Small;
-    let fuel_tank = ShipSlot::new_fuel_tank(fuel_tank_type.clone());
-    model.set_slot(vessel, ShipSlotLocation::Middle, fuel_tank);
     
     assert!(StartBurnEvent::can_create_ever(&model, vessel));
     
@@ -130,11 +121,12 @@ fn test_create_and_adjust_burn() {
     let test_time = start_time + duration / 2.0;
     let mass_at_time = model.mass_at_time(vessel, test_time, None);
     let rocket_equation_function = RocketEquationFunction::new(
-        class.mass(),
-        fuel_tank_type.capacity_kg(),
-        engine_type.fuel_kg_per_second(),
-        engine_type.specific_impulse_space(),
+        vessel_component_dry_mass,
+        vessel_component_fuel_mass,
+        engine.fuel_kg_per_second(),
+        engine.specific_impulse(),
         duration / 2.0);
+
     // *sigh* some variation is expected because the mass clamps to the lowest previous point
     // to avoid integration errors when interpolating points
     println!("actual mass = {} expected mass = {}", mass_at_time, rocket_equation_function.mass());
@@ -143,11 +135,12 @@ fn test_create_and_adjust_burn() {
     let mass_before = model.mass_at_time(vessel, start_time - 0.1, None);
     let mass_after = model.mass_at_time(vessel, end_time + 0.1, None);
     let rocket_equation_function = RocketEquationFunction::new(
-        class.mass(),
-        fuel_tank_type.capacity_kg(),
-        engine_type.fuel_kg_per_second(),
-        engine_type.specific_impulse_space(),
+        vessel_component_dry_mass,
+        vessel_component_fuel_mass,
+        engine.fuel_kg_per_second(),
+        engine.specific_impulse(),
         duration);
+
     assert_eq!(mass_after, rocket_equation_function.mass());
     println!("mass before = {} mass after = {} expected burnt = {}", mass_before, mass_after, rocket_equation_function.fuel_kg_burnt());
     assert!(((mass_before - mass_after) - rocket_equation_function.fuel_kg_burnt()).abs() < 1.0e-3);

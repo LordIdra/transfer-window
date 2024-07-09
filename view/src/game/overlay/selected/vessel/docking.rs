@@ -1,5 +1,5 @@
 use eframe::egui::{Color32, Grid, Pos2, Rect, RichText, Rounding, Stroke, Ui};
-use transfer_window_model::{components::vessel_component::station::{DockingPort, DockingPortLocation, ResourceTransferDirection, Station}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::docking::{ContinuousResourceTransfer, DiscreteResourceTransfer, DockingPort, DockingPortLocation, ResourceTransferDirection}, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{explorer::vessel_normal_circle_color, vessel_editor::VesselEditor, widgets::{buttons::{draw_edit_vessel, draw_undock}, custom_image_button::CustomCircularImageButton, labels::{draw_subtitle, draw_value}, util::{advance_cursor_to, should_draw_dv, should_draw_fuel, should_draw_torpedoes}}}, selected::Selected, util::{format_time, vessel_texture}, View}, styles};
 
@@ -50,8 +50,8 @@ fn draw_resources_grid(view: &View, ui: &mut Ui, station_entity: Entity, docked_
         }
 
         if should_draw_fuel(vessel_component) {
-            let transfer = view.model.get_docking_port(station_entity, location).fuel_transfer();
-            let direction = transfer.map(|transfer| transfer.direction());
+            let transfer = view.model.docking_port(station_entity, location).docked_vessel().fuel_transfer();
+            let direction = transfer.map(ContinuousResourceTransfer::direction);
             let is_transfer_from = direction.is_some_and(|direction| direction.is_from_docked());
             let is_transfer_to = direction.is_some_and(|direction| direction.is_to_docked());
             let can_transfer_from_docked = view.model.can_transfer_fuel_from_docked(station_entity, location);
@@ -66,8 +66,8 @@ fn draw_resources_grid(view: &View, ui: &mut Ui, station_entity: Entity, docked_
         }
 
         if should_draw_torpedoes(vessel_component) {
-            let transfer = view.model.get_docking_port(station_entity, location).torpedo_transfer();
-            let direction = transfer.map(|transfer| transfer.direction());
+            let transfer = view.model.docking_port(station_entity, location).docked_vessel().torpedo_transfer();
+            let direction = transfer.map(DiscreteResourceTransfer::direction);
             let is_transfer_from = direction.is_some_and(|direction| direction.is_from_docked());
             let is_transfer_to = direction.is_some_and(|direction| direction.is_to_docked());
             let can_transfer_from_docked = view.model.can_transfer_torpedoes_from_docked(station_entity, location);
@@ -103,21 +103,18 @@ fn draw_controls(view: &View, station: Entity, entity: Entity, ui: &mut Ui) {
     });
 }
 
-fn draw_header(ui: &mut Ui, docking_port: &Option<DockingPort>, view: &View, location: DockingPortLocation) {
+fn draw_header(ui: &mut Ui, docking_port: &DockingPort, view: &View, location: DockingPortLocation) {
     ui.horizontal(|ui| {
-        let (texture, color) = match docking_port {
-            Some(docking_port) => {
-                let docked_entity = docking_port.docked_entity();
-                let faction = view.model.vessel_component(docked_entity).faction();
-                let texture = vessel_texture(view.model.vessel_component(docked_entity));
-                let color = vessel_normal_circle_color(faction);
-                (texture, color)
-            }
-            None => {
-                let texture = "dock";
-                let color = Color32::from_rgb(100, 100, 100);
-                (texture, color)
-            }
+        let (texture, color) = if docking_port.has_docked_vessel() {
+            let docked_entity = docking_port.docked_vessel().entity();
+            let faction = view.model.vessel_component(docked_entity).faction();
+            let texture = vessel_texture(view.model.vessel_component(docked_entity));
+            let color = vessel_normal_circle_color(faction);
+            (texture, color)
+        } else {
+            let texture = "dock";
+            let color = Color32::from_rgb(100, 100, 100);
+            (texture, color)
         };
 
         let button = CustomCircularImageButton::new(view, texture, 24.0)
@@ -132,23 +129,23 @@ fn draw_header(ui: &mut Ui, docking_port: &Option<DockingPort>, view: &View, loc
         ui.add(button);
         ui.label(text);
 
-        if let Some(docking_port) = docking_port {
-            let name = view.model.name_component(docking_port.docked_entity()).name();
+        if docking_port.has_docked_vessel() {
+            let name = view.model.name_component(docking_port.docked_vessel().entity()).name();
             ui.label(RichText::new("-").size(14.0));
             ui.label(RichText::new(name).size(14.0).monospace().strong());
         };
     });
 }
 
-pub fn draw_docking(view: &View, ui: &mut Ui, station_entity: Entity, station: &Station) {
+pub fn draw_docking(view: &View, ui: &mut Ui, station_entity: Entity) {
     draw_subtitle(ui, "Docking ports");
-    for (location, docking_port) in station.docking_ports() {
+    for (location, docking_port) in view.model.vessel_component(station_entity).docking_ports().unwrap() {
         draw_header(ui, docking_port, view, *location);
 
-        let Some(docking_port) = docking_port else {
+        if !docking_port.has_docked_vessel() {
             continue;
         };
-        let docked_entity = docking_port.docked_entity();
+        let docked_entity = docking_port.docked_vessel().entity();
 
         ui.horizontal(|ui| {
             let rect = ui.vertical(|ui| {

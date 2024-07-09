@@ -1,7 +1,7 @@
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{ship::ship_slot::{ShipSlotLocation, System}, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::class::VesselClass}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 const TIME_BEFORE_BURN_START: f64 = 0.1;
 const INITIAL_DV: DVec2 = DVec2::new(0.0, 1.0);
@@ -11,13 +11,12 @@ pub struct FireTorpedoEvent {
     time: f64,
     fire_from: Entity,
     ghost: Entity,
-    slot_location: ShipSlotLocation,
     burn_time: f64,
 }
 
 impl FireTorpedoEvent {
-    pub fn new(model: &mut Model, fire_from: Entity, time: f64, slot_location: ShipSlotLocation) -> Self {
-        let mut vessel_component = VesselComponent::new_torpedo(model.vessel_component(fire_from).faction());
+    pub fn new(model: &mut Model, fire_from: Entity, time: f64) -> Self {
+        let mut vessel_component = VesselClass::Torpedo.build(model.vessel_component(fire_from).faction());
         vessel_component.set_target(model.vessel_component(fire_from).target());
 
         let fire_from_orbit = model.orbit_at_time(fire_from, time, None);
@@ -38,20 +37,15 @@ impl FireTorpedoEvent {
         model.create_burn(ghost, burn_time, rocket_equation_function);
         model.adjust_burn(ghost, burn_time, INITIAL_DV);
 
-        Self { time, fire_from, ghost, slot_location, burn_time }
+        Self { time, fire_from, ghost, burn_time }
     }
 
     /// # Panics
     /// Panics if the weapon slot requested does not in fact contain a weapon or is not a torpedo
     pub fn execute(&self, model: &mut Model) {
-        model.vessel_component_mut(self.ghost).as_torpedo_mut().unwrap().set_ghost(false);
-        let weapon = model.vessel_component_mut(self.fire_from)
-            .as_ship_mut()
-            .unwrap()
-            .get_slot_mut(self.slot_location)
-            .as_weapon_mut()
-            .expect("Weapon slot does not contain a weapon");
-        weapon.type_mut().as_torpedo_mut().decrement_stockpile();
+        model.vessel_component_mut(self.ghost).unset_ghost();
+        model.vessel_component_mut(self.fire_from).decrement_torpedoes();
+        model.vessel_component_mut(self.fire_from).torpedo_launcher.as_mut().unwrap().reset_time_to_reload();
     }
 
     pub fn cancel(&self, model: &mut Model) {
@@ -78,9 +72,24 @@ impl FireTorpedoEvent {
         model.vessel_component(self.ghost).timeline().last_blocking_event().is_none()
     }
 
-    pub fn can_create(model: &Model, entity: Entity, time: f64, slot_location: ShipSlotLocation) -> bool {
-        model.vessel_component(entity).timeline().is_time_after_last_blocking_event(time) 
-            && model.vessel_component(entity).as_ship().unwrap().final_torpedoes(slot_location) != 0
+    pub fn can_create_ever(model: &Model, entity: Entity) -> bool {
+        let vessel_component = &model.vessel_component(entity);
+        vessel_component.has_torpedo_storage()
+            && vessel_component.has_torpedo_launcher()
+    }
+
+    pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
+        let vessel_component = &model.vessel_component(entity);
+        let cooldown = vessel_component.torpedo_launcher.as_ref().unwrap().type_().cooldown();
+        if let Some(event) = vessel_component.timeline.last_fire_torpedo_event() {
+            if event.time + cooldown > time {
+                return false;
+            }
+        } else if model.time + vessel_component.torpedo_launcher.as_ref().unwrap().time_to_reload() > time {
+            return false;
+        }
+        vessel_component.timeline().is_time_after_last_blocking_event(time)
+            && vessel_component.final_torpedoes() != 0
     }
 
     pub fn ghost(&self) -> Entity {
@@ -89,9 +98,5 @@ impl FireTorpedoEvent {
     
     pub fn burn_time(&self) -> f64 {
         self.burn_time
-    }
-
-    pub fn slot_location(&self) -> ShipSlotLocation {
-        self.slot_location
     }
 }

@@ -2,7 +2,7 @@ pub mod explosion_renderer;
 pub mod geometry_renderer;
 pub mod render_pipeline;
 pub mod screen_texture_renderer;
-pub mod planet_renderer;
+pub mod celestial_object_renderer;
 pub mod atmosphere_renderer;
 mod shader_program;
 pub mod texture_renderer;
@@ -14,9 +14,10 @@ use std::{collections::HashMap, sync::{Arc, Mutex}};
 
 use eframe::{egui::{CentralPanel, PaintCallback, Rect}, egui_glow::CallbackFn, glow::{self}};
 use log::error;
+
+use crate::{game::rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, screen_texture_renderer::ScreenTextureRenderer, texture_renderer::TextureRenderer, celestial_object_renderer::CelestialObjectRenderer, atmosphere_renderer::AtmosphereRenderer}, resources::Resources};
 use transfer_window_model::components::ComponentType;
 use transfer_window_model::Model;
-use crate::{game::rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, screen_texture_renderer::ScreenTextureRenderer, texture_renderer::TextureRenderer, planet_renderer::PlanetRenderer, atmosphere_renderer::AtmosphereRenderer}, resources::Resources};
 
 use super::View;
 
@@ -27,10 +28,10 @@ use super::View;
 /// 4) The texture is rendered to the default FBO
 pub struct Renderers {
     render_pipeline: Arc<Mutex<RenderPipeline>>,
-    object_renderers: HashMap<String, Arc<Mutex<PlanetRenderer>>>,
+    celestial_object_renderers: HashMap<String, Arc<Mutex<CelestialObjectRenderer>>>,
     atmosphere_renderers: HashMap<String, Arc<Mutex<AtmosphereRenderer>>>,
     segment_renderer: Arc<Mutex<GeometryRenderer>>,
-    icon_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
+    texture_renderers: HashMap<String, Arc<Mutex<TextureRenderer>>>,
     screen_texture_renderer: Arc<Mutex<ScreenTextureRenderer>>,
     explosion_renderers: Arc<Mutex<Vec<ExplosionRenderer>>>,
 }
@@ -39,7 +40,7 @@ impl Renderers {
     #[allow(clippy::needless_pass_by_value)]
     pub fn new(resources: &Resources, gl: &Arc<glow::Context>, model: &Model, screen_rect: Rect) -> Self {
         let render_pipeline = Arc::new(Mutex::new(RenderPipeline::new(gl, screen_rect)));
-        let object_renderers = resources.build_planet_renderers(gl);
+        let celestial_object_renderers = resources.build_celestial_object_renderers(gl);
         let mut atmosphere_renderers = HashMap::new();
         for entity in model.entities(vec![ComponentType::AtmosphereComponent]) {
             let name = model.name_component(entity).name().to_lowercase();
@@ -48,21 +49,21 @@ impl Renderers {
             atmosphere_renderers.insert(name, renderer);
         }
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
-        let icon_renderers = resources.build_icon_renderers(gl);
+        let texture_renderers = resources.build_texture_renderers(gl);
         let screen_texture_renderer = Arc::new(Mutex::new(ScreenTextureRenderer::new(gl, screen_rect)));
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
         
-        Self { render_pipeline, object_renderers, atmosphere_renderers, segment_renderer, icon_renderers, screen_texture_renderer, explosion_renderers }
+        Self { render_pipeline, celestial_object_renderers, atmosphere_renderers, segment_renderer, texture_renderers, screen_texture_renderer, explosion_renderers }
     }
 
-    pub fn add_object_vertices(&self, name: &str, vertices: &mut Vec<f32>) {
-        self.object_renderers[name].lock().unwrap().add_vertices(vertices);
+    pub fn add_celestial_object_vertices(&self, name: &str, vertices: &mut Vec<f32>) {
+        self.celestial_object_renderers[name].lock().unwrap().add_vertices(vertices);
     }
     
     pub fn set_object_rotation(&self, name: &str, rotation: f32) {
-        self.object_renderers[name].lock().unwrap().set_rotation(rotation);
+        self.celestial_object_renderers[name].lock().unwrap().set_rotation(rotation);
     }
-    
+
     pub fn add_atmosphere_vertices(&self, name: &str, vertices: &mut Vec<f32>) {
         self.atmosphere_renderers[name].lock().unwrap().add_vertices(vertices);
     }
@@ -72,7 +73,7 @@ impl Renderers {
     }
 
     pub fn add_texture_vertices(&self, texture: &str, vertices: &mut Vec<f32>) {
-        let Some(renderer) = self.icon_renderers.get(texture) else {
+        let Some(renderer) = self.texture_renderers.get(texture) else {
             error!("Texture {} does not exist", texture);
             return;
         };
@@ -86,10 +87,10 @@ impl Renderers {
     pub fn destroy(&mut self, gl: &Arc<glow::Context>) {
         self.render_pipeline.lock().unwrap().destroy(gl);
         self.segment_renderer.lock().unwrap().destroy(gl);
-        for renderer in self.icon_renderers.values() {
+        for renderer in self.texture_renderers.values() {
             renderer.lock().unwrap().destroy(gl);
         }
-        for renderer in self.object_renderers.values() {
+        for renderer in self.celestial_object_renderers.values() {
             renderer.lock().unwrap().destroy(gl);
         }
         for renderer in self.atmosphere_renderers.values() {
@@ -108,10 +109,10 @@ pub fn update(view: &View) {
 
     let screen_rect = view.screen_rect;
     let render_pipeline = view.renderers.render_pipeline.clone();
-    let object_renderers = view.renderers.object_renderers.clone();
+    let object_renderers = view.renderers.celestial_object_renderers.clone();
     let atmosphere_renderers = view.renderers.atmosphere_renderers.clone();
     let segment_renderer = view.renderers.segment_renderer.clone();
-    let texture_renderers = view.renderers.icon_renderers.clone();
+    let texture_renderers = view.renderers.texture_renderers.clone();
     let explosion_renderers = view.renderers.explosion_renderers.clone();
     let time = view.model.time();
     let zoom = view.camera.zoom();

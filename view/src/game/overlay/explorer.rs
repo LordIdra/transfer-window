@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use eframe::{egui::{Align2, Color32, RichText, Ui, Window}, epaint};
 use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
 
@@ -19,6 +21,41 @@ pub fn vessel_normal_circle_color(faction: Faction) -> Color32 {
         Faction::Ally => Color32::from_rgb(0, 80, 60),
         Faction::Enemy => Color32::from_rgb(80, 30, 0),
     }
+}
+
+fn root_entities(view: &View) -> HashSet<Entity> {
+    view.model.entities(vec![ComponentType::OrbitableComponent])
+        .into_iter()
+        .filter(|entity| view.model.parent(*entity).is_none())
+        .collect()
+}
+
+fn order_by_altitude(view: &View, mut entities: Vec<Entity>) -> Vec<Entity> {
+    entities.sort_by(|a, b| {
+        let altitude_a = view.model.position(*a).magnitude();
+        let altitude_b = view.model.position(*b).magnitude();
+        altitude_a.partial_cmp(&altitude_b).unwrap()
+    });
+    entities
+}
+
+fn child_vessel_entities(view: &View, parent_entity: Entity) -> Vec<Entity> {
+    let entities: Vec<Entity> = view.model.entities(vec![ComponentType::VesselComponent])
+        .into_iter()
+        .filter(|entity| view.model.try_vessel_component(*entity).is_some())
+        .filter(|entity| !view.model.vessel_component(*entity).is_ghost())
+        .filter(|entity| view.model.parent(*entity).is_some_and(|parent| parent == parent_entity))
+        .collect();
+    order_by_altitude(view, entities)
+}
+
+pub fn child_orbitable_entities(view: &View, parent_entity: Entity) -> Vec<Entity> {
+    let entities: Vec<Entity> = view.model.entities(vec![ComponentType::OrbitableComponent])
+        .into_iter()
+        .filter(|entity| view.model.try_orbitable_component(*entity).is_some())
+        .filter(|entity| view.model.parent(*entity).is_some_and(|parent| parent == parent_entity))
+        .collect();
+    order_by_altitude(view, entities)
 }
 
 fn render_orbitable(view: &View, ui: &mut Ui, entity: Entity) {
@@ -87,15 +124,11 @@ fn render_entity(view: &View, ui: &mut Ui, entity: Entity, levels: &[bool]) {
 
     if view.model.try_orbitable_component(entity).is_some() {
         let mut to_render = vec![];
-        for other_entity in view.model.entities(vec![ComponentType::VesselComponent]) {
-            if !view.model.vessel_component(other_entity).is_ghost() && view.model.parent(other_entity).is_some_and(|parent| parent == entity) {
-                to_render.push(other_entity);
-            }
+        for other_entity in child_vessel_entities(view, entity) {
+            to_render.push(other_entity);
         }
-        for other_entity in view.model.entities(vec![ComponentType::OrbitableComponent]) {
-            if view.model.parent(other_entity).is_some_and(|parent| parent == entity) {
-                to_render.push(other_entity);
-            }
+        for other_entity in child_orbitable_entities(view, entity) {
+            to_render.push(other_entity);
         }
 
         for i in 0..to_render.len() {
@@ -122,10 +155,8 @@ pub fn update(view: &View) {
             .show(&view.context.clone(), |ui| {
         draw_title(ui, "Overview");
         
-        for entity in view.model.entities(vec![ComponentType::OrbitableComponent]) {
-            if view.model.parent(entity).is_none() {
-                render_entity(view, ui, entity, &[]);
-            }
+        for entity in root_entities(view) {
+            render_entity(view, ui, entity, &[]);
         }
     });
 }
