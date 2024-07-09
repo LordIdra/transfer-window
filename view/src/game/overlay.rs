@@ -22,7 +22,9 @@ pub fn draw(view: &View) {
 
     styles::DefaultWindow::apply(&view.context);
 
-    explorer::update(view);
+    if view.config.explorer {
+        explorer::update(view);
+    }
     fps::update(view);
     objectives::update(view);
     scale::update(view);

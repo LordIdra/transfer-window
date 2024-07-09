@@ -27,10 +27,27 @@ pub mod storyteller;
 mod underlay;
 mod util;
 
+pub struct ViewConfig {
+    apsis_icons: bool,
+    selected: bool,
+    explorer: bool,
+}
+
+impl Default for ViewConfig {
+    fn default() -> Self {
+        Self { 
+            apsis_icons: true, 
+            selected: true, 
+            explorer: true 
+        }
+    }
+}
+
 pub struct View {
     gl: Arc<glow::Context>,
     model: Model,
     story: Story,
+    config: ViewConfig,
     context: Context,
     previous_screen_rect: Rect,
     screen_rect: Rect,
@@ -54,7 +71,7 @@ pub struct View {
 }
 
 impl View {
-    pub fn new(gl: Arc<glow::Context>, model: Model, story: Story, context: Context, resources: Arc<Resources>, focus: Option<Entity>) -> Self {
+    pub fn new(gl: Arc<glow::Context>, model: Model, story: Story, context: Context, resources: Arc<Resources>, config: ViewConfig, focus: Option<Entity>) -> Self {
         let previous_screen_rect = context.screen_rect();
         let screen_rect = context.screen_rect();
         let controller_events = Arc::new(Mutex::new(vec![]));
@@ -76,7 +93,7 @@ impl View {
         let pointer_over_ui = false;
         let pointer_over_icon = false;
         let objectives = vec![];
-        Self { gl, model, story, context, previous_screen_rect, screen_rect, controller_events, model_events, view_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon, objectives }
+        Self { gl, model, story, config, context, previous_screen_rect, screen_rect, controller_events, model_events, view_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon, objectives }
     }
 
     fn update_camera_focus_position(&mut self) {

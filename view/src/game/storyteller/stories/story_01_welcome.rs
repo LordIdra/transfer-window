@@ -1,7 +1,7 @@
 use nalgebra_glm::vec2;
 use transfer_window_model::{api::{builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
-use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{create_vessel_action::CreateVesselAction, finish_level_action::FinishLevelAction, set_focus_action::SetFocusAction, set_time_step_action::SetTimeStepAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}};
+use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{create_vessel_action::CreateVesselAction, finish_level_action::FinishLevelAction, set_focus_action::SetFocusAction, set_time_step_action::SetTimeStepAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}, ViewConfig};
 
 use super::StoryBuilder;
 
@@ -13,7 +13,7 @@ impl StoryBuilder for Story01Welcome {
         None
     }
 
-    fn build(&self) -> (Model, Story, Option<Entity>) {
+    fn build(&self) -> (Model, Story, ViewConfig, Option<Entity>) {
         let mut model = Model::default();
 
         let centralia = OrbitableBuilder {
@@ -32,7 +32,7 @@ impl StoryBuilder for Story01Welcome {
             .transition(Transition::new("intro-2", Condition::click_continue()))
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
-                    .normal("Hello. Welcome to the Transfer Window command interface.")
+                    .normal("Hello. Welcome to the Transfer Window Interface.")
                     .with_continue()
                 )
             )
@@ -42,7 +42,7 @@ impl StoryBuilder for Story01Welcome {
             .transition(Transition::new("intro-3", Condition::click_continue()))
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
-                    .normal("My name's Jake, and I'll be training you on the basics of using the interface. Once you've finished your training, you'll work to solve real-world tactical and strategic problems.")
+                    .normal("My name's Jake, and I'll be training you on the basics of using the Interface. Once you've finished your training, you'll work to solve real-world tactical and strategic problems.")
                     .with_continue()
                 )
             )
@@ -52,7 +52,7 @@ impl StoryBuilder for Story01Welcome {
             .transition(Transition::new("camera-movement", Condition::click_continue()))
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
-                    .normal("Please keep in mind that for now, this is a fully simulated environment, and your actions will have no real-world consequences. Now, let's begin.")
+                    .normal("Please keep in mind that for now, this is a fully simulated environment, and your actions will have no real-world consequences. You have access to a limited subset of the Interface for now so as not to overwhelm you, but I'll activate new sections as you learn. Now, let's begin.")
                     .with_continue()
                 )
             )
@@ -238,6 +238,12 @@ impl StoryBuilder for Story01Welcome {
         story.add("end", |_model: &Model| State::default()
             .action(FinishLevelAction::new("1-01".to_string())));
 
-        (model, story, Some(centralia))
+        let view_config = ViewConfig {
+            apsis_icons: false,
+            selected: false,
+            explorer: false,
+        };
+
+        (model, story, view_config, Some(centralia))
     }
 }

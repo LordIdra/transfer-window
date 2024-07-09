@@ -193,6 +193,10 @@
 [x] Vessel constructor
 [x] Orbitable constructor
 [x] Storyteller objectives
+[x] Persist completed levels
+[x] Different texture for completed/locked levels
+[x] Hide aspects of UI
+[ ] Exit to menu option
 
 
 
@@ -205,9 +209,6 @@
 
 # Levels
 Chapter 1: Intro
-[ ] Hide aspects of UI?
-[ ] persist completed levels
-[ ] different texture for completed/locked levels
 [ ] 02 Orbits
   - periapsis, apoapsis
   - comparison of higher and lower orbits speed

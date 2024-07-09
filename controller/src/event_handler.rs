@@ -3,7 +3,7 @@ use std::fs;
 use eframe::egui::{Context, ViewportCommand};
 use log::error;
 use transfer_window_model::Model;
-use transfer_window_view::{game::{self, storyteller::{stories::StoryBuilder, story::Story}}, Scene};
+use transfer_window_view::{game::{self, storyteller::{stories::StoryBuilder, story::Story}, ViewConfig}, Scene};
 
 use crate::Controller;
 
@@ -18,8 +18,8 @@ pub fn new_game(controller: &mut Controller, context: &Context, story_builder: &
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("New game");
 
-    let (model, story, focus) = story_builder.build();
-    controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, story, context.clone(), controller.resources.clone(), focus));
+    let (model, story, view_config, focus) = story_builder.build();
+    controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, story, context.clone(), controller.resources.clone(), view_config, focus));
 }
 
 pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
@@ -37,7 +37,9 @@ pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
     return;
     };
 
-    controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, Story::empty(), context.clone(), controller.resources.clone(), None));
+    let view_config = ViewConfig::default();
+
+    controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, Story::empty(), context.clone(), controller.resources.clone(), view_config, None));
 }
 
 pub fn finish_level(controller: &mut Controller, level: String) {

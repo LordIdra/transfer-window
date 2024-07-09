@@ -117,7 +117,11 @@ impl View {
                     self.add_story_event(StoryEvent::ChangeFocus(focus));
                     self.camera.set_focus(focus, self.model.absolute_position(focus));
                 },
-                ViewEvent::SetSelected(selected) => self.selected = selected,
+                ViewEvent::SetSelected(selected) => {
+                    if self.config.selected {
+                        self.selected = selected
+                    }
+                }
                 ViewEvent::SetVesselEditor(vessel_editor) => self.vessel_editor = vessel_editor,
                 ViewEvent::SetDebugWindowOpen(debug_window_open) => self.debug_window_open = debug_window_open,
                 ViewEvent::SetDebugWindowTab(debug_window_tab) => self.debug_window_tab = debug_window_tab,

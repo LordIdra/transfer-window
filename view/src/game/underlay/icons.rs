@@ -81,8 +81,10 @@ fn compute_initial_icons(view: &View, pointer: &PointerState) -> Vec<Box<dyn Ico
     let mut icons: Vec<Box<dyn Icon>> = vec![];
     icons.append(&mut AdjustBurn::generate(view, pointer));
     icons.append(&mut AdjustFireTorpedo::generate(view, pointer));
-    icons.append(&mut Apsis::generate(view));
-    icons.append(&mut Burn::generate(view));
+    if view.config.apsis_icons {
+        icons.append(&mut Apsis::generate(view));
+        icons.append(&mut Burn::generate(view));
+    }
     icons.append(&mut ClosestApproach::generate(view));
     icons.append(&mut Encounter::generate(view));
     icons.append(&mut FireTorpedo::generate(view));
