@@ -212,7 +212,6 @@ Chapter 1: Intro
 [ ] 02 Burns
   - periapsis, apoapsis
   - warp to point, pause
-  - create a burn and get further from centralia
   - circularise orbit
 
 - 04 Chase

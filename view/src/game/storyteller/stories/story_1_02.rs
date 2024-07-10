@@ -1,9 +1,13 @@
+use std::f64::consts::PI;
+
 use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::api::time::TimeStep;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
+use crate::game::storyteller::story::action::create_vessel_action::CreateVesselAction;
+use crate::game::storyteller::story::action::delete_vessel_action::DeleteVesselAction;
 use crate::game::storyteller::story::action::set_time_step_action::SetTimeStepAction;
 use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{finish_level_action::FinishLevelAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}, ViewConfig};
 
@@ -151,35 +155,36 @@ impl StoryBuilder for Story1_02 {
             }
         );
 
-        story.add("create-burn-circularise", |_| {
+        story.add("create-burn-circularise", move |_| {
             State::default()
                 .transition(Transition::new("create-burn-engines", Condition::click_continue()))
-                // .action(CreateVesselAction::new(VesselBuilder {
-                //     name: "Demo Ship",
-                //     vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                //     orbit_builder: OrbitBuilder::Freeform { 
-                //         parent: centralia,
-                //         distance: 1.0e7,
-                //         speed: 8.0e3,
-                //         angle: 0.0,
-                //         direction: OrbitDirection::AntiClockwise, 
-                //     },
-                // }))
+                .action(CreateVesselAction::new(VesselBuilder {
+                    name: "Demo Ship",
+                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
+                    orbit_builder: OrbitBuilder::Circular { 
+                        parent: centralia,
+                        distance: 1.576e7,
+                        angle: PI,
+                        direction: OrbitDirection::AntiClockwise, 
+                    },
+                }))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
-                        .normal("Great. Now, let's say we want to take this elliptical orbit and make it circular at the apoapsis. Here's the orbit we're aiming for. How do we get to that orbit?")
+                        .normal("Great. Now, let's say we want to take this elliptical orbit and make it circular at the apoapsis. I've created a temporary vessel on the orbit we're aiming for to show you what I mean. How do we get to that orbit?")
                         .with_continue()
                     )
                 )
             }
         );
 
-        story.add("create-burn-engines", |_| {
+        story.add("create-burn-engines", |model| {
+            let demo_ship = model.entity_by_name("Demo Ship").unwrap();
             State::default()
                 .transition(Transition::new("end", Condition::click_continue()))
+                .action(DeleteVesselAction::new(demo_ship))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
-                        .normal("Well, this is where things start to get difficult. ")
+                        .normal("Well, we'll need to fire the ship's engine at the apoapsis.")
                         .with_continue()
                     )
                 )
