@@ -1,7 +1,7 @@
 use eframe::epaint::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::{api::{builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
-use transfer_window_model::api::builder::AtmosphereBuilder;
+use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{create_vessel_action::CreateVesselAction, finish_level_action::FinishLevelAction, set_focus_action::SetFocusAction, set_time_step_action::SetTimeStepAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}, ViewConfig};
 
 use super::StoryBuilder;
@@ -25,12 +25,12 @@ impl StoryBuilder for Story1_01 {
             rotation_angle: 100.0,
             type_: OrbitableType::Planet,
             physics: OrbitablePhysicsBuilder::Stationary(vec2(0.0, 0.0)),
-            atmosphere: AtmosphereBuilder {
-                color: Color32::from_hex("#3558A5").unwrap(),
-                density: 0.9,
-                height: 0.15,
-                falloff: 4.0
-            }.build_some()
+            atmosphere: Atmosphere::new_some(
+                Color32::from_hex("#3558A5").unwrap(),
+                0.9,
+                0.15,
+                4.0
+            )
         }.build(&mut model);
 
         let mut story = Story::new("intro-1");
