@@ -1,10 +1,18 @@
-use std::{collections::HashMap, fs::{self, DirEntry}, sync::{Arc, Mutex}};
+use std::collections::HashMap;
+use std::fs;
+use std::fs::DirEntry;
+use std::sync::{Arc, Mutex};
 
-use eframe::{egui::{self, ImageSource}, glow};
+use eframe::egui;
+use eframe::egui::ImageSource;
+use eframe::glow;
 use image::GenericImageView;
+use itertools::Itertools;
 use log::{info, trace};
 
-use crate::game::rendering::{texture, texture_renderer::TextureRenderer, celestial_object_renderer::CelestialObjectRenderer};
+use crate::game::rendering::celestial_object_renderer::CelestialObjectRenderer;
+use crate::game::rendering::texture;
+use crate::game::rendering::texture_renderer::TextureRenderer;
 
 fn directory_entries(directory: String) -> Vec<DirEntry> {
     fs::read_dir(directory)
@@ -92,8 +100,19 @@ impl Resources {
                 continue;
             }
             let texture_name = texture_name.trim_end_matches(".celestial_object");
-            trace!("Building celestial_object renderer for {}", texture_name);
-            let renderer = CelestialObjectRenderer::new(gl, texture.gl_texture.texture());
+            trace!("Building celestial object renderer for {}", texture_name);
+            let clouds = self.textures.iter()
+                .filter(|(name, _)| name.starts_with(texture_name) && name.ends_with(".clouds"))
+                .sorted_by_key(|(name, _)|
+                    name.trim_start_matches(texture_name)
+                        .trim_start_matches('.')
+                        .parse::<u32>()
+                        .unwrap()
+                )
+                .map(|(_, texture)| texture.gl_texture.texture())
+                .collect::<Vec<_>>();
+            trace!("Cloud layers: {:?}", clouds.len());
+            let renderer = CelestialObjectRenderer::new(gl, texture.gl_texture.texture(), clouds);
             celestial_object_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
         }
         celestial_object_renderers

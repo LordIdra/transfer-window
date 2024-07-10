@@ -11,6 +11,13 @@ impl Model {
             .into_iter()
             .find(|&entity| self.name_component(entity).name() == name)
     }
+    
+    #[allow(unused)]
+    pub fn entity_by_name_ignore_case(&self, name: &str) -> Option<Entity> {
+        self.entities(vec![ComponentType::NameComponent])
+            .into_iter()
+            .find(|&entity| self.name_component(entity).name().eq_ignore_ascii_case(name))
+    }
 
     #[allow(unused)]
     pub fn log_components(&self, entity: Entity) {

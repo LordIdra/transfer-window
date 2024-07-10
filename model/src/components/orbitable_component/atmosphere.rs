@@ -7,12 +7,13 @@ pub struct Atmosphere {
     density: f64,
     height: f64,
     falloff: f64,
+    cloud_speeds: Vec<f64>,
 }
 
 impl Atmosphere {
     
-    pub fn new(color: Color32, density: f64, height: f64, falloff: f64) -> Self {
-        Self { color, density, height, falloff }
+    pub fn new(color: Color32, density: f64, height: f64, falloff: f64, cloud_speeds: Vec<f64>) -> Self {
+        Self { color, density, height, falloff, cloud_speeds }
     }
 
     pub fn color(&self) -> Color32 {
@@ -29,5 +30,9 @@ impl Atmosphere {
 
     pub fn falloff(&self) -> f64 {
         self.falloff
+    }
+    
+    pub fn cloud_speeds(&self) -> Vec<f64> {
+        self.cloud_speeds.clone()
     }
 }

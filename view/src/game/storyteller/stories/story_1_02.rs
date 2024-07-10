@@ -29,7 +29,8 @@ impl StoryBuilder for Story1_02 {
                 color: Color32::from_hex("#3558A5").unwrap(),
                 density: 0.9,
                 height: 0.15,
-                falloff: 4.0
+                falloff: 4.0,
+                cloud_speeds: vec![]
             }.build_some()
         }.build(&mut model);
 

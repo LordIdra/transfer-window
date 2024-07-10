@@ -110,11 +110,12 @@ pub struct AtmosphereBuilder {
     pub density: f64,
     pub height: f64,
     pub falloff: f64,
+    pub cloud_speeds: Vec<f64>,
 }
 
 impl AtmosphereBuilder {
     pub fn build(self) -> Atmosphere {
-        Atmosphere::new(self.color, self.density, self.height, self.falloff)
+        Atmosphere::new(self.color, self.density, self.height, self.falloff, self.cloud_speeds)
     }
     
     pub fn build_some(self) -> Option<Atmosphere> {
