@@ -29,12 +29,6 @@ pub fn draw_subtitle(ui: &mut Ui, name: &str) {
     ui.label(RichText::new(name.to_uppercase()).size(18.0).monospace().strong());
 }
 
-pub fn draw_mass_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    ui.label(RichText::new("Mass").size(12.0).strong());
-    ui.label(RichText::new(format!("{} kg", view.model.mass_at_time(entity, time, Some(Faction::Player)).round())).size(12.0));
-    ui.end_row();
-}
-
 pub fn draw_altitude_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_key(ui, "Altitude");
     draw_value(ui, &format_distance(view.model.position_at_time(entity, time, Some(Faction::Player)).magnitude()));
@@ -154,7 +148,6 @@ pub fn draw_info(view: &View, ui: &mut Ui, name: &str, entity: Entity) {
 pub fn draw_info_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_subtitle(ui, "Info");
     Grid::new("Selected approach info").show(ui, |ui| {
-        draw_mass_at_time(view, ui, entity, time);
         draw_altitude_at_time(view, ui, entity, time);
         draw_speed_at_time(view, ui, entity, time);
         if view.model.vessel_component(entity).target().is_some() {
@@ -167,7 +160,6 @@ pub fn draw_info_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
 pub fn draw_info_at_time_with_orbits(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_subtitle(ui, "Info");
     Grid::new("Selected point info").show(ui, |ui| {
-        draw_mass_at_time(view, ui, entity, time);
         draw_altitude_at_time(view, ui, entity, time);
         draw_speed_at_time(view, ui, entity, time);
         if view.model.vessel_component(entity).has_target() {
