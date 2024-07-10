@@ -138,11 +138,14 @@ fn draw_row(model: &Model, ui: &mut Ui, entity: Entity) {
 
 pub fn draw(model: &Model, ui: &mut Ui) {
     let entities: Vec<Entity> = model.entities(vec![]).into_iter().collect();
-    ScrollArea::vertical()
-        .auto_shrink([false, false])
-        .show_rows(ui, 10.0, entities.len(), |ui, row_range| {
+    ScrollArea::vertical().auto_shrink([false, false]).show_rows(
+        ui,
+        10.0,
+        entities.len(),
+        |ui, row_range| {
             for i in row_range {
                 draw_row(model, ui, entities[i]);
             }
-        });
+        },
+    );
 }

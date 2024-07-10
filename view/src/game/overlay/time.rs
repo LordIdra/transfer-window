@@ -17,11 +17,7 @@ pub fn update(view: &View) {
             ui.horizontal(|ui| {
                 ui.set_height(25.0);
                 ui.add(CustomImage::new(view, "time", 25.0).with_padding(2.0));
-                ui.label(
-                    RichText::new(format_time(view.model.time()))
-                        .strong()
-                        .size(20.0),
-                );
+                ui.label(RichText::new(format_time(view.model.time())).strong().size(20.0));
             });
 
             ui.horizontal(|ui| {

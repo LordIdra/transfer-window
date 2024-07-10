@@ -27,16 +27,11 @@ impl VertexArrayObject {
     pub fn new(gl: &Arc<Context>, vertex_attributes: Vec<VertexAttribute>) -> Self {
         let vertex_array: VertexArray;
         let vertex_buffer: Buffer;
-        let attributes_per_vertex = vertex_attributes
-            .iter()
-            .map(|attribute| attribute.count)
-            .sum();
+        let attributes_per_vertex = vertex_attributes.iter().map(|attribute| attribute.count).sum();
         let stride = vertex_attributes.iter().map(VertexAttribute::size).sum();
 
         unsafe {
-            vertex_array = gl
-                .create_vertex_array()
-                .expect("Cannot create vertex array");
+            vertex_array = gl.create_vertex_array().expect("Cannot create vertex array");
             vertex_buffer = gl.create_buffer().expect("Cannot create vertex buffer");
             gl.bind_vertex_array(Some(vertex_array));
             gl.bind_buffer(ARRAY_BUFFER, Some(vertex_buffer));

@@ -117,12 +117,7 @@ impl StoryBuilder for Story01Welcome {
 
         story.add("warp", |model| {
             let ship = model.entity_by_name("Ship 1").unwrap();
-            let ship_period = model
-                .current_segment(ship)
-                .as_orbit()
-                .unwrap()
-                .period()
-                .unwrap();
+            let ship_period = model.current_segment(ship).as_orbit().unwrap().period().unwrap();
             let time = model.time() + ship_period;
             State::default()
                 .transition(Transition::new(

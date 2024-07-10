@@ -103,20 +103,15 @@ fn draw_resources_grid(
         }
 
         if should_draw_fuel(vessel_component) {
-            let transfer = view
-                .model
-                .docking_port(station_entity, location)
-                .docked_vessel()
-                .fuel_transfer();
+            let transfer =
+                view.model.docking_port(station_entity, location).docked_vessel().fuel_transfer();
             let direction = transfer.map(ContinuousResourceTransfer::direction);
             let is_transfer_from = direction.is_some_and(|direction| direction.is_from_docked());
             let is_transfer_to = direction.is_some_and(|direction| direction.is_to_docked());
-            let can_transfer_from_docked = view
-                .model
-                .can_transfer_fuel_from_docked(station_entity, location);
-            let can_transfer_to_docked = view
-                .model
-                .can_transfer_fuel_to_docked(station_entity, location);
+            let can_transfer_from_docked =
+                view.model.can_transfer_fuel_from_docked(station_entity, location);
+            let can_transfer_to_docked =
+                view.model.can_transfer_fuel_to_docked(station_entity, location);
 
             ui.horizontal(|ui| {
                 draw_fuel_transfer_button(
@@ -155,12 +150,10 @@ fn draw_resources_grid(
             let direction = transfer.map(DiscreteResourceTransfer::direction);
             let is_transfer_from = direction.is_some_and(|direction| direction.is_from_docked());
             let is_transfer_to = direction.is_some_and(|direction| direction.is_to_docked());
-            let can_transfer_from_docked = view
-                .model
-                .can_transfer_torpedoes_from_docked(station_entity, location);
-            let can_transfer_to_docked = view
-                .model
-                .can_transfer_torpedoes_to_docked(station_entity, location);
+            let can_transfer_from_docked =
+                view.model.can_transfer_torpedoes_from_docked(station_entity, location);
+            let can_transfer_to_docked =
+                view.model.can_transfer_torpedoes_to_docked(station_entity, location);
 
             ui.horizontal(|ui| {
                 draw_torpedo_transfer_button(
@@ -247,10 +240,7 @@ fn draw_header(
         ui.label(text);
 
         if docking_port.has_docked_vessel() {
-            let name = view
-                .model
-                .name_component(docking_port.docked_vessel().entity())
-                .name();
+            let name = view.model.name_component(docking_port.docked_vessel().entity()).name();
             ui.label(RichText::new("-").size(14.0));
             ui.label(RichText::new(name).size(14.0).monospace().strong());
         };
@@ -259,11 +249,8 @@ fn draw_header(
 
 pub fn draw_docking(view: &View, ui: &mut Ui, station_entity: Entity) {
     draw_subtitle(ui, "Docking ports");
-    for (location, docking_port) in view
-        .model
-        .vessel_component(station_entity)
-        .docking_ports()
-        .unwrap()
+    for (location, docking_port) in
+        view.model.vessel_component(station_entity).docking_ports().unwrap()
     {
         draw_header(ui, docking_port, view, *location);
 
@@ -294,8 +281,7 @@ pub fn draw_docking(view: &View, ui: &mut Ui, station_entity: Entity) {
             let top_left = Pos2::new(17.0, rect.top() + 5.0);
             let bottom_right = Pos2::new(22.0, rect.bottom() - 10.0);
             let line_rect = Rect::from_min_max(top_left, bottom_right);
-            ui.painter_at(line_rect)
-                .rect(line_rect, Rounding::same(2.0), color, Stroke::NONE);
+            ui.painter_at(line_rect).rect(line_rect, Rounding::same(2.0), color, Stroke::NONE);
         });
     }
 }

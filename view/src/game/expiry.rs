@@ -51,10 +51,8 @@ pub fn update(view: &mut View) {
         time,
     } = view.selected.clone()
     {
-        if let Some(orbit) = view
-            .model
-            .segment_at_time(entity, time, Some(Faction::Player))
-            .as_orbit()
+        if let Some(orbit) =
+            view.model.segment_at_time(entity, time, Some(Faction::Player)).as_orbit()
         {
             let expected_time = match type_ {
                 ApsisType::Periapsis => orbit.next_periapsis_time(),
@@ -108,11 +106,7 @@ pub fn update(view: &mut View) {
         state: _,
     } = view.selected.clone()
     {
-        if view
-            .model
-            .fire_torpedo_event_at_time(entity, time)
-            .is_none()
-        {
+        if view.model.fire_torpedo_event_at_time(entity, time).is_none() {
             trace!("Selected fire torpedo event expired at time={time}");
             view.selected = Selected::None;
         }

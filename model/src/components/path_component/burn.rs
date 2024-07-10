@@ -105,10 +105,8 @@ impl Burn {
 
     #[allow(clippy::missing_panics_doc)]
     pub fn duration(&self) -> f64 {
-        let final_rocket_equation_function = self
-            .rocket_equation_function
-            .step_by_dv(self.total_dv())
-            .unwrap();
+        let final_rocket_equation_function =
+            self.rocket_equation_function.step_by_dv(self.total_dv()).unwrap();
         final_rocket_equation_function.burn_time() - self.rocket_equation_function.burn_time()
     }
 
@@ -132,10 +130,7 @@ impl Burn {
     pub fn rocket_equation_function_at_time(&self, time: f64) -> RocketEquationFunction {
         // Slightly annoying workaround to make sure that if the burn expends all our
         // DV, there won't be a panic
-        match self
-            .rocket_equation_function
-            .step_by_time(time - self.start_point().time())
-        {
+        match self.rocket_equation_function.step_by_time(time - self.start_point().time()) {
             Some(rocket_equation_function) => rocket_equation_function,
             None => self.rocket_equation_function.end(),
         }
@@ -195,8 +190,7 @@ impl Burn {
             let undershot_dt = end_time - self.end_point().time();
             let last = self.points.last().unwrap();
             let mass = self.rocket_equation_function_at_time(end_time).mass();
-            self.points
-                .push(last.next(undershot_dt, mass, self.absolute_acceleration(end_time)));
+            self.points.push(last.next(undershot_dt, mass, self.absolute_acceleration(end_time)));
         }
     }
 
@@ -228,11 +222,7 @@ mod test {
         let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 1.0, 0.0);
         let rocket_equation_function_clone = rocket_equation_function.clone();
         let acceleration_from_time = move |time: f64| {
-            rocket_equation_function_clone
-                .step_by_time(time)
-                .unwrap()
-                .acceleration()
-                * tangent
+            rocket_equation_function_clone.step_by_time(time).unwrap().acceleration() * tangent
         };
         let delta_v = rocket_equation_function.end().used_dv() * tangent;
         let start_time = 0.0;

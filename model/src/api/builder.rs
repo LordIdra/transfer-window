@@ -71,9 +71,7 @@ pub struct VesselBuilder {
 
 impl VesselBuilder {
     pub fn build(self, model: &mut Model) -> Entity {
-        let orbit = self
-            .orbit_builder
-            .build(model, self.vessel_component.mass());
+        let orbit = self.orbit_builder.build(model, self.vessel_component.mass());
         model.allocate(
             EntityBuilder::default()
                 .with_name_component(NameComponent::new(self.name.to_string()))

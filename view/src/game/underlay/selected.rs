@@ -33,8 +33,7 @@ pub fn update(view: &View) {
             let latest_world = view.window_space_to_world_space(latest_window);
 
             if let Some((entity, time)) =
-                view.model
-                    .closest_burn_point(latest_world, select_distance, Some(Faction::Player))
+                view.model.closest_burn_point(latest_world, select_distance, Some(Faction::Player))
             {
                 trace!("Selected orbit point at time={}", time);
                 let selected = Selected::BurnPoint { entity, time };
@@ -48,8 +47,7 @@ pub fn update(view: &View) {
                 let selected = Selected::GuidancePoint { entity, time };
                 view.add_view_event(ViewEvent::SetSelected(selected));
             } else if let Some((entity, time)) =
-                view.model
-                    .closest_orbit_point(latest_world, select_distance, Some(Faction::Player))
+                view.model.closest_orbit_point(latest_world, select_distance, Some(Faction::Player))
             {
                 trace!("Selected orbit point at time={}", time);
                 let selected = Selected::OrbitPoint { entity, time };

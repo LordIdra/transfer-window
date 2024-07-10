@@ -40,11 +40,7 @@ impl State {
         &self,
         events: &Vec<StoryEvent>,
     ) -> Option<(&'static str, Option<&'static str>)> {
-        if self
-            .transition
-            .as_ref()
-            .is_some_and(|transition| transition.can_transition(events))
-        {
+        if self.transition.as_ref().is_some_and(|transition| transition.can_transition(events)) {
             Some((
                 self.transition.as_ref().unwrap().to(),
                 self.transition.as_ref().unwrap().objective(),

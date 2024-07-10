@@ -124,9 +124,8 @@ fn split_overlapping_icons(
     let mut overlapped = vec![];
     for icon in icons {
         #[allow(clippy::borrowed_box)] // false positive
-        let overlaps_any_not_overlapped = not_overlapped
-            .iter()
-            .any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, &*icon));
+        let overlaps_any_not_overlapped =
+            not_overlapped.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, &*icon));
         if overlaps_any_not_overlapped {
             overlapped.push(icon);
         } else {
@@ -164,8 +163,7 @@ fn draw_icon(
         add_textured_square(&mut vertices, icon.position(view), radius, alpha);
     }
 
-    view.renderers
-        .add_texture_vertices(&icon.texture(view), &mut vertices);
+    view.renderers.add_texture_vertices(&icon.texture(view), &mut vertices);
 }
 
 // 'rust is simple' said no one ever

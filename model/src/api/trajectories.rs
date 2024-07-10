@@ -35,14 +35,7 @@ impl Model {
         // A spacecraft that is for example in LEO will never have any
         // encounters, but without this, the predictor would keep on going every single
         // frame and rediscovering the exact same orbits
-        if self
-            .path_component(entity)
-            .final_orbit()
-            .unwrap()
-            .end_point()
-            .time()
-            == end_time
-        {
+        if self.path_component(entity).final_orbit().unwrap().end_point().time() == end_time {
             return false;
         }
 
@@ -85,10 +78,7 @@ impl Model {
     pub fn recompute_trajectory(&mut self, entity: Entity) -> bool {
         // Add 1 because the final orbit will have duration 0
         let segments_to_predict = SEGMENTS_TO_PREDICT + 1
-            - self
-                .path_component(entity)
-                .future_orbits_after_final_non_orbit()
-                .len();
+            - self.path_component(entity).future_orbits_after_final_non_orbit().len();
         self.predict(entity, 1.0e10, segments_to_predict)
     }
 
@@ -102,8 +92,7 @@ impl Model {
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, self.time);
 
         self.path_component_mut(entity).clear_future_segments();
-        self.path_component_mut(entity)
-            .add_segment(Segment::Orbit(orbit));
+        self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
         self.recompute_trajectory(entity);
     }
 

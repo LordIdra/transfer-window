@@ -77,8 +77,7 @@ impl ExplosionRenderer {
         self.program.use_program(gl);
         self.program.uniform_float(gl, "time", time_since_start);
         self.program.uniform_float(gl, "width", screen_rect.width());
-        self.program
-            .uniform_float(gl, "height", screen_rect.height());
+        self.program.uniform_float(gl, "height", screen_rect.height());
         self.program.uniform_float(gl, "zoom", zoom as f32);
         self.program.uniform_vec2(gl, "center", center.x, center.y);
         self.program.uniform_float(gl, "size", self.size as f32);

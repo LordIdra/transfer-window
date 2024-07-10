@@ -41,15 +41,13 @@ impl ScreenTextureRenderer {
             ],
         );
         unsafe {
-            let multisample_framebuffer = gl
-                .create_framebuffer()
-                .expect("Failed to create framebuffer");
+            let multisample_framebuffer =
+                gl.create_framebuffer().expect("Failed to create framebuffer");
             let multisample_texture =
                 create_multisample_color_attachment(gl, multisample_framebuffer, screen_rect);
 
-            let intermediate_framebuffer = gl
-                .create_framebuffer()
-                .expect("Failed to create framebuffer");
+            let intermediate_framebuffer =
+                gl.create_framebuffer().expect("Failed to create framebuffer");
             let intermediate_texture =
                 create_normal_color_attachment(gl, intermediate_framebuffer, screen_rect);
 

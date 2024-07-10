@@ -279,18 +279,14 @@ pub fn compute_adjust_fire_torpedo_arrow_position(
     time: f64,
     direction: BurnAdjustDirection,
 ) -> DVec2 {
-    let event = view
-        .model
-        .fire_torpedo_event_at_time(entity, time)
-        .expect("No fire torpedo event found");
+    let event =
+        view.model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
     let orbit = view.model.orbit_at_time(entity, time, None);
     let burn_position = view.model.absolute_position(orbit.parent())
         + view.model.position_at_time(entity, time, None);
-    let burn_to_arrow_unit = view
-        .model
-        .burn_starting_at_time(event.ghost(), event.burn_time())
-        .rotation_matrix()
-        * direction.vector();
+    let burn_to_arrow_unit =
+        view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix()
+            * direction.vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
 }
 
@@ -310,10 +306,7 @@ pub fn should_render(view: &View, entity: Entity) -> bool {
 }
 
 pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
-    let Some(parent) = view
-        .model
-        .parent_at_time(entity, time, Some(Faction::Player))
-    else {
+    let Some(parent) = view.model.parent_at_time(entity, time, Some(Faction::Player)) else {
         return true;
     };
     should_render_parent(view, parent)

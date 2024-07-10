@@ -66,9 +66,7 @@ impl FireTorpedoEvent {
     /// is not a torpedo
     pub fn execute(&self, model: &mut Model) {
         model.vessel_component_mut(self.ghost).unset_ghost();
-        model
-            .vessel_component_mut(self.fire_from)
-            .decrement_torpedoes();
+        model.vessel_component_mut(self.fire_from).decrement_torpedoes();
         model
             .vessel_component_mut(self.fire_from)
             .torpedo_launcher
@@ -98,11 +96,7 @@ impl FireTorpedoEvent {
     }
 
     pub fn can_adjust(&self, model: &Model) -> bool {
-        model
-            .vessel_component(self.ghost)
-            .timeline()
-            .last_blocking_event()
-            .is_none()
+        model.vessel_component(self.ghost).timeline().last_blocking_event().is_none()
     }
 
     pub fn can_create_ever(model: &Model, entity: Entity) -> bool {
@@ -112,29 +106,17 @@ impl FireTorpedoEvent {
 
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         let vessel_component = &model.vessel_component(entity);
-        let cooldown = vessel_component
-            .torpedo_launcher
-            .as_ref()
-            .unwrap()
-            .type_()
-            .cooldown();
+        let cooldown = vessel_component.torpedo_launcher.as_ref().unwrap().type_().cooldown();
         if let Some(event) = vessel_component.timeline.last_fire_torpedo_event() {
             if event.time + cooldown > time {
                 return false;
             }
-        } else if model.time
-            + vessel_component
-                .torpedo_launcher
-                .as_ref()
-                .unwrap()
-                .time_to_reload()
+        } else if model.time + vessel_component.torpedo_launcher.as_ref().unwrap().time_to_reload()
             > time
         {
             return false;
         }
-        vessel_component
-            .timeline()
-            .is_time_after_last_blocking_event(time)
+        vessel_component.timeline().is_time_after_last_blocking_event(time)
             && vessel_component.final_torpedoes() != 0
     }
 

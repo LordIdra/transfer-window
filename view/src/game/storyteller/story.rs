@@ -42,8 +42,7 @@ impl Story {
             !self.state_creators.contains_key(name),
             "Duplicate state {name}"
         );
-        self.state_creators
-            .insert(name, StateCreator::new(Box::new(factory)));
+        self.state_creators.insert(name, StateCreator::new(Box::new(factory)));
     }
 
     pub fn update(

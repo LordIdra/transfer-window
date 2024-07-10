@@ -51,8 +51,7 @@ impl GeometryRenderer {
         let _span = tracy_client::span!("Geometry render");
         self.vertex_array_object.data(gl, &self.vertices);
         self.program.use_program(gl);
-        self.program
-            .uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
+        self.program.uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
         self.program.uniform_mat3(
             gl,
             "translation_matrix_upper",
@@ -77,8 +76,7 @@ impl GeometryRenderer {
         let _span = tracy_client::span!("Geometry render lines");
         self.vertex_array_object.data(gl, &self.vertices);
         self.program.use_program(gl);
-        self.program
-            .uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
+        self.program.uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
         self.program.uniform_mat3(
             gl,
             "translation_matrix_upper",

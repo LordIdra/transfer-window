@@ -78,9 +78,7 @@ impl Model {
     /// # Panics
     /// Panics if there is no segment at the given time
     pub fn current_orbit(&self, entity: Entity) -> &Orbit {
-        self.current_segment(entity)
-            .as_orbit()
-            .expect("Segment is not orbit")
+        self.current_segment(entity).as_orbit().expect("Segment is not orbit")
     }
 
     /// # Panics
@@ -176,8 +174,7 @@ impl Model {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return orbitable_component.position();
         }
-        self.segment_at_time(entity, time, observer)
-            .position_at_time(time)
+        self.segment_at_time(entity, time, observer).position_at_time(time)
     }
 
     /// # Panics
@@ -233,8 +230,7 @@ impl Model {
                 return vec2(0.0, 0.0);
             }
         }
-        self.segment_at_time(entity, time, observer)
-            .velocity_at_time(time)
+        self.segment_at_time(entity, time, observer).velocity_at_time(time)
     }
 
     /// # Panics
@@ -286,8 +282,7 @@ impl Model {
         if let Some(orbitable_component) = self.try_orbitable_component(entity) {
             return orbitable_component.mass();
         }
-        self.segment_at_time(entity, time, observer)
-            .mass_at_time(time)
+        self.segment_at_time(entity, time, observer).mass_at_time(time)
     }
 
     /// Returns none if the entity does not have an engine

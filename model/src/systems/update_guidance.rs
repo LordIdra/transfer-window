@@ -47,32 +47,17 @@ impl Model {
                 continue;
             }
 
-            assert!(
-                self.vessel_component(entity)
-                    .timeline()
-                    .last_event()
-                    .unwrap()
-                    .is_intercept()
-            );
+            assert!(self.vessel_component(entity).timeline().last_event().unwrap().is_intercept());
             self.cancel_last_event(entity);
 
             let on_guidance_segment_to_recalculate = self.time
-                >= self
-                    .path_component(entity)
-                    .final_guidance()
-                    .unwrap()
-                    .start_point()
-                    .time();
+                >= self.path_component(entity).final_guidance().unwrap().start_point().time();
             if on_guidance_segment_to_recalculate {
                 trace!("Recalculating guidance for current segment");
                 self.recalculate_current_guidance(entity);
             } else {
                 trace!("Recalculating guidance for future segment");
-                let event = self
-                    .vessel_component(entity)
-                    .timeline()
-                    .last_event()
-                    .unwrap();
+                let event = self.vessel_component(entity).timeline().last_event().unwrap();
                 assert!(event.is_enable_guidance());
                 let time = event.time();
                 self.cancel_last_event(entity);

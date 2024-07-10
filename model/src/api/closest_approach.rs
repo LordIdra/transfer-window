@@ -381,9 +381,7 @@ mod test {
         let vessel_b = model.allocate(EntityBuilder::default().with_path_component(path_component));
 
         let expected = orbit.period().unwrap() / 4.0;
-        let actual = model
-            .find_next_closest_approach(vessel_a, vessel_b, 0.0, None)
-            .unwrap();
+        let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0, None).unwrap();
 
         println!("Actual: {actual} Expected: {expected}");
         assert!((expected - actual).abs() / expected < 1.0e-3);

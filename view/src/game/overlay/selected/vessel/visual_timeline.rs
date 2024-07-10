@@ -194,11 +194,7 @@ impl VisualTimelineEvent {
     }
 
     pub fn is_selected(&self, view: &View, other_entity: Entity) -> bool {
-        if view
-            .selected
-            .entity(&view.model)
-            .is_some_and(|entity| entity != other_entity)
-        {
+        if view.selected.entity(&view.model).is_some_and(|entity| entity != other_entity) {
             return false;
         };
 
@@ -309,13 +305,10 @@ fn generate_closest_approaches(view: &View, entity: Entity, events: &mut Vec<Vis
     };
 
     let (approach_1_time, approach_2_time) =
-        view.model
-            .find_next_two_closest_approaches(entity, target, Some(Faction::Player));
+        view.model.find_next_two_closest_approaches(entity, target, Some(Faction::Player));
 
     if let Some(time) = approach_1_time {
-        let distance = view
-            .model
-            .distance_at_time(entity, target, time, Some(Faction::Player));
+        let distance = view.model.distance_at_time(entity, target, time, Some(Faction::Player));
         events.push(VisualTimelineEvent::Approach {
             type_: ApproachType::First,
             target,
@@ -325,9 +318,7 @@ fn generate_closest_approaches(view: &View, entity: Entity, events: &mut Vec<Vis
     }
 
     if let Some(time) = approach_2_time {
-        let distance = view
-            .model
-            .distance_at_time(entity, target, time, Some(Faction::Player));
+        let distance = view.model.distance_at_time(entity, target, time, Some(Faction::Player));
         events.push(VisualTimelineEvent::Approach {
             type_: ApproachType::Second,
             target,

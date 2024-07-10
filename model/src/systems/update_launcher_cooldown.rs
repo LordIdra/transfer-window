@@ -10,8 +10,7 @@ impl Model {
             if !self.vessel_component(entity).is_ghost()
                 && self.vessel_component(entity).has_torpedo_launcher()
             {
-                self.vessel_component_mut(entity)
-                    .step_torpedo_launcher(dt * time_step);
+                self.vessel_component_mut(entity).step_torpedo_launcher(dt * time_step);
             }
         }
     }

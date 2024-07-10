@@ -74,12 +74,12 @@ fn draw_slot(
     translation: Vec2,
 ) {
     let texture = match type_ {
-        SlotType::Engine => vessel_component
-            .engine_type()
-            .map_or("silhouette-engine", |x| x.texture()),
-        SlotType::FuelTank => vessel_component
-            .fuel_tank_type()
-            .map_or("silhouette-fuel-tank", |x| x.texture()),
+        SlotType::Engine => {
+            vessel_component.engine_type().map_or("silhouette-engine", |x| x.texture())
+        }
+        SlotType::FuelTank => {
+            vessel_component.fuel_tank_type().map_or("silhouette-fuel-tank", |x| x.texture())
+        }
         SlotType::TorpedoStorage => vessel_component
             .torpedo_storage_type()
             .map_or("silhouette-torpedo-storage", |x| x.texture()),
@@ -92,9 +92,7 @@ fn draw_slot(
 }
 
 fn draw_ship_underlay(view: &View, ui: &mut Ui, class: VesselClass) -> Response {
-    let texture = view
-        .resources
-        .texture_image(compute_texture_ship_underlay(class));
+    let texture = view.resources.texture_image(compute_texture_ship_underlay(class));
     let size = view.screen_rect.size() * UNDERLAY_SIZE_PROPORTION;
     ui.add(Image::new(texture).fit_to_exact_size(size))
 }

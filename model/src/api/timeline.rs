@@ -7,10 +7,7 @@ use crate::Model;
 
 impl Model {
     pub fn cancel_last_event(&mut self, entity: Entity) {
-        let event = &self
-            .vessel_component_mut(entity)
-            .timeline_mut()
-            .pop_last_event();
+        let event = &self.vessel_component_mut(entity).timeline_mut().pop_last_event();
         debug!("Cancelled timeline event {event:?}");
         event.cancel(self);
     }
@@ -23,10 +20,7 @@ impl Model {
     /// # Panics
     /// Panics if there is no create torpedo event at the specified time
     pub fn timeline_event_at_time(&self, entity: Entity, time: f64) -> &TimelineEvent {
-        self.vessel_component(entity)
-            .timeline()
-            .event_at_time(time)
-            .unwrap()
+        self.vessel_component(entity).timeline().event_at_time(time).unwrap()
     }
 
     pub fn fire_torpedo_event_at_time(
@@ -34,9 +28,6 @@ impl Model {
         entity: Entity,
         time: f64,
     ) -> Option<FireTorpedoEvent> {
-        self.vessel_component(entity)
-            .timeline()
-            .event_at_time(time)?
-            .as_fire_torpedo()
+        self.vessel_component(entity).timeline().event_at_time(time)?.as_fire_torpedo()
     }
 }

@@ -43,17 +43,11 @@ impl PathComponent {
     }
 
     pub fn past_orbits(&self) -> Vec<&Orbit> {
-        self.past_segments
-            .iter()
-            .filter_map(|segment| segment.as_orbit())
-            .collect()
+        self.past_segments.iter().filter_map(|segment| segment.as_orbit()).collect()
     }
 
     pub fn past_burns(&self) -> Vec<&Burn> {
-        self.past_segments
-            .iter()
-            .filter_map(|segment| segment.as_burn())
-            .collect()
+        self.past_segments.iter().filter_map(|segment| segment.as_burn()).collect()
     }
 
     pub fn future_segments(&self) -> &VecDeque<Segment> {
@@ -61,24 +55,15 @@ impl PathComponent {
     }
 
     pub fn future_orbits(&self) -> Vec<&Orbit> {
-        self.future_segments
-            .iter()
-            .filter_map(|segment| segment.as_orbit())
-            .collect()
+        self.future_segments.iter().filter_map(|segment| segment.as_orbit()).collect()
     }
 
     pub fn future_burns(&self) -> Vec<&Burn> {
-        self.future_segments
-            .iter()
-            .filter_map(|segment| segment.as_burn())
-            .collect()
+        self.future_segments.iter().filter_map(|segment| segment.as_burn()).collect()
     }
 
     pub fn future_guidances(&self) -> Vec<&Guidance> {
-        self.future_segments
-            .iter()
-            .filter_map(|segment| segment.as_guidance())
-            .collect()
+        self.future_segments.iter().filter_map(|segment| segment.as_guidance()).collect()
     }
 
     pub fn future_orbits_after_final_non_orbit(&self) -> Vec<&Orbit> {
@@ -240,11 +225,7 @@ impl PathComponent {
     /// Panics if there are no more future segments after the finished segment
     pub fn on_segment_finished(&mut self, time: f64) {
         trace!("Segment finished at time={time}");
-        self.past_segments.push(
-            self.future_segments
-                .pop_front()
-                .expect("No more future segments"),
-        );
+        self.past_segments.push(self.future_segments.pop_front().expect("No more future segments"));
         self.current_segment_mut().next(time);
     }
 
@@ -353,13 +334,7 @@ mod test {
         }
 
         assert!(
-            (path_component
-                .current_segment()
-                .as_orbit()
-                .unwrap()
-                .current_point()
-                .time()
-                - 100.0)
+            (path_component.current_segment().as_orbit().unwrap().current_point().time() - 100.0)
                 .abs()
                 < 1.0e-6
         );

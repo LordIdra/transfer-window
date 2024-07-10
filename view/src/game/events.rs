@@ -144,9 +144,8 @@ pub enum ViewEvent {
 
 impl View {
     pub(crate) fn handle_events(&mut self) {
-        let (new_model_events, new_view_events) = self
-            .story
-            .update(&self.model, &self.story_events.lock().unwrap());
+        let (new_model_events, new_view_events) =
+            self.story.update(&self.model, &self.story_events.lock().unwrap());
         self.model_events.lock().unwrap().extend(new_model_events);
         self.view_events.lock().unwrap().extend(new_view_events);
         self.story_events.lock().unwrap().clear();
@@ -225,8 +224,7 @@ impl View {
                 ViewEvent::SetCameraZoom(zoom) => self.camera.set_zoom(zoom),
                 ViewEvent::SetCameraFocus(focus) => {
                     self.add_story_event(StoryEvent::ChangeFocus(focus));
-                    self.camera
-                        .set_focus(focus, self.model.absolute_position(focus));
+                    self.camera.set_focus(focus, self.model.absolute_position(focus));
                 }
                 ViewEvent::SetSelected(selected) => {
                     if self.config.selected {
@@ -249,13 +247,10 @@ impl View {
                     self.objectives.push(Objective::new(objective))
                 }
                 ViewEvent::FinishObjective(objective) => {
-                    self.objectives
-                        .iter_mut()
-                        .find(|x| x.objective() == objective)
-                        .map_or_else(
-                            || error!("Attempt to complete nonexistent objective {}", objective),
-                            Objective::set_complete,
-                        );
+                    self.objectives.iter_mut().find(|x| x.objective() == objective).map_or_else(
+                        || error!("Attempt to complete nonexistent objective {}", objective),
+                        Objective::set_complete,
+                    );
                 }
                 ViewEvent::FinishLevel(level) => {
                     self.add_controller_event(ControllerEvent::FinishLevel { level })

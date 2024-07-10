@@ -52,9 +52,7 @@ impl Controller {
 
         log_gl_info(creation_context.gl.as_ref().unwrap());
 
-        creation_context
-            .egui_ctx
-            .send_viewport_cmd(ViewportCommand::Maximized(true));
+        creation_context.egui_ctx.send_viewport_cmd(ViewportCommand::Maximized(true));
 
         egui_extras::install_image_loaders(&creation_context.egui_ctx);
         let gl = creation_context.gl.as_ref().unwrap().clone();
@@ -120,12 +118,8 @@ impl App for Controller {
         self.handle_events(events, context);
 
         // toggle fullscreen on f11
-        let fullscreen = context.input(|input| {
-            input
-                .viewport()
-                .fullscreen
-                .is_some_and(|fullscreen| fullscreen)
-        });
+        let fullscreen =
+            context.input(|input| input.viewport().fullscreen.is_some_and(|fullscreen| fullscreen));
         if context.input(|input| input.key_pressed(Key::F11)) {
             context.send_viewport_cmd(ViewportCommand::Fullscreen(!fullscreen));
         }
@@ -144,17 +138,11 @@ fn setup_logging() {
     // A layer that logs events to a file.
     create_dir_all("log").expect("Failed to create log directory");
     let file = File::create("data/log/latest.log").expect("Failed to create file");
-    let layer = Layer::new()
-        .compact()
-        .with_ansi(false)
-        .with_writer(Arc::new(file));
+    let layer = Layer::new().compact().with_ansi(false).with_writer(Arc::new(file));
     let filter = EnvFilter::builder()
         .parse("debug,transfer_window_controller=trace,transfer_window_view=trace,transfer_window_model=trace")
         .expect("Failed to parse env filter");
-    tracing_subscriber::registry()
-        .with(layer)
-        .with(filter)
-        .init();
+    tracing_subscriber::registry().with(layer).with(filter).init();
 
     info!("Starting application");
 

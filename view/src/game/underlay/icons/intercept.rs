@@ -75,14 +75,10 @@ impl Icon for Intercept {
     fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Intercept position");
-        let parent = view
-            .model
-            .parent_at_time(self.entity, self.time, Some(Faction::Player))
-            .unwrap();
+        let parent =
+            view.model.parent_at_time(self.entity, self.time, Some(Faction::Player)).unwrap();
         view.model.absolute_position(parent)
-            + view
-                .model
-                .position_at_time(self.entity, self.time, Some(Faction::Player))
+            + view.model.position_at_time(self.entity, self.time, Some(Faction::Player))
     }
 
     fn facing(&self, _view: &View) -> Option<DVec2> {

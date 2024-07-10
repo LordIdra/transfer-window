@@ -473,9 +473,7 @@ mod tests {
         );
         let theta = f64::to_radians(107.78);
         let expected_speed = 1.051_245_7e4;
-        let speed = hyperbola
-            .velocity(hyperbola.position(theta), theta)
-            .magnitude();
+        let speed = hyperbola.velocity(hyperbola.position(theta), theta).magnitude();
         assert!((speed - expected_speed).abs() < 0.1);
     }
 
@@ -502,9 +500,7 @@ mod tests {
         );
         let theta = f64::to_radians(-107.78 + 90.0);
         let expected_speed = 1.05126e4;
-        let speed = hyperbola
-            .velocity(hyperbola.position(theta), theta)
-            .magnitude();
+        let speed = hyperbola.velocity(hyperbola.position(theta), theta).magnitude();
         assert!((speed - expected_speed).abs() < 0.5);
     }
 

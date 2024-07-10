@@ -17,11 +17,8 @@ pub fn calculate_exit_encounter(
     let new_parent_mass = model.mass(new_parent);
     let mass = orbit.mass();
 
-    let old_parent_point = &model
-        .orbitable_component(old_parent)
-        .orbit()
-        .unwrap()
-        .point_at_time(time);
+    let old_parent_point =
+        &model.orbitable_component(old_parent).orbit().unwrap().point_at_time(time);
     let position = orbit.end_point().position() + old_parent_point.position();
     let velocity = orbit.end_point().velocity() + old_parent_point.velocity();
 
@@ -37,11 +34,8 @@ pub fn calculate_entrance_encounter(
     let new_parent_mass = model.mass(new_parent);
     let mass = orbit.mass();
 
-    let new_parent_point = &model
-        .orbitable_component(new_parent)
-        .orbit()
-        .unwrap()
-        .point_at_time(time);
+    let new_parent_point =
+        &model.orbitable_component(new_parent).orbit().unwrap().point_at_time(time);
     let position = orbit.end_point().position() - new_parent_point.position();
     let velocity = orbit.end_point().velocity() - new_parent_point.velocity();
 
@@ -63,9 +57,7 @@ fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
 
     let new_orbit = calculate_exit_encounter(model, old_orbit, new_parent, time);
 
-    model
-        .path_component_mut(entity)
-        .add_segment(Segment::Orbit(new_orbit));
+    model.path_component_mut(entity).add_segment(Segment::Orbit(new_orbit));
 }
 
 fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
@@ -83,9 +75,7 @@ fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64)
 
     let new_orbit = calculate_entrance_encounter(model, old_orbit, new_parent, time);
 
-    model
-        .path_component_mut(entity)
-        .add_segment(Segment::Orbit(new_orbit));
+    model.path_component_mut(entity).add_segment(Segment::Orbit(new_orbit));
 }
 
 /// This detachment of encounter solving and application

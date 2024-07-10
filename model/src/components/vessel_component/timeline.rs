@@ -157,26 +157,15 @@ impl Timeline {
     }
 
     pub fn last_fire_torpedo_event(&self) -> Option<FireTorpedoEvent> {
-        self.events
-            .iter()
-            .rev()
-            .find_map(TimelineEvent::as_fire_torpedo)
-            .clone()
+        self.events.iter().rev().find_map(TimelineEvent::as_fire_torpedo).clone()
     }
 
     pub fn last_blocking_event(&self) -> Option<TimelineEvent> {
-        self.events
-            .iter()
-            .rev()
-            .find(|event| event.is_blocking())
-            .cloned()
+        self.events.iter().rev().find(|event| event.is_blocking()).cloned()
     }
 
     pub fn depleted_torpedoes(&self) -> usize {
-        self.events
-            .iter()
-            .filter(|event| event.is_fire_torpedo())
-            .count()
+        self.events.iter().filter(|event| event.is_fire_torpedo()).count()
     }
 
     pub fn is_time_after_last_blocking_event(&self, time: f64) -> bool {

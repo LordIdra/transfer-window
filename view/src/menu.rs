@@ -120,10 +120,7 @@ impl View {
         if context.screen_rect() != self.previous_screen_rect {
             #[cfg(feature = "profiling")]
             let _span = tracy_client::span!("Resize buffers");
-            self.screen_texture_renderer
-                .lock()
-                .unwrap()
-                .resize(&self.gl, context.screen_rect());
+            self.screen_texture_renderer.lock().unwrap().resize(&self.gl, context.screen_rect());
         }
 
         let mut events = vec![];
@@ -177,9 +174,6 @@ impl View {
 
 impl Drop for View {
     fn drop(&mut self) {
-        self.screen_texture_renderer
-            .lock()
-            .unwrap()
-            .destroy(&self.gl);
+        self.screen_texture_renderer.lock().unwrap().destroy(&self.gl);
     }
 }

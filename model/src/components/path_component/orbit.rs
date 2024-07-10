@@ -125,13 +125,11 @@ impl Orbit {
     }
 
     pub fn remaining_orbits(&self) -> i32 {
-        self.conic
-            .orbits(self.end_point.time() - self.current_point.time())
+        self.conic.orbits(self.end_point.time() - self.current_point.time())
     }
 
     pub fn completed_orbits(&self) -> i32 {
-        self.conic
-            .orbits(self.current_point.time() - self.start_point.time())
+        self.conic.orbits(self.current_point.time() - self.start_point.time())
     }
 
     pub fn conic(&self) -> &Conic {
@@ -248,8 +246,7 @@ impl Orbit {
 
     pub fn theta_from_time(&self, time: f64) -> f64 {
         let time_since_periapsis = time - self.first_periapsis_time();
-        self.conic
-            .theta_from_time_since_periapsis(time_since_periapsis)
+        self.conic.theta_from_time_since_periapsis(time_since_periapsis)
     }
 
     pub fn position_from_theta(&self, theta: f64) -> DVec2 {

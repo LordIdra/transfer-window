@@ -77,9 +77,7 @@ impl Icon for FireTorpedo {
     fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Fire torpedo position");
-        let orbit = view
-            .model
-            .orbit_at_time(self.entity, self.time, Some(Faction::Player));
+        let orbit = view.model.orbit_at_time(self.entity, self.time, Some(Faction::Player));
         view.model.absolute_position(orbit.parent()) + orbit.point_at_time(self.time).position()
     }
 
@@ -113,10 +111,7 @@ impl Icon for FireTorpedo {
         {
             if *entity == self.entity
                 && *time == self.time
-                && view
-                    .model
-                    .timeline_event_at_time(self.entity, self.time)
-                    .can_adjust(&view.model)
+                && view.model.timeline_event_at_time(self.entity, self.time).can_adjust(&view.model)
                 && view
                     .model
                     .timeline_event_at_time(*entity, *time)

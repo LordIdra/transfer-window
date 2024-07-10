@@ -11,8 +11,7 @@ impl Model {
         let end_point = guidance.end_point().clone();
         let will_intercept = guidance.will_intercept();
         let target = guidance.target();
-        self.path_component_mut(entity)
-            .add_segment(Segment::Guidance(guidance));
+        self.path_component_mut(entity).add_segment(Segment::Guidance(guidance));
 
         if will_intercept {
             let intercept_time = end_point.time();
@@ -30,8 +29,7 @@ impl Model {
             end_point.velocity(),
             end_point.time(),
         );
-        self.path_component_mut(entity)
-            .add_segment(Segment::Orbit(orbit));
+        self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
         self.recompute_trajectory(entity);
     }
 
@@ -73,18 +71,10 @@ impl Model {
         let _span = tracy_client::span!("Recalculate current guidance");
         assert!(self.path_component(entity).current_segment().is_guidance());
         assert!(
-            self.path_component(entity)
-                .current_segment()
-                .as_guidance()
-                .unwrap()
-                .will_intercept()
+            self.path_component(entity).current_segment().as_guidance().unwrap().will_intercept()
         );
 
-        let guidance = self
-            .path_component(entity)
-            .current_segment()
-            .as_guidance()
-            .unwrap();
+        let guidance = self.path_component(entity).current_segment().as_guidance().unwrap();
         let parent = guidance.parent();
         let target = guidance.target();
         let faction = self.vessel_component(entity).faction();

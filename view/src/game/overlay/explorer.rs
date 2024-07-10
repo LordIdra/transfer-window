@@ -54,11 +54,7 @@ fn child_vessel_entities(view: &View, parent_entity: Entity) -> Vec<Entity> {
         .into_iter()
         .filter(|entity| view.model.try_vessel_component(*entity).is_some())
         .filter(|entity| !view.model.vessel_component(*entity).is_ghost())
-        .filter(|entity| {
-            view.model
-                .parent(*entity)
-                .is_some_and(|parent| parent == parent_entity)
-        })
+        .filter(|entity| view.model.parent(*entity).is_some_and(|parent| parent == parent_entity))
         .collect();
     order_by_altitude(view, entities)
 }
@@ -69,11 +65,7 @@ pub fn child_orbitable_entities(view: &View, parent_entity: Entity) -> Vec<Entit
         .entities(vec![ComponentType::OrbitableComponent])
         .into_iter()
         .filter(|entity| view.model.try_orbitable_component(*entity).is_some())
-        .filter(|entity| {
-            view.model
-                .parent(*entity)
-                .is_some_and(|parent| parent == parent_entity)
-        })
+        .filter(|entity| view.model.parent(*entity).is_some_and(|parent| parent == parent_entity))
         .collect();
     order_by_altitude(view, entities)
 }

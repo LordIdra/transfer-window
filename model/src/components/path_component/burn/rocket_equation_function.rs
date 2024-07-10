@@ -159,10 +159,7 @@ mod test {
     #[test]
     fn test_step() {
         let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 1.0, 0.0);
-        let step_end_mass = rocket_equation_function
-            .step_by_time(99.9999)
-            .unwrap()
-            .mass();
+        let step_end_mass = rocket_equation_function.step_by_time(99.9999).unwrap().mass();
         let actual_end_mass = rocket_equation_function.end().mass();
         assert!((step_end_mass - actual_end_mass).abs() < 1.0e-3);
 

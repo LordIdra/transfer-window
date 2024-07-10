@@ -124,22 +124,14 @@ fn draw_controls(
         }
 
         if has_intel
-            && view
-                .model
-                .path_component(entity)
-                .current_segment()
-                .is_burn()
+            && view.model.path_component(entity).current_segment().is_burn()
             && draw_cancel_burn(view, ui)
         {
             view.add_model_event(ModelEvent::CancelCurrentSegment { entity });
         }
 
         if has_intel
-            && view
-                .model
-                .path_component(entity)
-                .current_segment()
-                .is_guidance()
+            && view.model.path_component(entity).current_segment().is_guidance()
             && draw_cancel_guidance(view, ui)
         {
             if view

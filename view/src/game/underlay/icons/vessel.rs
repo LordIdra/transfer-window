@@ -35,10 +35,8 @@ impl Icon for Vessel {
     fn texture(&self, view: &View) -> String {
         let mut base_name = vessel_texture(view.model.vessel_component(self.entity)).to_string();
         if let Some(target) = view.selected.target(&view.model) {
-            let selected_faction = view
-                .model
-                .vessel_component(view.selected.entity(&view.model).unwrap())
-                .faction();
+            let selected_faction =
+                view.model.vessel_component(view.selected.entity(&view.model).unwrap()).faction();
             if target == self.entity && Faction::Player.has_intel_for(selected_faction) {
                 base_name += "-target";
             }

@@ -38,11 +38,9 @@ impl AdjustFireTorpedo {
             .model
             .fire_torpedo_event_at_time(entity, time)
             .expect("No fire torpedo event found");
-        let event_to_arrow_unit = view
-            .model
-            .burn_starting_at_time(event.ghost(), event.burn_time())
-            .rotation_matrix()
-            * direction.vector();
+        let event_to_arrow_unit =
+            view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix()
+                * direction.vector();
         let mut position =
             compute_adjust_fire_torpedo_arrow_position(view, entity, time, direction);
 
@@ -144,9 +142,7 @@ impl Icon for AdjustFireTorpedo {
             .fire_torpedo_event_at_time(self.entity, self.time)
             .expect("No fire torpedo event found");
         Some(
-            view.model
-                .burn_starting_at_time(event.ghost(), event.burn_time())
-                .rotation_matrix()
+            view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix()
                 * self.direction.vector(),
         )
     }

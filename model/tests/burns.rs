@@ -52,12 +52,8 @@ fn test_burn_without_engine_or_fuel_tank() {
 
     assert!(!StartBurnEvent::can_create_ever(&model, vessel));
 
-    model
-        .vessel_component_mut(vessel)
-        .set_fuel_tank(Some(FuelTankType::FuelTank2));
-    model
-        .vessel_component_mut(vessel)
-        .set_engine(Some(EngineType::Regular));
+    model.vessel_component_mut(vessel).set_fuel_tank(Some(FuelTankType::FuelTank2));
+    model.vessel_component_mut(vessel).set_engine(Some(EngineType::Regular));
 
     assert!(StartBurnEvent::can_create_ever(&model, vessel));
 }
@@ -119,11 +115,7 @@ fn test_create_burn_with_zero_dv() {
     let velocity_after = model.velocity_at_time(vessel, time, None);
 
     assert_eq!(
-        model
-            .path_component(vessel)
-            .final_burn()
-            .unwrap()
-            .total_dv(),
+        model.path_component(vessel).final_burn().unwrap().total_dv(),
         0.0
     );
 
@@ -156,10 +148,8 @@ fn test_create_and_adjust_burn() {
 
     let fuel_tank = FuelTankType::FuelTank2;
     let engine = EngineType::Booster;
-    let vessel_component = VesselClass::Scout1
-        .build(Faction::Player)
-        .with_fuel_tank(fuel_tank)
-        .with_engine(engine);
+    let vessel_component =
+        VesselClass::Scout1.build(Faction::Player).with_fuel_tank(fuel_tank).with_engine(engine);
     let vessel_component_dry_mass = vessel_component.dry_mass();
     let vessel_component_fuel_mass = vessel_component.fuel_kg();
     let orbit = Orbit::circle(
@@ -187,11 +177,7 @@ fn test_create_and_adjust_burn() {
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, vessel, burn_time));
     model.add_event(vessel, event);
     model.burn_starting_at_time(vessel, burn_time); // just to make sure empty burns can be acquired
-    model
-        .timeline_event_at_time(vessel, burn_time)
-        .as_start_burn()
-        .unwrap()
-        .adjust(&mut model, dv);
+    model.timeline_event_at_time(vessel, burn_time).as_start_burn().unwrap().adjust(&mut model, dv);
 
     let burn = model.burn_starting_at_time(vessel, burn_time);
     let start_time = burn.start_point().time();

@@ -64,15 +64,13 @@ impl Model {
         assert!(self.can_dock(entity));
         self.path_components.remove_if_exists(entity);
         let docking_port_location = self.find_free_docking_port(station).unwrap();
-        self.vessel_component_mut(station)
-            .dock(docking_port_location, entity);
+        self.vessel_component_mut(station).dock(docking_port_location, entity);
     }
 
     pub fn undock(&mut self, station: Entity, entity: Entity) {
         assert!(self.docked(entity));
         let docking_port_location = self.find_docking_port(station, entity).unwrap();
-        self.vessel_component_mut(station)
-            .undock(docking_port_location);
+        self.vessel_component_mut(station).undock(docking_port_location);
         let parent = self.parent(station).unwrap();
         let mass = self.vessel_component(entity).mass();
         let parent_mass = self.mass(parent);
@@ -81,8 +79,7 @@ impl Model {
         let velocity = self.velocity(station) + extra_velocity;
         let time = self.time;
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, time);
-        self.path_components
-            .set(entity, Some(PathComponent::new_with_orbit(orbit)));
+        self.path_components.set(entity, Some(PathComponent::new_with_orbit(orbit)));
         self.recompute_trajectory(entity);
     }
 

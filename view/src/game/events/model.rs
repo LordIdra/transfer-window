@@ -125,17 +125,13 @@ impl View {
     pub fn set_torpedo_storage(&mut self, entity: Entity, type_: Option<TorpedoStorageType>) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Set slot");
-        self.model
-            .vessel_component_mut(entity)
-            .set_torpedo_storage(type_);
+        self.model.vessel_component_mut(entity).set_torpedo_storage(type_);
     }
 
     pub fn set_torpedo_launcher(&mut self, entity: Entity, type_: Option<TorpedoLauncherType>) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Set slot");
-        self.model
-            .vessel_component_mut(entity)
-            .set_torpedo_launcher(type_);
+        self.model.vessel_component_mut(entity).set_torpedo_launcher(type_);
     }
 
     pub fn create_fire_torpedo(&mut self, entity: Entity, time: f64) {
@@ -199,10 +195,7 @@ impl View {
     pub fn stop_fuel_transfer(&mut self, station: Entity, location: DockingPortLocation) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Stop fuel transfer");
-        self.model
-            .docking_port_mut(station, location)
-            .docked_vessel_mut()
-            .stop_fuel_transfer();
+        self.model.docking_port_mut(station, location).docked_vessel_mut().stop_fuel_transfer();
     }
 
     pub fn start_torpedo_transfer(
@@ -222,9 +215,6 @@ impl View {
     pub fn stop_torpedo_transfer(&mut self, station: Entity, location: DockingPortLocation) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Stop torpedo transfer");
-        self.model
-            .docking_port_mut(station, location)
-            .docked_vessel_mut()
-            .stop_torpedo_transfer();
+        self.model.docking_port_mut(station, location).docked_vessel_mut().stop_torpedo_transfer();
     }
 }

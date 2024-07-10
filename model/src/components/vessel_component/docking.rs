@@ -244,15 +244,11 @@ impl Docking {
     }
 
     pub fn docking_port(&self, location: DockingPortLocation) -> &DockingPort {
-        self.docking_ports
-            .get(&location)
-            .expect("Attempt to get nonexistant docking port")
+        self.docking_ports.get(&location).expect("Attempt to get nonexistant docking port")
     }
 
     pub(crate) fn docking_port_mut(&mut self, location: DockingPortLocation) -> &mut DockingPort {
-        self.docking_ports
-            .get_mut(&location)
-            .expect("Attempt to get nonexistant docking port")
+        self.docking_ports.get_mut(&location).expect("Attempt to get nonexistant docking port")
     }
 
     pub fn dock(&mut self, location: DockingPortLocation, entity: Entity) {

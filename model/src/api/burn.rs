@@ -46,10 +46,8 @@ impl Model {
             end_point.time(),
         );
 
-        self.path_component_mut(entity)
-            .add_segment(Segment::Burn(burn));
-        self.path_component_mut(entity)
-            .add_segment(Segment::Orbit(orbit));
+        self.path_component_mut(entity).add_segment(Segment::Burn(burn));
+        self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
         self.recompute_trajectory(entity);
     }
 

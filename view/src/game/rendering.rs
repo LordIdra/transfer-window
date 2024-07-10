@@ -64,17 +64,11 @@ impl Renderers {
     }
 
     pub fn add_celestial_object_vertices(&self, name: &str, vertices: &mut Vec<f32>) {
-        self.celestial_object_renderers[name]
-            .lock()
-            .unwrap()
-            .add_vertices(vertices);
+        self.celestial_object_renderers[name].lock().unwrap().add_vertices(vertices);
     }
 
     pub fn set_object_rotation(&self, name: &str, rotation: f32) {
-        self.celestial_object_renderers[name]
-            .lock()
-            .unwrap()
-            .set_rotation(rotation);
+        self.celestial_object_renderers[name].lock().unwrap().set_rotation(rotation);
     }
 
     pub fn add_segment_vertices(&self, vertices: &mut Vec<f32>) {
@@ -138,11 +132,7 @@ pub fn update(view: &View) {
             explosion.offset(),
             explosion.combined_mass(),
         );
-        view.renderers
-            .explosion_renderers
-            .lock()
-            .unwrap()
-            .push(renderer);
+        view.renderers.explosion_renderers.lock().unwrap().push(renderer);
     }
 
     // Delete expired explosion renderers
@@ -165,15 +155,8 @@ pub fn update(view: &View) {
     if screen_rect != view.previous_screen_rect {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Resize buffers");
-        render_pipeline
-            .lock()
-            .unwrap()
-            .resize(&view.gl, screen_rect);
-        view.renderers
-            .screen_texture_renderer
-            .lock()
-            .unwrap()
-            .resize(&view.gl, screen_rect);
+        render_pipeline.lock().unwrap().resize(&view.gl, screen_rect);
+        view.renderers.screen_texture_renderer.lock().unwrap().resize(&view.gl, screen_rect);
     }
 
     let callback = Arc::new(CallbackFn::new(move |_info, painter| {
@@ -191,16 +174,10 @@ pub fn update(view: &View) {
             #[cfg(feature = "profiling")]
             let _span = tracy_client::span!("Render normal");
             for renderer in object_renderers.values() {
-                renderer
-                    .lock()
-                    .unwrap()
-                    .render(painter.gl(), zoom_matrix, translation_matrices);
+                renderer.lock().unwrap().render(painter.gl(), zoom_matrix, translation_matrices);
             }
             for renderer in texture_renderers.values() {
-                renderer
-                    .lock()
-                    .unwrap()
-                    .render(painter.gl(), zoom_matrix, translation_matrices);
+                renderer.lock().unwrap().render(painter.gl(), zoom_matrix, translation_matrices);
             }
         };
 

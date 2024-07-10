@@ -40,9 +40,7 @@ fn update_fuel_transfer(
             .docked_vessel_mut()
             .stop_fuel_transfer();
     } else {
-        model
-            .vessel_component_mut(from)
-            .set_fuel_kg(from_fuel - amount);
+        model.vessel_component_mut(from).set_fuel_kg(from_fuel - amount);
         model.vessel_component_mut(to).set_fuel_kg(to_fuel + amount);
     }
 }

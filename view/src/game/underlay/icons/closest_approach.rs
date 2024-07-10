@@ -28,9 +28,7 @@ impl ClosestApproach {
         entity: Entity,
         time: f64,
     ) -> Self {
-        let orbit = view
-            .model
-            .orbit_at_time(entity, time, Some(Faction::Player));
+        let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
         let position =
             view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
         Self {

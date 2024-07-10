@@ -128,10 +128,7 @@ impl VesselComponent {
 
     pub(crate) fn should_recompute_trajectory(&self) -> bool {
         !(self.class().is_torpedo()
-            && self
-                .timeline()
-                .last_event()
-                .is_some_and(|event| event.is_intercept()))
+            && self.timeline().last_event().is_some_and(|event| event.is_intercept()))
     }
 
     // ------------------------
@@ -214,14 +211,8 @@ impl VesselComponent {
         self.class.mass()
             + self.fuel_tank.as_ref().map_or(0.0, |x| x.type_().mass())
             + self.engine.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self
-                .torpedo_storage
-                .as_ref()
-                .map_or(0.0, |x| x.type_().mass())
-            + self
-                .torpedo_launcher
-                .as_ref()
-                .map_or(0.0, |x| x.type_().mass())
+            + self.torpedo_storage.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.torpedo_launcher.as_ref().map_or(0.0, |x| x.type_().mass())
     }
 
     pub fn wet_mass(&self) -> f64 {
@@ -353,10 +344,7 @@ impl VesselComponent {
     }
 
     pub fn step_torpedo_launcher(&mut self, dt: f64) {
-        self.torpedo_launcher
-            .as_mut()
-            .unwrap()
-            .step_time_to_reload(dt);
+        self.torpedo_launcher.as_mut().unwrap().step_time_to_reload(dt);
     }
 
     pub fn torpedo_launcher_time_to_reload(&self) -> f64 {

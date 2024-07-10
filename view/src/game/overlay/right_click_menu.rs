@@ -33,11 +33,7 @@ fn draw_set_target(view: &View, ui: &mut Ui, right_clicked: Entity, selected: En
         let button = CustomCircularImageButton::new(view, "set-target", 36.0)
             .with_enabled(enabled)
             .with_padding(8.0);
-        if ui
-            .add_enabled(enabled, button)
-            .on_hover_text("Set target")
-            .clicked()
-        {
+        if ui.add_enabled(enabled, button).on_hover_text("Set target").clicked() {
             view.add_model_event(ModelEvent::SetTarget {
                 entity: selected,
                 target: Some(right_clicked),

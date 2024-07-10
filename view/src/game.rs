@@ -168,18 +168,14 @@ impl View {
         self.context = context.clone();
         self.previous_screen_rect = self.screen_rect;
         self.screen_rect = self.context.screen_rect();
-        self.frame_history
-            .update(self.context.input(|i| i.time), frame.info().cpu_usage);
+        self.frame_history.update(self.context.input(|i| i.time), frame.info().cpu_usage);
         self.update_animation(dt);
         self.update_camera_focus_position();
         self.draw_ui();
         self.post_draw_ui();
         self.draw_underlay();
         self.handle_events();
-        self.story_events
-            .lock()
-            .unwrap()
-            .extend(self.model.update(dt));
+        self.story_events.lock().unwrap().extend(self.model.update(dt));
         expiry::update(self);
         self.controller_events.lock().unwrap().clone()
     }

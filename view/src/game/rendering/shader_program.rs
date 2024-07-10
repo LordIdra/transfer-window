@@ -10,9 +10,7 @@ struct Shader {
 impl Shader {
     fn new(gl: &Arc<Context>, shader_source: &str, shader_type: u32) -> Self {
         unsafe {
-            let shader = gl
-                .create_shader(shader_type)
-                .expect("Failed to create shader");
+            let shader = gl.create_shader(shader_type).expect("Failed to create shader");
             // gl.render
             gl.shader_source(shader, shader_source);
             gl.compile_shader(shader);
@@ -50,10 +48,7 @@ impl ShaderProgram {
     ) -> Self {
         let mut vertex_shader = Shader::new(gl, vertex_shader_source, VERTEX_SHADER);
         let mut fragment_shader = Shader::new(gl, fragment_shader_source, FRAGMENT_SHADER);
-        let program = unsafe {
-            gl.create_program()
-                .expect("Failed to create shader program")
-        };
+        let program = unsafe { gl.create_program().expect("Failed to create shader program") };
         vertex_shader.attach(gl, program);
         fragment_shader.attach(gl, program);
 

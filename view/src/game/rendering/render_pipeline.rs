@@ -34,33 +34,28 @@ pub struct RenderPipeline {
 impl RenderPipeline {
     pub fn new(gl: &Arc<Context>, screen_rect: Rect) -> Self {
         unsafe {
-            let multisample_framebuffer = gl
-                .create_framebuffer()
-                .expect("Failed to create framebuffer");
+            let multisample_framebuffer =
+                gl.create_framebuffer().expect("Failed to create framebuffer");
             let multisample_texture =
                 create_multisample_color_attachment(gl, multisample_framebuffer, screen_rect);
 
-            let intermediate_framebuffer = gl
-                .create_framebuffer()
-                .expect("Failed to create framebuffer");
+            let intermediate_framebuffer =
+                gl.create_framebuffer().expect("Failed to create framebuffer");
             let intermediate_texture =
                 create_normal_color_attachment(gl, intermediate_framebuffer, screen_rect);
 
-            let bloom_framebuffer_1 = gl
-                .create_framebuffer()
-                .expect("Failed to create framebuffer");
+            let bloom_framebuffer_1 =
+                gl.create_framebuffer().expect("Failed to create framebuffer");
             let bloom_texture_1 =
                 create_normal_color_attachment(gl, bloom_framebuffer_1, screen_rect);
 
-            let bloom_framebuffer_2 = gl
-                .create_framebuffer()
-                .expect("Failed to create framebuffer");
+            let bloom_framebuffer_2 =
+                gl.create_framebuffer().expect("Failed to create framebuffer");
             let bloom_texture_2 =
                 create_normal_color_attachment(gl, bloom_framebuffer_2, screen_rect);
 
-            let explosion_framebuffer = gl
-                .create_framebuffer()
-                .expect("Failed to create framebuffer");
+            let explosion_framebuffer =
+                gl.create_framebuffer().expect("Failed to create framebuffer");
             let explosion_texture =
                 create_normal_color_attachment(gl, explosion_framebuffer, screen_rect);
 
@@ -269,12 +264,9 @@ impl RenderPipeline {
             gl.active_texture(TEXTURE2);
             gl.bind_texture(TEXTURE_2D, Some(self.intermediate_texture));
             self.screen_program.use_program(gl);
-            self.screen_program
-                .uniform_int(gl, "texture_sampler_bloom", 0);
-            self.screen_program
-                .uniform_int(gl, "texture_sampler_explosion", 1);
-            self.screen_program
-                .uniform_int(gl, "texture_sampler_normal", 2);
+            self.screen_program.uniform_int(gl, "texture_sampler_bloom", 0);
+            self.screen_program.uniform_int(gl, "texture_sampler_explosion", 1);
+            self.screen_program.uniform_int(gl, "texture_sampler_normal", 2);
             self.screen_vao.draw(gl);
         }
     }

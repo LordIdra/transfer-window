@@ -63,8 +63,7 @@ impl CelestialObjectRenderer {
             gl.bind_texture(TEXTURE_2D, Some(self.texture));
         }
         self.program.use_program(gl);
-        self.program
-            .uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
+        self.program.uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
         self.program.uniform_mat3(
             gl,
             "translation_matrix_upper",

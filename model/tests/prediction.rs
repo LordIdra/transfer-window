@@ -212,12 +212,7 @@ fn test_prediction_with_burn() {
 
     assert_eq!(model.path_component(vessel).future_segments().len(), 1);
 
-    model
-        .path_component_mut(vessel)
-        .final_segment_mut()
-        .as_orbit_mut()
-        .unwrap()
-        .end_at(0.0);
+    model.path_component_mut(vessel).final_segment_mut().as_orbit_mut().unwrap().end_at(0.0);
     let burn = Burn::new(
         earth,
         earth_mass,
@@ -228,9 +223,7 @@ fn test_prediction_with_burn() {
         vessel_start_position,
         vessel_start_velocity,
     );
-    model
-        .path_component_mut(vessel)
-        .add_segment(Segment::Burn(burn.clone()));
+    model.path_component_mut(vessel).add_segment(Segment::Burn(burn.clone()));
 
     let end_point = burn.end_point();
     let orbit = Orbit::new(
@@ -241,9 +234,7 @@ fn test_prediction_with_burn() {
         end_point.velocity(),
         end_point.time(),
     );
-    model
-        .path_component_mut(vessel)
-        .add_segment(Segment::Orbit(orbit));
+    model.path_component_mut(vessel).add_segment(Segment::Orbit(orbit));
 
     println!(
         "At end of burn, vessel position={:?} velocity={:?} time={} mass={}",

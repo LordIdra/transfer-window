@@ -29,26 +29,15 @@ fn draw_controls(
         let button = CustomCircularImageButton::new(view, "warp-here", 36.0)
             .with_enabled(enabled)
             .with_padding(8.0);
-        if ui
-            .add_enabled(enabled, button)
-            .on_hover_text("Warp here")
-            .clicked()
-        {
+        if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        let enabled = view
-            .model
-            .timeline_event_at_time(entity, time)
-            .can_delete(&view.model);
+        let enabled = view.model.timeline_event_at_time(entity, time).can_delete(&view.model);
         let button = CustomCircularImageButton::new(view, "cancel", 36.0)
             .with_enabled(enabled)
             .with_padding(8.0);
-        if ui
-            .add_enabled(enabled, button)
-            .on_hover_text("Cancel")
-            .clicked()
-        {
+        if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
             view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
             view.add_view_event(ViewEvent::SetSelected(Selected::None));
         }
@@ -67,11 +56,7 @@ pub fn update(view: &View) {
         return;
     };
 
-    if view
-        .model
-        .fire_torpedo_event_at_time(entity, time)
-        .is_none()
-    {
+    if view.model.fire_torpedo_event_at_time(entity, time).is_none() {
         return;
     };
 

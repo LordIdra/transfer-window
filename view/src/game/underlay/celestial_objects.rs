@@ -45,9 +45,7 @@ pub fn draw(view: &View) {
         let orbitable = view.model.orbitable_component(entity);
         let name = view.model.name_component(entity).name().to_lowercase();
         let mut vertices = compute_celestial_object_vertices(position, orbitable.radius());
-        view.renderers
-            .add_celestial_object_vertices(&name, &mut vertices);
-        view.renderers
-            .set_object_rotation(&name, orbitable.rotation_angle() as f32);
+        view.renderers.add_celestial_object_vertices(&name, &mut vertices);
+        view.renderers.set_object_rotation(&name, orbitable.rotation_angle() as f32);
     }
 }
