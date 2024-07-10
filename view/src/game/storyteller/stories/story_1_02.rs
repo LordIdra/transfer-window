@@ -37,7 +37,7 @@ impl StoryBuilder for Story1_02 {
                 0.95,
                 0.3,
                 4.0,
-                vec![]
+                vec![0.7]
             )
         }.build(&mut model);
 
