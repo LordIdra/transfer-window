@@ -98,6 +98,7 @@ impl Model {
     }
 
     pub fn start_warp(&mut self, end_time: f64) {
+        self.add_story_event(StoryEvent::WarpStarted);
         self.warp = Some(TimeWarp::new(self.time, end_time));
     }
 

@@ -26,9 +26,9 @@ impl StoryBuilder for Story1_01 {
             type_: OrbitableType::Planet,
             physics: OrbitablePhysicsBuilder::Stationary(vec2(0.0, 0.0)),
             atmosphere: Atmosphere::new_some(
-                Color32::from_hex("#3558A5").unwrap(),
-                0.9,
-                0.15,
+                Color32::from_hex("#a0b5ff").unwrap(),
+                0.95,
+                0.3,
                 4.0,
                 vec![]
             )
@@ -104,7 +104,7 @@ impl StoryBuilder for Story1_01 {
             let ship_period = model.current_segment(ship).as_orbit().unwrap().period().unwrap();
             let time = model.time() + ship_period;
             State::default()
-                .transition(Transition::new("pause", Condition::time(time).objective("Warp forwards one orbitaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa safigeuigew egwuigenew")))
+                .transition(Transition::new("pause", Condition::time(time).objective("Warp forwards one orbit")))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
                         .normal("Try speeding up and slowing down time using the ")
