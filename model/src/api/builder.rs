@@ -1,4 +1,3 @@
-use ecolor::Color32;
 use nalgebra_glm::{DVec2, vec2};
 
 use crate::components::name_component::NameComponent;
@@ -101,24 +100,5 @@ impl OrbitableBuilder {
         model.allocate(EntityBuilder::default()
             .with_name_component(NameComponent::new(self.name.to_string()))
             .with_orbitable_component(orbitable_component))
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AtmosphereBuilder {
-    pub color: Color32,
-    pub density: f64,
-    pub height: f64,
-    pub falloff: f64,
-    pub cloud_speeds: Vec<f64>,
-}
-
-impl AtmosphereBuilder {
-    pub fn build(self) -> Atmosphere {
-        Atmosphere::new(self.color, self.density, self.height, self.falloff, self.cloud_speeds)
-    }
-    
-    pub fn build_some(self) -> Option<Atmosphere> {
-        Some(self.build())
     }
 }
