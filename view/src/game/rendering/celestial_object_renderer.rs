@@ -41,6 +41,7 @@ impl CelestialObjectRenderer {
     pub fn render(&mut self, gl: &Arc<Context>, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Planet render");
+        assert_eq!(self.clouds.len(), self.cloud_speeds.len(), "Clouds must have corresponding speeds");
         self.render_layer(gl, zoom_matrix, translation_matrices, self.texture, self.rotation);
         for (i, cloud) in self.clouds.clone().iter().enumerate() {
             let speed = self.cloud_speeds[i] as f32;
