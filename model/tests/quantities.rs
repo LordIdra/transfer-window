@@ -9,7 +9,7 @@ fn test_stationary_position() {
 
     let earth_position = vec2(100.0, 0.0);
     let planet = model.allocate(EntityBuilder::default()
-        .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(earth_position))));
+        .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(earth_position), None)));
 
     assert!(model.position(planet) == earth_position);
     assert!(model.absolute_position(planet) == earth_position);
@@ -21,7 +21,7 @@ fn test_stationary_velocity() {
 
     let earth_position = vec2(100.0, 0.0);
     let planet = model.allocate(EntityBuilder::default()
-        .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(earth_position))));
+        .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(earth_position), None)));
 
     assert!(model.velocity(planet) == vec2(0.0, 0.0));
     assert!(model.absolute_velocity(planet) == vec2(0.0, 0.0));
@@ -32,7 +32,7 @@ fn test_trajectory_position() {
     let mut model = Model::default();
 
     let planet = model.allocate(EntityBuilder::default()
-        .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)), None)));
 
     let vessel_position = vec2(1.0e4, 0.0);
     let orbit = Orbit::circle(planet, 1.0e3, 1.0e16, vessel_position, 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
@@ -59,7 +59,7 @@ fn test_trajectory_velocity() {
     let mut model = Model::default();
 
     let planet = model.allocate(EntityBuilder::default()
-        .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(1.0e23, 1.0e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)), None)));
 
     let vessel_position = vec2(1.0e4, 0.0);
     let orbit = Orbit::circle(planet, 1.0e3, 1.0e16, vessel_position, 0.0, OrbitDirection::AntiClockwise).with_end_at(1.0e10);
@@ -87,7 +87,7 @@ fn test_simple_mass() {
 
     let mass = 1.0e23;
     let planet = model.allocate(EntityBuilder::default()
-        .with_orbitable_component(OrbitableComponent::new(mass, 1.0e4, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(mass, 1.0e4, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)), None)));
 
     assert_eq!(model.mass(planet), mass);
 }

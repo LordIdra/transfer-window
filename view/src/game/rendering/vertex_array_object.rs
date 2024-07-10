@@ -22,6 +22,16 @@ pub struct VertexArrayObject {
 }
 
 impl VertexArrayObject {
+    
+    pub fn texture_vertex_array(gl: &Arc<Context>) -> Self {
+        return Self::new(gl, vec![
+            VertexAttribute { index: 0, count: 2 }, // x
+            VertexAttribute { index: 1, count: 2 }, // y
+            VertexAttribute { index: 2, count: 1 }, // alpha
+            VertexAttribute { index: 3, count: 2 }, // texture coordinates
+        ])
+    }
+    
     pub fn new(gl: &Arc<Context>, vertex_attributes: Vec<VertexAttribute>) -> Self {
         let vertex_array: VertexArray;
         let vertex_buffer: Buffer;

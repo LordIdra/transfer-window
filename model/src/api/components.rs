@@ -1,7 +1,9 @@
+use crate::components::name_component::NameComponent;
+use crate::components::orbitable_component::OrbitableComponent;
+use crate::components::path_component::PathComponent;
 use crate::components::vessel_component::VesselComponent;
 use crate::Model;
-
-use crate::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent}, storage::entity_allocator::Entity};
+use crate::storage::entity_allocator::Entity;
 
 impl Model {
     pub fn name_component_mut(&mut self, entity: Entity) -> &mut NameComponent {

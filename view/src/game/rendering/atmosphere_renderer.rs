@@ -1,49 +1,60 @@
 use std::sync::Arc;
 
-use eframe::glow;
-use eframe::glow::{Context, HasContext, TEXTURE_2D};
+use eframe::epaint::Rgba;
+use eframe::glow::Context;
 use nalgebra_glm::Mat3;
+
+use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 
 use super::shader_program::ShaderProgram;
 use super::vertex_array_object::VertexArrayObject;
 
-pub struct CelestialObjectRenderer {
+pub struct AtmosphereRenderer {
     program: ShaderProgram,
     vertex_array_object: VertexArrayObject,
-    texture: glow::Texture,
     vertices: Vec<f32>,
-    rotation: f32
+    height: f32,
+    color: Rgba,
+    falloff: f32,
 }
 
-impl CelestialObjectRenderer {
-    pub fn new(gl: &Arc<Context>, texture: glow::Texture) -> Self {
-        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/celestial_object.vert"), include_str!("../../../resources/shaders/celestial_object.frag"));
+impl AtmosphereRenderer {
+    pub fn new(gl: &Arc<Context>, atmosphere: &Atmosphere) -> Self {
+        let program = ShaderProgram::new(
+            gl,
+            include_str!("../../../resources/shaders/atmosphere.vert"),
+            include_str!("../../../resources/shaders/atmosphere.frag")
+        );
         let vertex_array_object = VertexArrayObject::texture_vertex_array(gl);
         let vertices = vec![];
-        let rotation = 0.0;
-        Self { program, vertex_array_object, texture, vertices, rotation }
+        let height = atmosphere.height() as f32;
+        let color = atmosphere.color().into();
+        let falloff = atmosphere.falloff() as f32;
+        Self { program, vertex_array_object, vertices, height, color, falloff }
     }
     
     pub fn add_vertices(&mut self, vertices: &mut Vec<f32>) {
         self.vertices.append(vertices);
     }
-    
-    pub fn set_rotation(&mut self, rotation: f32) {
-        self.rotation = rotation;
-    }
 
     pub fn render(&mut self, gl: &Arc<Context>, zoom_matrix: Mat3, translation_matrices: (Mat3, Mat3)) {
         #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Planet render");
+        let _span = tracy_client::span!("Atmosphere render");
         self.vertex_array_object.data(gl, &self.vertices);
-        unsafe {
-            gl.bind_texture(TEXTURE_2D, Some(self.texture));
-        }
         self.program.use_program(gl);
         self.program.uniform_mat3(gl, "zoom_matrix", zoom_matrix.as_slice());
         self.program.uniform_mat3(gl, "translation_matrix_upper", translation_matrices.0.as_slice());
         self.program.uniform_mat3(gl, "translation_matrix_lower", translation_matrices.1.as_slice());
-        self.program.uniform_float(gl, "rotation", self.rotation);
+        self.program.uniform_float(gl, "height", self.height);
+        self.program.uniform_vec4(
+            gl,
+            "color",
+            self.color.r(),
+            self.color.g(),
+            self.color.b(),
+            self.color.a()
+        );
+        self.program.uniform_float(gl, "falloff", self.falloff);
         self.vertex_array_object.draw(gl);
         self.vertices.clear();
     }

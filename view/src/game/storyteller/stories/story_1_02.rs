@@ -1,3 +1,4 @@
+use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::api::time::TimeStep;
 use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
@@ -27,6 +28,12 @@ impl StoryBuilder for Story1_02 {
             rotation_angle: 100.0,
             type_: OrbitableType::Planet,
             physics: OrbitablePhysicsBuilder::Stationary(vec2(0.0, 0.0)),
+            atmosphere: Atmosphere::new_some(
+                Color32::from_hex("#3558A5").unwrap(),
+                0.9,
+                0.15,
+                4.0
+            )
         }.build(&mut model);
 
         let ship = VesselBuilder {

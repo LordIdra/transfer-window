@@ -1,6 +1,16 @@
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::{DVec2, vec2};
 
-use crate::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}, vessel_component::VesselComponent}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::components::name_component::NameComponent;
+use crate::components::orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType};
+use crate::components::orbitable_component::atmosphere::Atmosphere;
+use crate::components::path_component::orbit::Orbit;
+use crate::components::path_component::orbit::orbit_direction::OrbitDirection;
+use crate::components::path_component::PathComponent;
+use crate::components::path_component::segment::Segment;
+use crate::components::vessel_component::VesselComponent;
+use crate::Model;
+use crate::storage::entity_allocator::Entity;
+use crate::storage::entity_builder::EntityBuilder;
 
 #[derive(Debug, Clone)]
 pub enum OrbitBuilder {
@@ -72,12 +82,21 @@ pub struct OrbitableBuilder {
     pub rotation_angle: f64,
     pub type_: OrbitableType,
     pub physics: OrbitablePhysicsBuilder,
+    pub atmosphere: Option<Atmosphere>,
 }
 
 impl OrbitableBuilder {
     pub fn build(self, model: &mut Model) -> Entity {
         let physics = self.physics.build(model, self.mass);
-        let orbitable_component = OrbitableComponent::new(self.mass, self.radius, self.rotation_period, self.rotation_angle, self.type_, physics);
+        let orbitable_component = OrbitableComponent::new(
+            self.mass,
+            self.radius,
+            self.rotation_period,
+            self.rotation_angle,
+            self.type_,
+            physics,
+            self.atmosphere
+        );
         model.allocate(EntityBuilder::default()
             .with_name_component(NameComponent::new(self.name.to_string()))
             .with_orbitable_component(orbitable_component))

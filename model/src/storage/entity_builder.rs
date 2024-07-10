@@ -1,4 +1,7 @@
-use crate::components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent as PathComponent, vessel_component::VesselComponent};
+use crate::components::name_component::NameComponent;
+use crate::components::orbitable_component::OrbitableComponent;
+use crate::components::path_component::PathComponent;
+use crate::components::vessel_component::VesselComponent;
 
 #[derive(Debug, Default, Clone)]
 pub struct EntityBuilder {

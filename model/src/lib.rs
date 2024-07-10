@@ -1,12 +1,19 @@
 use std::{collections::HashSet, sync::Mutex};
 
+use serde::{Deserialize, Serialize};
+
 use api::{explosion::Explosion, time::TimeStep};
 use components::vessel_component::VesselComponent;
-use serde::{Deserialize, Serialize};
 use story_event::StoryEvent;
 use systems::update_warp::TimeWarp;
 
-use self::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
+use self::components::ComponentType;
+use self::components::name_component::NameComponent;
+use self::components::orbitable_component::OrbitableComponent;
+use self::components::path_component::PathComponent;
+use self::storage::component_storage::ComponentStorage;
+use self::storage::entity_allocator::{Entity, EntityAllocator};
+use self::storage::entity_builder::EntityBuilder;
 
 pub const SEGMENTS_TO_PREDICT: usize = 3;
 
@@ -142,7 +149,7 @@ impl Model {
 mod test {
     use std::collections::HashSet;
 
-    use crate::{components::{name_component::NameComponent, ComponentType}, storage::entity_builder::EntityBuilder};
+    use crate::{components::{ComponentType, name_component::NameComponent}, storage::entity_builder::EntityBuilder};
 
     use super::Model;
 
