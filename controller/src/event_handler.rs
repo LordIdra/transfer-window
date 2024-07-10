@@ -46,7 +46,6 @@ pub fn finish_level(controller: &mut Controller, level: String) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Finish level");
 
-    controller.load_menu = true;
     controller.completed_levels.add(level);
     controller.completed_levels.save();
 }

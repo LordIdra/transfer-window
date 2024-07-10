@@ -144,7 +144,7 @@ impl StoryBuilder for Story1_02 {
 
         story.add("warp-to-point", |_| {
             State::default()
-                .transition(Transition::new("create-burn-circularise", Condition::start_any_warp().objective("Warp to the selected point on the orbit")))
+                .transition(Transition::new("burn-explanation", Condition::start_any_warp().objective("Warp to the selected point on the orbit")))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
                         .normal("You can also warp to the point you selected - it's much more precise to do that rather than fiddling around with manual warps. Try clicking the ")
@@ -155,53 +155,77 @@ impl StoryBuilder for Story1_02 {
             }
         );
 
-        story.add("create-burn-circularise", move |_| {
+        story.add("burn-explanation", |_| {
             State::default()
-                .transition(Transition::new("create-burn-engines", Condition::click_continue()))
-                .action(CreateVesselAction::new(VesselBuilder {
-                    name: "Demo Ship",
-                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                    orbit_builder: OrbitBuilder::Circular { 
-                        parent: centralia,
-                        distance: 1.576e7,
-                        angle: PI,
-                        direction: OrbitDirection::AntiClockwise, 
-                    },
-                }))
+                .transition(Transition::new("create-burn-circularise", Condition::click_continue()))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
-                        .normal("Great. Now, let's say we want to take this elliptical orbit and make it circular at the apoapsis. I've created a temporary vessel on the orbit we're aiming for to show you what I mean. How do we get to that orbit?")
+                        .normal("Great. Now, let's try firing the ship's engines to adjust our orbit. We call this a 'burn' since we're burning fuel.")
                         .with_continue()
                     )
                 )
             }
         );
 
-        story.add("create-burn-engines", |model| {
-            let demo_ship = model.entity_by_name("Demo Ship").unwrap();
+        story.add("warp-to-point", |_| {
             State::default()
-                .transition(Transition::new("end", Condition::click_continue()))
-                .action(DeleteVesselAction::new(demo_ship))
+                .transition(Transition::new("create-burn-circularise", Condition::start_any_warp().objective("Warp to the selected point on the orbit")))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
-                        .normal("Well, we'll need to fire the ship's engine at the apoapsis.")
+                        .normal("Great. Now, let's try firing the ship's engines to adjust our orbit. We call this a 'burn' since we're burning fuel.")
                         .with_continue()
                     )
                 )
             }
         );
 
-        story.add("create-burn", |_| {
-            State::default()
-                .transition(Transition::new("end", Condition::click_continue()))
-                .action(ShowDialogueAction::new(
-                    Dialogue::new("jake")
-                        .normal("We'll need to fire the ship's engines somewhere. But where?")
-                        .with_continue()
-                    )
-                )
-            }
-        );
+        // story.add("create-burn-circularise", move |_| {
+        //     State::default()
+        //         .transition(Transition::new("create-burn-engines", Condition::click_continue()))
+        //         .action(CreateVesselAction::new(VesselBuilder {
+        //             name: "Demo Ship",
+        //             vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
+        //             orbit_builder: OrbitBuilder::Circular { 
+        //                 parent: centralia,
+        //                 distance: 1.576e7,
+        //                 angle: PI,
+        //                 direction: OrbitDirection::AntiClockwise, 
+        //             },
+        //         }))
+        //         .action(ShowDialogueAction::new(
+        //             Dialogue::new("jake")
+        //                 .normal("Great. Now, let's say we want to take this elliptical orbit and make it circular at the apoapsis. I've created a temporary vessel on the orbit we're aiming for to show you what I mean. How do we get to that orbit?")
+        //                 .with_continue()
+        //             )
+        //         )
+        //     }
+        // );
+
+        // story.add("create-burn-engines", |model| {
+        //     let demo_ship = model.entity_by_name("Demo Ship").unwrap();
+        //     State::default()
+        //         .transition(Transition::new("end", Condition::click_continue()))
+        //         .action(DeleteVesselAction::new(demo_ship))
+        //         .action(ShowDialogueAction::new(
+        //             Dialogue::new("jake")
+        //                 .normal("Well, we'll need to fire the ship's engine at the apoapsis.")
+        //                 .with_continue()
+        //             )
+        //         )
+        //     }
+        // );
+
+        // story.add("create-burn", |_| {
+        //     State::default()
+        //         .transition(Transition::new("end", Condition::click_continue()))
+        //         .action(ShowDialogueAction::new(
+        //             Dialogue::new("jake")
+        //                 .normal("We'll need to fire the ship's engines somewhere. But where?")
+        //                 .with_continue()
+        //             )
+        //         )
+        //     }
+        // );
 
         story.add("end", |_model: &Model| State::default()
             .action(FinishLevelAction::new("1-02".to_string())));

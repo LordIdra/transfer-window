@@ -212,9 +212,11 @@ Chapter 1: Intro
 [ ] 02 Burns
   - periapsis, apoapsis
   - warp to point, pause
-  - circularise orbit
+  - get into elliptical orbit
 
-- 04 Chase
+[ ] 03 Hohman
+
+[ ] 04 Chase
   - set target
   - explanation of closest approaches
   - catch up to a spacecraft in front

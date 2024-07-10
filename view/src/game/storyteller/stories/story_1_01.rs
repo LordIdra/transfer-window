@@ -2,6 +2,7 @@ use eframe::epaint::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::{api::{builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
+use crate::game::storyteller::story::action::exit_level_action::ExitLevelAction;
 use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{create_vessel_action::CreateVesselAction, finish_level_action::FinishLevelAction, set_focus_action::SetFocusAction, set_time_step_action::SetTimeStepAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}, ViewConfig};
 
 use super::StoryBuilder;
@@ -243,7 +244,8 @@ impl StoryBuilder for Story1_01 {
         );
 
         story.add("end", |_model: &Model| State::default()
-            .action(FinishLevelAction::new("1-01".to_string())));
+            .action(FinishLevelAction::new("1-01".to_string()))
+            .action(ExitLevelAction::new()));
 
         let view_config = ViewConfig {
             draw_apsis_icons: false,
