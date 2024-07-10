@@ -54,7 +54,7 @@ impl Dialogue {
                 match component {
                     DialogueComponent::Normal(text) => ui.label(RichText::new(*text).size(14.0).color(Color32::WHITE)),
                     DialogueComponent::Bold(text) => ui.label(RichText::new(*text).size(14.0).color(Color32::GOLD)),
-                    DialogueComponent::Image(texture) => ui.add(CustomImage::new(view, texture, 10.0)),
+                    DialogueComponent::Image(texture) => ui.add(CustomImage::new(view, texture, 14.0)),
                 };
             }
         }).response

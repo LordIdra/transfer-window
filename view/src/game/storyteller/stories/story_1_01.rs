@@ -6,9 +6,9 @@ use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{cre
 use super::StoryBuilder;
 
 #[derive(Debug, Clone, Default)]
-pub struct Story01Welcome;
+pub struct Story1_01;
 
-impl StoryBuilder for Story01Welcome {
+impl StoryBuilder for Story1_01 {
     fn prerequisite(&self) -> Option<String> {
         None
     }

@@ -19,16 +19,18 @@ fn draw_info(ui: &mut Ui, orbitable_component: &OrbitableComponent) {
 }
 
 fn draw_orbit(ui: &mut Ui, orbitable_component: &OrbitableComponent, view: &View) {
+    let Some(orbit) = orbitable_component.orbit() else {
+        return;
+    };
+    
     draw_subtitle(ui, "Orbit");
     Grid::new("Orbitable orbit info grid").show(ui, |ui| {
-        if let Some(orbit) = orbitable_component.orbit() {
             draw_orbit_labels(view, ui, orbit);
             draw_key(ui, "Sphere of influence");
             draw_value(ui, &format_distance(orbit.sphere_of_influence()));
             ui.end_row();
+        });
         }
-    });
-}
 
 fn draw_controls(view: &View, ui: &mut Ui, entity: Entity) {
     ui.horizontal(|ui| {

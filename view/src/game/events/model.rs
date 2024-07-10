@@ -55,8 +55,7 @@ impl View {
     pub fn build_vessel(&mut self, vessel_builder: VesselBuilder) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Build vessel");
-        let entity = vessel_builder.build(&mut self.model);
-        self.model.recompute_trajectory(entity);
+        vessel_builder.build(&mut self.model);
     }
 
     pub fn delete_vessel(&mut self, entity: Entity) {

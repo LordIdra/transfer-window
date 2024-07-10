@@ -3,7 +3,7 @@ use std::{collections::HashSet, sync::{Arc, Mutex}};
 use eframe::{egui::{CentralPanel, Context, CursorIcon, Key, Rect, Sense, Ui, Vec2, Window}, glow};
 use log::trace;
 
-use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer, storyteller::stories::{story_01_welcome::Story01Welcome, StoryBuilder}}, resources::Resources};
+use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer, storyteller::stories::{story_1_01::Story1_01, story_1_02::Story1_02, StoryBuilder}}, resources::Resources};
 
 impl CustomImage {
     pub fn new_menu(view: &View, texture_name: &str, width: f32, height: f32) -> Self {
@@ -104,8 +104,8 @@ impl View {
                 ui.vertical(|ui| {
                     ui.add(CustomImage::new_menu(self, "title-1", 215.0, 70.0));
                     ui.horizontal(|ui| {
-                        self.draw_level(context, ui, &mut events, completed_levels, "1-01", Box::new(Story01Welcome));
-                        self.draw_level(context, ui, &mut events, completed_levels, "1-02", Box::new(Story01Welcome));
+                        self.draw_level(context, ui, &mut events, completed_levels, "1-01", Box::new(Story1_01));
+                        self.draw_level(context, ui, &mut events, completed_levels, "1-02", Box::new(Story1_02));
                     });
                     // ui.add_space(15.0);
                     // ui.horizontal(|ui| {

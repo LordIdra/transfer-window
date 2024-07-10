@@ -6,7 +6,8 @@ use crate::game::ViewConfig;
 
 use super::story::Story;
 
-pub mod story_01_welcome;
+pub mod story_1_01;
+pub mod story_1_02;
 
 // wtf?
 // https://stackoverflow.com/questions/50017987/cant-clone-vecboxtrait-because-trait-cannot-be-made-into-an-object
