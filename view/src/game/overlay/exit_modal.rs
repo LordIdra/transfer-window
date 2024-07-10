@@ -1,5 +1,6 @@
 use eframe::{egui::{Align2, CursorIcon, RichText, Window}, epaint};
 
+use crate::controller_events::ControllerEvent;
 use crate::{game::{events::ViewEvent, View}, styles};
 
 use super::widgets::custom_image::CustomImage;
@@ -41,7 +42,7 @@ pub fn update(view: &View) {
                         view.context.set_cursor_icon(CursorIcon::PointingHand);
                     }
                     if response.clicked() {
-                        view.add_view_event(ViewEvent::ExitLevel);
+                        view.add_controller_event(ControllerEvent::ExitLevel);
                     }
                 })
             })

@@ -1,38 +1,38 @@
-use transfer_window_model::{story_event::StoryEvent, Model};
+use transfer_window_model::story_event::StoryEvent;
 
-use crate::game::events::{ModelEvent, ViewEvent};
+use crate::game::View;
 
-use super::{action::Action, transition::Transition};
+use super::condition::Condition;
+use super::transition::Transition;
 
 pub struct StateCreator {
-    factory: Box<dyn Fn(&Model) -> State>,
+    factory: Box<dyn Fn(&View) -> State>,
 }
 
 impl StateCreator {
-    pub fn new(factory: Box<dyn Fn(&Model) -> State>) -> Self {
+    pub fn new(factory: Box<dyn Fn(&View) -> State>) -> Self {
         Self { factory }
     }
 
-    pub fn create(&self, model: &Model) -> State {
-        (self.factory)(model)
+    pub fn create(&self, view: &View) -> State {
+        (self.factory)(view)
     }
 }
 
 #[derive(Default)]
 pub struct State {
     transition: Option<Transition>,
-    actions: Vec<Box<dyn Action>>,
 }
 
 
 impl State {
-    pub fn transition(mut self, transition: Transition) -> Self {
-        self.transition = Some(transition);
-        self
+    pub fn new(to: &'static str, condition: Condition) -> Self {
+        let transition = Transition::new(to, condition);
+        Self { transition: Some(transition) }
     }
 
-    pub fn action(mut self, action: Box<dyn Action>) -> Self {
-        self.actions.push(action);
+    pub fn transition(mut self, transition: Transition) -> Self {
+        self.transition = Some(transition);
         self
     }
 
@@ -44,19 +44,7 @@ impl State {
         }
     }
 
-    pub fn trigger(&self) -> (Vec<ModelEvent>, Vec<ViewEvent>) {
-        let mut model_events = vec![];
-        let mut view_events = vec![];
-        if let Some(transition) = &self.transition {
-            if let Some(objective) = transition.objective() {
-                view_events.push(ViewEvent::StartObjective(objective));
-            }
-        }
-        for action in &self.actions {
-            let (new_model_events, new_view_events) = action.trigger();
-            model_events.extend(new_model_events);
-            view_events.extend(new_view_events);
-        }
-        (model_events, view_events)
+    pub fn get_transition(&self) -> &Option<Transition> {
+        &self.transition
     }
 }

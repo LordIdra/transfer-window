@@ -6,10 +6,13 @@ use transfer_window_model::api::time::TimeStep;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
-use crate::game::storyteller::story::action::create_vessel_action::CreateVesselAction;
-use crate::game::storyteller::story::action::delete_vessel_action::DeleteVesselAction;
-use crate::game::storyteller::story::action::set_time_step_action::SetTimeStepAction;
-use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{finish_level_action::FinishLevelAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}, ViewConfig};
+use crate::controller_events::ControllerEvent;
+use crate::game::events::{ModelEvent, ViewEvent};
+use crate::game::overlay::dialogue::Dialogue;
+use crate::game::storyteller::story::condition::Condition;
+use crate::game::storyteller::story::state::State;
+use crate::game::storyteller::story::Story;
+use crate::game::ViewConfig;
 
 use super::StoryBuilder;
 
@@ -54,19 +57,17 @@ impl StoryBuilder for Story1_02 {
 
         let mut story = Story::new("intro");
 
-        story.add("intro", |_| State::default()
-            .transition(Transition::new("apsis-icons", Condition::click_continue()))
-            .action(ShowDialogueAction::new(
+        story.add("intro", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("Welcome back. Let's discuss some more about orbits.")
                     .with_continue()
-                )
-            )
-        );
+            ));
+            State::new("apsis-icons", Condition::click_continue())
+        });
 
-        story.add("apsis-icons", |_| State::default()
-            .transition(Transition::new("apsis-explanation", Condition::click_continue()))
-            .action(ShowDialogueAction::new(
+        story.add("apsis-icons", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("I've enabled apoapsis (")
                     .image("apoapsis")
@@ -81,154 +82,129 @@ impl StoryBuilder for Story1_02 {
                     .normal("point in an orbit\n")
                     .normal("Don't worry about too much about remembering which one is which - you can always check on the fly.")
                     .with_continue()
-                )
-            )
-        );
+            ));
+            State::new("apsis-explanation", Condition::click_continue())
+        });
 
-        story.add("apsis-explanation", |_| State::default()
-            .transition(Transition::new("select-vessel", Condition::click_continue()))
-            .action(ShowDialogueAction::new(
+        story.add("apsis-explanation", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("The periapsis and apoapsis give us a useful way to think about orbits. Most orbits you'll be dealing with won't be circular, so it helps to know what the lowest and highest points are. You'll see what I mean when we start constructing orbits ourselves.")
                     .with_continue()
-                )
-            )
-        );
+            ));
+            State::new("select-vessel", Condition::click_continue())
+        });
 
-        story.add("select-vessel", move |_| State::default()
-            .transition(Transition::new("warp-one-orbit", Condition::select_vessel(ship).objective("Select the ship")))
-            .action(ShowDialogueAction::new(
+        story.add("select-vessel", move |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("Anyway, let's observe what happens to the ship as it reaches the periapsis and apoapsis. Click the ship to select it, so we can see its altitude and speed.")
-                )
-            )
-        );
+            ));
+            State::new("warp-one-orbit", Condition::select_vessel(ship).objective("Select the ship"))
+        });
 
-        story.add("warp-one-orbit", move |model| {
-            let ship_period = model.current_segment(ship).as_orbit().unwrap().period().unwrap();
-            let time = model.time() + ship_period;
+        story.add("warp-one-orbit", move |view| {
+            let ship_period = view.model.current_segment(ship).as_orbit().unwrap().period().unwrap();
+            let time = view.model.time() + ship_period;
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Try speeding up the simulation again and watch how the altitude and speed change as we reach the periapsis and apoapsis.")
+            ));
+            State::new("select-apoapsis", Condition::time(time).objective("Warp forwards one orbit"))
+        });
+
+        story.add("select-apoapsis", |view| {
+            view.add_model_event(ModelEvent::SetTimeStep { time_step: TimeStep::Level { level: 1, paused: false } });
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("We can check what the altitude and speed is at an apsis by selecting it. Try clicking the ")
+                    .image("apoapsis")
+                    .normal(" symbol to select the apoapsis.")
+            ));
+            State::new("select-orbit-point", Condition::select_any_apoapsis().objective("Select the apoapsis"))
+        });
+
+        story.add("select-orbit-point", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("In fact, we can find out the altitude and speed at any point on the orbit. Try selecting a point on the orbit by clicking somewhere on it.")
+            ));
+            State::new("warp-to-point", Condition::select_any_orbit_point().objective("Select a point on the orbit"))
+        });
+
+        story.add("warp-to-point", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("You can also warp to the point you selected - it's much more precise to do that rather than fiddling around with manual warps. Try clicking the ")
+                    .image("warp-here")
+                    .normal(" button to warp to your selected point.")
+            ));
+            State::new("burn-explanation", Condition::start_any_warp().objective("Warp to the selected point on the orbit"))
+        });
+
+        story.add("burn-explanation", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Great. Now, let's try firing the ship's engines to adjust our orbit. We call this a 'burn' since we're burning fuel.")
+                    .with_continue()
+            ));
+            State::new("select-point-for-burn", Condition::click_continue())
+        });
+
+        story.add("select-point-for-burn", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("First, select a new point where you wish to create the burn.")
+                    .with_continue()
+            ));
+            State::new("create-burn", Condition::select_any_orbit_point().objective("Select a point to create the burn"))
+        });
+
+        story.add("create-burn-circularise", move |view| {
+            view.add_model_event(ModelEvent::BuildVessel { 
+                vessel_builder: VesselBuilder {
+                    name: "Demo Ship",
+                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
+                    orbit_builder: OrbitBuilder::Circular { 
+                        parent: centralia,
+                        distance: 1.576e7,
+                        angle: PI,
+                        direction: OrbitDirection::AntiClockwise, 
+                    },
+                }
+            });
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Great. Now, let's say we want to take this elliptical orbit and make it circular at the apoapsis. I've created a temporary vessel on the orbit we're aiming for to show you what I mean. How do we get to that orbit?")
+                    .with_continue()
+            ));
+            State::new("create-burn-engines", Condition::click_continue())
+        });
+
+        story.add("create-burn-engines", |view| {
+            let demo_ship = view.model.entity_by_name("Demo Ship").unwrap();
+            view.add_model_event(ModelEvent::DeleteVessel { entity: demo_ship });
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Well, we'll need to fire the ship's engine at the apoapsis.")
+                    .with_continue()
+            ));
+            State::new("end", Condition::click_continue())
+        });
+
+        story.add("create-burn", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("We'll need to fire the ship's engines somewhere. But where?")
+                    .with_continue()
+            ));
+            State::new("end", Condition::click_continue())
+        });
+
+        story.add("end", |view| {
+            view.add_controller_event(ControllerEvent::FinishLevel { level: "1-02".to_string() });
             State::default()
-                .transition(Transition::new("select-apoapsis", Condition::time(time).objective("Warp forwards one orbit")))
-                .action(ShowDialogueAction::new(
-                    Dialogue::new("jake")
-                        .normal("Try speeding up the simulation again and watch how the altitude and speed change as we reach the periapsis and apoapsis.")
-                    )
-                )
-            }
-        );
-
-        story.add("select-apoapsis", |_| {
-            State::default()
-                .transition(Transition::new("select-orbit-point", Condition::select_any_apoapsis().objective("Select the apoapsis")))
-                .action(SetTimeStepAction::new(TimeStep::Level { level: 1, paused: false }))
-                .action(ShowDialogueAction::new(
-                    Dialogue::new("jake")
-                        .normal("We can check what the altitude and speed is at an apsis by selecting it. Try clicking the ")
-                        .image("apoapsis")
-                        .normal(" symbol to select the apoapsis.")
-                    )
-                )
-            }
-        );
-
-        story.add("select-orbit-point", |_| {
-            State::default()
-                .transition(Transition::new("warp-to-point", Condition::select_any_orbit_point().objective("Select a point on the orbit")))
-                .action(ShowDialogueAction::new(
-                    Dialogue::new("jake")
-                        .normal("In fact, we can find out the altitude and speed at any point on the orbit. Try selecting a point on the orbit by clicking somewhere on it.")
-                    )
-                )
-            }
-        );
-
-        story.add("warp-to-point", |_| {
-            State::default()
-                .transition(Transition::new("burn-explanation", Condition::start_any_warp().objective("Warp to the selected point on the orbit")))
-                .action(ShowDialogueAction::new(
-                    Dialogue::new("jake")
-                        .normal("You can also warp to the point you selected - it's much more precise to do that rather than fiddling around with manual warps. Try clicking the ")
-                        .image("warp-here")
-                        .normal(" button to warp to your selected point.")
-                    )
-                )
-            }
-        );
-
-        story.add("burn-explanation", |_| {
-            State::default()
-                .transition(Transition::new("create-burn-circularise", Condition::click_continue()))
-                .action(ShowDialogueAction::new(
-                    Dialogue::new("jake")
-                        .normal("Great. Now, let's try firing the ship's engines to adjust our orbit. We call this a 'burn' since we're burning fuel.")
-                        .with_continue()
-                    )
-                )
-            }
-        );
-
-        story.add("warp-to-point", |_| {
-            State::default()
-                .transition(Transition::new("create-burn-circularise", Condition::start_any_warp().objective("Warp to the selected point on the orbit")))
-                .action(ShowDialogueAction::new(
-                    Dialogue::new("jake")
-                        .normal("Great. Now, let's try firing the ship's engines to adjust our orbit. We call this a 'burn' since we're burning fuel.")
-                        .with_continue()
-                    )
-                )
-            }
-        );
-
-        // story.add("create-burn-circularise", move |_| {
-        //     State::default()
-        //         .transition(Transition::new("create-burn-engines", Condition::click_continue()))
-        //         .action(CreateVesselAction::new(VesselBuilder {
-        //             name: "Demo Ship",
-        //             vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-        //             orbit_builder: OrbitBuilder::Circular { 
-        //                 parent: centralia,
-        //                 distance: 1.576e7,
-        //                 angle: PI,
-        //                 direction: OrbitDirection::AntiClockwise, 
-        //             },
-        //         }))
-        //         .action(ShowDialogueAction::new(
-        //             Dialogue::new("jake")
-        //                 .normal("Great. Now, let's say we want to take this elliptical orbit and make it circular at the apoapsis. I've created a temporary vessel on the orbit we're aiming for to show you what I mean. How do we get to that orbit?")
-        //                 .with_continue()
-        //             )
-        //         )
-        //     }
-        // );
-
-        // story.add("create-burn-engines", |model| {
-        //     let demo_ship = model.entity_by_name("Demo Ship").unwrap();
-        //     State::default()
-        //         .transition(Transition::new("end", Condition::click_continue()))
-        //         .action(DeleteVesselAction::new(demo_ship))
-        //         .action(ShowDialogueAction::new(
-        //             Dialogue::new("jake")
-        //                 .normal("Well, we'll need to fire the ship's engine at the apoapsis.")
-        //                 .with_continue()
-        //             )
-        //         )
-        //     }
-        // );
-
-        // story.add("create-burn", |_| {
-        //     State::default()
-        //         .transition(Transition::new("end", Condition::click_continue()))
-        //         .action(ShowDialogueAction::new(
-        //             Dialogue::new("jake")
-        //                 .normal("We'll need to fire the ship's engines somewhere. But where?")
-        //                 .with_continue()
-        //             )
-        //         )
-        //     }
-        // );
-
-        story.add("end", |_model: &Model| State::default()
-            .action(FinishLevelAction::new("1-02".to_string())));
+        });
 
         let view_config = ViewConfig {
             draw_apsis_icons: true,

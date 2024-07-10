@@ -4,7 +4,7 @@ use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity, story_event::StoryEvent};
 
-use crate::{controller_events::ControllerEvent, game::{overlay::{dialogue::Dialogue, objectives::Objective}, util::ApsisType}};
+use crate::game::{overlay::{dialogue::Dialogue, objectives::Objective}, util::ApsisType};
 
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
@@ -42,7 +42,7 @@ pub enum ModelEvent {
     StopTorpedoTransfer { station: Entity, location: DockingPortLocation },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ViewEvent {
     ResetCameraPanning,
     PanCamera(DVec2),
@@ -59,16 +59,12 @@ pub enum ViewEvent {
     CloseDialogue,
     StartObjective(&'static str),
     FinishObjective(&'static str),
-    FinishLevel(String),
-    ExitLevel,
     ToggleExitModal,
 }
 
 impl View {
     pub(crate) fn handle_events(&mut self) {
-        let (new_model_events, new_view_events) = self.story.update(&self.model, &self.story_events.lock().unwrap());
-        self.model_events.lock().unwrap().extend(new_model_events);
-        self.view_events.lock().unwrap().extend(new_view_events);
+        self.story.update(&self);
         self.story_events.lock().unwrap().clear();
 
         let model_events = self.model_events.clone();
@@ -147,8 +143,6 @@ impl View {
                         .find(|x| x.objective() == objective)
                         .map_or_else(|| error!("Attempt to complete nonexistent objective {}", objective), Objective::set_complete);
                 },
-                ViewEvent::ExitLevel => self.add_controller_event(ControllerEvent::ExitLevel),
-                ViewEvent::FinishLevel(level) => self.add_controller_event(ControllerEvent::FinishLevel { level }),
                 ViewEvent::ToggleExitModal => self.exit_modal_open = !self.exit_modal_open,
             }
         }
