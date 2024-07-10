@@ -1,6 +1,9 @@
 use nalgebra_glm::vec2;
+use transfer_window_model::api::time::TimeStep;
 use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
+use crate::game::storyteller::story::action::set_time_step_action::SetTimeStepAction;
+use crate::game::storyteller::story::action::Action;
 use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{finish_level_action::FinishLevelAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}, ViewConfig};
 
 use super::StoryBuilder;
@@ -38,10 +41,10 @@ impl StoryBuilder for Story1_02 {
             },
         }.build(&mut model);
 
-        let mut story = Story::new("intro-1");
+        let mut story = Story::new("intro");
 
-        story.add("intro-1", |_| State::default()
-            .transition(Transition::new("intro-2", Condition::click_continue()))
+        story.add("intro", |_| State::default()
+            .transition(Transition::new("apsis-icons", Condition::click_continue()))
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
                     .normal("Welcome back. Let's discuss some more about orbits.")
@@ -50,8 +53,8 @@ impl StoryBuilder for Story1_02 {
             )
         );
 
-        story.add("intro-2", |_| State::default()
-            .transition(Transition::new("intro-3", Condition::click_continue()))
+        story.add("apsis-icons", |_| State::default()
+            .transition(Transition::new("apsis-explanation", Condition::click_continue()))
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
                     .normal("I've enabled apoapsis (")
@@ -71,26 +74,110 @@ impl StoryBuilder for Story1_02 {
             )
         );
 
-        story.add("intro-3", |_| State::default()
-            .transition(Transition::new("intro-4", Condition::click_continue()))
+        story.add("apsis-explanation", |_| State::default()
+            .transition(Transition::new("select-vessel", Condition::click_continue()))
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
-                    .normal("The periapsis and apoapsis give us a useful way to think about orbits. Most orbits you'll be dealing with won't be circular, so it helps to know what the lowest and highest points are. You'll see what I mean in the next level, where we'll start constructing orbits ourselves.")
+                    .normal("The periapsis and apoapsis give us a useful way to think about orbits. Most orbits you'll be dealing with won't be circular, so it helps to know what the lowest and highest points are. You'll see what I mean when we start constructing orbits ourselves.")
                     .with_continue()
                 )
             )
         );
 
-        story.add("intro-4", |_| State::default()
-            .transition(Transition::new("intro-5", Condition::click_continue()))
+        story.add("select-vessel", move |_| State::default()
+            .transition(Transition::new("warp-one-orbit", Condition::select_vessel(ship).objective("Select the ship")))
             .action(ShowDialogueAction::new(
                 Dialogue::new("jake")
-                    .normal("You can select an apsis to see more information about it. Try selecting the")
-                    .bold(" periapsis ")
-                    .normal(".")
-                    .with_continue()
+                    .normal("Anyway, let's observe what happens to the ship as it reaches the periapsis and apoapsis. Click the ship to select it, so we can see its altitude and speed.")
                 )
             )
+        );
+
+        story.add("warp-one-orbit", move |model| {
+            let ship_period = model.current_segment(ship).as_orbit().unwrap().period().unwrap();
+            let time = model.time() + ship_period;
+            State::default()
+                .transition(Transition::new("select-apoapsis", Condition::time(time).objective("Warp forwards one orbit")))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("Try speeding up the simulation again and watch how the altitude and speed change as we reach the periapsis and apoapsis.")
+                    )
+                )
+            }
+        );
+
+        story.add("select-apoapsis", |_| {
+            State::default()
+                .transition(Transition::new("select-orbit-point", Condition::select_any_apoapsis().objective("Select the apoapsis")))
+                .action(SetTimeStepAction::new(TimeStep::Level { level: 1, paused: false }))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("We can check what the altitude and speed is at an apsis by selecting it. Try clicking the ")
+                        .image("apoapsis")
+                        .normal(" symbol to select the apoapsis.")
+                    )
+                )
+            }
+        );
+
+        story.add("select-orbit-point", |_| {
+            State::default()
+                .transition(Transition::new("warp-to-point", Condition::select_any_orbit_point().objective("Select a point on the orbit")))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("In fact, we can find out the altitude and speed at any point on the orbit. Try selecting a point on the orbit by clicking somewhere on it.")
+                    )
+                )
+            }
+        );
+
+        story.add("warp-to-point", |_| {
+            State::default()
+                .transition(Transition::new("create-burn-circularise", Condition::start_any_warp().objective("Warp to the selected point on the orbit")))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("You can also warp to the point you selected - it's much more precise to do that rather than fiddling around with manual warps. Try clicking the ")
+                        .image("warp-here")
+                        .normal(" button to warp to your selected point.")
+                    )
+                )
+            }
+        );
+
+        story.add("create-burn-circularise", |_| {
+            State::default()
+                .transition(Transition::new("create-burn-engines", Condition::click_continue()))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("Great. Now, let's say we want to take this elliptical orbit and make it circular at the apoapsis. Here's the orbit we're aiming for. How do we get to that orbit?")
+                        .with_continue()
+                    )
+                )
+            }
+        );
+
+        story.add("create-burn-engines", |_| {
+            State::default()
+                .transition(Transition::new("end", Condition::click_continue()))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("Well, this is where things start to get difficult. ")
+                        .with_continue()
+                    )
+                )
+            }
+        );
+
+        story.add("create-burn", |_| {
+            State::default()
+                .transition(Transition::new("end", Condition::click_continue()))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("We'll need to fire the ship's engines somewhere. But where?")
+                        .with_continue()
+                    )
+                )
+            }
         );
 
         story.add("end", |_model: &Model| State::default()
@@ -100,7 +187,7 @@ impl StoryBuilder for Story1_02 {
             draw_apsis_icons: true,
             can_select: true,
             draw_explorer: false,
-            draw_timeline: false
+            draw_timeline: false,
         };
 
         (model, story, view_config, Some(centralia))

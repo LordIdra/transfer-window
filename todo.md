@@ -209,13 +209,9 @@
 
 # Levels
 Chapter 1: Intro
-[ ] 02 Orbits
+[ ] 02 Burns
   - periapsis, apoapsis
   - warp to point, pause
-  - comparison of higher and lower orbits speed
-  - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
-
-- 03 Burns
   - create a burn and get further from centralia
   - circularise orbit
 
@@ -229,6 +225,7 @@ Chapter 1: Intro
 - 05 Translunar
   - spheres of influence
   - first intercept not necessarily the best, keep going
+  - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
   - fly by the moon
 
 - 06 Moon Orbit

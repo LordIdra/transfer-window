@@ -8,4 +8,8 @@ pub enum StoryEvent {
     NewTime(f64),
     ChangeFocus(Entity),
     Paused,
+    AnyApoapsisSelected,
+    AnyOrbitPointSelected,
+    VesselSelected(Entity),
+    WarpStarted,
 }

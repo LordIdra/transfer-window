@@ -4,7 +4,7 @@ use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity, story_event::StoryEvent};
 
-use crate::{controller_events::ControllerEvent, game::overlay::{dialogue::Dialogue, objectives::Objective}};
+use crate::{controller_events::ControllerEvent, game::{overlay::{dialogue::Dialogue, objectives::Objective}, util::ApsisType}};
 
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
@@ -121,6 +121,15 @@ impl View {
                 },
                 ViewEvent::SetSelected(selected) => {
                     if self.config.can_select {
+                        if matches!(selected, Selected::Apsis { type_: ApsisType::Apoapsis, .. }) {
+                            self.add_story_event(StoryEvent::AnyApoapsisSelected);
+                        }
+                        if matches!(selected, Selected::OrbitPoint { .. }) {
+                            self.add_story_event(StoryEvent::AnyOrbitPointSelected);
+                        }
+                        if let Selected::Vessel(entity) = selected {
+                            self.add_story_event(StoryEvent::VesselSelected(entity));
+                        }
                         self.selected = selected;
                     }
                 }
