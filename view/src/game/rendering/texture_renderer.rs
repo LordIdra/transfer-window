@@ -4,7 +4,8 @@ use eframe::glow::{self, TEXTURE_2D};
 use glow::{Context, HasContext};
 use nalgebra_glm::Mat3;
 
-use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
+use super::shader_program::ShaderProgram;
+use super::vertex_array_object::VertexArrayObject;
 
 pub struct TextureRenderer {
     program: ShaderProgram,
@@ -16,12 +17,7 @@ pub struct TextureRenderer {
 impl TextureRenderer {
     pub fn new(gl: &Arc<Context>, texture: glow::Texture) -> Self {
         let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/icon.vert"), include_str!("../../../resources/shaders/icon.frag"));
-        let vertex_array_object = VertexArrayObject::new(gl, vec![
-            VertexAttribute { index: 0, count: 2 }, // x
-            VertexAttribute { index: 1, count: 2 }, // y
-            VertexAttribute { index: 2, count: 1 }, // alpha
-            VertexAttribute { index: 3, count: 2 }, // texture coordinates
-        ]);
+        let vertex_array_object = VertexArrayObject::texture_vertex_array(gl);
         let vertices = vec![];
         Self { program, vertex_array_object, texture, vertices }
     }

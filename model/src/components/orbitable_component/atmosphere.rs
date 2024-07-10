@@ -1,20 +1,21 @@
-use ecolor::Rgba;
+use ecolor::Color32;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct AtmosphereComponent {
-    color: Rgba,
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Atmosphere {
+    color: Color32,
     density: f64,
     height: f64,
     falloff: f64,
 }
 
-impl AtmosphereComponent {
-    pub fn new(color: Rgba, density: f64, height: f64, falloff: f64) -> Self {
+impl Atmosphere {
+    
+    pub fn new(color: Color32, density: f64, height: f64, falloff: f64) -> Self {
         Self { color, density, height, falloff }
     }
 
-    pub fn color(&self) -> Rgba {
+    pub fn color(&self) -> Color32 {
         self.color
     }
 
@@ -25,7 +26,7 @@ impl AtmosphereComponent {
     pub fn height(&self) -> f64 {
         self.height
     }
-    
+
     pub fn falloff(&self) -> f64 {
         self.falloff
     }

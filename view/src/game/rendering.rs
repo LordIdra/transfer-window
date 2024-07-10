@@ -42,11 +42,12 @@ impl Renderers {
         let render_pipeline = Arc::new(Mutex::new(RenderPipeline::new(gl, screen_rect)));
         let celestial_object_renderers = resources.build_celestial_object_renderers(gl);
         let mut atmosphere_renderers = HashMap::new();
-        for entity in model.entities(vec![ComponentType::AtmosphereComponent]) {
-            let name = model.name_component(entity).name().to_lowercase();
-            let atmosphere = model.atmosphere_component(entity);
-            let renderer = Arc::new(Mutex::new(AtmosphereRenderer::new(gl, atmosphere)));
-            atmosphere_renderers.insert(name, renderer);
+        for entity in model.entities(vec![ComponentType::OrbitableComponent]) {
+            if let Some(atmosphere) = model.orbitable_component(entity).atmosphere() {
+                let name = model.name_component(entity).name().to_lowercase();
+                let renderer = Arc::new(Mutex::new(AtmosphereRenderer::new(gl, atmosphere)));
+                atmosphere_renderers.insert(name, renderer);
+            }
         }
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
         let texture_renderers = resources.build_texture_renderers(gl);

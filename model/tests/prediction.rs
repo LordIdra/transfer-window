@@ -11,7 +11,7 @@ fn test_prediction() {
     let moon_mass = 7.348e22;
     let vessel_mass = 3.0e2;
 
-    let orbitable_component = OrbitableComponent::new(sun_mass, 1.0, 10.0, 0.0, OrbitableType::Star, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)));
+    let orbitable_component = OrbitableComponent::new(sun_mass, 1.0, 10.0, 0.0, OrbitableType::Star, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)), None);
     let sun = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Sun".to_string()))
         .with_orbitable_component(orbitable_component));
@@ -20,13 +20,13 @@ fn test_prediction() {
         .with_end_at(1.0e10);
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
+        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)), None)));
 
     let orbit = Orbit::new(earth, moon_mass, earth_mass, vec2(0.0, 0.1055e9), vec2(1.870e3, 0.0), 0.0)
         .with_end_at(1.0e10);
     let _moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(moon_mass, 1.0, 10.0, 0.0, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
+        .with_orbitable_component(OrbitableComponent::new(moon_mass, 1.0, 10.0, 0.0, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)), None)));
 
     // Do not end this orbit because we are expecting to do trajectory prediction
     let orbit = Orbit::new(earth, vessel_mass, earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
@@ -67,19 +67,19 @@ fn test_prediction_with_burn() {
 
     let sun = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Sun".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(sun_mass, 1.0, 10.0, 0.0, OrbitableType::Star, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)))));
+        .with_orbitable_component(OrbitableComponent::new(sun_mass, 1.0, 10.0, 0.0, OrbitableType::Star, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)), None)));
 
     let orbit = Orbit::new(sun, earth_mass, sun_mass, vec2(1.521e11, 0.0), vec2(0.0, -2.929e4), 0.0)
         .with_end_at(1.0e10);
     let earth = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Earth".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
+        .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)), None)));
 
     let orbit = Orbit::new(earth, moon_mass, earth_mass, vec2(0.0, 0.1055e9), vec2(1.870e3, 0.0), 0.0)
         .with_end_at(1.0e10);
     let moon = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Moon".to_string()))
-        .with_orbitable_component(OrbitableComponent::new(moon_mass, 1.0, 10.0, 0.0, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)))));
+        .with_orbitable_component(OrbitableComponent::new(moon_mass, 1.0, 10.0, 0.0, OrbitableType::Moon, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)), None)));
 
     // Do not end this orbit because we are expecting to do trajectory prediction
     let vessel_start_position = vec2(0.01041e9, 0.0);

@@ -44,7 +44,7 @@ pub fn draw(view: &View) {
         view.renderers.add_celestial_object_vertices(&name, &mut vertices);
         view.renderers.set_object_rotation(&name, orbitable.rotation_angle() as f32);
 
-        if let Some(atmosphere) = view.model.try_atmosphere_component(entity) {
+        if let Some(atmosphere) = orbitable.atmosphere() {
             let atmosphere_radius = orbitable.radius() + atmosphere.height() * orbitable.radius();
             let mut vertices = compute_celestial_object_vertices(
                 position,

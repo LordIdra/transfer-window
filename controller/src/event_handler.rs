@@ -33,7 +33,7 @@ pub fn load_game(controller: &mut Controller, context: &Context, name: &str) {
 
     let model = Model::deserialize(serialized.as_str());
     let Ok(model) = model else {
-    error!("Failed to handle load game; error while deseraizing: {}", model.err().unwrap());
+    error!("Failed to handle load game; error while deserializing: {}", model.err().unwrap());
     return;
     };
 

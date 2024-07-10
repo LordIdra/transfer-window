@@ -1,6 +1,9 @@
+use crate::components::name_component::NameComponent;
+use crate::components::orbitable_component::OrbitableComponent;
+use crate::components::path_component::PathComponent;
+use crate::components::vessel_component::VesselComponent;
 use crate::Model;
-
-use crate::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, atmosphere_component::AtmosphereComponent, path_component::PathComponent, vessel_component::VesselComponent}, storage::entity_allocator::Entity};
+use crate::storage::entity_allocator::Entity;
 
 impl Model {
     pub fn name_component_mut(&mut self, entity: Entity) -> &mut NameComponent {
@@ -33,14 +36,6 @@ impl Model {
 
     pub fn try_orbitable_component(&self, entity: Entity) -> Option<&OrbitableComponent> {
         self.orbitable_components.try_get(entity)
-    }
-    
-    pub fn atmosphere_component(&self, entity: Entity) -> &AtmosphereComponent {
-        self.atmosphere_components.get(entity)
-    }
-    
-    pub fn try_atmosphere_component(&self, entity: Entity) -> Option<&AtmosphereComponent> {
-        self.atmosphere_components.try_get(entity)
     }
 
     pub fn path_component_mut(&mut self, entity: Entity) -> &mut PathComponent {

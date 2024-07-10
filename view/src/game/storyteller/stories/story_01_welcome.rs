@@ -1,8 +1,23 @@
+use eframe::epaint::Color32;
 use nalgebra_glm::vec2;
-use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
-use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{close_dialogue_action::CloseDialogueAction, create_vessel_action::CreateVesselAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}};
+use transfer_window_model::api::builder::{AtmosphereBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, OrbitBuilder, VesselBuilder};
+use transfer_window_model::components::orbitable_component::OrbitableType;
+use transfer_window_model::components::path_component::orbit::orbit_direction::OrbitDirection;
+use transfer_window_model::components::vessel_component::class::VesselClass;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::vessel_component::VesselComponent;
+use transfer_window_model::Model;
+use transfer_window_model::storage::entity_allocator::Entity;
 
+use crate::game::overlay::dialogue::Dialogue;
+use crate::game::storyteller::story::action::close_dialogue_action::CloseDialogueAction;
+use crate::game::storyteller::story::action::create_vessel_action::CreateVesselAction;
+use crate::game::storyteller::story::action::show_dialogue_action::ShowDialogueAction;
+use crate::game::storyteller::story::condition::Condition;
+use crate::game::storyteller::story::state::State;
+use crate::game::storyteller::story::Story;
+use crate::game::storyteller::story::transition::Transition;
 use super::StoryBuilder;
 
 #[derive(Debug, Default)]
@@ -20,6 +35,12 @@ impl StoryBuilder for Story01Welcome {
             rotation_angle: 100.0,
             type_: OrbitableType::Planet,
             physics: OrbitablePhysicsBuilder::Stationary(vec2(0.0, 0.0)),
+            atmosphere: AtmosphereBuilder {
+                color: Color32::from_hex("#3558A5").unwrap(),
+                density: 0.9,
+                height: 0.13,
+                falloff: 2.0,
+            }.build_some()
         }.build(&mut model);
 
         let mut story = Story::new("1");

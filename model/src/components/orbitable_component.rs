@@ -1,7 +1,11 @@
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::{DVec2, vec2};
 use serde::{Deserialize, Serialize};
 
 use super::path_component::{orbit::Orbit, segment::Segment};
+
+use self::atmosphere::Atmosphere;
+
+pub mod atmosphere;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum OrbitableType {
@@ -46,7 +50,6 @@ impl OrbitableComponentPhysics {
     }
 }
 
-/// Must have `MassComponent`
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OrbitableComponent {
     mass: f64,
@@ -55,12 +58,21 @@ pub struct OrbitableComponent {
     rotation_angle: f64,
     type_: OrbitableType,
     physics: OrbitableComponentPhysics,
+    atmosphere: Option<Atmosphere>
 }
 
 impl OrbitableComponent {
-    pub fn new(mass: f64, radius: f64, rotation_period_in_days: f64, rotation_angle: f64, type_: OrbitableType, physics: OrbitableComponentPhysics) -> Self {
+    pub fn new(
+        mass: f64,
+        radius: f64,
+        rotation_period_in_days: f64,
+        rotation_angle: f64,
+        type_: OrbitableType,
+        physics: OrbitableComponentPhysics,
+        atmosphere: Option<Atmosphere>,
+    ) -> Self {
         let rotation_period = rotation_period_in_days * 24.0 * 60.0 * 60.0;
-        Self { mass, radius, rotation_period, rotation_angle, type_, physics }
+        Self { mass, radius, rotation_period, rotation_angle, type_, physics, atmosphere }
     }
 
     pub fn mass(&self) -> f64 {
@@ -71,7 +83,7 @@ impl OrbitableComponent {
         self.radius
     }
 
-    /// Returned segment is always an oribt
+    /// Returned segment is always an orbit
     pub fn segment(&self) -> Option<&Segment> {
         match &self.physics {
             OrbitableComponentPhysics::Stationary(_) => None,
@@ -129,5 +141,9 @@ impl OrbitableComponent {
 
     pub fn velocity_at_time(&self, time: f64) -> DVec2 {
         self.physics.velocity_at_time(time)
+    }
+    
+    pub fn atmosphere(&self) -> Option<&Atmosphere> {
+        self.atmosphere.as_ref()
     }
 }

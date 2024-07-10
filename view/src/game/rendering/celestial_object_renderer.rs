@@ -1,8 +1,11 @@
 use std::sync::Arc;
+
 use eframe::glow;
 use eframe::glow::{Context, HasContext, TEXTURE_2D};
 use nalgebra_glm::Mat3;
-use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
+
+use super::shader_program::ShaderProgram;
+use super::vertex_array_object::VertexArrayObject;
 
 pub struct CelestialObjectRenderer {
     program: ShaderProgram,
@@ -15,12 +18,7 @@ pub struct CelestialObjectRenderer {
 impl CelestialObjectRenderer {
     pub fn new(gl: &Arc<Context>, texture: glow::Texture) -> Self {
         let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/celestial_object.vert"), include_str!("../../../resources/shaders/celestial_object.frag"));
-        let vertex_array_object = VertexArrayObject::new(gl, vec![
-            VertexAttribute { index: 0, count: 2 }, // x
-            VertexAttribute { index: 1, count: 2 }, // y
-            VertexAttribute { index: 2, count: 1 }, // alpha
-            VertexAttribute { index: 3, count: 2 }, // texture coordinates
-        ]);
+        let vertex_array_object = VertexArrayObject::texture_vertex_array(gl);
         let vertices = vec![];
         let rotation = 0.0;
         Self { program, vertex_array_object, texture, vertices, rotation }

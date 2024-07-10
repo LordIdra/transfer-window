@@ -3,8 +3,11 @@ use std::sync::Arc;
 use eframe::epaint::Rgba;
 use eframe::glow::Context;
 use nalgebra_glm::Mat3;
-use transfer_window_model::components::atmosphere_component::AtmosphereComponent;
-use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
+
+use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
+
+use super::shader_program::ShaderProgram;
+use super::vertex_array_object::VertexArrayObject;
 
 pub struct AtmosphereRenderer {
     program: ShaderProgram,
@@ -16,17 +19,16 @@ pub struct AtmosphereRenderer {
 }
 
 impl AtmosphereRenderer {
-    pub fn new(gl: &Arc<Context>, atmosphere: &AtmosphereComponent) -> Self {
-        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/atmosphere.vert"), include_str!("../../../resources/shaders/atmosphere.frag"));
-        let vertex_array_object = VertexArrayObject::new(gl, vec![
-            VertexAttribute { index: 0, count: 2 }, // x
-            VertexAttribute { index: 1, count: 2 }, // y
-            VertexAttribute { index: 2, count: 1 }, // alpha
-            VertexAttribute { index: 3, count: 2 }, // uv
-        ]);
+    pub fn new(gl: &Arc<Context>, atmosphere: &Atmosphere) -> Self {
+        let program = ShaderProgram::new(
+            gl,
+            include_str!("../../../resources/shaders/atmosphere.vert"),
+            include_str!("../../../resources/shaders/atmosphere.frag")
+        );
+        let vertex_array_object = VertexArrayObject::texture_vertex_array(gl);
         let vertices = vec![];
         let height = atmosphere.height() as f32;
-        let color = atmosphere.color();
+        let color = atmosphere.color().into();
         let falloff = atmosphere.falloff() as f32;
         Self { program, vertex_array_object, vertices, height, color, falloff }
     }
