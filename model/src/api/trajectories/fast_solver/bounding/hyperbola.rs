@@ -1,11 +1,20 @@
-use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectories::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
+use transfer_window_common::numerical_methods::itp::itp;
+use transfer_window_common::numerical_methods::util::differentiate_1;
 
-use super::{sdf::make_sdf, window::Window};
-
-use transfer_window_common::numerical_methods::{itp::itp, util::differentiate_1};
+use super::sdf::make_sdf;
+use super::window::Window;
+use crate::api::trajectories::fast_solver::bounding::util::{
+    angle_window_to_time_window, make_range_containing,
+};
+use crate::components::path_component::orbit::Orbit;
+use crate::storage::entity_allocator::Entity;
 
 // Hyperbolic SDF only has a maximum, no minimum
-fn find_max(sdf: &impl Fn(f64) -> f64, min_asymptote_theta: f64, max_asymptote_theta: f64) -> Result<f64, &'static str> {
+fn find_max(
+    sdf: &impl Fn(f64) -> f64,
+    min_asymptote_theta: f64,
+    max_asymptote_theta: f64,
+) -> Result<f64, &'static str> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Max signed distance");
     let min_derivative_theta = max_asymptote_theta;
@@ -15,9 +24,9 @@ fn find_max(sdf: &impl Fn(f64) -> f64, min_asymptote_theta: f64, max_asymptote_t
 }
 
 struct BounderData<'a> {
-    orbit: &'a Orbit, 
-    sibling_orbit: &'a Orbit, 
-    sibling: Entity, 
+    orbit: &'a Orbit,
+    sibling_orbit: &'a Orbit,
+    sibling: Entity,
     max_theta: f64,
     min_asymptote_theta: f64,
     max_asymptote_theta: f64,
@@ -70,7 +79,11 @@ impl<'a> BounderData<'a> {
     }
 }
 
-pub fn compute_hyperbola_bound<'a>(orbit: &'a Orbit, sibling_orbit: &'a Orbit, sibling: Entity) -> Result<Vec<Window<'a>>, &'static str> {
+pub fn compute_hyperbola_bound<'a>(
+    orbit: &'a Orbit,
+    sibling_orbit: &'a Orbit,
+    sibling: Entity,
+) -> Result<Vec<Window<'a>>, &'static str> {
     let sdf = make_sdf(orbit, sibling_orbit);
     let soi = sibling_orbit.sphere_of_influence();
     let min_asymptote_theta = orbit.min_asymptote_theta().unwrap() + 0.001;

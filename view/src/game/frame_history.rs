@@ -5,7 +5,7 @@ use eframe::emath::History;
 const MAX_AGE: f32 = 1.0;
 
 pub struct FrameHistory {
-    frame_times: History<f32>
+    frame_times: History<f32>,
 }
 
 impl Default for FrameHistory {

@@ -1,21 +1,27 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
-
-use crate::game::{events::ViewEvent, selected::Selected, util::vessel_texture, View};
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::ComponentType;
+use transfer_window_model::storage::entity_allocator::Entity;
 
 use super::Icon;
-
+use crate::game::events::ViewEvent;
+use crate::game::selected::Selected;
+use crate::game::util::vessel_texture;
+use crate::game::View;
 
 #[derive(Debug)]
 pub struct Vessel {
-    entity: Entity
+    entity: Entity,
 }
 
 impl Vessel {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
+        for entity in view.entities_should_render(vec![
+            ComponentType::VesselComponent,
+            ComponentType::PathComponent,
+        ]) {
             if !view.model.vessel_component(entity).is_ghost() {
                 let icon = Self { entity };
                 icons.push(Box::new(icon) as Box<dyn Icon>);
@@ -29,7 +35,10 @@ impl Icon for Vessel {
     fn texture(&self, view: &View) -> String {
         let mut base_name = vessel_texture(view.model.vessel_component(self.entity)).to_string();
         if let Some(target) = view.selected.target(&view.model) {
-            let selected_faction = view.model.vessel_component(view.selected.entity(&view.model).unwrap()).faction();
+            let selected_faction = view
+                .model
+                .vessel_component(view.selected.entity(&view.model).unwrap())
+                .faction();
             if target == self.entity && Faction::Player.has_intel_for(selected_faction) {
                 base_name += "-target";
             }
@@ -45,7 +54,7 @@ impl Icon for Vessel {
             return 1.0;
         }
         if is_hovered {
-            return 0.8
+            return 0.8;
         }
         0.6
     }
@@ -59,7 +68,7 @@ impl Icon for Vessel {
             u64::from(self.is_selected(view)),
             1,
             0,
-            view.model.mass(self.entity) as u64
+            view.model.mass(self.entity) as u64,
         ]
     }
 

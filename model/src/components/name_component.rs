@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct NameComponent {
-    name: String
+    name: String,
 }
 
 impl NameComponent {

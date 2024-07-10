@@ -1,8 +1,8 @@
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use crate::{api::time::{TimeStep, WARP_STOP_BEFORE_TARGET_SECONDS}, Model};
-
+use crate::api::time::{TimeStep, WARP_STOP_BEFORE_TARGET_SECONDS};
+use crate::Model;
 
 const SLOW_DOWN_AFTER_PROPORTION: f64 = 0.95;
 const ADDITIONAL_MULTIPLER: f64 = 0.06;
@@ -15,7 +15,10 @@ pub struct TimeWarp {
 
 impl TimeWarp {
     pub fn new(start_time: f64, end_time: f64) -> Self {
-        Self { start_time, end_time: end_time - WARP_STOP_BEFORE_TARGET_SECONDS }
+        Self {
+            start_time,
+            end_time: end_time - WARP_STOP_BEFORE_TARGET_SECONDS,
+        }
     }
 
     fn compute_max_warp_speed(&self) -> f64 {
@@ -27,13 +30,16 @@ impl TimeWarp {
         let total_duration = self.end_time - self.start_time;
         current_duration / total_duration
     }
-    
+
     pub fn compute_warp_speed(&self, time: f64) -> f64 {
         if self.compute_fraction_completed(time) < SLOW_DOWN_AFTER_PROPORTION {
             self.compute_max_warp_speed()
         } else {
-            let fraction_of_last_fraction_completed = (self.compute_fraction_completed(time) - SLOW_DOWN_AFTER_PROPORTION) / (1.0 - SLOW_DOWN_AFTER_PROPORTION);
-            let multiplier = (fraction_of_last_fraction_completed - 1.0).powi(2) + ADDITIONAL_MULTIPLER;
+            let fraction_of_last_fraction_completed = (self.compute_fraction_completed(time)
+                - SLOW_DOWN_AFTER_PROPORTION)
+                / (1.0 - SLOW_DOWN_AFTER_PROPORTION);
+            let multiplier =
+                (fraction_of_last_fraction_completed - 1.0).powi(2) + ADDITIONAL_MULTIPLER;
             multiplier * self.compute_max_warp_speed()
         }
     }
@@ -47,11 +53,14 @@ impl Model {
         } else {
             return;
         };
-        
+
         if warp_finished {
             trace!("Warp finished");
             self.warp = None;
-            self.time_step = TimeStep::Level { level: 1, paused: false };
+            self.time_step = TimeStep::Level {
+                level: 1,
+                paused: false,
+            };
         }
 
         if let Some(warp) = &self.warp {
@@ -65,7 +74,10 @@ impl Model {
                 speed = overshot_time / dt + 1.0e-3;
                 trace!("Compensating for warp overshoot of {overshot_time}");
             }
-            self.time_step = TimeStep::Warp { speed, paused: false };
+            self.time_step = TimeStep::Warp {
+                speed,
+                paused: false,
+            };
         }
     }
 }

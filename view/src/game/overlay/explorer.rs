@@ -1,11 +1,18 @@
 use std::collections::HashSet;
 
-use eframe::{egui::{Align2, Color32, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
+use eframe::egui::{Align2, Color32, RichText, Ui, Window};
+use eframe::epaint;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::ComponentType;
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::{events::ViewEvent, selected::Selected, util::{orbitable_texture, vessel_texture}};
-
-use super::{widgets::{custom_image::CustomImage, custom_image_button::CustomCircularImageButton, labels::draw_title}, View};
+use super::widgets::custom_image::CustomImage;
+use super::widgets::custom_image_button::CustomCircularImageButton;
+use super::widgets::labels::draw_title;
+use super::View;
+use crate::game::events::ViewEvent;
+use crate::game::selected::Selected;
+use crate::game::util::{orbitable_texture, vessel_texture};
 
 pub fn vessel_hover_circle_color(faction: Faction) -> Color32 {
     match faction {
@@ -24,7 +31,8 @@ pub fn vessel_normal_circle_color(faction: Faction) -> Color32 {
 }
 
 fn root_entities(view: &View) -> HashSet<Entity> {
-    view.model.entities(vec![ComponentType::OrbitableComponent])
+    view.model
+        .entities(vec![ComponentType::OrbitableComponent])
         .into_iter()
         .filter(|entity| view.model.parent(*entity).is_none())
         .collect()
@@ -40,20 +48,32 @@ fn order_by_altitude(view: &View, mut entities: Vec<Entity>) -> Vec<Entity> {
 }
 
 fn child_vessel_entities(view: &View, parent_entity: Entity) -> Vec<Entity> {
-    let entities: Vec<Entity> = view.model.entities(vec![ComponentType::VesselComponent])
+    let entities: Vec<Entity> = view
+        .model
+        .entities(vec![ComponentType::VesselComponent])
         .into_iter()
         .filter(|entity| view.model.try_vessel_component(*entity).is_some())
         .filter(|entity| !view.model.vessel_component(*entity).is_ghost())
-        .filter(|entity| view.model.parent(*entity).is_some_and(|parent| parent == parent_entity))
+        .filter(|entity| {
+            view.model
+                .parent(*entity)
+                .is_some_and(|parent| parent == parent_entity)
+        })
         .collect();
     order_by_altitude(view, entities)
 }
 
 pub fn child_orbitable_entities(view: &View, parent_entity: Entity) -> Vec<Entity> {
-    let entities: Vec<Entity> = view.model.entities(vec![ComponentType::OrbitableComponent])
+    let entities: Vec<Entity> = view
+        .model
+        .entities(vec![ComponentType::OrbitableComponent])
         .into_iter()
         .filter(|entity| view.model.try_orbitable_component(*entity).is_some())
-        .filter(|entity| view.model.parent(*entity).is_some_and(|parent| parent == parent_entity))
+        .filter(|entity| {
+            view.model
+                .parent(*entity)
+                .is_some_and(|parent| parent == parent_entity)
+        })
         .collect();
     order_by_altitude(view, entities)
 }
@@ -149,14 +169,14 @@ pub fn update(view: &View) {
     }
 
     Window::new("Explorer")
-            .title_bar(false)
-            .resizable(false)
-            .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
-            .show(&view.context.clone(), |ui| {
-        draw_title(ui, "Overview");
-        
-        for entity in root_entities(view) {
-            render_entity(view, ui, entity, &[]);
-        }
-    });
+        .title_bar(false)
+        .resizable(false)
+        .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
+        .show(&view.context.clone(), |ui| {
+            draw_title(ui, "Overview");
+
+            for entity in root_entities(view) {
+                render_entity(view, ui, entity, &[]);
+            }
+        });
 }

@@ -1,10 +1,9 @@
 use transfer_window_model::api::time::TimeStep;
 
+use super::Action;
 use crate::game::events::{ModelEvent, ViewEvent};
 
-use super::Action;
-
-pub struct SetTimeStepAction{
+pub struct SetTimeStepAction {
     time_step: TimeStep,
 }
 
@@ -16,7 +15,9 @@ impl SetTimeStepAction {
 
 impl Action for SetTimeStepAction {
     fn trigger(&self) -> (Vec<ModelEvent>, Vec<ViewEvent>) {
-        let event = ModelEvent::SetTimeStep { time_step: self.time_step.clone() };
+        let event = ModelEvent::SetTimeStep {
+            time_step: self.time_step.clone(),
+        };
         (vec![event], vec![])
     }
 }

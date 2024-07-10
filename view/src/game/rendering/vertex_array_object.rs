@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
 use eframe::glow::{self, LINES};
-use glow::{VertexArray, Buffer, Context, HasContext, ARRAY_BUFFER, FLOAT, DYNAMIC_DRAW, TRIANGLES};
+use glow::{
+    Buffer, Context, HasContext, VertexArray, ARRAY_BUFFER, DYNAMIC_DRAW, FLOAT, TRIANGLES,
+};
 
 pub struct VertexAttribute {
     pub index: u32,
@@ -25,11 +27,16 @@ impl VertexArrayObject {
     pub fn new(gl: &Arc<Context>, vertex_attributes: Vec<VertexAttribute>) -> Self {
         let vertex_array: VertexArray;
         let vertex_buffer: Buffer;
-        let attributes_per_vertex = vertex_attributes.iter().map(|attribute| attribute.count).sum();
+        let attributes_per_vertex = vertex_attributes
+            .iter()
+            .map(|attribute| attribute.count)
+            .sum();
         let stride = vertex_attributes.iter().map(VertexAttribute::size).sum();
 
-        unsafe { 
-            vertex_array = gl.create_vertex_array().expect("Cannot create vertex array");
+        unsafe {
+            vertex_array = gl
+                .create_vertex_array()
+                .expect("Cannot create vertex array");
             vertex_buffer = gl.create_buffer().expect("Cannot create vertex buffer");
             gl.bind_vertex_array(Some(vertex_array));
             gl.bind_buffer(ARRAY_BUFFER, Some(vertex_buffer));
@@ -37,14 +44,26 @@ impl VertexArrayObject {
 
         let mut offset = 0;
         for attribute in vertex_attributes {
-            unsafe { 
-                gl.vertex_attrib_pointer_f32(attribute.index, attribute.count, FLOAT, false, stride, offset);
+            unsafe {
+                gl.vertex_attrib_pointer_f32(
+                    attribute.index,
+                    attribute.count,
+                    FLOAT,
+                    false,
+                    stride,
+                    offset,
+                );
                 gl.enable_vertex_attrib_array(attribute.index);
             };
             offset += attribute.size();
         }
 
-        VertexArrayObject { vertices: 0, attributes_per_vertex, vertex_array, vertex_buffer }
+        VertexArrayObject {
+            vertices: 0,
+            attributes_per_vertex,
+            vertex_array,
+            vertex_buffer,
+        }
     }
 
     fn bind(&self, gl: &Arc<Context>) {

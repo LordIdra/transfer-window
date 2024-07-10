@@ -1,11 +1,16 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
-
-use crate::game::{events::ViewEvent, selected::Selected, util::{should_render_at_time, ApsisType}, View};
+use transfer_window_model::components::path_component::orbit::Orbit;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::ComponentType;
+use transfer_window_model::storage::entity_allocator::Entity;
 
 use super::Icon;
+use crate::game::events::ViewEvent;
+use crate::game::selected::Selected;
+use crate::game::util::{should_render_at_time, ApsisType};
+use crate::game::View;
 
 fn compute_time_of_next_periapsis(orbit: &Orbit) -> Option<f64> {
     let periapsis_time = if orbit.is_ellipse() {
@@ -51,11 +56,22 @@ pub struct Apsis {
 
 impl Apsis {
     pub fn new(view: &View, type_: ApsisType, entity: Entity, orbit: &Orbit, time: f64) -> Self {
-        let position = view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
-        Self { type_, entity, time, position }
+        let position =
+            view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
+        Self {
+            type_,
+            entity,
+            time,
+            position,
+        }
     }
-    
-    pub fn generate_for_orbit(view: &View, entity: Entity, orbit: &Orbit, icons: &mut Vec<Box<dyn Icon>>) {
+
+    pub fn generate_for_orbit(
+        view: &View,
+        entity: Entity,
+        orbit: &Orbit,
+        icons: &mut Vec<Box<dyn Icon>>,
+    ) {
         if let Some(time) = compute_time_of_next_periapsis(orbit) {
             if should_render_at_time(view, entity, time) {
                 let icon = Apsis::new(view, ApsisType::Periapsis, entity, orbit, time);
@@ -73,7 +89,10 @@ impl Apsis {
 
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.model.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
+        for entity in view.model.entities(vec![
+            ComponentType::VesselComponent,
+            ComponentType::PathComponent,
+        ]) {
             for orbit in &view.model.future_orbits(entity, Some(Faction::Player)) {
                 Self::generate_for_orbit(view, entity, orbit, &mut icons);
             }
@@ -95,7 +114,8 @@ impl Icon for Apsis {
         match self.type_ {
             ApsisType::Periapsis => "periapsis",
             ApsisType::Apoapsis => "apoapsis",
-        }.to_string()
+        }
+        .to_string()
     }
 
     fn alpha(&self, _view: &View, is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
@@ -106,7 +126,7 @@ impl Icon for Apsis {
             return 1.0;
         }
         if is_hovered {
-            return 0.8
+            return 0.8;
         }
         0.6
     }
@@ -116,12 +136,7 @@ impl Icon for Apsis {
     }
 
     fn priorities(&self, view: &View) -> [u64; 4] {
-        [
-            u64::from(self.is_selected(view)),
-            0,
-            2,
-            0,
-        ]
+        [u64::from(self.is_selected(view)), 0, 2, 0]
     }
 
     fn position(&self, _view: &View) -> DVec2 {
@@ -135,7 +150,12 @@ impl Icon for Apsis {
     }
 
     fn is_selected(&self, view: &View) -> bool {
-        if let Selected::Apsis { type_, entity, time } = &view.selected {
+        if let Selected::Apsis {
+            type_,
+            entity,
+            time,
+        } = &view.selected
+        {
             // calculations can produce slightly different times when an apsis is calculated
             *type_ == self.type_ && *entity == self.entity && (*time - self.time).abs() < 1.0
         } else {
@@ -146,7 +166,11 @@ impl Icon for Apsis {
     fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
         if pointer.primary_clicked() {
             trace!("Apsis icon clicked; switching to Selected");
-            let selected = Selected::Apsis { type_: self.type_, entity: self.entity, time: self.time };
+            let selected = Selected::Apsis {
+                type_: self.type_,
+                entity: self.entity,
+                time: self.time,
+            };
             view.add_view_event(ViewEvent::SetSelected(selected));
         }
     }

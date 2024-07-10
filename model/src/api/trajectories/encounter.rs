@@ -17,8 +17,18 @@ pub struct Encounter {
 }
 
 impl Encounter {
-    pub fn new(encounter_type: EncounterType, entity: Entity, new_parent: Entity, time: f64) -> Self {
-        Self { encounter_type, entity, new_parent, time }
+    pub fn new(
+        encounter_type: EncounterType,
+        entity: Entity,
+        new_parent: Entity,
+        time: f64,
+    ) -> Self {
+        Self {
+            encounter_type,
+            entity,
+            new_parent,
+            time,
+        }
     }
 
     pub fn type_(&self) -> EncounterType {

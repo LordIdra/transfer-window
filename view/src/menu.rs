@@ -1,9 +1,16 @@
-use std::{collections::HashSet, sync::{Arc, Mutex}};
+use std::collections::HashSet;
+use std::sync::{Arc, Mutex};
 
-use eframe::{egui::{CentralPanel, Context, CursorIcon, Key, Rect, Sense, Ui, Vec2, Window}, glow};
+use eframe::egui::{CentralPanel, Context, CursorIcon, Key, Rect, Sense, Ui, Vec2, Window};
+use eframe::glow;
 use log::trace;
 
-use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer, storyteller::stories::{story_01_welcome::Story01Welcome, StoryBuilder}}, resources::Resources};
+use crate::controller_events::ControllerEvent;
+use crate::game::overlay::widgets::custom_image::CustomImage;
+use crate::game::rendering::screen_texture_renderer::ScreenTextureRenderer;
+use crate::game::storyteller::stories::story_01_welcome::Story01Welcome;
+use crate::game::storyteller::stories::StoryBuilder;
+use crate::resources::Resources;
 
 impl CustomImage {
     pub fn new_menu(view: &View, texture_name: &str, width: f32, height: f32) -> Self {
@@ -13,7 +20,16 @@ impl CustomImage {
         let sense = Sense::union(Sense::click(), Sense::hover());
         let padding = 0.0;
         let alpha = 1.0;
-        Self::new_from_parts(renderer, texture, screen_rect, width, height, sense, padding, alpha)
+        Self::new_from_parts(
+            renderer,
+            texture,
+            screen_rect,
+            width,
+            height,
+            sense,
+            padding,
+            alpha,
+        )
     }
 }
 
@@ -30,14 +46,33 @@ impl View {
     pub fn new(resources: Arc<Resources>, context: &Context, gl: Arc<glow::Context>) -> Self {
         let previous_screen_rect = context.screen_rect();
         let screen_rect = context.screen_rect();
-        let screen_texture_renderer = Arc::new(Mutex::new(ScreenTextureRenderer::new(&gl, screen_rect)));
+        let screen_texture_renderer =
+            Arc::new(Mutex::new(ScreenTextureRenderer::new(&gl, screen_rect)));
         let debug_window_open = false;
-        Self { gl, previous_screen_rect, screen_rect, resources, screen_texture_renderer, debug_window_open }
+        Self {
+            gl,
+            previous_screen_rect,
+            screen_rect,
+            resources,
+            screen_texture_renderer,
+            debug_window_open,
+        }
     }
 
-    fn draw_level(&self, context: &Context, ui: &mut Ui, events: &mut Vec<ControllerEvent>, completed_levels: &HashSet<String>, level: &str, story_builder: Box<dyn StoryBuilder>) {
+    fn draw_level(
+        &self,
+        context: &Context,
+        ui: &mut Ui,
+        events: &mut Vec<ControllerEvent>,
+        completed_levels: &HashSet<String>,
+        level: &str,
+        story_builder: Box<dyn StoryBuilder>,
+    ) {
         let mut level = level.to_string();
-        let prerequisite_met = story_builder.prerequisite().map_or_else(|| true, |prerequisite| completed_levels.contains(&prerequisite));
+        let prerequisite_met = story_builder.prerequisite().map_or_else(
+            || true,
+            |prerequisite| completed_levels.contains(&prerequisite),
+        );
         let (rect, _) = ui.allocate_exact_size(Vec2::new(300.0, 150.0), Sense::click());
         let hovered = ui.rect_contains_pointer(rect);
         let clicked = hovered && ui.input(|input| input.pointer.primary_clicked());
@@ -65,7 +100,11 @@ impl View {
         ui.add_space(10.0);
     }
 
-    pub fn update(&mut self, context: &Context, completed_levels: HashSet<String>) -> Vec<ControllerEvent> {
+    pub fn update(
+        &mut self,
+        context: &Context,
+        completed_levels: HashSet<String>,
+    ) -> Vec<ControllerEvent> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("View update");
 
@@ -81,16 +120,20 @@ impl View {
         if context.screen_rect() != self.previous_screen_rect {
             #[cfg(feature = "profiling")]
             let _span = tracy_client::span!("Resize buffers");
-            self.screen_texture_renderer.lock().unwrap().resize(&self.gl, context.screen_rect());
+            self.screen_texture_renderer
+                .lock()
+                .unwrap()
+                .resize(&self.gl, context.screen_rect());
         }
 
         let mut events = vec![];
 
         if self.debug_window_open {
-            Window::new("Debug")
-                    .show(context, |ui| {
+            Window::new("Debug").show(context, |ui| {
                 if ui.button("Load game").clicked() {
-                    events.push(ControllerEvent::LoadGame { name: "debug".to_owned() });
+                    events.push(ControllerEvent::LoadGame {
+                        name: "debug".to_owned(),
+                    });
                 }
             });
         }
@@ -104,8 +147,22 @@ impl View {
                 ui.vertical(|ui| {
                     ui.add(CustomImage::new_menu(self, "title-1", 215.0, 70.0));
                     ui.horizontal(|ui| {
-                        self.draw_level(context, ui, &mut events, &completed_levels, "1-01", Box::new(Story01Welcome));
-                        self.draw_level(context, ui, &mut events, &completed_levels, "1-02", Box::new(Story01Welcome));
+                        self.draw_level(
+                            context,
+                            ui,
+                            &mut events,
+                            &completed_levels,
+                            "1-01",
+                            Box::new(Story01Welcome),
+                        );
+                        self.draw_level(
+                            context,
+                            ui,
+                            &mut events,
+                            &completed_levels,
+                            "1-02",
+                            Box::new(Story01Welcome),
+                        );
                     });
                     // ui.add_space(15.0);
                     // ui.horizontal(|ui| {
@@ -120,6 +177,9 @@ impl View {
 
 impl Drop for View {
     fn drop(&mut self) {
-        self.screen_texture_renderer.lock().unwrap().destroy(&self.gl);
+        self.screen_texture_renderer
+            .lock()
+            .unwrap()
+            .destroy(&self.gl);
     }
 }

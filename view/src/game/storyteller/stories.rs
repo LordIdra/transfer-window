@@ -1,10 +1,10 @@
 use std::fmt::Debug;
 
-use transfer_window_model::{storage::entity_allocator::Entity, Model};
-
-use crate::game::ViewConfig;
+use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::Model;
 
 use super::story::Story;
+use crate::game::ViewConfig;
 
 pub mod story_01_welcome;
 

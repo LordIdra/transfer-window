@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{api::explosion::Explosion, storage::entity_allocator::Entity, Model};
+use crate::api::explosion::Explosion;
+use crate::storage::entity_allocator::Entity;
+use crate::Model;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InterceptEvent {
@@ -11,7 +13,11 @@ pub struct InterceptEvent {
 
 impl InterceptEvent {
     pub fn new(_model: &mut Model, entity: Entity, target: Entity, time: f64) -> Self {
-        Self { entity, target, time }
+        Self {
+            entity,
+            target,
+            time,
+        }
     }
 
     #[allow(clippy::missing_panics_doc)]
@@ -49,5 +55,4 @@ impl InterceptEvent {
     pub fn time(&self) -> f64 {
         self.time
     }
-
 }

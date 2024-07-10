@@ -1,8 +1,8 @@
-use eframe::{egui::{Align2, Color32, RichText, Ui, Window}, epaint};
-
-use crate::game::View;
+use eframe::egui::{Align2, Color32, RichText, Ui, Window};
+use eframe::epaint;
 
 use super::widgets::custom_image::CustomImage;
+use crate::game::View;
 
 const FADE_OUT_TIME: f32 = 1.0;
 
@@ -17,7 +17,11 @@ impl Objective {
     pub fn new(objective: &'static str) -> Self {
         let complete = false;
         let opacity = 1.0;
-        Self { objective, complete, opacity }
+        Self {
+            objective,
+            complete,
+            opacity,
+        }
     }
 
     pub fn update(&mut self, dt: f64) {
@@ -34,7 +38,7 @@ impl Objective {
     pub fn set_complete(&mut self) {
         self.complete = true;
     }
-    
+
     pub fn objective(&self) -> &str {
         self.objective
     }
@@ -43,13 +47,13 @@ impl Objective {
         ui.horizontal(|ui| {
             let texture = if self.complete {
                 "objective-complete"
-            } else { 
+            } else {
                 "objective-incomplete"
             };
             ui.add(CustomImage::new(view, texture, 12.0).with_alpha(self.opacity));
-            ui.label(RichText::new(self.objective)
-                .monospace()
-                .color(Color32::from_rgba_unmultiplied(255, 255, 255, (self.opacity * 255.0) as u8)));
+            ui.label(RichText::new(self.objective).monospace().color(
+                Color32::from_rgba_unmultiplied(255, 255, 255, (self.opacity * 255.0) as u8),
+            ));
         });
     }
 }

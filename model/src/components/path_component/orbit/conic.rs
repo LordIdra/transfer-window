@@ -1,9 +1,12 @@
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use self::{ellipse::Ellipse, hyperbola::Hyperbola};
-
-use super::{orbit_direction::OrbitDirection, scary_math::{eccentricity, semi_major_axis, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT}};
+use self::ellipse::Ellipse;
+use self::hyperbola::Hyperbola;
+use super::orbit_direction::OrbitDirection;
+use super::scary_math::{
+    eccentricity, semi_major_axis, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT,
+};
 
 mod ellipse;
 mod hyperbola;
@@ -13,8 +16,9 @@ pub enum ConicType {
     Hyperbola,
 }
 
-/// Describes all the static parmeters of an orbit, but says nothing about the current model of the object in the orbit
-/// We use an enum instead of dynamic dispatch here because we cannot serialize trait objects
+/// Describes all the static parmeters of an orbit, but says nothing about the
+/// current model of the object in the orbit We use an enum instead of dynamic
+/// dispatch here because we cannot serialize trait objects
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Conic {
     Ellipse(Ellipse),
@@ -25,12 +29,31 @@ impl Conic {
     pub fn new(parent_mass: f64, position: DVec2, velocity: DVec2) -> Self {
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * parent_mass;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
-        let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
+        let eccentricity = eccentricity(
+            position,
+            velocity,
+            standard_gravitational_parameter,
+            semi_major_axis,
+        );
         let direction = OrbitDirection::new(position, velocity);
         if eccentricity <= 1.0 {
-            Conic::Ellipse(Ellipse::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction))
+            Conic::Ellipse(Ellipse::new(
+                position,
+                velocity,
+                standard_gravitational_parameter,
+                semi_major_axis,
+                eccentricity,
+                direction,
+            ))
         } else {
-            Conic::Hyperbola(Hyperbola::new(position, velocity, standard_gravitational_parameter, semi_major_axis, eccentricity, direction))
+            Conic::Hyperbola(Hyperbola::new(
+                position,
+                velocity,
+                standard_gravitational_parameter,
+                semi_major_axis,
+                eccentricity,
+                direction,
+            ))
         }
     }
 
@@ -38,14 +61,24 @@ impl Conic {
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * parent_mass;
         let semi_major_axis = position.magnitude();
         let eccentricity: f64 = 1.0e-6;
-        let velocity = velocity_to_obtain_eccentricity(position, eccentricity, standard_gravitational_parameter, semi_major_axis, direction);
+        let velocity = velocity_to_obtain_eccentricity(
+            position,
+            eccentricity,
+            standard_gravitational_parameter,
+            semi_major_axis,
+            direction,
+        );
         Self::new(parent_mass, position, velocity)
     }
 
     pub fn theta_from_time_since_periapsis(&self, time_since_periapsis: f64) -> f64 {
         match self {
-            Conic::Ellipse(ellipse) => ellipse.theta_from_time_since_periapsis(time_since_periapsis),
-            Conic::Hyperbola(hyperbola) => hyperbola.theta_from_time_since_periapsis(time_since_periapsis),
+            Conic::Ellipse(ellipse) => {
+                ellipse.theta_from_time_since_periapsis(time_since_periapsis)
+            }
+            Conic::Hyperbola(hyperbola) => {
+                hyperbola.theta_from_time_since_periapsis(time_since_periapsis)
+            }
         }
     }
 
@@ -136,7 +169,7 @@ impl Conic {
     pub fn orbits(&self, time: f64) -> i32 {
         match self {
             Conic::Ellipse(ellipse) => ellipse.orbits(time),
-            Conic::Hyperbola(_) => 0
+            Conic::Hyperbola(_) => 0,
         }
     }
 }
@@ -145,19 +178,26 @@ impl Conic {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::components::path_component::orbit::orbit_direction::OrbitDirection;
-
     use super::Conic;
+    use crate::components::path_component::orbit::orbit_direction::OrbitDirection;
 
     #[test]
     fn test_circle() {
         let conic = Conic::circle(1.0e23, vec2(1.0e9, -1.0e8), OrbitDirection::AntiClockwise);
-        println!("e={} direction={:?}", conic.eccentricity(), conic.direction());
+        println!(
+            "e={} direction={:?}",
+            conic.eccentricity(),
+            conic.direction()
+        );
         assert!(conic.eccentricity().abs() < 1.0e-2);
         assert!(conic.direction().is_anticlockwise());
 
         let conic = Conic::circle(1.0e17, vec2(-1.0e3, 0.0), OrbitDirection::Clockwise);
-        println!("e={} direction={:?}", conic.eccentricity(), conic.direction());
+        println!(
+            "e={} direction={:?}",
+            conic.eccentricity(),
+            conic.direction()
+        );
         assert!(conic.eccentricity().abs() < 1.0e-2);
         assert!(conic.direction().is_clockwise());
     }

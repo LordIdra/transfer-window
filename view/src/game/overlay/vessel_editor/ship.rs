@@ -1,9 +1,16 @@
 use eframe::egui::{self, Color32, Grid, Image, Pos2, Rect, Response, RichText, Ui, Vec2};
-use transfer_window_model::{components::{path_component::burn::rocket_equation_function::RocketEquationFunction, vessel_component::{class::VesselClass, VesselComponent}}, storage::entity_allocator::Entity};
+use transfer_window_model::components::path_component::burn::rocket_equation_function::RocketEquationFunction;
+use transfer_window_model::components::vessel_component::class::VesselClass;
+use transfer_window_model::components::vessel_component::VesselComponent;
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::ViewEvent, overlay::{slot_textures::TexturedSlot, widgets::custom_image_button::CustomCircularImageButton}, View}, styles};
-
-use super::{util::{compute_slot_locations, SLOT_SIZE}, SlotType};
+use super::util::{compute_slot_locations, SLOT_SIZE};
+use super::SlotType;
+use crate::game::events::ViewEvent;
+use crate::game::overlay::slot_textures::TexturedSlot;
+use crate::game::overlay::widgets::custom_image_button::CustomCircularImageButton;
+use crate::game::View;
+use crate::styles;
 
 const UNDERLAY_SIZE_PROPORTION: f32 = 0.9;
 
@@ -32,11 +39,20 @@ fn on_slot_clicked(view: &View, type_: SlotType) {
 }
 
 #[allow(clippy::too_many_arguments)]
-fn draw_slot_from_texture(view: &View, ui: &mut Ui, texture: &str, color: Color32, type_: SlotType, center: Pos2, size: f32, translation: Vec2) {
+fn draw_slot_from_texture(
+    view: &View,
+    ui: &mut Ui,
+    texture: &str,
+    color: Color32,
+    type_: SlotType,
+    center: Pos2,
+    size: f32,
+    translation: Vec2,
+) {
     let slot_position = center + translation;
     let slot_size = egui::Vec2::splat(size);
     let slot_rect = Rect::from_center_size(slot_position, slot_size);
-    
+
     styles::SlotEditor::apply(ui, size, color);
     ui.allocate_ui_at_rect(slot_rect, |ui| {
         let slot_image = CustomCircularImageButton::new(view, texture, size)
@@ -45,22 +61,40 @@ fn draw_slot_from_texture(view: &View, ui: &mut Ui, texture: &str, color: Color3
         if ui.add(slot_image).clicked() {
             on_slot_clicked(view, type_);
         }
-});
+    });
 }
 
-fn draw_slot(view: &View, ui: &mut Ui, vessel_component: &VesselComponent, type_: SlotType, center: Pos2, size: f32, translation: Vec2) {
+fn draw_slot(
+    view: &View,
+    ui: &mut Ui,
+    vessel_component: &VesselComponent,
+    type_: SlotType,
+    center: Pos2,
+    size: f32,
+    translation: Vec2,
+) {
     let texture = match type_ {
-        SlotType::Engine => vessel_component.engine_type().map_or("silhouette-engine", |x| x.texture()),
-        SlotType::FuelTank => vessel_component.fuel_tank_type().map_or("silhouette-fuel-tank", |x| x.texture()),
-        SlotType::TorpedoStorage => vessel_component.torpedo_storage_type().map_or("silhouette-torpedo-storage", |x| x.texture()),
-        SlotType::TorpedoLauncher => vessel_component.torpedo_launcher_type().map_or("silhouette-torpedo-launcher", |x| x.texture()),
+        SlotType::Engine => vessel_component
+            .engine_type()
+            .map_or("silhouette-engine", |x| x.texture()),
+        SlotType::FuelTank => vessel_component
+            .fuel_tank_type()
+            .map_or("silhouette-fuel-tank", |x| x.texture()),
+        SlotType::TorpedoStorage => vessel_component
+            .torpedo_storage_type()
+            .map_or("silhouette-torpedo-storage", |x| x.texture()),
+        SlotType::TorpedoLauncher => vessel_component
+            .torpedo_launcher_type()
+            .map_or("silhouette-torpedo-launcher", |x| x.texture()),
     };
     let color = Color32::from_rgb(200, 200, 200);
     draw_slot_from_texture(view, ui, texture, color, type_, center, size, translation);
 }
 
 fn draw_ship_underlay(view: &View, ui: &mut Ui, class: VesselClass) -> Response {
-    let texture = view.resources.texture_image(compute_texture_ship_underlay(class));
+    let texture = view
+        .resources
+        .texture_image(compute_texture_ship_underlay(class));
     let size = view.screen_rect.size() * UNDERLAY_SIZE_PROPORTION;
     ui.add(Image::new(texture).fit_to_exact_size(size))
 }
@@ -68,16 +102,16 @@ fn draw_ship_underlay(view: &View, ui: &mut Ui, class: VesselClass) -> Response 
 fn draw_ship_stats(ui: &mut Ui, vessel_component: &VesselComponent, vessel_name: &str) {
     ui.vertical(|ui| {
         ui.set_width(200.0);
-    
+
         Grid::new("Ship stats - ".to_string() + vessel_name).show(ui, |ui| {
             ui.label(RichText::new("Class").monospace().strong());
             ui.label(vessel_component.class().name());
             ui.end_row();
-        
+
             ui.label(RichText::new("Dry mass").monospace().strong());
             ui.label(format!("{} kg", vessel_component.dry_mass()));
             ui.end_row();
-            
+
             if !vessel_component.is_fuel_empty() {
                 ui.label(RichText::new("Wet mass").monospace().strong());
                 ui.label(format!("{} kg", vessel_component.wet_mass().round()));
@@ -86,27 +120,38 @@ fn draw_ship_stats(ui: &mut Ui, vessel_component: &VesselComponent, vessel_name:
                 ui.label(RichText::new("Fuel capacity").monospace().strong());
                 ui.label(format!("{} L", vessel_component.fuel_capacity_litres()));
                 ui.end_row();
-            
 
                 if vessel_component.has_engine() {
                     let rocket_equation_function = RocketEquationFunction::new(
-                        vessel_component.dry_mass(), vessel_component.fuel_capacity_kg(),
-                        vessel_component.fuel_kg_per_second(), vessel_component.specific_impulse().unwrap(), 0.0);
+                        vessel_component.dry_mass(),
+                        vessel_component.fuel_capacity_kg(),
+                        vessel_component.fuel_kg_per_second(),
+                        vessel_component.specific_impulse().unwrap(),
+                        0.0,
+                    );
 
                     ui.label(RichText::new("Max ΔV").monospace().strong());
-                    ui.label(format!("{} m/s", rocket_equation_function.remaining_dv().round()));
+                    ui.label(format!(
+                        "{} m/s",
+                        rocket_equation_function.remaining_dv().round()
+                    ));
                     ui.end_row();
-            
+
                     ui.label(RichText::new("Acceleration (wet)").monospace().strong());
-                    ui.label(format!("{:.2} m/s", rocket_equation_function.acceleration()));
+                    ui.label(format!(
+                        "{:.2} m/s",
+                        rocket_equation_function.acceleration()
+                    ));
                     ui.end_row();
 
                     ui.label(RichText::new("Acceleration (dry)").monospace().strong());
-                    ui.label(format!("{:.2} m/s", rocket_equation_function.end().acceleration()));
+                    ui.label(format!(
+                        "{:.2} m/s",
+                        rocket_equation_function.end().acceleration()
+                    ));
                     ui.end_row();
                 }
             }
-
         });
     });
 }
@@ -120,8 +165,17 @@ pub fn draw_vessel_editor(view: &View, ui: &mut Ui, vessel_name: &str, entity: E
         let size = response.rect.size();
         let slot_size = SLOT_SIZE * size.x;
         for (type_, translation) in compute_slot_locations(vessel_component.class()) {
-            draw_slot(view, ui, vessel_component, type_, center, slot_size, translation * size.x);
+            draw_slot(
+                view,
+                ui,
+                vessel_component,
+                type_,
+                center,
+                slot_size,
+                translation * size.x,
+            );
         }
         response.rect
-    }).inner
+    })
+    .inner
 }

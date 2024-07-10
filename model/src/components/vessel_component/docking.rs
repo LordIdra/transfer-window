@@ -30,13 +30,18 @@ impl DockingPortLocation {
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DockingType {
-    Quadruple
+    Quadruple,
 }
 
 impl DockingType {
     pub fn docking_port_locations(&self) -> Vec<DockingPortLocation> {
         match self {
-            DockingType::Quadruple => vec![DockingPortLocation::North, DockingPortLocation::East, DockingPortLocation::South, DockingPortLocation::West],
+            DockingType::Quadruple => vec![
+                DockingPortLocation::North,
+                DockingPortLocation::East,
+                DockingPortLocation::South,
+                DockingPortLocation::West,
+            ],
         }
     }
 
@@ -71,7 +76,10 @@ pub struct ContinuousResourceTransfer {
 
 impl ContinuousResourceTransfer {
     pub fn new(direction: ResourceTransferDirection) -> Self {
-        Self { direction, rate: FUEL_TRANSFER_RATE }
+        Self {
+            direction,
+            rate: FUEL_TRANSFER_RATE,
+        }
     }
 
     pub fn direction(&self) -> ResourceTransferDirection {
@@ -92,7 +100,11 @@ pub struct DiscreteResourceTransfer {
 
 impl DiscreteResourceTransfer {
     pub fn new(direction: ResourceTransferDirection) -> Self {
-        Self { direction, interval: TORPEDO_TRANSFER_TIME, time_to_next: TORPEDO_TRANSFER_TIME }
+        Self {
+            direction,
+            interval: TORPEDO_TRANSFER_TIME,
+            time_to_next: TORPEDO_TRANSFER_TIME,
+        }
     }
 
     pub fn direction(&self) -> ResourceTransferDirection {
@@ -111,7 +123,11 @@ impl DiscreteResourceTransfer {
         let direction = self.direction;
         let interval = self.interval;
         let time_to_next = self.time_to_next - dt;
-        Self { direction, interval, time_to_next }
+        Self {
+            direction,
+            interval,
+            time_to_next,
+        }
     }
 }
 
@@ -126,7 +142,11 @@ impl DockedVessel {
     pub fn new(entity: Entity) -> Self {
         let fuel_transfer = None;
         let torpedo_transfer = None;
-        Self { entity, fuel_transfer, torpedo_transfer }
+        Self {
+            entity,
+            fuel_transfer,
+            torpedo_transfer,
+        }
     }
 
     pub fn entity(&self) -> Entity {
@@ -136,11 +156,11 @@ impl DockedVessel {
     pub fn fuel_transfer(&self) -> Option<&ContinuousResourceTransfer> {
         self.fuel_transfer.as_ref()
     }
-    
+
     pub fn torpedo_transfer(&self) -> Option<&DiscreteResourceTransfer> {
         self.torpedo_transfer.as_ref()
     }
-    
+
     pub fn start_fuel_transfer(&mut self, direction: ResourceTransferDirection) {
         self.fuel_transfer = Some(ContinuousResourceTransfer::new(direction));
     }
@@ -180,11 +200,15 @@ impl DockingPort {
     }
 
     pub fn docked_vessel(&self) -> &DockedVessel {
-        self.docked_vessel.as_ref().expect("Attempt to get vessel from docking port without docked vessel")
+        self.docked_vessel
+            .as_ref()
+            .expect("Attempt to get vessel from docking port without docked vessel")
     }
 
     pub fn docked_vessel_mut(&mut self) -> &mut DockedVessel {
-        self.docked_vessel.as_mut().expect("Attempt to get vessel from docking port without docked vessel")
+        self.docked_vessel
+            .as_mut()
+            .expect("Attempt to get vessel from docking port without docked vessel")
     }
 }
 
@@ -196,11 +220,15 @@ pub struct Docking {
 
 impl Docking {
     pub fn new(type_: DockingType) -> Self {
-        let docking_ports = type_.docking_port_locations()
+        let docking_ports = type_
+            .docking_port_locations()
             .into_iter()
             .map(|location| (location, DockingPort::default()))
             .collect();
-        Self { type_, docking_ports }
+        Self {
+            type_,
+            docking_ports,
+        }
     }
 
     pub fn type_(&self) -> DockingType {
@@ -216,11 +244,15 @@ impl Docking {
     }
 
     pub fn docking_port(&self, location: DockingPortLocation) -> &DockingPort {
-        self.docking_ports.get(&location).expect("Attempt to get nonexistant docking port")
+        self.docking_ports
+            .get(&location)
+            .expect("Attempt to get nonexistant docking port")
     }
 
     pub(crate) fn docking_port_mut(&mut self, location: DockingPortLocation) -> &mut DockingPort {
-        self.docking_ports.get_mut(&location).expect("Attempt to get nonexistant docking port")
+        self.docking_ports
+            .get_mut(&location)
+            .expect("Attempt to get nonexistant docking port")
     }
 
     pub fn dock(&mut self, location: DockingPortLocation, entity: Entity) {

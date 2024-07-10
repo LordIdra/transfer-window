@@ -1,6 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use super::{docking::DockingType, engine::EngineType, faction::Faction, fuel_tank::FuelTankType, torpedo_storage::TorpedoStorageType, VesselComponent};
+use super::docking::DockingType;
+use super::engine::EngineType;
+use super::faction::Faction;
+use super::fuel_tank::FuelTankType;
+use super::torpedo_storage::TorpedoStorageType;
+use super::VesselComponent;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub enum VesselClass {
@@ -34,7 +39,10 @@ impl VesselClass {
                 .with_fuel_tank(FuelTankType::Hub)
                 .with_torpedo_storage(TorpedoStorageType::Hub)
                 .with_docking(DockingType::Quadruple),
-            VesselClass::Scout1 | VesselClass::Scout2 | VesselClass::Frigate1 | VesselClass::Frigate2 => VesselComponent::new(*self, faction),
+            VesselClass::Scout1
+            | VesselClass::Scout2
+            | VesselClass::Frigate1
+            | VesselClass::Frigate2 => VesselComponent::new(*self, faction),
         }
     }
 
@@ -56,14 +64,20 @@ impl VesselClass {
     pub fn dockable(&self) -> bool {
         match self {
             VesselClass::Torpedo | VesselClass::Hub => false,
-            VesselClass::Scout1 | VesselClass::Scout2 | VesselClass::Frigate1 | VesselClass::Frigate2 => true,
+            VesselClass::Scout1
+            | VesselClass::Scout2
+            | VesselClass::Frigate1
+            | VesselClass::Frigate2 => true,
         }
     }
 
     pub fn editable(&self) -> bool {
         match self {
             VesselClass::Torpedo | VesselClass::Hub => false,
-            VesselClass::Scout1 | VesselClass::Scout2 | VesselClass::Frigate1 | VesselClass::Frigate2 => true,
+            VesselClass::Scout1
+            | VesselClass::Scout2
+            | VesselClass::Frigate1
+            | VesselClass::Frigate2 => true,
         }
     }
 }

@@ -1,27 +1,37 @@
+pub mod celestial_object_renderer;
 pub mod explosion_renderer;
 pub mod geometry_renderer;
 pub mod render_pipeline;
 pub mod screen_texture_renderer;
-pub mod celestial_object_renderer;
 mod shader_program;
-pub mod texture_renderer;
 pub mod texture;
+pub mod texture_renderer;
 mod util;
 mod vertex_array_object;
 
-use std::{collections::HashMap, sync::{Arc, Mutex}};
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 
-use eframe::{egui::{CentralPanel, PaintCallback, Rect}, egui_glow::CallbackFn, glow::{self}};
+use eframe::egui::{CentralPanel, PaintCallback, Rect};
+use eframe::egui_glow::CallbackFn;
+use eframe::glow::{self};
 use log::error;
 
-use crate::{game::rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, screen_texture_renderer::ScreenTextureRenderer, texture_renderer::TextureRenderer, celestial_object_renderer::CelestialObjectRenderer}, resources::Resources};
-
 use super::View;
+use crate::game::rendering::celestial_object_renderer::CelestialObjectRenderer;
+use crate::game::rendering::explosion_renderer::ExplosionRenderer;
+use crate::game::rendering::geometry_renderer::GeometryRenderer;
+use crate::game::rendering::render_pipeline::RenderPipeline;
+use crate::game::rendering::screen_texture_renderer::ScreenTextureRenderer;
+use crate::game::rendering::texture_renderer::TextureRenderer;
+use crate::resources::Resources;
 
 /// Rendering pipeline overview
 /// 1) View adds all necessary vertices to various renderers
-/// 2) All renderers are rendered to `multisample_framebuffer` which allows multisampling
-/// 3) The resulting texture is resolved onto a texture in `intermediate_framebuffer`
+/// 2) All renderers are rendered to `multisample_framebuffer` which allows
+///    multisampling
+/// 3) The resulting texture is resolved onto a texture in
+///    `intermediate_framebuffer`
 /// 4) The texture is rendered to the default FBO
 pub struct Renderers {
     render_pipeline: Arc<Mutex<RenderPipeline>>,
@@ -39,18 +49,32 @@ impl Renderers {
         let celestial_object_renderers = resources.build_celestial_object_renderers(gl);
         let segment_renderer = Arc::new(Mutex::new(GeometryRenderer::new(gl)));
         let texture_renderers = resources.build_texture_renderers(gl);
-        let screen_texture_renderer = Arc::new(Mutex::new(ScreenTextureRenderer::new(gl, screen_rect)));
+        let screen_texture_renderer =
+            Arc::new(Mutex::new(ScreenTextureRenderer::new(gl, screen_rect)));
         let explosion_renderers = Arc::new(Mutex::new(vec![]));
-        
-        Self { render_pipeline, celestial_object_renderers, segment_renderer, texture_renderers, screen_texture_renderer, explosion_renderers }
+
+        Self {
+            render_pipeline,
+            celestial_object_renderers,
+            segment_renderer,
+            texture_renderers,
+            screen_texture_renderer,
+            explosion_renderers,
+        }
     }
 
     pub fn add_celestial_object_vertices(&self, name: &str, vertices: &mut Vec<f32>) {
-        self.celestial_object_renderers[name].lock().unwrap().add_vertices(vertices);
+        self.celestial_object_renderers[name]
+            .lock()
+            .unwrap()
+            .add_vertices(vertices);
     }
-    
+
     pub fn set_object_rotation(&self, name: &str, rotation: f32) {
-        self.celestial_object_renderers[name].lock().unwrap().set_rotation(rotation);
+        self.celestial_object_renderers[name]
+            .lock()
+            .unwrap()
+            .set_rotation(rotation);
     }
 
     pub fn add_segment_vertices(&self, vertices: &mut Vec<f32>) {
@@ -98,7 +122,8 @@ pub fn update(view: &View) {
     let time = view.model.time();
     let zoom = view.camera.zoom();
 
-    // Matrices need model to calculate, which is not send/sync, so we have to calculate matrices *before* constructing a callback
+    // Matrices need model to calculate, which is not send/sync, so we have to
+    // calculate matrices *before* constructing a callback
     let zoom_matrix = view.camera.zoom_matrix(screen_rect);
     let translation_matrices = view.camera.translation_matrices();
 
@@ -106,41 +131,76 @@ pub fn update(view: &View) {
     for explosion in view.model.explosions_started_this_frame() {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Start explosion renderer");
-        let renderer = ExplosionRenderer::new(&view.gl, view.model.time(), explosion.parent(), explosion.offset(), explosion.combined_mass());
-        view.renderers.explosion_renderers.lock().unwrap().push(renderer);
+        let renderer = ExplosionRenderer::new(
+            &view.gl,
+            view.model.time(),
+            explosion.parent(),
+            explosion.offset(),
+            explosion.combined_mass(),
+        );
+        view.renderers
+            .explosion_renderers
+            .lock()
+            .unwrap()
+            .push(renderer);
     }
 
     // Delete expired explosion renderers
-    view.renderers.explosion_renderers.lock().unwrap()
+    view.renderers
+        .explosion_renderers
+        .lock()
+        .unwrap()
         .retain(|renderer| !renderer.is_finished(view.model.time()));
 
     // Update explosion renderers
-    view.renderers.explosion_renderers.clone().lock().unwrap()
-        .iter_mut().for_each(|renderer| renderer.update_position(view));
+    view.renderers
+        .explosion_renderers
+        .clone()
+        .lock()
+        .unwrap()
+        .iter_mut()
+        .for_each(|renderer| renderer.update_position(view));
 
     // Make sure to regenerate framebuffer with new size if window resized
     if screen_rect != view.previous_screen_rect {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Resize buffers");
-        render_pipeline.lock().unwrap().resize(&view.gl, screen_rect);
-        view.renderers.screen_texture_renderer.lock().unwrap().resize(&view.gl, screen_rect);
+        render_pipeline
+            .lock()
+            .unwrap()
+            .resize(&view.gl, screen_rect);
+        view.renderers
+            .screen_texture_renderer
+            .lock()
+            .unwrap()
+            .resize(&view.gl, screen_rect);
     }
 
     let callback = Arc::new(CallbackFn::new(move |_info, painter| {
         let render_bloom = || {
             #[cfg(feature = "profiling")]
             let _span = tracy_client::span!("Render bloom");
-            segment_renderer.lock().unwrap().render_lines(painter.gl(), zoom_matrix, translation_matrices);
+            segment_renderer.lock().unwrap().render_lines(
+                painter.gl(),
+                zoom_matrix,
+                translation_matrices,
+            );
         };
 
         let render_normal = || {
             #[cfg(feature = "profiling")]
             let _span = tracy_client::span!("Render normal");
             for renderer in object_renderers.values() {
-                renderer.lock().unwrap().render(painter.gl(), zoom_matrix, translation_matrices);
+                renderer
+                    .lock()
+                    .unwrap()
+                    .render(painter.gl(), zoom_matrix, translation_matrices);
             }
             for renderer in texture_renderers.values() {
-                renderer.lock().unwrap().render(painter.gl(),zoom_matrix, translation_matrices);
+                renderer
+                    .lock()
+                    .unwrap()
+                    .render(painter.gl(), zoom_matrix, translation_matrices);
             }
         };
 
@@ -152,11 +212,21 @@ pub fn update(view: &View) {
             }
         };
 
-        render_pipeline.lock().unwrap().render(painter.gl(), render_bloom, render_normal, render_explosion, screen_rect);
+        render_pipeline.lock().unwrap().render(
+            painter.gl(),
+            render_bloom,
+            render_normal,
+            render_explosion,
+            screen_rect,
+        );
     }));
 
-    // At time of writing there is no way to do this without providing a callback (which must be send + sync)
+    // At time of writing there is no way to do this without providing a callback
+    // (which must be send + sync)
     CentralPanel::default().show(&view.context.clone(), |ui| {
-        ui.painter().add(PaintCallback { rect: screen_rect, callback });
+        ui.painter().add(PaintCallback {
+            rect: screen_rect,
+            callback,
+        });
     });
 }

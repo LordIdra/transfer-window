@@ -1,10 +1,13 @@
 use eframe::egui::{Align2, Ui, Window};
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, View}, styles};
-
-use super::widgets::{buttons, custom_image_button::CustomCircularImageButton};
+use super::widgets::buttons;
+use super::widgets::custom_image_button::CustomCircularImageButton;
+use crate::game::events::{ModelEvent, ViewEvent};
+use crate::game::View;
+use crate::styles;
 
 fn draw_focus(view: &View, ui: &mut Ui, entity: Entity) {
     if buttons::draw_focus(view, ui) {
@@ -17,11 +20,10 @@ fn draw_focus(view: &View, ui: &mut Ui, entity: Entity) {
 fn draw_set_target(view: &View, ui: &mut Ui, right_clicked: Entity, selected: Entity) {
     let is_already_target = view.model.target(selected) == Some(right_clicked);
     if is_already_target {
-        let button = CustomCircularImageButton::new(view, "unset-target", 36.0)
-            .with_padding(8.0);
+        let button = CustomCircularImageButton::new(view, "unset-target", 36.0).with_padding(8.0);
         if ui.add(button).on_hover_text("Unset target").clicked() {
-            view.add_model_event(ModelEvent::SetTarget { 
-                entity: selected, 
+            view.add_model_event(ModelEvent::SetTarget {
+                entity: selected,
                 target: None,
             });
             view.add_view_event(ViewEvent::HideRightClickMenu);
@@ -31,14 +33,16 @@ fn draw_set_target(view: &View, ui: &mut Ui, right_clicked: Entity, selected: En
         let button = CustomCircularImageButton::new(view, "set-target", 36.0)
             .with_enabled(enabled)
             .with_padding(8.0);
-        if ui.add_enabled(enabled, button)
-                .on_hover_text("Set target")
-                .clicked() {
-            view.add_model_event(ModelEvent::SetTarget { 
-            entity: selected, 
-            target: Some(right_clicked),
-        });
-        view.add_view_event(ViewEvent::HideRightClickMenu);
+        if ui
+            .add_enabled(enabled, button)
+            .on_hover_text("Set target")
+            .clicked()
+        {
+            view.add_model_event(ModelEvent::SetTarget {
+                entity: selected,
+                target: Some(right_clicked),
+            });
+            view.add_view_event(ViewEvent::HideRightClickMenu);
         }
     }
 }
@@ -72,9 +76,7 @@ pub fn update(view: &View) {
 
     let is_mouse_over_ui_element = view.pointer_over_ui || view.pointer_over_icon;
     if !is_mouse_over_ui_element {
-        let pointer = view.context.input(|input| {
-            input.pointer.clone()
-        });
+        let pointer = view.context.input(|input| input.pointer.clone());
         if view.right_click_menu.is_some() && pointer.primary_clicked() {
             view.add_view_event(ViewEvent::HideRightClickMenu);
         }

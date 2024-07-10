@@ -10,9 +10,9 @@ use serde::{Deserialize, Serialize};
 use timeline::Timeline;
 use torpedo_launcher::{TorpedoLauncher, TorpedoLauncherType};
 use torpedo_storage::{TorpedoStorage, TorpedoStorageType};
-use crate::storage::entity_allocator::Entity;
 
 use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
+use crate::storage::entity_allocator::Entity;
 
 pub mod class;
 pub mod docking;
@@ -48,7 +48,18 @@ impl VesselComponent {
         let torpedo_storage = None;
         let torpedo_launcher = None;
         let docking = None;
-        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, torpedo_storage, torpedo_launcher, docking }
+        Self {
+            class,
+            faction,
+            is_ghost,
+            timeline,
+            target,
+            fuel_tank,
+            engine,
+            torpedo_storage,
+            torpedo_launcher,
+            docking,
+        }
     }
 
     // ------------------------
@@ -116,9 +127,13 @@ impl VesselComponent {
     }
 
     pub(crate) fn should_recompute_trajectory(&self) -> bool {
-        !(self.class().is_torpedo() && self.timeline().last_event().is_some_and(|event| event.is_intercept()))
+        !(self.class().is_torpedo()
+            && self
+                .timeline()
+                .last_event()
+                .is_some_and(|event| event.is_intercept()))
     }
-    
+
     // ------------------------
     // Target
     // ------------------------
@@ -186,7 +201,8 @@ impl VesselComponent {
     }
 
     pub fn set_fuel_kg(&mut self, new_fuel_kg: f64) {
-        self.fuel_tank.as_mut()
+        self.fuel_tank
+            .as_mut()
             .expect("Attempt to set fuel on vessel without fuel tank")
             .set_fuel_kg(new_fuel_kg);
     }
@@ -198,8 +214,14 @@ impl VesselComponent {
         self.class.mass()
             + self.fuel_tank.as_ref().map_or(0.0, |x| x.type_().mass())
             + self.engine.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self.torpedo_storage.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self.torpedo_launcher.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self
+                .torpedo_storage
+                .as_ref()
+                .map_or(0.0, |x| x.type_().mass())
+            + self
+                .torpedo_launcher
+                .as_ref()
+                .map_or(0.0, |x| x.type_().mass())
     }
 
     pub fn wet_mass(&self) -> f64 {
@@ -243,7 +265,7 @@ impl VesselComponent {
                 let final_mass = self.dry_mass();
                 let isp = engine.specific_impulse();
                 isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass)
-            },
+            }
             None => 0.0,
         }
     }
@@ -255,8 +277,8 @@ impl VesselComponent {
                 let final_mass = self.dry_mass();
                 let isp = engine.specific_impulse();
                 isp * STANDARD_GRAVITY * f64::ln(initial_mass / final_mass)
-            },
-            None =>0.0,
+            }
+            None => 0.0,
         }
     }
 
@@ -289,7 +311,7 @@ impl VesselComponent {
         }
     }
 
-    pub fn final_torpedoes(&self) -> usize { 
+    pub fn final_torpedoes(&self) -> usize {
         self.torpedoes() - self.timeline().depleted_torpedoes()
     }
 
@@ -331,7 +353,10 @@ impl VesselComponent {
     }
 
     pub fn step_torpedo_launcher(&mut self, dt: f64) {
-        self.torpedo_launcher.as_mut().unwrap().step_time_to_reload(dt);
+        self.torpedo_launcher
+            .as_mut()
+            .unwrap()
+            .step_time_to_reload(dt);
     }
 
     pub fn torpedo_launcher_time_to_reload(&self) -> f64 {
@@ -380,10 +405,16 @@ impl VesselComponent {
     }
 
     pub fn dock(&mut self, location: DockingPortLocation, entity: Entity) {
-        self.docking.as_mut().expect("Attempt to dock to vessel without docking ports").dock(location, entity);
+        self.docking
+            .as_mut()
+            .expect("Attempt to dock to vessel without docking ports")
+            .dock(location, entity);
     }
 
     pub fn undock(&mut self, location: DockingPortLocation) {
-        self.docking.as_mut().expect("Attempt to dock to vessel without docking ports").undock(location);
+        self.docking
+            .as_mut()
+            .expect("Attempt to dock to vessel without docking ports")
+            .undock(location);
     }
 }

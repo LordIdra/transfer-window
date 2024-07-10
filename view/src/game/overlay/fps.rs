@@ -1,4 +1,5 @@
-use eframe::{egui::{Align2, RichText, Window}, epaint};
+use eframe::egui::{Align2, RichText, Window};
+use eframe::epaint;
 
 use crate::game::View;
 

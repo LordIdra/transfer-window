@@ -1,5 +1,5 @@
-use eframe::{egui::Pos2, epaint::Rect};
-
+use eframe::egui::Pos2;
+use eframe::epaint::Rect;
 use nalgebra_glm::{scale2d, translate2d, vec2, DMat3, DVec2, Mat3, Vec2};
 use transfer_window_model::storage::entity_allocator::Entity;
 
@@ -44,7 +44,7 @@ impl Camera {
         self.focus_position = focus_position;
     }
 
-    pub fn unset_focus(&mut self,) {
+    pub fn unset_focus(&mut self) {
         self.focus = None;
     }
 
@@ -63,12 +63,24 @@ impl Camera {
     pub fn zoom_matrix(&self, screen_rect: Rect) -> Mat3 {
         let mut mat = DMat3::identity();
         // Scale to width and height so we don't end up stretching shapes
-        mat = scale2d(&mat, &DVec2::new(2.0 / screen_rect.width() as f64, 2.0 / screen_rect.height() as f64));
+        mat = scale2d(
+            &mat,
+            &DVec2::new(
+                2.0 / screen_rect.width() as f64,
+                2.0 / screen_rect.height() as f64,
+            ),
+        );
         mat = scale2d(&mat, &DVec2::new(self.zoom, self.zoom));
         Mat3::new(
-            mat.m11 as f32, mat.m12 as f32, mat.m13 as f32,
-            mat.m21 as f32, mat.m22 as f32, mat.m23 as f32,
-            mat.m31 as f32, mat.m32 as f32, mat.m33 as f32,
+            mat.m11 as f32,
+            mat.m12 as f32,
+            mat.m13 as f32,
+            mat.m21 as f32,
+            mat.m22 as f32,
+            mat.m23 as f32,
+            mat.m31 as f32,
+            mat.m32 as f32,
+            mat.m33 as f32,
         )
     }
 
@@ -76,14 +88,21 @@ impl Camera {
         let translation = self.translation();
         let translation_pair_x = f64_to_f32_pair(translation.x);
         let translation_pair_y = f64_to_f32_pair(translation.y);
-        let mat1 = translate2d(&Mat3::identity(), &Vec2::new(-translation_pair_x.0, -translation_pair_y.0));
-        let mat2 = translate2d(&Mat3::identity(), &Vec2::new(-translation_pair_x.1, -translation_pair_y.1));
+        let mat1 = translate2d(
+            &Mat3::identity(),
+            &Vec2::new(-translation_pair_x.0, -translation_pair_y.0),
+        );
+        let mat2 = translate2d(
+            &Mat3::identity(),
+            &Vec2::new(-translation_pair_x.1, -translation_pair_y.1),
+        );
         (mat1, mat2)
     }
 
     pub fn window_space_to_screen_space(screen_rect: Rect, window_coords: Pos2) -> Pos2 {
         Pos2::new(
-            (window_coords.x * 2.0) / screen_rect.width() - 1.0, 
-            -(window_coords.y * 2.0) / screen_rect.height() + 1.0, )
+            (window_coords.x * 2.0) / screen_rect.width() - 1.0,
+            -(window_coords.y * 2.0) / screen_rect.height() + 1.0,
+        )
     }
 }

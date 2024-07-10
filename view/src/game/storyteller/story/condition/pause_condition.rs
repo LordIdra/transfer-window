@@ -12,10 +12,7 @@ impl PauseCondition {
 
 impl ConditionCheck for PauseCondition {
     fn met(&self, story_events: &Vec<StoryEvent>) -> bool {
-        let condition = |event: &StoryEvent| {
-            matches!(event, StoryEvent::Paused)
-        };
+        let condition = |event: &StoryEvent| matches!(event, StoryEvent::Paused);
         story_events_contains(story_events, condition)
     }
 }
-

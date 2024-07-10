@@ -1,13 +1,14 @@
 use std::sync::Arc;
 
-use eframe::{egui::{Pos2, Rect}, glow};
+use eframe::egui::{Pos2, Rect};
+use eframe::glow;
 use glow::Context;
 use nalgebra_glm::DVec2;
 use transfer_window_model::storage::entity_allocator::Entity;
 
+use super::shader_program::ShaderProgram;
+use super::vertex_array_object::{VertexArrayObject, VertexAttribute};
 use crate::game::View;
-
-use super::{shader_program::ShaderProgram, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 
 pub struct ExplosionRenderer {
     program: ShaderProgram,
@@ -22,26 +23,39 @@ pub struct ExplosionRenderer {
 }
 
 impl ExplosionRenderer {
-    pub fn new(gl: &Arc<Context>, explosion_time: f64, parent: Entity, offset: DVec2, combined_mass: f64) -> Self {
-        let size = combined_mass / 2.0e5; 
+    pub fn new(
+        gl: &Arc<Context>,
+        explosion_time: f64,
+        parent: Entity,
+        offset: DVec2,
+        combined_mass: f64,
+    ) -> Self {
+        let size = combined_mass / 2.0e5;
         let speed = 1.0e6 / combined_mass;
         let duration = 5.0e3 / speed;
-        let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/explosion.vert"), include_str!("../../../resources/shaders/explosion.frag"));
-        let mut vertex_array_object = VertexArrayObject::new(gl, vec![
-            VertexAttribute { index: 0, count: 2 },
-        ]);
+        let program = ShaderProgram::new(
+            gl,
+            include_str!("../../../resources/shaders/explosion.vert"),
+            include_str!("../../../resources/shaders/explosion.frag"),
+        );
+        let mut vertex_array_object =
+            VertexArrayObject::new(gl, vec![VertexAttribute { index: 0, count: 2 }]);
         let vertices = vec![
-            -1.0, -1.0,
-            1.0, 1.0,
-            1.0, -1.0,
-
-            -1.0, -1.0,
-            1.0, 1.0,
-            -1.0, 1.0,
+            -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0,
         ];
         vertex_array_object.data(gl, &vertices);
         let center = None;
-        Self { program, vertex_array_object, explosion_time, duration, parent, offset, size, speed, center }
+        Self {
+            program,
+            vertex_array_object,
+            explosion_time,
+            duration,
+            parent,
+            offset,
+            size,
+            speed,
+            center,
+        }
     }
 
     pub fn update_position(&mut self, view: &View) {
@@ -59,11 +73,12 @@ impl ExplosionRenderer {
         let _span = tracy_client::span!("Explosion render");
         let time_since_start = (time - self.explosion_time) as f32;
         let center = self.center.unwrap();
-        
+
         self.program.use_program(gl);
         self.program.uniform_float(gl, "time", time_since_start);
         self.program.uniform_float(gl, "width", screen_rect.width());
-        self.program.uniform_float(gl, "height", screen_rect.height());
+        self.program
+            .uniform_float(gl, "height", screen_rect.height());
         self.program.uniform_float(gl, "zoom", zoom as f32);
         self.program.uniform_vec2(gl, "center", center.x, center.y);
         self.program.uniform_float(gl, "size", self.size as f32);

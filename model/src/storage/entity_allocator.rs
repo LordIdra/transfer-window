@@ -10,7 +10,10 @@ pub struct Entity {
 
 impl Entity {
     pub fn mock() -> Self {
-        Self { index: 0, generation: 0 }
+        Self {
+            index: 0,
+            generation: 0,
+        }
     }
 
     pub fn index(&self) -> usize {
@@ -47,7 +50,10 @@ impl EntityAllocator {
         let index = self.entries.len();
         let is_allocated = true;
         let generation = 0;
-        self.entries.push(AllocatorEntry { is_allocated, generation });
+        self.entries.push(AllocatorEntry {
+            is_allocated,
+            generation,
+        });
         let entity = Entity { index, generation };
         self.entities.insert(entity);
         entity
@@ -56,7 +62,10 @@ impl EntityAllocator {
     /// # Panics
     /// Panics if the entity is not allocated
     pub fn deallocate(&mut self, entity: Entity) {
-        assert!(self.entries[entity.index].is_allocated, "Attempt to deallocate an entity that was already deallocated");
+        assert!(
+            self.entries[entity.index].is_allocated,
+            "Attempt to deallocate an entity that was already deallocated"
+        );
         self.entries[entity.index].is_allocated = false;
         self.entries[entity.index].generation += 1;
         self.entities.remove(&entity);
@@ -71,7 +80,6 @@ impl EntityAllocator {
 #[cfg(test)]
 mod test {
     use crate::storage::entity_allocator::EntityAllocator;
-
 
     #[test]
     fn test() {

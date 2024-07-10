@@ -1,8 +1,8 @@
 use log::trace;
 
+use super::storage::entity_allocator::Entity;
+use super::Model;
 use crate::components::ComponentType;
-
-use super::{storage::entity_allocator::Entity, Model};
 
 impl Model {
     #[allow(unused)]

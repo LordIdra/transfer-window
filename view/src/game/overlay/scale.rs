@@ -1,8 +1,8 @@
-use eframe::{egui::{Align, Align2, Color32, Layout, Window}, epaint};
-
-use crate::game::View;
+use eframe::egui::{Align, Align2, Color32, Layout, Window};
+use eframe::epaint;
 
 use super::widgets::bars::draw_scale_bar;
+use crate::game::View;
 
 fn calculate_scale(pixels_per_metre: f32) -> (f32, String) {
     let mut width = pixels_per_metre;

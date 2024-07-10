@@ -33,12 +33,36 @@ impl OrbitDirection {
 fn test() {
     use nalgebra_glm::vec2;
 
-    assert_eq!(OrbitDirection::new(vec2(1.0, 0.0), vec2(0.0, 1.0)), OrbitDirection::AntiClockwise);
-    assert_eq!(OrbitDirection::new(vec2(1.0, 0.0), vec2(0.0, -1.0)), OrbitDirection::Clockwise);
-    assert_eq!(OrbitDirection::new(vec2(1.0, 1.0), vec2(0.0, 1.0)), OrbitDirection::AntiClockwise);
-    assert_eq!(OrbitDirection::new(vec2(1.0, 1.0), vec2(0.0, -1.0)), OrbitDirection::Clockwise);
-    assert_eq!(OrbitDirection::new(vec2(-1.0, 1.0), vec2(0.0, -1.0)), OrbitDirection::AntiClockwise);
-    assert_eq!(OrbitDirection::new(vec2(-1.0, 1.0), vec2(0.0, 1.0)), OrbitDirection::Clockwise);
-    assert_eq!(OrbitDirection::new(vec2(-0.2, 1.0), vec2(1.0, 0.0)), OrbitDirection::Clockwise);
-    assert_eq!(OrbitDirection::new(vec2(-1.0, 1.0), vec2(-1.0, 0.0)), OrbitDirection::AntiClockwise);
+    assert_eq!(
+        OrbitDirection::new(vec2(1.0, 0.0), vec2(0.0, 1.0)),
+        OrbitDirection::AntiClockwise
+    );
+    assert_eq!(
+        OrbitDirection::new(vec2(1.0, 0.0), vec2(0.0, -1.0)),
+        OrbitDirection::Clockwise
+    );
+    assert_eq!(
+        OrbitDirection::new(vec2(1.0, 1.0), vec2(0.0, 1.0)),
+        OrbitDirection::AntiClockwise
+    );
+    assert_eq!(
+        OrbitDirection::new(vec2(1.0, 1.0), vec2(0.0, -1.0)),
+        OrbitDirection::Clockwise
+    );
+    assert_eq!(
+        OrbitDirection::new(vec2(-1.0, 1.0), vec2(0.0, -1.0)),
+        OrbitDirection::AntiClockwise
+    );
+    assert_eq!(
+        OrbitDirection::new(vec2(-1.0, 1.0), vec2(0.0, 1.0)),
+        OrbitDirection::Clockwise
+    );
+    assert_eq!(
+        OrbitDirection::new(vec2(-0.2, 1.0), vec2(1.0, 0.0)),
+        OrbitDirection::Clockwise
+    );
+    assert_eq!(
+        OrbitDirection::new(vec2(-1.0, 1.0), vec2(-1.0, 0.0)),
+        OrbitDirection::AntiClockwise
+    );
 }

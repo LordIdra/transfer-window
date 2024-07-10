@@ -1,4 +1,3 @@
-
 use super::View;
 
 mod celestial_objects;

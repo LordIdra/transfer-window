@@ -43,11 +43,11 @@ impl TorpedoLauncher {
             time_to_reload,
         }
     }
-    
+
     pub fn type_(&self) -> TorpedoLauncherType {
         self.type_
     }
-    
+
     pub fn time_to_reload(&self) -> f64 {
         self.time_to_reload
     }

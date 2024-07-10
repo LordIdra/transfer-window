@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use nalgebra_glm::{DVec2, vec2};
+use nalgebra_glm::{vec2, DVec2};
 
 use super::orbit_direction::OrbitDirection;
 
@@ -13,24 +13,59 @@ pub const STANDARD_GRAVITY: f64 = 9.81;
 /// Returns Component of velocity perpendicular to the displacement
 pub fn transverse_velocity(position: DVec2, velocity: DVec2) -> f64 {
     let angle = -f64::atan2(position.y, position.x);
-    let normalized_velocity = vec2(velocity.x * angle.cos() - velocity.y * angle.sin(), velocity.y * angle.cos() + velocity.x * angle.sin());
+    let normalized_velocity = vec2(
+        velocity.x * angle.cos() - velocity.y * angle.sin(),
+        velocity.y * angle.cos() + velocity.x * angle.sin(),
+    );
     normalized_velocity.y
 }
 
-pub fn semi_major_axis(position: DVec2, velocity: DVec2, standard_gravitational_parameter: f64) -> f64 {
-    ((2.0 / position.magnitude()) - (velocity.magnitude().powi(2) / standard_gravitational_parameter)).powi(-1)
+pub fn semi_major_axis(
+    position: DVec2,
+    velocity: DVec2,
+    standard_gravitational_parameter: f64,
+) -> f64 {
+    ((2.0 / position.magnitude())
+        - (velocity.magnitude().powi(2) / standard_gravitational_parameter))
+        .powi(-1)
 }
 
-pub fn eccentricity(position: DVec2, velocity: DVec2, standard_gravitational_parameter: f64, semi_major_axis: f64) -> f64 {
-    (1.0 - ((position.magnitude_squared() * transverse_velocity(position, velocity).powi(2)) / (standard_gravitational_parameter * semi_major_axis))).sqrt()
+pub fn eccentricity(
+    position: DVec2,
+    velocity: DVec2,
+    standard_gravitational_parameter: f64,
+    semi_major_axis: f64,
+) -> f64 {
+    (1.0 - ((position.magnitude_squared() * transverse_velocity(position, velocity).powi(2))
+        / (standard_gravitational_parameter * semi_major_axis)))
+        .sqrt()
 }
 
-pub fn speed_to_obtain_eccentricity(position: DVec2, eccentricity: f64, standard_gravitational_parameter: f64, semi_major_axis: f64) -> f64 {
-    f64::sqrt(standard_gravitational_parameter * semi_major_axis * (1.0 - eccentricity) / position.magnitude_squared())
+pub fn speed_to_obtain_eccentricity(
+    position: DVec2,
+    eccentricity: f64,
+    standard_gravitational_parameter: f64,
+    semi_major_axis: f64,
+) -> f64 {
+    f64::sqrt(
+        standard_gravitational_parameter * semi_major_axis * (1.0 - eccentricity)
+            / position.magnitude_squared(),
+    )
 }
 
-pub fn velocity_to_obtain_eccentricity(position: DVec2, eccentricity: f64, standard_gravitational_parameter: f64, semi_major_axis: f64, direction: OrbitDirection) -> DVec2 {
-    let speed = speed_to_obtain_eccentricity(position, eccentricity, standard_gravitational_parameter, semi_major_axis);
+pub fn velocity_to_obtain_eccentricity(
+    position: DVec2,
+    eccentricity: f64,
+    standard_gravitational_parameter: f64,
+    semi_major_axis: f64,
+    direction: OrbitDirection,
+) -> DVec2 {
+    let speed = speed_to_obtain_eccentricity(
+        position,
+        eccentricity,
+        standard_gravitational_parameter,
+        semi_major_axis,
+    );
     let mut velocity_unit = vec2(-position.y, position.x).normalize();
     if direction.is_clockwise() {
         velocity_unit = -velocity_unit;
@@ -38,8 +73,16 @@ pub fn velocity_to_obtain_eccentricity(position: DVec2, eccentricity: f64, stand
     velocity_unit * speed
 }
 
-pub fn argument_of_periapsis(position: DVec2, velocity: DVec2, standard_gravitational_parameter: f64) -> f64 {
-    let eccentricity_vector = ((velocity.magnitude().powi(2) - standard_gravitational_parameter / position.magnitude()) * position - (position.dot(&velocity) * velocity)) / standard_gravitational_parameter;
+pub fn argument_of_periapsis(
+    position: DVec2,
+    velocity: DVec2,
+    standard_gravitational_parameter: f64,
+) -> f64 {
+    let eccentricity_vector = ((velocity.magnitude().powi(2)
+        - standard_gravitational_parameter / position.magnitude())
+        * position
+        - (position.dot(&velocity) * velocity))
+        / standard_gravitational_parameter;
     f64::atan2(eccentricity_vector.y, eccentricity_vector.x)
 }
 
@@ -58,68 +101,110 @@ pub fn sphere_of_influence(mass: f64, parent_mass: f64, position: DVec2, velocit
 
 pub fn asymptote_theta(eccentricity: f64, argument_of_periapsis: f64) -> (f64, f64) {
     let true_anomaly_of_asymptote = f64::acos(-1.0 / eccentricity);
-    (argument_of_periapsis - true_anomaly_of_asymptote, argument_of_periapsis + true_anomaly_of_asymptote)
+    (
+        argument_of_periapsis - true_anomaly_of_asymptote,
+        argument_of_periapsis + true_anomaly_of_asymptote,
+    )
 }
 
 #[cfg(test)]
 mod tests {
     use std::f64::consts::PI;
 
-    use super::*;
-
     use nalgebra_glm::vec2;
+
+    use super::*;
 
     #[test]
     fn test_semi_major_axis() {
         // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
-        let position = vec2(6.9818e10 * f64::cos(PI / 6.0),  6.9818e10 * f64::sin(PI / 6.0));
-        let velocity = vec2(3.886e4 * f64::cos(PI / 6.0 + PI / 2.0), 3.886e4 * f64::sin(PI / 6.0 + PI / 2.0));
+        let position = vec2(
+            6.9818e10 * f64::cos(PI / 6.0),
+            6.9818e10 * f64::sin(PI / 6.0),
+        );
+        let velocity = vec2(
+            3.886e4 * f64::cos(PI / 6.0 + PI / 2.0),
+            3.886e4 * f64::sin(PI / 6.0 + PI / 2.0),
+        );
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.989e30;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
         // actual SMA is slightly different due to N-body perturbations and the like
         // yes this is 'slightly' in astronomical terms
-        assert!((semi_major_axis - 5.7909e10).abs() < 1.0e7); 
+        assert!((semi_major_axis - 5.7909e10).abs() < 1.0e7);
     }
 
     #[test]
     fn test_eccentricity_1() {
         // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
-        let position = vec2(6.9818e10 * f64::cos(-PI / 6.0), 6.9818e10 * f64::sin(-PI / 6.0),);
-        let velocity = vec2(3.886e4 * f64::cos(-PI / 6.0 + PI / 2.0), 3.886e4 * f64::sin(-PI / 6.0 + PI / 2.0));
+        let position = vec2(
+            6.9818e10 * f64::cos(-PI / 6.0),
+            6.9818e10 * f64::sin(-PI / 6.0),
+        );
+        let velocity = vec2(
+            3.886e4 * f64::cos(-PI / 6.0 + PI / 2.0),
+            3.886e4 * f64::sin(-PI / 6.0 + PI / 2.0),
+        );
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.989e30;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
-        let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
+        let eccentricity = eccentricity(
+            position,
+            velocity,
+            standard_gravitational_parameter,
+            semi_major_axis,
+        );
         assert!((eccentricity - 0.2056).abs() < 0.001);
     }
 
     #[test]
     fn test_eccentricity_2() {
         // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/hyperbolic-trajectory-example.html
-        let position = vec2(6_678_100.0 * f64::cos(-PI / 6.0), 6_678_100.0 * f64::sin(-PI / 6.0));
-        let velocity = vec2(15000.0 * f64::cos(-PI / 6.0 + PI / 2.0), 15000.0 * f64::sin(-PI / 6.0 + PI / 2.0));
+        let position = vec2(
+            6_678_100.0 * f64::cos(-PI / 6.0),
+            6_678_100.0 * f64::sin(-PI / 6.0),
+        );
+        let velocity = vec2(
+            15000.0 * f64::cos(-PI / 6.0 + PI / 2.0),
+            15000.0 * f64::sin(-PI / 6.0 + PI / 2.0),
+        );
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.972e24;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
-        let eccentricity = eccentricity(position, velocity, standard_gravitational_parameter, semi_major_axis);
+        let eccentricity = eccentricity(
+            position,
+            velocity,
+            standard_gravitational_parameter,
+            semi_major_axis,
+        );
         assert!((eccentricity - 2.7696).abs() < 0.001);
     }
 
     #[test]
     fn test_argument_of_periapsis_1() {
         // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
-        let position = vec2(6.9818e10 * f64::cos(-PI / 6.0), 6.9818e10 * f64::sin(-PI / 6.0),);
-        let velocity = vec2(-3.886e4 * f64::cos(-PI / 6.0 + PI / 2.0), -3.886e4 * f64::sin(-PI / 6.0 + PI / 2.0));
+        let position = vec2(
+            6.9818e10 * f64::cos(-PI / 6.0),
+            6.9818e10 * f64::sin(-PI / 6.0),
+        );
+        let velocity = vec2(
+            -3.886e4 * f64::cos(-PI / 6.0 + PI / 2.0),
+            -3.886e4 * f64::sin(-PI / 6.0 + PI / 2.0),
+        );
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.9895e30;
-        let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
+        let argument_of_periapsis =
+            argument_of_periapsis(position, velocity, standard_gravitational_parameter);
         let expected_argument_of_periapsis = -PI / 6.0 + PI;
         assert!((argument_of_periapsis - expected_argument_of_periapsis).abs() < 0.01);
     }
 
     #[test]
     fn test_argument_of_periapsis_2() {
-        let position = vec2(0.4055e9 * f64::cos(PI/6.0), 0.4055e9 * f64::sin(PI/6.0));
-        let velocity = vec2(0.570e3 * f64::cos(PI/6.0 + PI/2.0), 0.570e3 * f64::sin(PI/6.0 + PI/2.0));
+        let position = vec2(0.4055e9 * f64::cos(PI / 6.0), 0.4055e9 * f64::sin(PI / 6.0));
+        let velocity = vec2(
+            0.570e3 * f64::cos(PI / 6.0 + PI / 2.0),
+            0.570e3 * f64::sin(PI / 6.0 + PI / 2.0),
+        );
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
-        let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
+        let argument_of_periapsis =
+            argument_of_periapsis(position, velocity, standard_gravitational_parameter);
         let expected_argument_of_periapsis = PI / 6.0 - PI;
         assert!((argument_of_periapsis - expected_argument_of_periapsis).abs() < 0.01);
     }
@@ -129,7 +214,8 @@ mod tests {
         let position = vec2(369_236_029.358_813_2, 143_598_629.719_664_34);
         let velocity = vec2(47.799_689_595_602_02, -607.392_053_430_677_3);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
-        let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
+        let argument_of_periapsis =
+            argument_of_periapsis(position, velocity, standard_gravitational_parameter);
         let expected_argument_of_periapsis = PI / 6.0 - PI;
         assert!((argument_of_periapsis - expected_argument_of_periapsis).abs() < 0.01);
     }
@@ -139,7 +225,8 @@ mod tests {
         let position = vec2(221_244_867.958_108_5, 278_127_601.097_456_3);
         let velocity = vec2(772.330_351_134_78, -73.803_348_907_595_99);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
-        let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
+        let argument_of_periapsis =
+            argument_of_periapsis(position, velocity, standard_gravitational_parameter);
         let expected_argument_of_periapsis = PI / 6.0 - PI;
         assert!((argument_of_periapsis - expected_argument_of_periapsis).abs() < 0.01);
     }
@@ -149,7 +236,8 @@ mod tests {
         let position = vec2(321_699_434.075_753_2, 238_177_462.813_335_57);
         let velocity = vec2(-448.885_375_943_825_5, 386.138_758_435_720_83);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 5.9722e24;
-        let argument_of_periapsis = argument_of_periapsis(position, velocity, standard_gravitational_parameter);
+        let argument_of_periapsis =
+            argument_of_periapsis(position, velocity, standard_gravitational_parameter);
         let expected_argument_of_periapsis = -2.615_930_001_576_588;
         assert!((argument_of_periapsis - expected_argument_of_periapsis).abs() < 0.01);
     }
@@ -161,7 +249,8 @@ mod tests {
         let velocity = vec2(0.0, 2.929e4);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.9895e30;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
-        let period = period(standard_gravitational_parameter, semi_major_axis) / (60.0 * 60.0 * 24.0);
+        let period =
+            period(standard_gravitational_parameter, semi_major_axis) / (60.0 * 60.0 * 24.0);
         let expected_period = 364.9;
         assert!((period - expected_period).abs() < 0.1);
     }
@@ -173,7 +262,8 @@ mod tests {
         let velocity = vec2(0.0, 3.886e4);
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.9895e30;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
-        let period = period(standard_gravitational_parameter, semi_major_axis) / (60.0 * 60.0 * 24.0);
+        let period =
+            period(standard_gravitational_parameter, semi_major_axis) / (60.0 * 60.0 * 24.0);
         let expected_period = 87.969;
         assert!((period - expected_period).abs() < 0.1);
     }
@@ -181,11 +271,18 @@ mod tests {
     #[test]
     fn test_period_3() {
         // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
-        let position = vec2(6.9818e10 * f64::cos(-PI / 6.0), 6.9818e10 * f64::sin(-PI / 6.0));
-        let velocity = vec2(3.886e4 * f64::cos(-PI / 6.0 + PI / 2.0), 3.886e4 * f64::sin(-PI / 6.0 + PI / 2.0));
+        let position = vec2(
+            6.9818e10 * f64::cos(-PI / 6.0),
+            6.9818e10 * f64::sin(-PI / 6.0),
+        );
+        let velocity = vec2(
+            3.886e4 * f64::cos(-PI / 6.0 + PI / 2.0),
+            3.886e4 * f64::sin(-PI / 6.0 + PI / 2.0),
+        );
         let standard_gravitational_parameter = GRAVITATIONAL_CONSTANT * 1.9895e30;
         let semi_major_axis = semi_major_axis(position, velocity, standard_gravitational_parameter);
-        let period = period(standard_gravitational_parameter, semi_major_axis) / (60.0 * 60.0 * 24.0);
+        let period =
+            period(standard_gravitational_parameter, semi_major_axis) / (60.0 * 60.0 * 24.0);
         let expected_period = 87.969;
         assert!((period - expected_period).abs() < 0.1);
     }

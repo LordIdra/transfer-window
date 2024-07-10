@@ -26,7 +26,7 @@ impl FuelTankType {
 
     pub fn ship_types() -> [Self; 4] {
         [
-            FuelTankType::FuelTank1, 
+            FuelTankType::FuelTank1,
             FuelTankType::FuelTank2,
             FuelTankType::FuelTank3,
             FuelTankType::FuelTank4,
@@ -58,7 +58,10 @@ pub struct FuelTank {
 impl FuelTank {
     pub fn new(type_: FuelTankType) -> Self {
         let remaining_litres = type_.capacity_litres() / 2.0;
-        FuelTank { type_, remaining_litres }
+        FuelTank {
+            type_,
+            remaining_litres,
+        }
     }
 
     pub fn type_(&self) -> FuelTankType {

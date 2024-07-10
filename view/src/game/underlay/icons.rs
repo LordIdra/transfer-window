@@ -1,13 +1,23 @@
-use std::{cmp::Ordering, fmt::Debug};
+use std::cmp::Ordering;
+use std::fmt::Debug;
 
 use eframe::egui::{PointerState, Pos2, Vec2};
 use encounter::Encounter;
 use intercept::Intercept;
 use nalgebra_glm::DVec2;
 
-use crate::game::{events::ViewEvent, util::{add_textured_square, add_textured_square_facing}, View};
-
-use self::{adjust_burn::AdjustBurn, adjust_fire_torpedo::AdjustFireTorpedo, apsis::Apsis, burn::Burn, closest_approach::ClosestApproach, fire_torpedo::FireTorpedo, guidance::Guidance, orbitable::Orbitable, vessel::Vessel};
+use self::adjust_burn::AdjustBurn;
+use self::adjust_fire_torpedo::AdjustFireTorpedo;
+use self::apsis::Apsis;
+use self::burn::Burn;
+use self::closest_approach::ClosestApproach;
+use self::fire_torpedo::FireTorpedo;
+use self::guidance::Guidance;
+use self::orbitable::Orbitable;
+use self::vessel::Vessel;
+use crate::game::events::ViewEvent;
+use crate::game::util::{add_textured_square, add_textured_square_facing};
+use crate::game::View;
 
 mod adjust_burn;
 mod adjust_fire_torpedo;
@@ -27,7 +37,7 @@ mod vessel;
 /// multiple levels of priority. Priorities are
 /// compared from the highest priority level until
 /// thereis a mismatch in priorities, at which point
-/// the icon with the highest priority at that level 
+/// the icon with the highest priority at that level
 /// is chosen.
 trait Icon: Debug {
     fn texture(&self, view: &View) -> String;
@@ -39,8 +49,10 @@ trait Icon: Debug {
     fn is_selected(&self, view: &View) -> bool;
     fn on_mouse_over(&self, view: &View, pointer: &PointerState);
     fn selectable(&self) -> bool;
-    
-    fn on_scroll(&self, _view: &View, _scroll_delta: Vec2) -> bool { false }
+
+    fn on_scroll(&self, _view: &View, _scroll_delta: Vec2) -> bool {
+        false
+    }
 
     fn is_hovered(&self, view: &View, mouse_position_window: Pos2) -> bool {
         #[cfg(feature = "profiling")]
@@ -53,7 +65,8 @@ trait Icon: Debug {
     fn overlaps(&self, view: &View, other_icon: &dyn Icon) -> bool {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Icon overlaps");
-        let min_distance_between_icons = (self.radius(view) + other_icon.radius(view)) / view.camera.zoom();
+        let min_distance_between_icons =
+            (self.radius(view) + other_icon.radius(view)) / view.camera.zoom();
         (self.position(view) - other_icon.position(view)).magnitude() < min_distance_between_icons
     }
 
@@ -96,11 +109,14 @@ fn compute_initial_icons(view: &View, pointer: &PointerState) -> Vec<Box<dyn Ico
 }
 
 /// Assumes the input is sorted already from highest to lowest
-/// Continually adds the highest priority remaining icon if it does not overlap any icons already added
-/// This means that when icons overlap, only the one with the highest priority is added
-/// Returns (`not_overlapped`, `overlapped`)
+/// Continually adds the highest priority remaining icon if it does not overlap
+/// any icons already added This means that when icons overlap, only the one
+/// with the highest priority is added Returns (`not_overlapped`, `overlapped`)
 #[allow(clippy::type_complexity)]
-fn split_overlapping_icons(view: &View, icons: Vec<Box<dyn Icon>>) -> (Vec<Box<dyn Icon>>, Vec<Box<dyn Icon>>) {
+fn split_overlapping_icons(
+    view: &View,
+    icons: Vec<Box<dyn Icon>>,
+) -> (Vec<Box<dyn Icon>>, Vec<Box<dyn Icon>>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Split overlapping icons");
 
@@ -108,7 +124,9 @@ fn split_overlapping_icons(view: &View, icons: Vec<Box<dyn Icon>>) -> (Vec<Box<d
     let mut overlapped = vec![];
     for icon in icons {
         #[allow(clippy::borrowed_box)] // false positive
-        let overlaps_any_not_overlapped = not_overlapped.iter().any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, &*icon));
+        let overlaps_any_not_overlapped = not_overlapped
+            .iter()
+            .any(|new_icon: &Box<dyn Icon>| new_icon.overlaps(view, &*icon));
         if overlaps_any_not_overlapped {
             overlapped.push(icon);
         } else {
@@ -118,13 +136,18 @@ fn split_overlapping_icons(view: &View, icons: Vec<Box<dyn Icon>>) -> (Vec<Box<d
     (not_overlapped, overlapped)
 }
 
-fn draw_icon(view: &View, mouse_position_window: Option<Pos2>, icon: &dyn Icon, is_overlapped: bool) {
+fn draw_icon(
+    view: &View,
+    mouse_position_window: Option<Pos2>,
+    icon: &dyn Icon,
+    is_overlapped: bool,
+) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw icon");
 
     let radius = icon.radius(view) / view.camera.zoom();
     let is_selected = icon.is_selected(view);
-    let is_hovered = if let Some(mouse_position_window) = mouse_position_window{
+    let is_hovered = if let Some(mouse_position_window) = mouse_position_window {
         icon.is_hovered(view, mouse_position_window)
     } else {
         false
@@ -141,11 +164,16 @@ fn draw_icon(view: &View, mouse_position_window: Option<Pos2>, icon: &dyn Icon, 
         add_textured_square(&mut vertices, icon.position(view), radius, alpha);
     }
 
-    view.renderers.add_texture_vertices(&icon.texture(view), &mut vertices);
+    view.renderers
+        .add_texture_vertices(&icon.texture(view), &mut vertices);
 }
 
 // 'rust is simple' said no one ever
-fn compute_mouse_over_icon<'a>(view: &View, mouse_position: Pos2, icons: &'a Vec<Box<dyn Icon>>) -> Option<&'a dyn Icon> {
+fn compute_mouse_over_icon<'a>(
+    view: &View,
+    mouse_position: Pos2,
+    icons: &'a Vec<Box<dyn Icon>>,
+) -> Option<&'a dyn Icon> {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute mouse over icon");
 
@@ -153,7 +181,7 @@ fn compute_mouse_over_icon<'a>(view: &View, mouse_position: Pos2, icons: &'a Vec
     for icon in icons {
         let radius = icon.radius(view) / view.camera.zoom();
         if icon.selectable() && (icon.position(view) - focus).magnitude() < radius {
-            return Some(&**icon)
+            return Some(&**icon);
         }
     }
     None
@@ -167,11 +195,13 @@ pub fn draw(view: &View) {
         let mut icons = compute_initial_icons(view, &input.pointer);
         icons.sort_by(|a, b| a.cmp(view, &**b));
         icons.reverse(); // sorted from HIGHEST to LOWEST priority
-        
+
         let (not_overlapped, overlapped) = split_overlapping_icons(view, icons);
         if let Some(mouse_position_window) = input.pointer.latest_pos() {
             if !view.pointer_over_ui {
-                if let Some(icon) = compute_mouse_over_icon(view, mouse_position_window, &not_overlapped) {
+                if let Some(icon) =
+                    compute_mouse_over_icon(view, mouse_position_window, &not_overlapped)
+                {
                     icon.on_mouse_over(view, &input.pointer);
                     let scroll_delta = input.smooth_scroll_delta;
                     if scroll_delta.y != 0.0 || scroll_delta.x != 0.0 {

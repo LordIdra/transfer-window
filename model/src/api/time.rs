@@ -1,16 +1,26 @@
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use crate::{story_event::StoryEvent, systems::update_warp::TimeWarp, Model};
+use crate::story_event::StoryEvent;
+use crate::systems::update_warp::TimeWarp;
+use crate::Model;
 
 pub const WARP_STOP_BEFORE_TARGET_SECONDS: f64 = 5.0;
 
 pub const TIME_STEP_LEVELS: [f64; 13] = [
-    1.0, 5.0, 15.0,  // 1s, 5s, 15s
-    60.0, 300.0, 900.0, // 1m, 5m, 15m
-    3600.0, 21600.0, // 1h, 6h
-    86400.0, 432_000.0, 2_160_000.0, 8_640_000.0, // 1d, 5d, 25d, 100d
-    31_536_000.0 // 1y
+    1.0,
+    5.0,
+    15.0, // 1s, 5s, 15s
+    60.0,
+    300.0,
+    900.0, // 1m, 5m, 15m
+    3600.0,
+    21600.0, // 1h, 6h
+    86400.0,
+    432_000.0,
+    2_160_000.0,
+    8_640_000.0,  // 1d, 5d, 25d, 100d
+    31_536_000.0, // 1y
 ];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -39,7 +49,9 @@ impl TimeStep {
 
     pub(crate) fn toggle_paused(&mut self) {
         match self {
-            TimeStep::Warp { speed: _, paused } | TimeStep::Level { level: _, paused } => *paused = !*paused,
+            TimeStep::Warp { speed: _, paused } | TimeStep::Level { level: _, paused } => {
+                *paused = !*paused
+            }
         }
         trace!("New time state: {:?}", self);
     }
@@ -53,9 +65,12 @@ impl TimeStep {
                     trace!("Could not increase time step level past max");
                 }
             }
-            TimeStep::Warp { speed: _, paused: _ } => {
+            TimeStep::Warp {
+                speed: _,
+                paused: _,
+            } => {
                 trace!("Could not increase time step level because a warp is in progress");
-            },
+            }
         }
         trace!("New time state: {:?}", self);
     }
@@ -69,9 +84,12 @@ impl TimeStep {
                     trace!("Could not decrease time step level past min");
                 }
             }
-            TimeStep::Warp { speed: _, paused: _ } => {
+            TimeStep::Warp {
+                speed: _,
+                paused: _,
+            } => {
                 trace!("Could not decrease time step level because a warp is in progress");
-            },
+            }
         }
         trace!("New time state: {:?}", self);
     }

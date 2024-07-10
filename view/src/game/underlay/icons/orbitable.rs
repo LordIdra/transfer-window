@@ -1,10 +1,13 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity};
-
-use crate::game::{events::ViewEvent, selected::Selected, util::orbitable_texture, View};
+use transfer_window_model::components::ComponentType;
+use transfer_window_model::storage::entity_allocator::Entity;
 
 use super::Icon;
+use crate::game::events::ViewEvent;
+use crate::game::selected::Selected;
+use crate::game::util::orbitable_texture;
+use crate::game::View;
 
 #[derive(Debug)]
 pub struct Orbitable {
@@ -24,13 +27,14 @@ impl Orbitable {
 
 impl Icon for Orbitable {
     fn texture(&self, view: &View) -> String {
-        let mut texture = orbitable_texture(view.model.orbitable_component(self.entity).type_()).to_string();
+        let mut texture =
+            orbitable_texture(view.model.orbitable_component(self.entity).type_()).to_string();
         if let Some(target) = view.selected.target(&view.model) {
             if target == self.entity {
                 texture += "-target";
             }
         }
-        
+
         texture
     }
 
@@ -42,7 +46,7 @@ impl Icon for Orbitable {
             return 1.0;
         }
         if is_hovered {
-            return 0.8
+            return 0.8;
         }
         0.6
     }
@@ -56,7 +60,7 @@ impl Icon for Orbitable {
             u64::from(self.is_selected(view)),
             2,
             0,
-            (view.model.mass(self.entity) / 1.0e20) as u64
+            (view.model.mass(self.entity) / 1.0e20) as u64,
         ]
     }
 

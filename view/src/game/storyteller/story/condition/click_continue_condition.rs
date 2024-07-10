@@ -12,9 +12,7 @@ impl ClickContinueCondition {
 
 impl ConditionCheck for ClickContinueCondition {
     fn met(&self, story_events: &Vec<StoryEvent>) -> bool {
-        let condition = |event: &StoryEvent| {
-            matches!(*event, StoryEvent::ClickContinue)
-        };
+        let condition = |event: &StoryEvent| matches!(*event, StoryEvent::ClickContinue);
         story_events_contains(story_events, condition)
     }
 }

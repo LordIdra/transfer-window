@@ -1,8 +1,8 @@
-use crate::game::{events::{ModelEvent, ViewEvent}, overlay::dialogue::Dialogue};
-
 use super::Action;
+use crate::game::events::{ModelEvent, ViewEvent};
+use crate::game::overlay::dialogue::Dialogue;
 
-pub struct ShowDialogueAction{
+pub struct ShowDialogueAction {
     dialogue: Dialogue,
 }
 

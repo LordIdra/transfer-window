@@ -1,10 +1,15 @@
-use std::{collections::HashMap, fs::{self, DirEntry}, sync::{Arc, Mutex}};
+use std::collections::HashMap;
+use std::fs::{self, DirEntry};
+use std::sync::{Arc, Mutex};
 
-use eframe::{egui::{self, ImageSource}, glow};
+use eframe::egui::{self, ImageSource};
+use eframe::glow;
 use image::GenericImageView;
 use log::{info, trace};
 
-use crate::game::rendering::{texture, texture_renderer::TextureRenderer, celestial_object_renderer::CelestialObjectRenderer};
+use crate::game::rendering::celestial_object_renderer::CelestialObjectRenderer;
+use crate::game::rendering::texture;
+use crate::game::rendering::texture_renderer::TextureRenderer;
 
 fn directory_entries(directory: String) -> Vec<DirEntry> {
     fs::read_dir(directory)
@@ -32,7 +37,9 @@ impl Texture {
         let bytes = image.to_rgba8().into_vec();
         let image = ImageSource::Uri(uri.clone().into());
         let gl_texture = texture::Texture::new(gl, size, &bytes);
-        context.try_load_bytes(&uri).expect("Failed to load texture");
+        context
+            .try_load_bytes(&uri)
+            .expect("Failed to load texture");
         Texture { image, gl_texture }
     }
 }
@@ -57,7 +64,8 @@ impl Resources {
     /// Panics if the texture does not exist
     #[allow(unused)]
     pub fn texture_image(&self, name: &str) -> ImageSource {
-        self.textures.get(name)
+        self.textures
+            .get(name)
             .unwrap_or_else(|| panic!("Texture {name} does not exist"))
             .image
             .clone()
@@ -67,13 +75,17 @@ impl Resources {
     /// Panics if the texture does not exist
     #[allow(unused)]
     pub fn gl_texture(&self, name: &str) -> glow::Texture {
-        self.textures.get(name)
+        self.textures
+            .get(name)
             .unwrap_or_else(|| panic!("Texture {name} does not exist"))
             .gl_texture
             .texture()
     }
 
-    pub fn build_texture_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
+    pub fn build_texture_renderers(
+        &self,
+        gl: &Arc<glow::Context>,
+    ) -> HashMap<String, Arc<Mutex<TextureRenderer>>> {
         info!("Building renderers");
         let mut texture_renderers = HashMap::new();
         for (texture_name, texture) in &self.textures {
@@ -84,7 +96,10 @@ impl Resources {
         texture_renderers
     }
 
-    pub fn build_celestial_object_renderers(&self, gl: &Arc<glow::Context>) -> HashMap<String, Arc<Mutex<CelestialObjectRenderer>>> {
+    pub fn build_celestial_object_renderers(
+        &self,
+        gl: &Arc<glow::Context>,
+    ) -> HashMap<String, Arc<Mutex<CelestialObjectRenderer>>> {
         info!("Building renderers");
         let mut celestial_object_renderers = HashMap::new();
         for (texture_name, texture) in &self.textures {
@@ -94,7 +109,8 @@ impl Resources {
             let texture_name = texture_name.trim_end_matches(".celestial_object");
             trace!("Building celestial_object renderer for {}", texture_name);
             let renderer = CelestialObjectRenderer::new(gl, texture.gl_texture.texture());
-            celestial_object_renderers.insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
+            celestial_object_renderers
+                .insert(texture_name.to_string(), Arc::new(Mutex::new(renderer)));
         }
         celestial_object_renderers
     }

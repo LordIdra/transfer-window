@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use condition::Condition;
 use state::{State, StateCreator};
-use transfer_window_model::{story_event::StoryEvent, Model};
+use transfer_window_model::story_event::StoryEvent;
+use transfer_window_model::Model;
 use transition::Transition;
 
 use crate::game::events::{ModelEvent, ViewEvent};
@@ -23,7 +24,11 @@ impl Story {
         let state_creators = HashMap::new();
         let state = State::default().transition(Transition::new(root, Condition::none()));
         let state_string = "uninitialized";
-        Self { state_creators, state, state_string }
+        Self {
+            state_creators,
+            state,
+            state_string,
+        }
     }
 
     pub fn empty() -> Self {
@@ -33,19 +38,29 @@ impl Story {
     }
 
     pub(super) fn add(&mut self, name: &'static str, factory: impl Fn(&Model) -> State + 'static) {
-        assert!(!self.state_creators.contains_key(name), "Duplicate state {name}");
-        self.state_creators.insert(name, StateCreator::new(Box::new(factory)));
+        assert!(
+            !self.state_creators.contains_key(name),
+            "Duplicate state {name}"
+        );
+        self.state_creators
+            .insert(name, StateCreator::new(Box::new(factory)));
     }
 
-    pub fn update(&mut self, model: &Model, events: &Vec<StoryEvent>) -> (Vec<ModelEvent>, Vec<ViewEvent>) {
+    pub fn update(
+        &mut self,
+        model: &Model,
+        events: &Vec<StoryEvent>,
+    ) -> (Vec<ModelEvent>, Vec<ViewEvent>) {
         let mut model_events = vec![];
         let mut view_events = vec![];
         if let Some((state_string, objective)) = self.state.try_transition(events) {
             self.state_string = state_string;
-            self.state = self.state_creators.get(state_string)
+            self.state = self
+                .state_creators
+                .get(state_string)
                 .unwrap_or_else(|| panic!("State does not exist {state_string}"))
                 .create(model);
-            
+
             let (new_model_events, new_view_events) = self.state.trigger();
             model_events.extend(new_model_events);
             view_events.extend(new_view_events);
@@ -56,7 +71,7 @@ impl Story {
         }
         (model_events, view_events)
     }
-    
+
     #[cfg(test)]
     pub fn states(&self) -> &HashMap<&'static str, StateCreator> {
         &self.state_creators

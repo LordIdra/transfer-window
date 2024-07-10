@@ -1,8 +1,9 @@
-use transfer_window_model::{story_event::StoryEvent, Model};
+use transfer_window_model::story_event::StoryEvent;
+use transfer_window_model::Model;
 
+use super::action::Action;
+use super::transition::Transition;
 use crate::game::events::{ModelEvent, ViewEvent};
-
-use super::{action::Action, transition::Transition};
 
 pub struct StateCreator {
     factory: Box<dyn Fn(&Model) -> State>,
@@ -24,7 +25,6 @@ pub struct State {
     actions: Vec<Box<dyn Action>>,
 }
 
-
 impl State {
     pub fn transition(mut self, transition: Transition) -> Self {
         self.transition = Some(transition);
@@ -36,9 +36,19 @@ impl State {
         self
     }
 
-    pub fn try_transition(&self, events: &Vec<StoryEvent>) -> Option<(&'static str, Option<&'static str>)> {
-        if self.transition.as_ref().is_some_and(|transition| transition.can_transition(events)) {
-            Some((self.transition.as_ref().unwrap().to(), self.transition.as_ref().unwrap().objective()))
+    pub fn try_transition(
+        &self,
+        events: &Vec<StoryEvent>,
+    ) -> Option<(&'static str, Option<&'static str>)> {
+        if self
+            .transition
+            .as_ref()
+            .is_some_and(|transition| transition.can_transition(events))
+        {
+            Some((
+                self.transition.as_ref().unwrap().to(),
+                self.transition.as_ref().unwrap().objective(),
+            ))
         } else {
             None
         }

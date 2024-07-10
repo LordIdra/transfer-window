@@ -1,4 +1,6 @@
-use eframe::{egui::{style::{Interaction, Spacing, WidgetVisuals}, Color32, Context, Margin, Rounding, Stroke, Style, Ui, Vec2, Visuals}, epaint::Shadow};
+use eframe::egui::style::{Interaction, Spacing, WidgetVisuals};
+use eframe::egui::{Color32, Context, Margin, Rounding, Stroke, Style, Ui, Vec2, Visuals};
+use eframe::epaint::Shadow;
 
 pub struct DefaultWindow;
 
@@ -77,19 +79,28 @@ impl SlotSelector {
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: default_color,
             weak_bg_fill: default_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
 
         ui.visuals_mut().widgets.hovered = WidgetVisuals {
             bg_fill: hovered_color,
             weak_bg_fill: hovered_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
 
         ui.visuals_mut().widgets.active = WidgetVisuals {
             bg_fill: selected_color,
             weak_bg_fill: selected_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
     }
 }
@@ -112,19 +123,28 @@ impl SlotEditor {
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: default_color,
             weak_bg_fill: default_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
 
         ui.visuals_mut().widgets.hovered = WidgetVisuals {
             bg_fill: hovered_color,
             weak_bg_fill: hovered_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
 
         ui.visuals_mut().widgets.active = WidgetVisuals {
             bg_fill: selected_color,
             weak_bg_fill: selected_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
     }
 }
@@ -145,19 +165,28 @@ impl SelectedMenuButton {
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: default_color,
             weak_bg_fill: default_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
 
         ui.visuals_mut().widgets.hovered = WidgetVisuals {
             bg_fill: hovered_color,
             weak_bg_fill: hovered_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
 
         ui.visuals_mut().widgets.active = WidgetVisuals {
             bg_fill: selected_color,
             weak_bg_fill: selected_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
     }
 }
@@ -203,19 +232,28 @@ impl DialogueContinueButton {
         ui.visuals_mut().widgets.inactive = WidgetVisuals {
             bg_fill: default_color,
             weak_bg_fill: default_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
 
         ui.visuals_mut().widgets.hovered = WidgetVisuals {
             bg_fill: hovered_color,
             weak_bg_fill: hovered_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
 
         ui.visuals_mut().widgets.active = WidgetVisuals {
             bg_fill: selected_color,
             weak_bg_fill: selected_color,
-            bg_stroke, rounding, fg_stroke, expansion,
+            bg_stroke,
+            rounding,
+            fg_stroke,
+            expansion,
         };
     }
 }

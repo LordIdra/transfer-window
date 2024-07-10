@@ -1,9 +1,28 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{api::{builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
-
-use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{create_vessel_action::CreateVesselAction, finish_level_action::FinishLevelAction, set_focus_action::SetFocusAction, set_time_step_action::SetTimeStepAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}, ViewConfig};
+use transfer_window_model::api::builder::{
+    OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder,
+};
+use transfer_window_model::api::time::TimeStep;
+use transfer_window_model::components::orbitable_component::OrbitableType;
+use transfer_window_model::components::path_component::orbit::orbit_direction::OrbitDirection;
+use transfer_window_model::components::vessel_component::class::VesselClass;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::vessel_component::VesselComponent;
+use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::Model;
 
 use super::StoryBuilder;
+use crate::game::overlay::dialogue::Dialogue;
+use crate::game::storyteller::story::action::create_vessel_action::CreateVesselAction;
+use crate::game::storyteller::story::action::finish_level_action::FinishLevelAction;
+use crate::game::storyteller::story::action::set_focus_action::SetFocusAction;
+use crate::game::storyteller::story::action::set_time_step_action::SetTimeStepAction;
+use crate::game::storyteller::story::action::show_dialogue_action::ShowDialogueAction;
+use crate::game::storyteller::story::condition::Condition;
+use crate::game::storyteller::story::state::State;
+use crate::game::storyteller::story::transition::Transition;
+use crate::game::storyteller::story::Story;
+use crate::game::ViewConfig;
 
 #[derive(Debug, Clone, Default)]
 pub struct Story01Welcome;
@@ -24,19 +43,20 @@ impl StoryBuilder for Story01Welcome {
             rotation_angle: 100.0,
             type_: OrbitableType::Planet,
             physics: OrbitablePhysicsBuilder::Stationary(vec2(0.0, 0.0)),
-        }.build(&mut model);
+        }
+        .build(&mut model);
 
         let mut story = Story::new("intro-1");
 
-        story.add("intro-1", |_| State::default()
-            .transition(Transition::new("intro-2", Condition::click_continue()))
-            .action(ShowDialogueAction::new(
-                Dialogue::new("jake")
-                    .normal("Hello. Welcome to the Transfer Window Interface.")
-                    .with_continue()
-                )
-            )
-        );
+        story.add("intro-1", |_| {
+            State::default()
+                .transition(Transition::new("intro-2", Condition::click_continue()))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("Hello. Welcome to the Transfer Window Interface.")
+                        .with_continue(),
+                ))
+        });
 
         story.add("intro-2", |_| State::default()
             .transition(Transition::new("intro-3", Condition::click_continue()))
@@ -58,103 +78,122 @@ impl StoryBuilder for Story01Welcome {
             )
         );
 
-        story.add("camera-movement", |_| State::default()
-            .transition(Transition::new("created-ship", Condition::click_continue()))
-            .action(ShowDialogueAction::new(
-                Dialogue::new("jake")
-                    .normal("Let's start with camera movement.\n")
-                    .normal("- ").bold("Right click and drag ").normal("to move the camera\n")
-                    .normal("- ").bold("Scroll ").normal("to zoom in and out\n")
-                    .normal("Try it now.")
-                    .with_continue()
-                )
-            )
-        );
+        story.add("camera-movement", |_| {
+            State::default()
+                .transition(Transition::new("created-ship", Condition::click_continue()))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("Let's start with camera movement.\n")
+                        .normal("- ")
+                        .bold("Right click and drag ")
+                        .normal("to move the camera\n")
+                        .normal("- ")
+                        .bold("Scroll ")
+                        .normal("to zoom in and out\n")
+                        .normal("Try it now.")
+                        .with_continue(),
+                ))
+        });
 
-        story.add("created-ship", move |_| State::default()
-            .transition(Transition::new("warp", Condition::click_continue()))
-            .action(CreateVesselAction::new(VesselBuilder {
-                name: "Ship 1",
-                vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                orbit_builder: OrbitBuilder::Circular { 
-                    parent: centralia,
-                    distance: 1.0e7,
-                    angle: 0.0, 
-                    direction: OrbitDirection::AntiClockwise, 
-                },
-            }))
-            .action(ShowDialogueAction::new(
-                Dialogue::new("jake")
-                    .normal("I've created a ship in orbit of Centralia.")
-                    .with_continue()
-                )
-            )
-        );
+        story.add("created-ship", move |_| {
+            State::default()
+                .transition(Transition::new("warp", Condition::click_continue()))
+                .action(CreateVesselAction::new(VesselBuilder {
+                    name: "Ship 1",
+                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
+                    orbit_builder: OrbitBuilder::Circular {
+                        parent: centralia,
+                        distance: 1.0e7,
+                        angle: 0.0,
+                        direction: OrbitDirection::AntiClockwise,
+                    },
+                }))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("I've created a ship in orbit of Centralia.")
+                        .with_continue(),
+                ))
+        });
 
         story.add("warp", |model| {
             let ship = model.entity_by_name("Ship 1").unwrap();
-            let ship_period = model.current_segment(ship).as_orbit().unwrap().period().unwrap();
+            let ship_period = model
+                .current_segment(ship)
+                .as_orbit()
+                .unwrap()
+                .period()
+                .unwrap();
             let time = model.time() + ship_period;
             State::default()
-                .transition(Transition::new("pause", Condition::time(time).objective("Warp forwards one orbit")))
+                .transition(Transition::new(
+                    "pause",
+                    Condition::time(time).objective("Warp forwards one orbit"),
+                ))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
                         .normal("Try speeding up and slowing down time using the ")
-                        .bold("+\n").normal("and ").bold("- ")
-                        .normal("keys. Warp forward until the ship has completed at least one orbit.")
-                    )
-                )
-            }
-        );
+                        .bold("+\n")
+                        .normal("and ")
+                        .bold("- ")
+                        .normal(
+                            "keys. Warp forward until the ship has completed at least one orbit.",
+                        ),
+                ))
+        });
 
         story.add("pause", |_| {
             State::default()
-                .transition(Transition::new("change-focus", Condition::pause().objective("Pause the simulation")))
+                .transition(Transition::new(
+                    "change-focus",
+                    Condition::pause().objective("Pause the simulation"),
+                ))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
                         .normal("Great. Now try tapping ")
                         .bold("spacebar\n")
-                        .normal("to pause the simulation.")
-                    )
-                )
-            }
-        );
+                        .normal("to pause the simulation."),
+                ))
+        });
 
         story.add("change-focus", |model| {
             let ship = model.entity_by_name("Ship 1").unwrap();
             State::default()
-                .transition(Transition::new("basic-controls-end", Condition::focus(ship).objective("Focus the ship")))
+                .transition(Transition::new(
+                    "basic-controls-end",
+                    Condition::focus(ship).objective("Focus the ship"),
+                ))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
                         .normal("Now let's change the camera focus. ")
                         .bold("Right click ")
                         .normal("the ship and click the ")
                         .image("focus")
-                        .normal(" button to focus the camera on it.")
-                    )
-                )
-                }
-        );
+                        .normal(" button to focus the camera on it."),
+                ))
+        });
 
-        story.add("basic-controls-end", |_| State::default()
-            .transition(Transition::new("orbit-intro", Condition::click_continue()))
-            .action(ShowDialogueAction::new(
-                Dialogue::new("jake")
-                    .normal("Excellent. That's basic controls down.")
-                    .with_continue()
-                )
-            )
-        );
+        story.add("basic-controls-end", |_| {
+            State::default()
+                .transition(Transition::new("orbit-intro", Condition::click_continue()))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("Excellent. That's basic controls down.")
+                        .with_continue(),
+                ))
+        });
 
-        story.add("orbit-intro", |_| State::default()
-            .transition(Transition::new("orbit-definition", Condition::click_continue()))
-            .action(ShowDialogueAction::new(
-                Dialogue::new("jake")
-                    .normal("Now let's take a look at how orbits work.")
-                    .with_continue()
-                )
-            )
-        );
+        story.add("orbit-intro", |_| {
+            State::default()
+                .transition(Transition::new(
+                    "orbit-definition",
+                    Condition::click_continue(),
+                ))
+                .action(ShowDialogueAction::new(
+                    Dialogue::new("jake")
+                        .normal("Now let's take a look at how orbits work.")
+                        .with_continue(),
+                ))
+        });
 
         story.add("orbit-definition", |_| State::default()
             .transition(Transition::new("orbit-shapes", Condition::click_continue()))
@@ -178,27 +217,28 @@ impl StoryBuilder for Story01Welcome {
 
         story.add("orbit-ellipse", move |_| {
             State::default()
-                .transition(Transition::new("orbit-ellipse-warp", Condition::click_continue()))
+                .transition(Transition::new(
+                    "orbit-ellipse-warp",
+                    Condition::click_continue(),
+                ))
                 .action(SetFocusAction::new(centralia))
                 .action(CreateVesselAction::new(VesselBuilder {
                     name: "Ship 2",
                     vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                    orbit_builder: OrbitBuilder::Freeform { 
+                    orbit_builder: OrbitBuilder::Freeform {
                         parent: centralia,
                         distance: 1.0e7,
                         speed: 8.0e3,
                         angle: 0.0,
-                        direction: OrbitDirection::AntiClockwise, 
+                        direction: OrbitDirection::AntiClockwise,
                     },
                 }))
                 .action(ShowDialogueAction::new(
                     Dialogue::new("jake")
                         .normal("Here's another ship in an elliptical orbit.")
-                        .with_continue()
-                    )
-                )
-            }
-        );
+                        .with_continue(),
+                ))
+        });
 
         story.add("orbit-ellipse-warp", move |model| {
             let ship = model.entity_by_name("Ship 2").unwrap();
@@ -235,8 +275,9 @@ impl StoryBuilder for Story01Welcome {
             )
         );
 
-        story.add("end", |_model: &Model| State::default()
-            .action(FinishLevelAction::new("1-01".to_string())));
+        story.add("end", |_model: &Model| {
+            State::default().action(FinishLevelAction::new("1-01".to_string()))
+        });
 
         let view_config = ViewConfig {
             apsis_icons: false,

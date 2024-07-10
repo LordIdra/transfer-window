@@ -15,7 +15,7 @@ impl Transition {
     pub fn can_transition(&self, events: &Vec<StoryEvent>) -> bool {
         self.condition.met(events)
     }
-    
+
     pub fn to(&self) -> &'static str {
         self.to
     }

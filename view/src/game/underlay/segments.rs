@@ -1,15 +1,21 @@
 use eframe::egui::Rgba;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::segment::Segment, vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::components::path_component::segment::Segment;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::ComponentType;
+use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::{util::{add_line, should_render_parent}, View};
+use crate::game::util::{add_line, should_render_parent};
+use crate::game::View;
 
 mod burn;
 mod guidance;
 mod orbit;
 
-/// Draws a line between two points so that all the lines on a segment are connected together
-/// This should be called multiple times with different i's to create a blur effect, where i represents how far away from the 'real' line this line is
+/// Draws a line between two points so that all the lines on a segment are
+/// connected together This should be called multiple times with different i's
+/// to create a blur effect, where i represents how far away from the 'real'
+/// line this line is
 fn add_orbit_line(vertices: &mut Vec<f32>, previous_point: &DVec2, new_point: &DVec2, color: Rgba) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Add orbit line");
@@ -31,22 +37,31 @@ fn draw_from_points(view: &View, points: &[DVec2], color: Rgba) {
     view.renderers.add_segment_vertices(&mut vertices);
 }
 
-fn draw_segment(view: &View, segment: &Segment, camera_centre: DVec2, zoom: f64, entity: Entity, segment_points_data: &mut Vec<(Vec<DVec2>, Rgba)>) {
+fn draw_segment(
+    view: &View,
+    segment: &Segment,
+    camera_centre: DVec2,
+    zoom: f64,
+    entity: Entity,
+    segment_points_data: &mut Vec<(Vec<DVec2>, Rgba)>,
+) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Draw segment");
     let absolute_parent_position = view.model.absolute_position(segment.parent());
     match segment {
         Segment::Orbit(orbit) => {
-            // When predicting trajectories, the last orbit will have duration zero, so skip it
+            // When predicting trajectories, the last orbit will have duration zero, so skip
+            // it
             if orbit.duration().abs() == 0.0 {
                 return;
             }
-            let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
+            let points =
+                orbit::compute_points(orbit, absolute_parent_position, camera_centre, zoom);
             let color = orbit::compute_color_vessel(view, entity);
             if should_render_parent(view, orbit.parent()) {
                 segment_points_data.push((points, color));
             }
-        },
+        }
 
         Segment::Burn(burn) => {
             let points = burn::compute_points(burn, absolute_parent_position, camera_centre, zoom);
@@ -57,7 +72,8 @@ fn draw_segment(view: &View, segment: &Segment, camera_centre: DVec2, zoom: f64,
         }
 
         Segment::Guidance(guidance) => {
-            let points = guidance::compute_points(guidance, absolute_parent_position, camera_centre, zoom);
+            let points =
+                guidance::compute_points(guidance, absolute_parent_position, camera_centre, zoom);
             let color = guidance::compute_color(view, entity);
             if should_render_parent(view, guidance.parent()) {
                 segment_points_data.push((points, color));
@@ -73,7 +89,14 @@ fn draw_path_segments(view: &View, entity: Entity, camera_centre: DVec2) {
 
     let mut segment_points_data = vec![];
     for segment in &view.model.future_segments(entity, Some(Faction::Player)) {
-        draw_segment(view, segment, camera_centre, zoom, entity, &mut segment_points_data);
+        draw_segment(
+            view,
+            segment,
+            camera_centre,
+            zoom,
+            entity,
+            &mut segment_points_data,
+        );
     }
 
     // Reverse to make sure that the segments are rendered in order
@@ -88,7 +111,12 @@ fn draw_orbitable_segment(view: &View, entity: Entity, camera_centre: DVec2) {
     let orbitable_component = view.model.orbitable_component(entity);
     if let Some(orbit) = orbitable_component.orbit() {
         let absolute_parent_position = view.model.absolute_position(orbit.parent());
-        let points = orbit::compute_points(orbit, absolute_parent_position, camera_centre, view.camera.zoom());
+        let points = orbit::compute_points(
+            orbit,
+            absolute_parent_position,
+            camera_centre,
+            view.camera.zoom(),
+        );
         let color = orbit::compute_color_orbitable(view, entity);
         draw_from_points(view, &points, color);
     }

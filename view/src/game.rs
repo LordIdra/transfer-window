@@ -1,17 +1,27 @@
-use std::{collections::HashSet, sync::{Arc, Mutex}};
+use std::collections::HashSet;
+use std::sync::{Arc, Mutex};
 
-use eframe::{egui::{Context, Pos2, Rect}, glow, Frame};
+use eframe::egui::{Context, Pos2, Rect};
+use eframe::{glow, Frame};
 use events::{ModelEvent, ViewEvent};
 use nalgebra_glm::DVec2;
-use overlay::{dialogue::Dialogue, objectives::Objective};
+use overlay::dialogue::Dialogue;
+use overlay::objectives::Objective;
 use rendering::Renderers;
 use storyteller::story::Story;
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, story_event::StoryEvent, Model};
+use transfer_window_model::components::ComponentType;
+use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::story_event::StoryEvent;
+use transfer_window_model::Model;
 use util::{should_render, should_render_at_time};
 
-use crate::{controller_events::ControllerEvent, resources::Resources};
-
-use self::{camera::Camera, debug::DebugWindowTab, frame_history::FrameHistory, overlay::vessel_editor::VesselEditor, selected::Selected};
+use self::camera::Camera;
+use self::debug::DebugWindowTab;
+use self::frame_history::FrameHistory;
+use self::overlay::vessel_editor::VesselEditor;
+use self::selected::Selected;
+use crate::controller_events::ControllerEvent;
+use crate::resources::Resources;
 
 mod animation;
 pub(crate) mod camera;
@@ -35,10 +45,10 @@ pub struct ViewConfig {
 
 impl Default for ViewConfig {
     fn default() -> Self {
-        Self { 
-            apsis_icons: true, 
-            selected: true, 
-            explorer: true 
+        Self {
+            apsis_icons: true,
+            selected: true,
+            explorer: true,
         }
     }
 }
@@ -71,7 +81,15 @@ pub struct View {
 }
 
 impl View {
-    pub fn new(gl: Arc<glow::Context>, model: Model, story: Story, context: Context, resources: Arc<Resources>, config: ViewConfig, focus: Option<Entity>) -> Self {
+    pub fn new(
+        gl: Arc<glow::Context>,
+        model: Model,
+        story: Story,
+        context: Context,
+        resources: Arc<Resources>,
+        config: ViewConfig,
+        focus: Option<Entity>,
+    ) -> Self {
         let previous_screen_rect = context.screen_rect();
         let screen_rect = context.screen_rect();
         let controller_events = Arc::new(Mutex::new(vec![]));
@@ -93,7 +111,32 @@ impl View {
         let pointer_over_ui = false;
         let pointer_over_icon = false;
         let objectives = vec![];
-        Self { gl, model, story, config, context, previous_screen_rect, screen_rect, controller_events, model_events, view_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, pointer_over_ui, pointer_over_icon, objectives }
+        Self {
+            gl,
+            model,
+            story,
+            config,
+            context,
+            previous_screen_rect,
+            screen_rect,
+            controller_events,
+            model_events,
+            view_events,
+            story_events,
+            camera,
+            resources,
+            renderers,
+            selected,
+            right_click_menu,
+            vessel_editor,
+            dialogue,
+            frame_history,
+            debug_window_open,
+            debug_window_tab,
+            pointer_over_ui,
+            pointer_over_icon,
+            objectives,
+        }
     }
 
     fn update_camera_focus_position(&mut self) {
@@ -113,7 +156,7 @@ impl View {
         self.pointer_over_ui = self.context.is_pointer_over_area();
         self.pointer_over_icon = false;
     }
-    
+
     fn draw_underlay(&self) {
         rendering::update(self);
     }
@@ -125,14 +168,18 @@ impl View {
         self.context = context.clone();
         self.previous_screen_rect = self.screen_rect;
         self.screen_rect = self.context.screen_rect();
-        self.frame_history.update(self.context.input(|i| i.time), frame.info().cpu_usage);
+        self.frame_history
+            .update(self.context.input(|i| i.time), frame.info().cpu_usage);
         self.update_animation(dt);
         self.update_camera_focus_position();
         self.draw_ui();
         self.post_draw_ui();
         self.draw_underlay();
         self.handle_events();
-        self.story_events.lock().unwrap().extend(self.model.update(dt));
+        self.story_events
+            .lock()
+            .unwrap()
+            .extend(self.model.update(dt));
         expiry::update(self);
         self.controller_events.lock().unwrap().clone()
     }
@@ -140,7 +187,7 @@ impl View {
     pub(crate) fn add_controller_event(&self, event: ControllerEvent) {
         self.controller_events.lock().unwrap().push(event);
     }
-    
+
     pub(crate) fn add_model_event(&self, event: ModelEvent) {
         self.model_events.lock().unwrap().push(event);
     }
@@ -171,8 +218,12 @@ impl View {
         self.right_click_menu = Some(right_clicked);
     }
 
-    pub(crate) fn entities_should_render(&self, with_component_types: Vec<ComponentType>) -> HashSet<Entity> {
-        self.model.entities(with_component_types)
+    pub(crate) fn entities_should_render(
+        &self,
+        with_component_types: Vec<ComponentType>,
+    ) -> HashSet<Entity> {
+        self.model
+            .entities(with_component_types)
             .iter()
             .filter(|entity| should_render(self, **entity))
             .copied()
@@ -180,8 +231,13 @@ impl View {
     }
 
     #[allow(unused)]
-    pub(crate) fn entities_should_render_at_time(&self, with_component_types: Vec<ComponentType>, time: f64) -> HashSet<Entity> {
-        self.model.entities(with_component_types)
+    pub(crate) fn entities_should_render_at_time(
+        &self,
+        with_component_types: Vec<ComponentType>,
+        time: f64,
+    ) -> HashSet<Entity> {
+        self.model
+            .entities(with_component_types)
             .iter()
             .filter(|entity| should_render_at_time(self, **entity, time))
             .copied()
@@ -194,15 +250,19 @@ impl View {
     }
 
     pub(crate) fn window_space_to_world_space(&self, window_coords: Pos2) -> DVec2 {
-        let offset_x = f64::from(window_coords.x - (self.screen_rect.width() / 2.0)) / self.camera.zoom();
-        let offset_y = f64::from((self.screen_rect.height() / 2.0) - window_coords.y) / self.camera.zoom();
+        let offset_x =
+            f64::from(window_coords.x - (self.screen_rect.width() / 2.0)) / self.camera.zoom();
+        let offset_y =
+            f64::from((self.screen_rect.height() / 2.0) - window_coords.y) / self.camera.zoom();
         self.camera.translation() + DVec2::new(offset_x, offset_y)
     }
 
     pub(crate) fn world_space_to_window_space(&self, world_coords: DVec2) -> Pos2 {
         let offset = world_coords - self.camera.translation();
-        let window_coords_x =  (offset.x * self.camera.zoom()) as f32 + 0.5 * self.screen_rect.width();
-        let window_coords_y = -(offset.y * self.camera.zoom()) as f32 - 0.5 * self.screen_rect.height();
+        let window_coords_x =
+            (offset.x * self.camera.zoom()) as f32 + 0.5 * self.screen_rect.width();
+        let window_coords_y =
+            -(offset.y * self.camera.zoom()) as f32 - 0.5 * self.screen_rect.height();
         Pos2::new(window_coords_x, window_coords_y)
     }
 }

@@ -1,11 +1,16 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::{timeline::TimelineEvent, faction::Faction}, ComponentType}, storage::entity_allocator::Entity};
-
-use crate::game::{events::ViewEvent, selected::Selected, util::should_render_at_time, View};
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::vessel_component::timeline::TimelineEvent;
+use transfer_window_model::components::ComponentType;
+use transfer_window_model::storage::entity_allocator::Entity;
 
 use super::Icon;
+use crate::game::events::ViewEvent;
+use crate::game::selected::Selected;
+use crate::game::util::should_render_at_time;
+use crate::game::View;
 
 #[derive(Debug)]
 pub struct Intercept {
@@ -16,14 +21,22 @@ pub struct Intercept {
 impl Intercept {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
+        for entity in view.entities_should_render(vec![
+            ComponentType::VesselComponent,
+            ComponentType::PathComponent,
+        ]) {
             let faction = view.model.vessel_component(entity).faction();
             if !Faction::Player.has_intel_for(faction) {
                 continue;
             }
-            if let Some(TimelineEvent::Intercept(intercept)) = view.model.vessel_component(entity).timeline().last_event() {
+            if let Some(TimelineEvent::Intercept(intercept)) =
+                view.model.vessel_component(entity).timeline().last_event()
+            {
                 if should_render_at_time(view, entity, intercept.time()) {
-                    let icon = Self { entity, time: intercept.time() };
+                    let icon = Self {
+                        entity,
+                        time: intercept.time(),
+                    };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
             }
@@ -46,7 +59,7 @@ impl Icon for Intercept {
             return 1.0;
         }
         if is_hovered {
-            return 0.8
+            return 0.8;
         }
         0.6
     }
@@ -56,19 +69,20 @@ impl Icon for Intercept {
     }
 
     fn priorities(&self, view: &View) -> [u64; 4] {
-        [
-            u64::from(self.is_selected(view)),
-            0,
-            4,
-            0,
-        ]
+        [u64::from(self.is_selected(view)), 0, 4, 0]
     }
 
     fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Intercept position");
-        let parent = view.model.parent_at_time(self.entity, self.time, Some(Faction::Player)).unwrap();
-        view.model.absolute_position(parent) + view.model.position_at_time(self.entity, self.time, Some(Faction::Player))
+        let parent = view
+            .model
+            .parent_at_time(self.entity, self.time, Some(Faction::Player))
+            .unwrap();
+        view.model.absolute_position(parent)
+            + view
+                .model
+                .position_at_time(self.entity, self.time, Some(Faction::Player))
     }
 
     fn facing(&self, _view: &View) -> Option<DVec2> {
@@ -86,7 +100,10 @@ impl Icon for Intercept {
     fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
         if pointer.primary_clicked() {
             trace!("Intercept icon clicked; switching to Selected");
-            let selected = Selected::Intercept { entity: self.entity, time: self.time };
+            let selected = Selected::Intercept {
+                entity: self.entity,
+                time: self.time,
+            };
             view.add_view_event(ViewEvent::SetSelected(selected));
         }
     }

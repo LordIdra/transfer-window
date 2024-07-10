@@ -18,9 +18,9 @@ pub struct ComponentStorage<T> {
 
 impl<T> Default for ComponentStorage<T> {
     fn default() -> Self {
-        Self { 
+        Self {
             entities: HashSet::new(),
-            entries: vec![] 
+            entries: vec![],
         }
     }
 }
@@ -49,7 +49,10 @@ impl<T> ComponentStorage<T> {
         let entry = self.entries.get_mut(entity.index());
         if let Some(entry) = entry {
             if let Some(entry) = entry {
-                assert!(entry.generation == entity.generation(), "Attempt to remove a component with an entity that has a different generation");
+                assert!(
+                    entry.generation == entity.generation(),
+                    "Attempt to remove a component with an entity that has a different generation"
+                );
                 self.entities.remove(&entity);
             }
             *entry = None;
@@ -103,9 +106,8 @@ impl<T> ComponentStorage<T> {
 mod test {
     use std::collections::HashSet;
 
-    use crate::storage::entity_allocator::EntityAllocator;
-
     use super::ComponentStorage;
+    use crate::storage::entity_allocator::EntityAllocator;
 
     #[test]
     fn test() {
@@ -119,9 +121,8 @@ mod test {
         assert!(*storage.get(e2) == 6.0);
         *storage.get_mut(e1) += 1.0;
         assert!(*storage.get(e1) == 2.0);
-        
     }
-    
+
     #[test]
     #[should_panic]
     fn test_deallocate() {

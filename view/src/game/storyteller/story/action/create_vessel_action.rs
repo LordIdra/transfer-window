@@ -1,10 +1,9 @@
 use transfer_window_model::api::builder::VesselBuilder;
 
+use super::Action;
 use crate::game::events::{ModelEvent, ViewEvent};
 
-use super::Action;
-
-pub struct CreateVesselAction{
+pub struct CreateVesselAction {
     vessel_builder: VesselBuilder,
 }
 
@@ -16,7 +15,9 @@ impl CreateVesselAction {
 
 impl Action for CreateVesselAction {
     fn trigger(&self) -> (Vec<ModelEvent>, Vec<ViewEvent>) {
-        let event = ModelEvent::BuildVessel { vessel_builder: self.vessel_builder.clone() };
+        let event = ModelEvent::BuildVessel {
+            vessel_builder: self.vessel_builder.clone(),
+        };
         (vec![event], vec![])
     }
 }

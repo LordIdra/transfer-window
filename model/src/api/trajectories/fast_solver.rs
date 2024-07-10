@@ -1,27 +1,47 @@
-use crate::{components::path_component::{orbit::Orbit, segment::Segment}, Model, storage::entity_allocator::Entity};
-
 use super::encounter::{Encounter, EncounterType};
+use crate::components::path_component::orbit::Orbit;
+use crate::components::path_component::segment::Segment;
+use crate::storage::entity_allocator::Entity;
+use crate::Model;
 
 mod bounding;
 pub mod solver;
 
-pub fn calculate_exit_encounter(model: &Model, orbit: &Orbit, new_parent: Entity, time: f64) -> Orbit {
+pub fn calculate_exit_encounter(
+    model: &Model,
+    orbit: &Orbit,
+    new_parent: Entity,
+    time: f64,
+) -> Orbit {
     let old_parent = orbit.parent();
     let new_parent_mass = model.mass(new_parent);
     let mass = orbit.mass();
 
-    let old_parent_point = &model.orbitable_component(old_parent).orbit().unwrap().point_at_time(time);
+    let old_parent_point = &model
+        .orbitable_component(old_parent)
+        .orbit()
+        .unwrap()
+        .point_at_time(time);
     let position = orbit.end_point().position() + old_parent_point.position();
     let velocity = orbit.end_point().velocity() + old_parent_point.velocity();
 
     Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time)
 }
 
-pub fn calculate_entrance_encounter(model: &Model, orbit: &Orbit, new_parent: Entity, time: f64) -> Orbit {
+pub fn calculate_entrance_encounter(
+    model: &Model,
+    orbit: &Orbit,
+    new_parent: Entity,
+    time: f64,
+) -> Orbit {
     let new_parent_mass = model.mass(new_parent);
     let mass = orbit.mass();
 
-    let new_parent_point = &model.orbitable_component(new_parent).orbit().unwrap().point_at_time(time);
+    let new_parent_point = &model
+        .orbitable_component(new_parent)
+        .orbit()
+        .unwrap()
+        .point_at_time(time);
     let position = orbit.end_point().position() - new_parent_point.position();
     let velocity = orbit.end_point().velocity() - new_parent_point.velocity();
 
@@ -29,50 +49,72 @@ pub fn calculate_entrance_encounter(model: &Model, orbit: &Orbit, new_parent: En
 }
 
 fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
-    model.path_component_mut(entity)
+    model
+        .path_component_mut(entity)
         .final_segment_mut()
         .as_orbit_mut()
         .expect("Attempt to do an exit encounter on a non-orbit")
         .end_at(time);
-    let old_orbit = model.path_component(entity)
+    let old_orbit = model
+        .path_component(entity)
         .final_segment()
         .as_orbit()
         .expect("Attempt to do an exit encounter on a non-orbit");
 
     let new_orbit = calculate_exit_encounter(model, old_orbit, new_parent, time);
 
-    model.path_component_mut(entity).add_segment(Segment::Orbit(new_orbit));
+    model
+        .path_component_mut(entity)
+        .add_segment(Segment::Orbit(new_orbit));
 }
 
 fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
-    model.path_component_mut(entity)
+    model
+        .path_component_mut(entity)
         .final_segment_mut()
         .as_orbit_mut()
         .expect("Attempt to do an entrance encounter on a non-orbit")
         .end_at(time);
-    let old_orbit = model.path_component(entity)
+    let old_orbit = model
+        .path_component(entity)
         .final_segment()
         .as_orbit()
         .expect("Attempt to do an entrance encounter on a non-orbit");
 
     let new_orbit = calculate_entrance_encounter(model, old_orbit, new_parent, time);
 
-    model.path_component_mut(entity).add_segment(Segment::Orbit(new_orbit));
+    model
+        .path_component_mut(entity)
+        .add_segment(Segment::Orbit(new_orbit));
 }
 
-/// This detachment of encounter solving and application 
-/// allows the solver to be much more easily tested, as well 
+/// This detachment of encounter solving and application
+/// allows the solver to be much more easily tested, as well
 /// as leading to cleaner overall design
 pub fn apply_encounter(model: &mut Model, encounter: &Encounter) {
     match encounter.type_() {
-        EncounterType::Entrance => do_entrance(model, encounter.entity(), encounter.new_parent(), encounter.time()),
-        EncounterType::Exit => do_exit(model, encounter.entity(), encounter.new_parent(), encounter.time()),
+        EncounterType::Entrance => do_entrance(
+            model,
+            encounter.entity(),
+            encounter.new_parent(),
+            encounter.time(),
+        ),
+        EncounterType::Exit => do_exit(
+            model,
+            encounter.entity(),
+            encounter.new_parent(),
+            encounter.time(),
+        ),
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::{components::ComponentType, api::trajectories::{fast_solver::{apply_encounter, solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
+    use crate::api::trajectories::encounter::Encounter;
+    use crate::api::trajectories::fast_solver::apply_encounter;
+    use crate::api::trajectories::fast_solver::solver::find_next_encounter;
+    use crate::api::trajectories::test_cases::load_case;
+    use crate::components::ComponentType;
 
     fn run_case(name: &str) {
         let (mut model, mut encounters, _, end_time, _) = load_case(name);
@@ -96,21 +138,28 @@ mod test {
             if soonest_encounter.is_none() {
                 break;
             }
-            
+
             let mut encounter = soonest_encounter.unwrap();
-            
+
             let Some(next_encounter) = encounters.front() else {
                 panic!("Found unexpected encounter: {encounter:#?}");
             };
-            assert!(next_encounter.compare(&model, &encounter), "Encounters not equal: {:#?} {:#?}", encounter, encounters.front());
+            assert!(
+                next_encounter.compare(&model, &encounter),
+                "Encounters not equal: {:#?} {:#?}",
+                encounter,
+                encounters.front()
+            );
 
-            // We unfortunately have to use the case encounter's time, not the calculated time
-            // Small errors in the cases or differences in implementations can cause the simulations to massively diverge in more complex tests
+            // We unfortunately have to use the case encounter's time, not the calculated
+            // time Small errors in the cases or differences in implementations
+            // can cause the simulations to massively diverge in more complex tests
             let case_encounter = encounters.pop_front().unwrap();
             encounter.set_time(case_encounter.time());
 
             for entity in model.entities(vec![ComponentType::PathComponent]) {
-                model.path_component_mut(entity)
+                model
+                    .path_component_mut(entity)
                     .final_segment_mut()
                     .as_orbit_mut()
                     .expect("Attempt to set end time of a segment that is not an orbit")

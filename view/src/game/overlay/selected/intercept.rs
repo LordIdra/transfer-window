@@ -1,9 +1,14 @@
-use eframe::{egui::{Align2, Ui, Window}, epaint};
+use eframe::egui::{Align2, Ui, Window};
+use eframe::epaint;
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_select_vessel, draw_warp_to}, labels::{draw_time_until, draw_title}}, selected::Selected, View}, styles};
-
 use super::vessel::visual_timeline::draw_visual_timeline;
+use crate::game::events::{ModelEvent, ViewEvent};
+use crate::game::overlay::widgets::buttons::{draw_select_vessel, draw_warp_to};
+use crate::game::overlay::widgets::labels::{draw_time_until, draw_title};
+use crate::game::selected::Selected;
+use crate::game::View;
+use crate::styles;
 
 fn draw_controls(ui: &mut Ui, view: &View, entity: Entity, time: f64) {
     ui.horizontal(|ui| {
@@ -27,13 +32,13 @@ pub fn update(view: &View) {
     };
 
     Window::new("Selected intercept")
-            .title_bar(false)
-            .resizable(false)
-            .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
-            .show(&view.context.clone(), |ui| {
-        draw_title(ui, "Intercept");
-        draw_time_until(view, ui, time);
-        draw_controls(ui, view, entity, time);
-        draw_visual_timeline(view, ui, entity, time, false);
-    });
+        .title_bar(false)
+        .resizable(false)
+        .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
+        .show(&view.context.clone(), |ui| {
+            draw_title(ui, "Intercept");
+            draw_time_until(view, ui, time);
+            draw_controls(ui, view, entity, time);
+            draw_visual_timeline(view, ui, entity, time, false);
+        });
 }

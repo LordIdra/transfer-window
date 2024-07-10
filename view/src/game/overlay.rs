@@ -1,8 +1,7 @@
 use eframe::egui::Style;
 
-use crate::styles;
-
 use super::View;
+use crate::styles;
 
 pub mod dialogue;
 mod explorer;

@@ -15,4 +15,3 @@ impl ConditionCheck for NoneCondition {
         true
     }
 }
-

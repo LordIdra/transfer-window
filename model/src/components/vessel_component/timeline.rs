@@ -4,14 +4,15 @@ use intercept::InterceptEvent;
 use log::trace;
 use serde::{Deserialize, Serialize};
 
+use self::enable_guidance::EnableGuidanceEvent;
+use self::fire_torpedo::FireTorpedoEvent;
+use self::start_burn::StartBurnEvent;
 use crate::Model;
 
-use self::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent};
-
-pub mod intercept;
 pub mod enable_guidance;
-pub mod start_burn;
 pub mod fire_torpedo;
+pub mod intercept;
+pub mod start_burn;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum TimelineEvent {
@@ -84,7 +85,7 @@ impl TimelineEvent {
     pub fn is_intercept(&self) -> bool {
         matches!(self, TimelineEvent::Intercept(_))
     }
-    
+
     pub fn is_enable_guidance(&self) -> bool {
         matches!(self, TimelineEvent::EnableGuidance(_))
     }
@@ -156,21 +157,24 @@ impl Timeline {
     }
 
     pub fn last_fire_torpedo_event(&self) -> Option<FireTorpedoEvent> {
-        self.events.iter()
+        self.events
+            .iter()
             .rev()
             .find_map(TimelineEvent::as_fire_torpedo)
             .clone()
     }
 
     pub fn last_blocking_event(&self) -> Option<TimelineEvent> {
-        self.events.iter()
+        self.events
+            .iter()
             .rev()
             .find(|event| event.is_blocking())
             .cloned()
     }
 
     pub fn depleted_torpedoes(&self) -> usize {
-        self.events.iter()
+        self.events
+            .iter()
             .filter(|event| event.is_fire_torpedo())
             .count()
     }

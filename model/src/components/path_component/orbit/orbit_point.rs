@@ -17,7 +17,13 @@ impl OrbitPoint {
         let theta = f64::atan2(position.y, position.x);
         let time_since_periapsis = conic.time_since_last_periapsis(theta);
         let velocity = conic.velocity(position, theta);
-        Self { theta, time, time_since_periapsis, position, velocity }
+        Self {
+            theta,
+            time,
+            time_since_periapsis,
+            position,
+            velocity,
+        }
     }
 
     pub fn next(&self, conic: &Conic, delta_time: f64) -> Self {
@@ -31,7 +37,13 @@ impl OrbitPoint {
         let theta = conic.theta_from_time_since_periapsis(time_since_periapsis);
         let position = conic.position(theta);
         let velocity = conic.velocity(position, theta);
-        Self { theta, time, time_since_periapsis, position, velocity }
+        Self {
+            theta,
+            time,
+            time_since_periapsis,
+            position,
+            velocity,
+        }
     }
 
     pub fn theta(&self) -> f64 {

@@ -1,15 +1,16 @@
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
+use super::burn::Burn;
+use super::guidance::Guidance;
+use super::orbit::Orbit;
 use crate::storage::entity_allocator::Entity;
-
-use super::{burn::Burn, guidance::Guidance, orbit::Orbit};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Segment {
     Orbit(Orbit),
     Burn(Burn),
-    Guidance(Guidance)
+    Guidance(Guidance),
 }
 
 impl Segment {

@@ -1,11 +1,24 @@
-use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
-use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction}, storage::entity_allocator::Entity};
-
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_fire_torpedo, draw_next, draw_previous, draw_select_vessel, draw_warp_to}, labels::{draw_info_at_time_with_orbits, draw_key, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
+use eframe::egui::{Align2, Grid, Ui, Window};
+use eframe::epaint;
+use transfer_window_model::components::path_component::orbit::Orbit;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::storage::entity_allocator::Entity;
 
 // use self::weapons::draw_weapons;
-
 use super::vessel::visual_timeline::draw_visual_timeline;
+use crate::game::events::{ModelEvent, ViewEvent};
+use crate::game::overlay::widgets::buttons::{
+    draw_create_burn, draw_enable_guidance, draw_fire_torpedo, draw_next, draw_previous,
+    draw_select_vessel, draw_warp_to,
+};
+use crate::game::overlay::widgets::labels::{
+    draw_info_at_time_with_orbits, draw_key, draw_subtitle, draw_time_until, draw_title, draw_value,
+};
+use crate::game::selected::util::BurnState;
+use crate::game::selected::Selected;
+use crate::game::util::{format_distance, format_time};
+use crate::game::View;
+use crate::styles;
 
 // mod weapons;
 
@@ -31,12 +44,15 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        
         let faction = view.model.vessel_component(entity).faction();
         if Faction::Player.can_control(faction) {
             if draw_create_burn(view, ui, entity, time) {
                 view.add_model_event(ModelEvent::CreateBurn { entity, time });
-                let selected = Selected::Burn { entity, time, state: BurnState::Selected };
+                let selected = Selected::Burn {
+                    entity,
+                    time,
+                    state: BurnState::Selected,
+                };
                 view.add_view_event(ViewEvent::SetSelected(selected));
             }
 
@@ -48,15 +64,16 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
 
             if draw_fire_torpedo(view, ui, entity, time) {
                 view.add_model_event(ModelEvent::CreateFireTorpedo { entity, time });
-                let selected = Selected::FireTorpedo { entity, time, state: BurnState::Selected };
+                let selected = Selected::FireTorpedo {
+                    entity,
+                    time,
+                    state: BurnState::Selected,
+                };
                 view.add_view_event(ViewEvent::SetSelected(selected));
             }
         }
-
     });
 }
-
-
 
 pub fn draw_orbit_labels(view: &View, ui: &mut Ui, orbit: &Orbit) {
     if orbit.is_ellipse() {
@@ -95,7 +112,9 @@ pub fn draw_orbit_labels(view: &View, ui: &mut Ui, orbit: &Orbit) {
 }
 
 fn draw_orbit(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
+    let orbit = view
+        .model
+        .orbit_at_time(entity, time, Some(Faction::Player));
     draw_subtitle(ui, "Orbit");
     Grid::new("Selected point orbit info").show(ui, |ui| {
         draw_orbit_labels(view, ui, orbit);
@@ -110,15 +129,15 @@ pub fn update(view: &View) {
     };
 
     Window::new("Selected point")
-            .title_bar(false)
-            .resizable(false)
-            .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
-            .show(&view.context.clone(), |ui| {
-        draw_title(ui, "Orbit");
-        draw_time_until(view, ui, time);
-        draw_controls(view, entity, ui, time);
-        draw_info_at_time_with_orbits(view, ui, entity, time);
-        draw_orbit(view, ui, entity, time);
-        draw_visual_timeline(view, ui, entity, time, true);
-    });
+        .title_bar(false)
+        .resizable(false)
+        .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
+        .show(&view.context.clone(), |ui| {
+            draw_title(ui, "Orbit");
+            draw_time_until(view, ui, time);
+            draw_controls(view, entity, ui, time);
+            draw_info_at_time_with_orbits(view, ui, entity, time);
+            draw_orbit(view, ui, entity, time);
+            draw_visual_timeline(view, ui, entity, time, true);
+        });
 }

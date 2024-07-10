@@ -1,11 +1,27 @@
-use eframe::{egui::{Align2, Color32, Grid, Ui, Window}, epaint};
+use eframe::egui::{Align2, Color32, Grid, Ui, Window};
+use eframe::epaint;
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{bars::{draw_filled_bar, FilledBar}, buttons::draw_select_vessel, custom_image::CustomImage, custom_image_button::CustomCircularImageButton, labels::{draw_key, draw_time_until, draw_title, draw_value}}, selected::Selected, util::format_time_with_millis, View}, styles};
-
 use super::vessel::visual_timeline::draw_visual_timeline;
+use crate::game::events::{ModelEvent, ViewEvent};
+use crate::game::overlay::widgets::bars::{draw_filled_bar, FilledBar};
+use crate::game::overlay::widgets::buttons::draw_select_vessel;
+use crate::game::overlay::widgets::custom_image::CustomImage;
+use crate::game::overlay::widgets::custom_image_button::CustomCircularImageButton;
+use crate::game::overlay::widgets::labels::{draw_key, draw_time_until, draw_title, draw_value};
+use crate::game::selected::Selected;
+use crate::game::util::format_time_with_millis;
+use crate::game::View;
+use crate::styles;
 
-pub fn draw_burn_labels(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, end_dv: f64, duration: f64) {
+pub fn draw_burn_labels(
+    view: &View,
+    ui: &mut Ui,
+    max_dv: f64,
+    start_dv: f64,
+    end_dv: f64,
+    duration: f64,
+) {
     let burnt_dv = start_dv - end_dv;
 
     let start_dv_proportion = (start_dv / max_dv) as f32;
@@ -16,7 +32,15 @@ pub fn draw_burn_labels(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, en
 
     ui.horizontal(|ui| {
         draw_key(ui, "ΔV");
-        draw_filled_bar(ui, 120.0, 10.0, 2.0, 3.0, Color32::DARK_GRAY, vec![start_bar, end_bar]);
+        draw_filled_bar(
+            ui,
+            120.0,
+            10.0,
+            2.0,
+            3.0,
+            Color32::DARK_GRAY,
+            vec![start_bar, end_bar],
+        );
     });
 
     Grid::new("DV grid").show(ui, |ui| {
@@ -67,15 +91,26 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
         let button = CustomCircularImageButton::new(view, "warp-here", 36.0)
             .with_enabled(enabled)
             .with_padding(8.0);
-        if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
+        if ui
+            .add_enabled(enabled, button)
+            .on_hover_text("Warp here")
+            .clicked()
+        {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        let enabled = view.model.timeline_event_at_time(entity, time).can_delete(&view.model);
+        let enabled = view
+            .model
+            .timeline_event_at_time(entity, time)
+            .can_delete(&view.model);
         let button = CustomCircularImageButton::new(view, "cancel", 36.0)
             .with_enabled(enabled)
             .with_padding(8.0);
-        if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
+        if ui
+            .add_enabled(enabled, button)
+            .on_hover_text("Cancel")
+            .clicked()
+        {
             view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
             view.add_view_event(ViewEvent::SetSelected(Selected::None));
         }
@@ -85,11 +120,20 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Update burn");
-    let Selected::Burn { entity, time, state: _ } = view.selected.clone() else { 
-        return
+    let Selected::Burn {
+        entity,
+        time,
+        state: _,
+    } = view.selected.clone()
+    else {
+        return;
     };
 
-    let Some(segment) = view.model.path_component(entity).future_segment_starting_at_time(time) else {
+    let Some(segment) = view
+        .model
+        .path_component(entity)
+        .future_segment_starting_at_time(time)
+    else {
         return;
     };
 
@@ -103,16 +147,16 @@ pub fn update(view: &View) {
     let start_dv = burn.rocket_equation_function().remaining_dv();
     let end_dv = burn.final_rocket_equation_function().remaining_dv();
     let duration = burn.duration();
-    
+
     Window::new("Selected burn")
-            .title_bar(false)
-            .resizable(false)
-            .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
-            .show(&view.context.clone(), |ui| {
-        draw_title(ui, "Burn");
-        draw_time_until(view, ui, time);
-        draw_controls(ui, view, time, entity);
-        draw_burn_labels(view, ui, max_dv, start_dv, end_dv, duration);
-        draw_visual_timeline(view, ui, entity, time, false);
-    });
+        .title_bar(false)
+        .resizable(false)
+        .anchor(Align2::LEFT_TOP, epaint::vec2(0.0, 0.0))
+        .show(&view.context.clone(), |ui| {
+            draw_title(ui, "Burn");
+            draw_time_until(view, ui, time);
+            draw_controls(ui, view, time, entity);
+            draw_burn_labels(view, ui, max_dv, start_dv, end_dv, duration);
+            draw_visual_timeline(view, ui, entity, time, false);
+        });
 }

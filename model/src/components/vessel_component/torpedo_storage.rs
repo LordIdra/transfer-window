@@ -41,12 +41,9 @@ pub struct TorpedoStorage {
 impl TorpedoStorage {
     pub fn new(type_: TorpedoStorageType) -> TorpedoStorage {
         let torpedoes = type_.capacity();
-        TorpedoStorage {
-            type_,
-            torpedoes
-        }
+        TorpedoStorage { type_, torpedoes }
     }
-    
+
     pub fn type_(&self) -> TorpedoStorageType {
         self.type_
     }

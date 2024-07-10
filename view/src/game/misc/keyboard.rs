@@ -1,8 +1,8 @@
 use eframe::egui::Key;
 
-use crate::game::{events::{ModelEvent, ViewEvent}, selected::Selected};
-
 use super::View;
+use crate::game::events::{ModelEvent, ViewEvent};
+use crate::game::selected::Selected;
 
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]
@@ -27,21 +27,21 @@ pub fn update(view: &View) {
 
         if input.key_pressed(Key::Delete) {
             match view.selected {
-                Selected::None 
-                    | Selected::Orbitable(_)
-                    | Selected::Vessel(_) 
-                    | Selected::Apsis { .. }
-                    | Selected::Approach { .. }
-                    | Selected::Encounter { .. }
-                    | Selected::Intercept { .. }
-                    | Selected::BurnPoint { .. }
-                    | Selected::GuidancePoint { .. }
-                    | Selected::OrbitPoint { .. } => (),
+                Selected::None
+                | Selected::Orbitable(_)
+                | Selected::Vessel(_)
+                | Selected::Apsis { .. }
+                | Selected::Approach { .. }
+                | Selected::Encounter { .. }
+                | Selected::Intercept { .. }
+                | Selected::BurnPoint { .. }
+                | Selected::GuidancePoint { .. }
+                | Selected::OrbitPoint { .. } => (),
                 Selected::Burn { entity, .. }
-                    | Selected::FireTorpedo { entity, .. } 
-                    | Selected::EnableGuidance { entity, .. } => {
-                        view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
-                        view.add_view_event(ViewEvent::SetSelected(Selected::None));
+                | Selected::FireTorpedo { entity, .. }
+                | Selected::EnableGuidance { entity, .. } => {
+                    view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
+                    view.add_view_event(ViewEvent::SetSelected(Selected::None));
                 }
             }
         }

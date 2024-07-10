@@ -24,7 +24,7 @@ impl EngineType {
     pub fn ship_types() -> [Self; 3] {
         [
             EngineType::Regular,
-            EngineType::Efficient, 
+            EngineType::Efficient,
             EngineType::Booster,
         ]
     }
@@ -62,7 +62,7 @@ impl Engine {
     pub fn new(type_: EngineType) -> Self {
         Engine { type_ }
     }
-    
+
     pub fn type_(&self) -> EngineType {
         self.type_
     }

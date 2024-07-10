@@ -12,7 +12,8 @@ pub fn normalize_angle(mut theta: f64) -> f64 {
     (theta + 2.0 * PI) % (2.0 * PI)
 }
 
-/// Returns a function that will return the closest point on the given orbit from an arbitrary point
+/// Returns a function that will return the closest point on the given orbit
+/// from an arbitrary point
 pub fn make_closest_point_on_ellipse_orbit_function(orbit: &Orbit) -> impl Fn(DVec2) -> DVec2 + '_ {
     assert!(orbit.is_ellipse());
     let a = orbit.semi_major_axis();
@@ -30,8 +31,6 @@ pub fn make_closest_point_on_ellipse_orbit_function(orbit: &Orbit) -> impl Fn(DV
         rotate_aop * point + center
     }
 }
-
-
 
 #[cfg(test)]
 mod test {

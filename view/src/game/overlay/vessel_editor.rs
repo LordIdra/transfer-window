@@ -1,16 +1,17 @@
-use eframe::{egui::{Align, Align2, Color32, Layout, RichText, Ui, Window}, epaint};
+use eframe::egui::{Align, Align2, Color32, Layout, RichText, Ui, Window};
+use eframe::epaint;
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::{events::ViewEvent, View};
-
-use self::{slot_editor::ShipSlotEditor, ship::draw_vessel_editor};
-
+use self::ship::draw_vessel_editor;
+use self::slot_editor::ShipSlotEditor;
 use super::widgets::custom_image_button::CustomCircularImageButton;
+use crate::game::events::ViewEvent;
+use crate::game::View;
 
+mod ship;
 mod slot_editor;
 mod tooltips;
 mod util;
-mod ship;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum SlotType {
@@ -28,7 +29,10 @@ pub struct VesselEditor {
 
 impl VesselEditor {
     pub fn new(entity: Entity) -> VesselEditor {
-        Self { entity, slot_editor: None }
+        Self {
+            entity,
+            slot_editor: None,
+        }
     }
 }
 
@@ -53,37 +57,46 @@ pub fn update(view: &View) {
     }
 
     let vessel_name = view.model.name_component(vessel_editor.entity).name();
-    
+
     Window::new("Vessel editor - ".to_string() + &vessel_name)
-            .title_bar(false)
-            .resizable(false)
-            .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
-            .show(&view.context.clone(), |ui| {
+        .title_bar(false)
+        .resizable(false)
+        .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
+        .show(&view.context.clone(), |ui| {
+            let rect = ui
+                .horizontal_top(|ui| {
+                    let rect = ui
+                        .vertical(|ui| {
+                            draw_header(view, ui, vessel_editor.entity);
+                            draw_vessel_editor(view, ui, &vessel_name, vessel_editor.entity)
+                        })
+                        .inner;
 
-        let rect = ui.horizontal_top(|ui| {
-            let rect = ui.vertical(|ui| {
-                draw_header(view, ui, vessel_editor.entity);
-                draw_vessel_editor(view, ui, &vessel_name, vessel_editor.entity)
-            }).inner;
+                    let button = CustomCircularImageButton::new(view, "cancel", 36.0)
+                        .with_padding(12.0)
+                        .with_normal_color(Color32::from_rgb(60, 60, 60))
+                        .with_hover_color(Color32::from_rgb(80, 80, 80));
+                    if ui.add(button).on_hover_text("Close editor").clicked() {
+                        view.add_view_event(ViewEvent::SetVesselEditor(None));
+                    }
 
-            let button = CustomCircularImageButton::new(view, "cancel", 36.0)
-                .with_padding(12.0)
-                .with_normal_color(Color32::from_rgb(60, 60, 60))
-                .with_hover_color(Color32::from_rgb(80, 80, 80));
-            if ui.add(button).on_hover_text("Close editor").clicked() {
-                view.add_view_event(ViewEvent::SetVesselEditor(None));
+                    rect
+                })
+                .inner;
+
+            let center = rect.center();
+            let scalar = rect.size().x;
+
+            if let Some(slot_type) = vessel_editor.slot_editor {
+                let vessel_component = view.model.vessel_component(vessel_editor.entity);
+                let class = vessel_component.class();
+                ShipSlotEditor::new(vessel_editor.entity, class, slot_type).draw(
+                    view,
+                    &vessel_name,
+                    slot_type,
+                    center,
+                    scalar,
+                );
             }
-
-            rect
-        }).inner;
-
-        let center = rect.center();
-        let scalar = rect.size().x;
-
-        if let Some(slot_type) = vessel_editor.slot_editor {
-            let vessel_component = view.model.vessel_component(vessel_editor.entity);
-            let class = vessel_component.class();
-            ShipSlotEditor::new(vessel_editor.entity, class, slot_type).draw(view, &vessel_name, slot_type, center, scalar);
-        }
-    });
+        });
 }

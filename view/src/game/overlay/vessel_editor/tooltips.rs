@@ -1,5 +1,8 @@
 use eframe::egui::{Grid, RichText, Ui};
-use transfer_window_model::components::vessel_component::{engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType};
+use transfer_window_model::components::vessel_component::engine::EngineType;
+use transfer_window_model::components::vessel_component::fuel_tank::FuelTankType;
+use transfer_window_model::components::vessel_component::torpedo_launcher::TorpedoLauncherType;
+use transfer_window_model::components::vessel_component::torpedo_storage::TorpedoStorageType;
 
 use crate::game::View;
 
@@ -18,7 +21,6 @@ pub fn show_tooltip_engine(type_: Option<EngineType>) -> TooltipFn {
             EngineType::Booster => "Booster Engine",
             EngineType::Torpedo => unreachable!(),
         };
-
 
         ui.label(RichText::new(name).strong().monospace().size(20.0));
 

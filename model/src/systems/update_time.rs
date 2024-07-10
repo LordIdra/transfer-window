@@ -1,4 +1,5 @@
-use crate::{story_event::StoryEvent, Model};
+use crate::story_event::StoryEvent;
+use crate::Model;
 
 impl Model {
     pub(crate) fn update_time(&mut self, dt: f64) {

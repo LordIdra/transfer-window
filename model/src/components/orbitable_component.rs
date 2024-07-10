@@ -1,7 +1,8 @@
 use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 
-use super::path_component::{orbit::Orbit, segment::Segment};
+use super::path_component::orbit::Orbit;
+use super::path_component::segment::Segment;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum OrbitableType {
@@ -13,7 +14,8 @@ pub enum OrbitableType {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum OrbitableComponentPhysics {
     Stationary(DVec2),
-    Orbit(Segment), // stored as a segment because you can go from Segment to &Orbit but not vice versa
+    Orbit(Segment), /* stored as a segment because you can go from Segment to &Orbit but not
+                     * vice versa */
 }
 
 impl OrbitableComponentPhysics {
@@ -58,9 +60,23 @@ pub struct OrbitableComponent {
 }
 
 impl OrbitableComponent {
-    pub fn new(mass: f64, radius: f64, rotation_period_in_days: f64, rotation_angle: f64, type_: OrbitableType, physics: OrbitableComponentPhysics) -> Self {
+    pub fn new(
+        mass: f64,
+        radius: f64,
+        rotation_period_in_days: f64,
+        rotation_angle: f64,
+        type_: OrbitableType,
+        physics: OrbitableComponentPhysics,
+    ) -> Self {
         let rotation_period = rotation_period_in_days * 24.0 * 60.0 * 60.0;
-        Self { mass, radius, rotation_period, rotation_angle, type_, physics }
+        Self {
+            mass,
+            radius,
+            rotation_period,
+            rotation_angle,
+            type_,
+            physics,
+        }
     }
 
     pub fn mass(&self) -> f64 {
@@ -94,15 +110,15 @@ impl OrbitableComponent {
             OrbitableComponentPhysics::Orbit(segment) => Some(segment.as_orbit_mut().unwrap()),
         }
     }
-    
+
     pub fn rotation_period_in_secs(&self) -> f64 {
         self.rotation_period
     }
-    
+
     pub fn rotation_angle(&self) -> f64 {
         self.rotation_angle
     }
-    
+
     pub fn set_rotation_angle(&mut self, rotation_angle: f64) {
         self.rotation_angle = rotation_angle;
     }

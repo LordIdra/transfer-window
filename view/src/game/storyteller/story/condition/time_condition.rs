@@ -2,7 +2,7 @@ use transfer_window_model::story_event::StoryEvent;
 
 use super::{story_events_contains, ConditionCheck};
 
-pub struct TimeCondition{
+pub struct TimeCondition {
     time: f64,
 }
 
@@ -24,4 +24,3 @@ impl ConditionCheck for TimeCondition {
         story_events_contains(story_events, condition)
     }
 }
-

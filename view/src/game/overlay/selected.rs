@@ -3,14 +3,14 @@ use crate::game::View;
 mod approach;
 mod apsis;
 mod burn;
+mod burn_point;
 mod encounter;
 mod fire_torpedo;
 mod guidance;
-mod intercept;
-mod orbitable;
-mod burn_point;
 mod guidance_point;
+mod intercept;
 mod orbit_point;
+mod orbitable;
 mod vessel;
 
 pub fn update(view: &View) {

@@ -1,6 +1,5 @@
-use crate::game::events::{ModelEvent, ViewEvent};
-
 use super::Action;
+use crate::game::events::{ModelEvent, ViewEvent};
 
 pub struct CloseDialogueAction;
 

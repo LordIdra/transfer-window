@@ -3,9 +3,12 @@ use log::trace;
 use nalgebra_glm::DVec2;
 use transfer_window_model::storage::entity_allocator::Entity;
 
-use crate::game::{events::ViewEvent, selected::{util::{BurnAdjustDirection, BurnState}, Selected}, util::compute_burn_arrow_position, View};
-
 use super::Icon;
+use crate::game::events::ViewEvent;
+use crate::game::selected::util::{BurnAdjustDirection, BurnState};
+use crate::game::selected::Selected;
+use crate::game::util::compute_burn_arrow_position;
+use crate::game::View;
 
 fn offset(amount: f64) -> f64 {
     if amount.is_sign_positive() {
@@ -24,28 +27,50 @@ pub struct AdjustBurn {
 }
 
 impl AdjustBurn {
-    fn new(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState) -> Self {
+    fn new(
+        view: &View,
+        entity: Entity,
+        time: f64,
+        direction: BurnAdjustDirection,
+        pointer: &PointerState,
+    ) -> Self {
         let burn = view.model.burn_starting_at_time(entity, time);
         let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
         let mut position = compute_burn_arrow_position(view, entity, time, direction);
 
         // Additional offset if arrow is being dragged
         if let Some(mouse_position) = pointer.latest_pos() {
-            if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(drag_direction) } = &view.selected {
+            if let Selected::Burn {
+                entity: _,
+                time: _,
+                state: BurnState::Dragging(drag_direction),
+            } = &view.selected
+            {
                 if *drag_direction == direction {
-                    let arrow_to_mouse = view.window_space_to_world_space(mouse_position) - position;
+                    let arrow_to_mouse =
+                        view.window_space_to_world_space(mouse_position) - position;
                     let amount = arrow_to_mouse.dot(&burn_to_arrow_unit);
                     position += offset(amount) * burn_to_arrow_unit;
                 }
             }
         }
 
-        Self { entity, time, position, direction }
+        Self {
+            entity,
+            time,
+            position,
+            direction,
+        }
     }
 
     pub fn generate(view: &View, pointer: &PointerState) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        if let Selected::Burn { entity, time, state } = view.selected.clone() {
+        if let Selected::Burn {
+            entity,
+            time,
+            state,
+        } = view.selected.clone()
+        {
             if state.is_adjusting() || state.is_dragging() {
                 let icon = Self::new(view, entity, time, BurnAdjustDirection::Prograde, pointer);
                 icons.push(Box::new(icon) as Box<dyn Icon>);
@@ -66,22 +91,23 @@ impl Icon for AdjustBurn {
         "adjust-burn-arrow".to_string()
     }
 
-    fn alpha(&self, view: &View,_is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
+    fn alpha(&self, view: &View, _is_selected: bool, is_hovered: bool, is_overlapped: bool) -> f32 {
         if is_overlapped {
             return 0.0;
         }
-        if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(direction) } = &view.selected {
+        if let Selected::Burn {
+            entity: _,
+            time: _,
+            state: BurnState::Dragging(direction),
+        } = &view.selected
+        {
             if *direction == self.direction {
                 return 1.0;
             }
             // Dim the other arrows if we are dragging one
             return 0.4;
         }
-        if is_hovered {
-            0.8
-        } else {
-            0.6
-        }
+        if is_hovered { 0.8 } else { 0.6 }
     }
 
     fn radius(&self, _view: &View) -> f64 {
@@ -104,18 +130,32 @@ impl Icon for AdjustBurn {
     }
 
     fn is_selected(&self, view: &View) -> bool {
-        if let Selected::Burn { entity: _, time: _, state: BurnState::Dragging(direction) } = &view.selected {
-            return *direction == self.direction
+        if let Selected::Burn {
+            entity: _,
+            time: _,
+            state: BurnState::Dragging(direction),
+        } = &view.selected
+        {
+            return *direction == self.direction;
         }
         false
     }
 
     fn on_mouse_over(&self, view: &View, pointer: &PointerState) {
-        if let Selected::Burn { entity, time, state } = &view.selected {
+        if let Selected::Burn {
+            entity,
+            time,
+            state,
+        } = &view.selected
+        {
             if !state.is_dragging() && pointer.primary_down() {
                 trace!("Started dragging to adjust burn {:?}", self.direction);
                 let state = BurnState::Dragging(self.direction);
-                let selected = Selected::Burn { entity: *entity, time: *time, state };
+                let selected = Selected::Burn {
+                    entity: *entity,
+                    time: *time,
+                    state,
+                };
                 view.add_view_event(ViewEvent::SetSelected(selected));
             }
         }

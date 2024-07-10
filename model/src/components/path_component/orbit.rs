@@ -3,9 +3,14 @@ use std::f64::consts::PI;
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use crate::{storage::entity_allocator::Entity, util::normalize_angle};
-
-use self::{conic::Conic, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{sphere_of_influence, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT}};
+use self::conic::Conic;
+use self::orbit_direction::OrbitDirection;
+use self::orbit_point::OrbitPoint;
+use self::scary_math::{
+    sphere_of_influence, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT,
+};
+use crate::storage::entity_allocator::Entity;
+use crate::util::normalize_angle;
 
 pub mod conic;
 pub mod orbit_direction;
@@ -24,24 +29,60 @@ pub struct Orbit {
 }
 
 impl Orbit {
-    pub fn new(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
+    pub fn new(
+        parent: Entity,
+        mass: f64,
+        parent_mass: f64,
+        position: DVec2,
+        velocity: DVec2,
+        time: f64,
+    ) -> Self {
         let conic = Conic::new(parent_mass, position, velocity);
         let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, mass, conic, sphere_of_influence, start_point, end_point, current_point }
+        Self {
+            parent,
+            mass,
+            conic,
+            sphere_of_influence,
+            start_point,
+            end_point,
+            current_point,
+        }
     }
 
-    pub fn circle(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, time: f64, direction: OrbitDirection) -> Self {
+    pub fn circle(
+        parent: Entity,
+        mass: f64,
+        parent_mass: f64,
+        position: DVec2,
+        time: f64,
+        direction: OrbitDirection,
+    ) -> Self {
         let conic = Conic::circle(parent_mass, position, direction);
         let standard_gravitational_parameter = parent_mass * GRAVITATIONAL_CONSTANT;
-        let velocity = velocity_to_obtain_eccentricity(position, conic.eccentricity(), standard_gravitational_parameter, conic.semi_major_axis(), direction);
+        let velocity = velocity_to_obtain_eccentricity(
+            position,
+            conic.eccentricity(),
+            standard_gravitational_parameter,
+            conic.semi_major_axis(),
+            direction,
+        );
         let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, mass, conic, sphere_of_influence, start_point, end_point, current_point }
+        Self {
+            parent,
+            mass,
+            conic,
+            sphere_of_influence,
+            start_point,
+            end_point,
+            current_point,
+        }
     }
 
     pub fn mass(&self) -> f64 {
@@ -84,11 +125,13 @@ impl Orbit {
     }
 
     pub fn remaining_orbits(&self) -> i32 {
-        self.conic.orbits(self.end_point.time() - self.current_point.time())
+        self.conic
+            .orbits(self.end_point.time() - self.current_point.time())
     }
 
     pub fn completed_orbits(&self) -> i32 {
-        self.conic.orbits(self.current_point.time() - self.start_point.time())
+        self.conic
+            .orbits(self.current_point.time() - self.start_point.time())
     }
 
     pub fn conic(&self) -> &Conic {
@@ -205,7 +248,8 @@ impl Orbit {
 
     pub fn theta_from_time(&self, time: f64) -> f64 {
         let time_since_periapsis = time - self.first_periapsis_time();
-        self.conic.theta_from_time_since_periapsis(time_since_periapsis)
+        self.conic
+            .theta_from_time_since_periapsis(time_since_periapsis)
     }
 
     pub fn position_from_theta(&self, theta: f64) -> DVec2 {
@@ -247,9 +291,8 @@ mod test {
 
     use nalgebra_glm::vec2;
 
-    use crate::storage::entity_allocator::Entity;
-
     use super::Orbit;
+    use crate::storage::entity_allocator::Entity;
 
     #[test]
     fn test_remaining_angle_1() {

@@ -1,11 +1,15 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
-
-use crate::game::{events::ViewEvent, selected::Selected, util::should_render_at_time, View};
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::ComponentType;
+use transfer_window_model::storage::entity_allocator::Entity;
 
 use super::Icon;
+use crate::game::events::ViewEvent;
+use crate::game::selected::Selected;
+use crate::game::util::should_render_at_time;
+use crate::game::View;
 
 #[derive(Debug)]
 pub struct Guidance {
@@ -16,14 +20,20 @@ pub struct Guidance {
 impl Guidance {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
-        for entity in view.entities_should_render(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
+        for entity in view.entities_should_render(vec![
+            ComponentType::VesselComponent,
+            ComponentType::PathComponent,
+        ]) {
             let faction = view.model.vessel_component(entity).faction();
             if !Faction::Player.has_intel_for(faction) {
                 continue;
             }
             for event in view.model.vessel_component(entity).timeline().events() {
                 if event.is_enable_guidance() && should_render_at_time(view, entity, event.time()) {
-                    let icon = Self { entity, time: event.time() };
+                    let icon = Self {
+                        entity,
+                        time: event.time(),
+                    };
                     icons.push(Box::new(icon) as Box<dyn Icon>);
                 }
             }
@@ -45,7 +55,7 @@ impl Icon for Guidance {
             return 1.0;
         }
         if is_hovered {
-            return 0.8
+            return 0.8;
         }
         0.6
     }
@@ -59,14 +69,16 @@ impl Icon for Guidance {
             u64::from(self.is_selected(view)),
             0,
             5,
-            view.model.mass(self.entity) as u64
+            view.model.mass(self.entity) as u64,
         ]
     }
 
     fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Guidance position");
-        let guidance = view.model.path_component(self.entity)
+        let guidance = view
+            .model
+            .path_component(self.entity)
             .future_segment_starting_at_time(self.time)
             .expect("Selected guidance does not exist")
             .as_guidance()
@@ -92,7 +104,10 @@ impl Icon for Guidance {
         }
 
         trace!("Guidance icon clicked; switching to Selected");
-        let selected = Selected::EnableGuidance { entity: self.entity, time: self.time };
+        let selected = Selected::EnableGuidance {
+            entity: self.entity,
+            time: self.time,
+        };
         view.add_view_event(ViewEvent::SetSelected(selected));
     }
 

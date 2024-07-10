@@ -1,4 +1,11 @@
-use crate::{components::{path_component::{orbit::Orbit, PathComponent}, vessel_component::docking::{DockingPort, DockingPortLocation, DOCKING_DISTANCE, DOCKING_SPEED}, ComponentType}, storage::entity_allocator::Entity, Model};
+use crate::components::path_component::orbit::Orbit;
+use crate::components::path_component::PathComponent;
+use crate::components::vessel_component::docking::{
+    DockingPort, DockingPortLocation, DOCKING_DISTANCE, DOCKING_SPEED,
+};
+use crate::components::ComponentType;
+use crate::storage::entity_allocator::Entity;
+use crate::Model;
 
 const EXTRA_UNDOCK_VELOCITY: f64 = 1.0;
 
@@ -10,7 +17,7 @@ impl Model {
 
     pub fn can_dock(&self, entity: Entity) -> bool {
         let target = self.target(entity).unwrap();
-        self.distance(entity, target) < DOCKING_DISTANCE 
+        self.distance(entity, target) < DOCKING_DISTANCE
             && self.relative_speed(entity, target) < DOCKING_SPEED
             && self.find_free_docking_port(target).is_some()
     }
@@ -25,7 +32,11 @@ impl Model {
     }
 
     /// Finds which docking port an entity is docked to
-    pub fn find_docking_port(&self, station: Entity, docked: Entity) -> Option<DockingPortLocation> {
+    pub fn find_docking_port(
+        &self,
+        station: Entity,
+        docked: Entity,
+    ) -> Option<DockingPortLocation> {
         self.vessel_component(station)
             .docking_ports()
             .expect("Attempt to find docking port on non-station entity")
@@ -37,23 +48,31 @@ impl Model {
 
     /// Find the station to which an entity is docked (if any)
     pub fn find_station_docked_to(&self, entity: Entity) -> Option<Entity> {
-        self.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent])
-            .into_iter()
-            .find(|&station| self.vessel_component(station).has_docking() && self.find_docking_port(station, entity).is_some())
+        self.entities(vec![
+            ComponentType::VesselComponent,
+            ComponentType::PathComponent,
+        ])
+        .into_iter()
+        .find(|&station| {
+            self.vessel_component(station).has_docking()
+                && self.find_docking_port(station, entity).is_some()
+        })
     }
-    
+
     pub fn dock(&mut self, station: Entity, entity: Entity) {
         assert!(self.can_ever_dock_to_target(entity));
         assert!(self.can_dock(entity));
         self.path_components.remove_if_exists(entity);
         let docking_port_location = self.find_free_docking_port(station).unwrap();
-        self.vessel_component_mut(station).dock(docking_port_location, entity);
+        self.vessel_component_mut(station)
+            .dock(docking_port_location, entity);
     }
 
     pub fn undock(&mut self, station: Entity, entity: Entity) {
         assert!(self.docked(entity));
         let docking_port_location = self.find_docking_port(station, entity).unwrap();
-        self.vessel_component_mut(station).undock(docking_port_location);
+        self.vessel_component_mut(station)
+            .undock(docking_port_location);
         let parent = self.parent(station).unwrap();
         let mass = self.vessel_component(entity).mass();
         let parent_mass = self.mass(parent);
@@ -62,7 +81,8 @@ impl Model {
         let velocity = self.velocity(station) + extra_velocity;
         let time = self.time;
         let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, time);
-        self.path_components.set(entity, Some(PathComponent::new_with_orbit(orbit)));
+        self.path_components
+            .set(entity, Some(PathComponent::new_with_orbit(orbit)));
         self.recompute_trajectory(entity);
     }
 
@@ -78,7 +98,11 @@ impl Model {
             .unwrap()
     }
 
-    pub fn docking_port_mut(&mut self, entity: Entity, location: DockingPortLocation) -> &mut DockingPort {
+    pub fn docking_port_mut(
+        &mut self,
+        entity: Entity,
+        location: DockingPortLocation,
+    ) -> &mut DockingPort {
         self.vessel_component_mut(entity)
             .docking_ports_mut()
             .expect("Attempt to get docking port of entity without docking ports")
@@ -90,27 +114,45 @@ impl Model {
         self.docking_port(entity, location).docked_vessel().entity()
     }
 
-    pub fn can_transfer_fuel_to_docked(&self, entity: Entity, location: DockingPortLocation) -> bool {
+    pub fn can_transfer_fuel_to_docked(
+        &self,
+        entity: Entity,
+        location: DockingPortLocation,
+    ) -> bool {
         let from = entity;
         let to = self.docked_entity(entity, location);
         !self.vessel_component(from).is_fuel_empty() && !self.vessel_component(to).is_fuel_full()
     }
 
-    pub fn can_transfer_fuel_from_docked(&self, entity: Entity, location: DockingPortLocation) -> bool {
+    pub fn can_transfer_fuel_from_docked(
+        &self,
+        entity: Entity,
+        location: DockingPortLocation,
+    ) -> bool {
         let to = entity;
         let from = self.docked_entity(entity, location);
         !self.vessel_component(from).is_fuel_empty() && !self.vessel_component(to).is_fuel_full()
     }
 
-    pub fn can_transfer_torpedoes_to_docked(&self, entity: Entity, location: DockingPortLocation) -> bool {
+    pub fn can_transfer_torpedoes_to_docked(
+        &self,
+        entity: Entity,
+        location: DockingPortLocation,
+    ) -> bool {
         let from = entity;
         let to = self.docked_entity(entity, location);
-        !self.vessel_component(from).is_torpedoes_empty() && !self.vessel_component(to).is_torpedoes_full()
+        !self.vessel_component(from).is_torpedoes_empty()
+            && !self.vessel_component(to).is_torpedoes_full()
     }
 
-    pub fn can_transfer_torpedoes_from_docked(&self, entity: Entity, location: DockingPortLocation) -> bool {
+    pub fn can_transfer_torpedoes_from_docked(
+        &self,
+        entity: Entity,
+        location: DockingPortLocation,
+    ) -> bool {
         let to = entity;
         let from = self.docked_entity(entity, location);
-        !self.vessel_component(from).is_torpedoes_empty() && !self.vessel_component(to).is_torpedoes_full()
+        !self.vessel_component(from).is_torpedoes_empty()
+            && !self.vessel_component(to).is_torpedoes_full()
     }
 }

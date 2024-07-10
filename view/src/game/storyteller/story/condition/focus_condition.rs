@@ -1,4 +1,5 @@
-use transfer_window_model::{storage::entity_allocator::Entity, story_event::StoryEvent};
+use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::story_event::StoryEvent;
 
 use super::{story_events_contains, ConditionCheck};
 
@@ -13,7 +14,7 @@ impl FocusCondition {
 }
 
 impl ConditionCheck for FocusCondition {
-    fn met(&self,story_events: &Vec<StoryEvent>) -> bool {
+    fn met(&self, story_events: &Vec<StoryEvent>) -> bool {
         let condition = |event: &StoryEvent| {
             if let StoryEvent::ChangeFocus(entity) = event {
                 *entity == self.entity
@@ -24,4 +25,3 @@ impl ConditionCheck for FocusCondition {
         story_events_contains(story_events, condition)
     }
 }
-

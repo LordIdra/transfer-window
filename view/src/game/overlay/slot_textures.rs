@@ -1,4 +1,7 @@
-use transfer_window_model::components::vessel_component::{engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType};
+use transfer_window_model::components::vessel_component::engine::EngineType;
+use transfer_window_model::components::vessel_component::fuel_tank::FuelTankType;
+use transfer_window_model::components::vessel_component::torpedo_launcher::TorpedoLauncherType;
+use transfer_window_model::components::vessel_component::torpedo_storage::TorpedoStorageType;
 
 pub trait TexturedSlot {
     fn texture(&self) -> &'static str;

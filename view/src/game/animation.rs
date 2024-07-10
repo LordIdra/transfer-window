@@ -5,6 +5,11 @@ impl View {
         for objective in &mut self.objectives {
             objective.update(dt);
         }
-        self.objectives = self.objectives.iter().filter(|objective| !objective.finished()).cloned().collect();
+        self.objectives = self
+            .objectives
+            .iter()
+            .filter(|objective| !objective.finished())
+            .cloned()
+            .collect();
     }
 }

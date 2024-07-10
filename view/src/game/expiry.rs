@@ -1,8 +1,9 @@
 use log::trace;
 use transfer_window_model::components::vessel_component::faction::Faction;
 
-use super::{selected::Selected, util::{should_render, should_render_at_time, ApsisType}, View};
-
+use super::selected::Selected;
+use super::util::{should_render, should_render_at_time, ApsisType};
+use super::View;
 
 pub fn update(view: &mut View) {
     #[cfg(feature = "profiling")]
@@ -18,28 +19,53 @@ pub fn update(view: &mut View) {
     // Remove selected if expired
     if let Some(time) = view.selected.time() {
         if time < view.model.time() {
-            trace!("Selected expired at time = {time} with model time = {}", view.model.time());
+            trace!(
+                "Selected expired at time = {time} with model time = {}",
+                view.model.time()
+            );
             view.selected = Selected::None;
         }
     }
 
     // Remove selected approach if target is no longer targeted
-    if let Selected::Approach { type_: _, entity, target, time: _ } = view.selected.clone() {
-        if !view.model.vessel_component(entity).has_target() || view.model.vessel_component(entity).target().unwrap() != target {
+    if let Selected::Approach {
+        type_: _,
+        entity,
+        target,
+        time: _,
+    } = view.selected.clone()
+    {
+        if !view.model.vessel_component(entity).has_target()
+            || view.model.vessel_component(entity).target().unwrap() != target
+        {
             trace!("Selected approach no longer has target");
             view.selected = Selected::None;
         }
     }
 
-    // Remove or update selected apsis if apsis no longer exists or is in a different place
-    if let Selected::Apsis { type_, entity, time } = view.selected.clone() {
-        if let Some(orbit) = view.model.segment_at_time(entity, time, Some(Faction::Player)).as_orbit() {
+    // Remove or update selected apsis if apsis no longer exists or is in a
+    // different place
+    if let Selected::Apsis {
+        type_,
+        entity,
+        time,
+    } = view.selected.clone()
+    {
+        if let Some(orbit) = view
+            .model
+            .segment_at_time(entity, time, Some(Faction::Player))
+            .as_orbit()
+        {
             let expected_time = match type_ {
                 ApsisType::Periapsis => orbit.next_periapsis_time(),
                 ApsisType::Apoapsis => orbit.next_apoapsis_time(),
             };
             if let Some(expected_time) = expected_time {
-                view.selected = Selected::Apsis { type_, entity, time: expected_time }
+                view.selected = Selected::Apsis {
+                    type_,
+                    entity,
+                    time: expected_time,
+                }
             } else {
                 trace!("Selected apsis orbit no longer has an orbit");
                 view.selected = Selected::None;
@@ -50,11 +76,23 @@ pub fn update(view: &mut View) {
         }
     }
 
-    // Remove or update selected encounter if encounter no longer exists or is in a different place
-    if let Selected::Encounter { type_, entity, time, from, to } = view.selected {
+    // Remove or update selected encounter if encounter no longer exists or is in a
+    // different place
+    if let Selected::Encounter {
+        type_,
+        entity,
+        time,
+        from,
+        to,
+    } = view.selected
+    {
         let mut any_encounter_matches = false;
         for encounter in view.model.future_encounters(entity, Some(Faction::Player)) {
-            if encounter.encounter_type() == type_ && encounter.from() == from && encounter.to() == to && (time - encounter.time()).abs() < 10.0 {
+            if encounter.encounter_type() == type_
+                && encounter.from() == from
+                && encounter.to() == to
+                && (time - encounter.time()).abs() < 10.0
+            {
                 any_encounter_matches = true;
             }
         }
@@ -64,8 +102,17 @@ pub fn update(view: &mut View) {
     }
 
     // Remove selected fire torpedo event if no longer exists
-    if let Selected::FireTorpedo { entity, time, state: _ } = view.selected.clone() {
-        if view.model.fire_torpedo_event_at_time(entity, time).is_none() {
+    if let Selected::FireTorpedo {
+        entity,
+        time,
+        state: _,
+    } = view.selected.clone()
+    {
+        if view
+            .model
+            .fire_torpedo_event_at_time(entity, time)
+            .is_none()
+        {
             trace!("Selected fire torpedo event expired at time={time}");
             view.selected = Selected::None;
         }

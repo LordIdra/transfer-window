@@ -1,17 +1,22 @@
 use std::f64::consts::TAU;
-use nalgebra_glm::{vec2, DVec2, Vec2, convert};
+
+use nalgebra_glm::{convert, vec2, DVec2, Vec2};
 use transfer_window_model::components::ComponentType;
 
-use crate::game::{util::add_textured_triangle, View};
+use crate::game::util::add_textured_triangle;
+use crate::game::View;
 
 fn compute_celestial_object_vertices(absolute_position: DVec2, radius: f64) -> Vec<f32> {
     let scaled_radius = radius;
     let mut vertices = vec![];
     let sides = 100;
     let mut previous_location = absolute_position + vec2(scaled_radius, 0.0);
-    for i in 1..=sides { // 1..=sides to make sure we fill in the gap between the last location and first location, wrapping back round
+    for i in 1..=sides {
+        // 1..=sides to make sure we fill in the gap between the last location and first
+        // location, wrapping back round
         let angle = (i as f64 / sides as f64) * TAU; // both i and sides must be cast to prevent integer division problems
-        let new_location = absolute_position + vec2(f64::cos(angle), f64::sin(angle)) * scaled_radius;
+        let new_location =
+            absolute_position + vec2(f64::cos(angle), f64::sin(angle)) * scaled_radius;
         add_textured_triangle(
             &mut vertices,
             absolute_position,
@@ -40,7 +45,9 @@ pub fn draw(view: &View) {
         let orbitable = view.model.orbitable_component(entity);
         let name = view.model.name_component(entity).name().to_lowercase();
         let mut vertices = compute_celestial_object_vertices(position, orbitable.radius());
-        view.renderers.add_celestial_object_vertices(&name, &mut vertices);
-        view.renderers.set_object_rotation(&name, orbitable.rotation_angle() as f32);
+        view.renderers
+            .add_celestial_object_vertices(&name, &mut vertices);
+        view.renderers
+            .set_object_rotation(&name, orbitable.rotation_angle() as f32);
     }
 }

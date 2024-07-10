@@ -13,8 +13,8 @@ pub fn solve_for_closest_point_on_ellipse(a: f64, b: f64, p: DVec2) -> DVec2 {
     let mut ty = 0.707 * py.signum();
 
     for _ in 0..3 {
-        let x = a*tx;
-        let y = b*ty;
+        let x = a * tx;
+        let y = b * ty;
 
         let ex = (a.powi(2) - b.powi(2)) * tx.powi(3) / a;
         let ey = (b.powi(2) - a.powi(2)) * ty.powi(3) / b;
@@ -36,5 +36,5 @@ pub fn solve_for_closest_point_on_ellipse(a: f64, b: f64, p: DVec2) -> DVec2 {
         ty /= t;
     }
 
-    vec2(a*tx, b*ty)
+    vec2(a * tx, b * ty)
 }

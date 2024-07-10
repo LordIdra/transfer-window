@@ -14,17 +14,31 @@ pub struct BurnPoint {
 
 impl BurnPoint {
     pub fn new(parent_mass: f64, mass: f64, time: f64, position: DVec2, velocity: DVec2) -> Self {
-        Self { parent_mass, mass, time, position, velocity }
+        Self {
+            parent_mass,
+            mass,
+            time,
+            position,
+            velocity,
+        }
     }
 
     pub fn next(&self, delta_time: f64, new_mass: f64, artificial_acceleration: DVec2) -> Self {
-        let gravity_acceleration = -self.position.normalize() * (GRAVITATIONAL_CONSTANT * self.parent_mass) / self.position.magnitude_squared();
+        let gravity_acceleration = -self.position.normalize()
+            * (GRAVITATIONAL_CONSTANT * self.parent_mass)
+            / self.position.magnitude_squared();
         let acceleration = gravity_acceleration + artificial_acceleration;
         let parent_mass = self.parent_mass;
         let time = self.time + delta_time;
         let velocity = self.velocity + acceleration * delta_time;
         let position = self.position + velocity * delta_time;
-        Self { parent_mass, mass: new_mass, time, position, velocity }
+        Self {
+            parent_mass,
+            mass: new_mass,
+            time,
+            position,
+            velocity,
+        }
     }
 
     pub fn mass(&self) -> f64 {

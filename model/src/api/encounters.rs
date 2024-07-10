@@ -1,4 +1,6 @@
-use crate::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity, Model};
+use crate::components::vessel_component::faction::Faction;
+use crate::storage::entity_allocator::Entity;
+use crate::Model;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncounterType {
@@ -15,21 +17,26 @@ pub struct Encounter {
 
 impl Encounter {
     fn new(time: f64, encounter_type: EncounterType, from: Entity, to: Entity) -> Self {
-        Self { time, encounter_type, from, to }
+        Self {
+            time,
+            encounter_type,
+            from,
+            to,
+        }
     }
-    
+
     pub fn time(&self) -> f64 {
         self.time
     }
-    
+
     pub fn encounter_type(&self) -> EncounterType {
         self.encounter_type
     }
-    
+
     pub fn from(&self) -> Entity {
         self.from
     }
-    
+
     pub fn to(&self) -> Entity {
         self.to
     }
@@ -46,7 +53,9 @@ impl Model {
             if let Some(previous_parent) = previous_parent {
                 let new_parent = orbit.parent();
                 if new_parent != previous_parent {
-                    let encounter_type = if let Some(previous_parent_orbit) = self.orbitable_component(previous_parent).segment() {
+                    let encounter_type = if let Some(previous_parent_orbit) =
+                        self.orbitable_component(previous_parent).segment()
+                    {
                         if previous_parent_orbit.parent() == new_parent {
                             EncounterType::Exit
                         } else {
@@ -56,7 +65,12 @@ impl Model {
                         EncounterType::Entrance
                     };
                     let time = orbit.start_point().time();
-                    encounters.push(Encounter::new(time, encounter_type, previous_parent, new_parent));
+                    encounters.push(Encounter::new(
+                        time,
+                        encounter_type,
+                        previous_parent,
+                        new_parent,
+                    ));
                 }
             }
             previous_parent = Some(orbit.parent());

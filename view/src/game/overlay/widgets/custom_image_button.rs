@@ -1,8 +1,15 @@
 use std::sync::{Arc, Mutex};
 
-use eframe::{egui::{Color32, Context, CursorIcon, PaintCallback, Pos2, Rect, Response, Sense, Ui, Vec2, Widget}, egui_glow::CallbackFn, emath::RectTransform, glow};
+use eframe::egui::{
+    Color32, Context, CursorIcon, PaintCallback, Pos2, Rect, Response, Sense, Ui, Vec2, Widget,
+};
+use eframe::egui_glow::CallbackFn;
+use eframe::emath::RectTransform;
+use eframe::glow;
 
-use crate::game::{camera::Camera, rendering::screen_texture_renderer::ScreenTextureRenderer, View};
+use crate::game::camera::Camera;
+use crate::game::rendering::screen_texture_renderer::ScreenTextureRenderer;
+use crate::game::View;
 
 const NORMAL_ALPHA: f32 = 1.0;
 const DISABLED_ALPHA: f32 = 0.4;
@@ -34,9 +41,26 @@ impl CustomCircularImageButton {
         let margin = 0.0;
         let enabled = true;
         let normal_color = Color32::TRANSPARENT;
-        let hover_color = Color32::from_rgb(HOVERED_CIRCLE_ALPHA, HOVERED_CIRCLE_ALPHA, HOVERED_CIRCLE_ALPHA);
+        let hover_color = Color32::from_rgb(
+            HOVERED_CIRCLE_ALPHA,
+            HOVERED_CIRCLE_ALPHA,
+            HOVERED_CIRCLE_ALPHA,
+        );
         let pointer = true;
-        Self { context, renderer, texture, screen_rect, size, sense, padding, margin, enabled, normal_color, hover_color, pointer }
+        Self {
+            context,
+            renderer,
+            texture,
+            screen_rect,
+            size,
+            sense,
+            padding,
+            margin,
+            enabled,
+            normal_color,
+            hover_color,
+            pointer,
+        }
     }
 
     /// Space around the icon, not including circle
@@ -65,7 +89,7 @@ impl CustomCircularImageButton {
         self.hover_color = color;
         self
     }
-    
+
     pub fn with_pointer(mut self, pointer: bool) -> Self {
         self.pointer = pointer;
         self
@@ -102,16 +126,35 @@ impl Widget for CustomCircularImageButton {
         painter.circle_filled(center, radius, circle_color);
 
         let total_padding = self.margin + self.padding;
-        let from = Camera::window_space_to_screen_space(self.screen_rect, to_screen.transform_pos(Pos2::new(total_padding, total_padding)));
-        let to = Camera::window_space_to_screen_space(self.screen_rect, to_screen.transform_pos(Pos2::new(self.size - total_padding, self.size - total_padding)));
+        let from = Camera::window_space_to_screen_space(
+            self.screen_rect,
+            to_screen.transform_pos(Pos2::new(total_padding, total_padding)),
+        );
+        let to = Camera::window_space_to_screen_space(
+            self.screen_rect,
+            to_screen.transform_pos(Pos2::new(
+                self.size - total_padding,
+                self.size - total_padding,
+            )),
+        );
         let renderer = self.renderer.clone();
 
         let callback = Arc::new(CallbackFn::new(move |_info, painter| {
-            renderer.lock().unwrap().render(painter.gl(), self.texture, self.screen_rect, from, to, alpha);
+            renderer.lock().unwrap().render(
+                painter.gl(),
+                self.texture,
+                self.screen_rect,
+                from,
+                to,
+                alpha,
+            );
         }));
 
-        painter.add(PaintCallback { rect: self.screen_rect, callback});
-        
+        painter.add(PaintCallback {
+            rect: self.screen_rect,
+            callback,
+        });
+
         response
     }
 }
