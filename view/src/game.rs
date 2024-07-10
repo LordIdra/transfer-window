@@ -31,6 +31,7 @@ pub struct ViewConfig {
     draw_apsis_icons: bool,
     can_select: bool,
     draw_explorer: bool,
+    draw_timeline: bool,
 }
 
 impl Default for ViewConfig {
@@ -38,7 +39,8 @@ impl Default for ViewConfig {
         Self { 
             draw_apsis_icons: true, 
             can_select: true, 
-            draw_explorer: true 
+            draw_explorer: true,
+            draw_timeline: false,
         }
     }
 }

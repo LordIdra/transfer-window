@@ -65,7 +65,29 @@ impl StoryBuilder for Story1_02 {
                     .normal("- The periapsis is the")
                     .bold(" lowest ")
                     .normal("point in an orbit\n")
-                    .normal("Don't worry about remembering which one is which - you can always check on the fly.")
+                    .normal("Don't worry about too much about remembering which one is which - you can always check on the fly.")
+                    .with_continue()
+                )
+            )
+        );
+
+        story.add("intro-3", |_| State::default()
+            .transition(Transition::new("intro-4", Condition::click_continue()))
+            .action(ShowDialogueAction::new(
+                Dialogue::new("jake")
+                    .normal("The periapsis and apoapsis give us a useful way to think about orbits. Most orbits you'll be dealing with won't be circular, so it helps to know what the lowest and highest points are. You'll see what I mean in the next level, where we'll start constructing orbits ourselves.")
+                    .with_continue()
+                )
+            )
+        );
+
+        story.add("intro-4", |_| State::default()
+            .transition(Transition::new("intro-5", Condition::click_continue()))
+            .action(ShowDialogueAction::new(
+                Dialogue::new("jake")
+                    .normal("You can select an apsis to see more information about it. Try selecting the")
+                    .bold(" periapsis ")
+                    .normal(".")
                     .with_continue()
                 )
             )
@@ -78,6 +100,7 @@ impl StoryBuilder for Story1_02 {
             draw_apsis_icons: true,
             can_select: true,
             draw_explorer: false,
+            draw_timeline: false
         };
 
         (model, story, view_config, Some(centralia))

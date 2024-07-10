@@ -242,6 +242,7 @@ impl StoryBuilder for Story1_01 {
             draw_apsis_icons: false,
             can_select: false,
             draw_explorer: false,
+            draw_timeline: false,
         };
 
         (model, story, view_config, Some(centralia))
