@@ -64,6 +64,10 @@ impl Renderers {
     pub fn set_object_rotation(&self, name: &str, rotation: f32) {
         self.celestial_object_renderers[name].lock().unwrap().set_rotation(rotation);
     }
+    
+    pub fn set_object_cloud_speeds(&self, name: &str, cloud_speeds: Vec<f64>) {
+        self.celestial_object_renderers[name].lock().unwrap().set_cloud_speeds(cloud_speeds);
+    }
 
     pub fn add_atmosphere_vertices(&self, name: &str, vertices: &mut Vec<f32>) {
         self.atmosphere_renderers[name].lock().unwrap().add_vertices(vertices);

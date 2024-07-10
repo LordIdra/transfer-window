@@ -52,6 +52,7 @@ pub fn draw(view: &View) {
                 atmosphere.density() as f32
             );
             view.renderers.add_atmosphere_vertices(&name, &mut vertices);
+            view.renderers.set_object_cloud_speeds(&name, atmosphere.cloud_speeds().clone());
         }
     }
 }
