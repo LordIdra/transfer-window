@@ -1,10 +1,10 @@
 use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::api::time::TimeStep;
+use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
 use crate::game::storyteller::story::action::set_time_step_action::SetTimeStepAction;
-use crate::game::storyteller::story::action::Action;
 use crate::game::{overlay::dialogue::Dialogue, storyteller::story::{action::{finish_level_action::FinishLevelAction, show_dialogue_action::ShowDialogueAction}, condition::Condition, state::State, transition::Transition, Story}, ViewConfig};
 
 use super::StoryBuilder;
