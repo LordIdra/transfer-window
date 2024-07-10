@@ -2,7 +2,7 @@ use std::fs;
 
 use log::error;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{api::builder::VesselBuilder, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
+use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 
@@ -18,7 +18,7 @@ impl View {
             return;
         };
 
-        if let Err(error) = fs::write("saves/".to_string() + name + ".json", serialized) {
+        if let Err(error) = fs::write("data/saves/".to_string() + name + ".json", serialized) {
             error!("Failed to handle save_game; error while saving: {}", error);
         }
     }
@@ -46,11 +46,22 @@ impl View {
         self.model.start_warp(end_time);
     }
 
+    pub fn set_time_step(&mut self, time_step: TimeStep) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Set time step");
+        self.model.set_time_step(time_step);
+    }
+
     pub fn build_vessel(&mut self, vessel_builder: VesselBuilder) {
         #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Start warp");
-        let entity = vessel_builder.build(&mut self.model);
-        self.model.recompute_trajectory(entity);
+        let _span = tracy_client::span!("Build vessel");
+        vessel_builder.build(&mut self.model);
+    }
+
+    pub fn delete_vessel(&mut self, entity: Entity) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Delete vessel");
+        self.model.deallocate(entity);
     }
 
     pub fn cancel_last_event(&mut self, entity: Entity) {

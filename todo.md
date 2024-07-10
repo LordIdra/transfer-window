@@ -189,6 +189,14 @@
 [x] Storyteller triggers
 [x] Storyteller events
 [x] Storyteller dialogue
+[x] 01 Welcome
+[x] Vessel constructor
+[x] Orbitable constructor
+[x] Storyteller objectives
+[x] Persist completed levels
+[x] Different texture for completed/locked levels
+[x] Hide aspects of UI
+[ ] Exit to menu option
 
 
 
@@ -196,38 +204,62 @@
 # CAMPAIGN PLANNING AREA
 # ------------------------------------ #
 # Backend
-[ ] Vessel constructor
-[ ] Orbitable constructor
-[ ] Storyteller objectives
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
 # Levels
 Chapter 1: Intro
-- 01 Welcome
-  - welcome, simulation environment
-  - adjust simulation speed
-  - orbit explanation with ships flying faster and faster
-- 02 Orbits
-  - more in-depth explanation of orbits
+[ ] 02 Orbits
   - periapsis, apoapsis
-  - notice spacecraft getting closer to earth goes much faster
-  - comparison of higher and lower orbits speed
   - warp to point, pause
+  - comparison of higher and lower orbits speed
+  - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
+
 - 03 Burns
-  - create a burn and get closer to earth
+  - create a burn and get further from centralia
   - circularise orbit
-- 04 Translunar
-  - get an intercept with the moon
-- 05 Moon Orbit
+
+- 04 Chase
+  - set target
+  - explanation of closest approaches
+  - catch up to a spacecraft in front
+  - then drop back to a spacecraft behind
+  - get within X km
+
+- 05 Translunar
+  - spheres of influence
+  - first intercept not necessarily the best, keep going
+  - fly by the moon
+
+- 06 Moon Orbit
+  - open ended
   - orbit the moon and come back into LEO
-- 06 Rendezvous
-  - dock with a station
-- 07 Destroy
-  - destroy a dummy target
-- 08 Evade
+
+- 07 Rendezvous
+  - use your knowledge of closest approaches to get an intercept
+  - then try and match its orbit
+  - patience! this might be more difficult than the last few missions
+  - dock
+
+- 08 Station
+  - takes place entirely at allied hub
+  - upgrade to frigate
+  - allied ship also docked
+  - equip new frigate
+  - resource transfers
+  - torpedo transfers
+  - we'll be using those torpedoes next time
+
+- 09 Destroy
+  - fire torpedoes
+  - guidance explanation
+  - destroy dummy targets
+  - target behind and in front - is there an advantage to being in front / behind?
+
+- 10 Evade
   - evade enemies torpedo
-  - the end time for real life
+  - can't evade that one, time to deploy our own torpedo against it, but leaves us without offensive capability...
+  - the end, time for real life
 
 ## Optional Levels
 [ ] Scientific notation
@@ -272,7 +304,8 @@ Chapter 1: Intro
 [ ] PDC range or time dropoff after which they are deleted to prevent bullet lag
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
-[ ] Energy production/storage/consumption
+[ ] Energy production/storage/consumptiongit pull
+[ ] Main menu background GIFs
 
 # Before release
 [ ] Versioning!

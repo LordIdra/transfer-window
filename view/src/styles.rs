@@ -219,3 +219,28 @@ impl DialogueContinueButton {
         };
     }
 }
+
+pub struct ExitModal;
+
+impl ExitModal {
+    pub fn apply(context: &Context) {
+        context.set_style(Style {
+            visuals: Visuals {
+                window_fill: Color32::from_rgba_unmultiplied(20, 20, 20, 255),
+                window_stroke: Stroke::NONE,
+                window_shadow: Shadow::NONE,
+                window_rounding: Rounding::same(40.0),
+                ..Default::default()
+            },
+            interaction: Interaction {
+                selectable_labels: false,
+                ..Default::default()
+            },
+            spacing: Spacing {
+                window_margin: Margin::same(30.0),
+                ..Spacing::default()
+            },
+            ..Default::default()
+        });
+    }
+}

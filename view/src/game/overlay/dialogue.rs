@@ -52,9 +52,9 @@ impl Dialogue {
             ui.spacing_mut().item_spacing.x = 0.0;
             for component in &self.components {
                 match component {
-                    DialogueComponent::Normal(text) => ui.label(RichText::new(*text).monospace().color(Color32::WHITE)),
-                    DialogueComponent::Bold(text) => ui.label(RichText::new(*text).monospace().color(Color32::GOLD)),
-                    DialogueComponent::Image(texture) => ui.add(CustomImage::new(view, &texture, 10.0)),
+                    DialogueComponent::Normal(text) => ui.label(RichText::new(*text).size(14.0).color(Color32::WHITE)),
+                    DialogueComponent::Bold(text) => ui.label(RichText::new(*text).size(14.0).color(Color32::GOLD)),
+                    DialogueComponent::Image(texture) => ui.add(CustomImage::new(view, texture, 14.0)),
                 };
             }
         }).response
@@ -80,6 +80,7 @@ pub fn update(view: &View) {
             .default_pos(Pos2::new(view.context.screen_rect().width() / 2.0 - 500.0 / 2.0, 80.0))
             .show(&view.context.clone(), |ui| {
         ui.vertical(|ui| {
+            ui.set_min_height(160.0);
             ui.add_space(10.0);
 
             ui.horizontal(|ui| {
@@ -95,13 +96,14 @@ pub fn update(view: &View) {
                 ui.vertical_centered(|ui| {
                     ui.add_space(20.0);
                     styles::DialogueContinueButton::apply(ui);
-                    let response = ui.button("Continue");
+                    let response = ui.button(RichText::new("Continue").strong().monospace().size(12.0));
                     if response.hovered() {
                         view.context.set_cursor_icon(CursorIcon::PointingHand);
                     }
                     if response.clicked() {
                         view.add_story_event(StoryEvent::ClickContinue);
                     }
+                    ui.add_space(5.0);
                 });
             }
         });

@@ -3574,6 +3574,8 @@ dependencies = [
  "egui_extras",
  "log",
  "nalgebra-glm",
+ "serde",
+ "serde_json",
  "sysinfo",
  "tracing",
  "tracing-subscriber",

@@ -67,12 +67,12 @@ export_and_bloom_menu() {
 # done
 # wait
 
-# cd "$root/view/resources/textures/menu" || exit
-# for file in *.drawio; do
-#     [ -f "$file" ] || break
-#     export_and_bloom_menu "$file" &
-# done
-# wait
+cd "$root/view/resources/textures/menu" || exit
+for file in *.drawio; do
+    [ -f "$file" ] || break
+    export_and_bloom_menu "$file" &
+done
+wait
 
 cd "$root/view/resources/textures/character" || exit
 for file in *.drawio; do

@@ -41,14 +41,20 @@ impl Objective {
 
     pub fn draw(&self, view: &View, ui: &mut Ui) {
         ui.horizontal(|ui| {
-            let texture = match self.complete {
-                false => "objective-incomplete",
-                true => "objective-complete",
+            let texture = if self.complete {
+                "objective-complete"
+            } else { 
+                "objective-incomplete"
             };
             ui.add(CustomImage::new(view, texture, 12.0).with_alpha(self.opacity));
-            ui.label(RichText::new(self.objective)
-                .monospace()
-                .color(Color32::from_rgba_unmultiplied(255, 255, 255, (self.opacity * 255.0) as u8)));
+            ui.add_space(-5.0);
+            ui.vertical(|ui| ui.add_space(22.0));
+            ui.horizontal_wrapped(|ui| {
+                ui.set_width(200.0);
+                ui.label(RichText::new(self.objective)
+                    .monospace()
+                    .color(Color32::from_rgba_unmultiplied(255, 255, 255, (self.opacity * 255.0) as u8)));
+            })
         });
     }
 }
@@ -60,7 +66,7 @@ pub fn update(view: &View) {
     Window::new("Objectives")
         .title_bar(false)
         .resizable(false)
-        .anchor(Align2::RIGHT_TOP, epaint::vec2(0.0, 50.0))
+        .anchor(Align2::RIGHT_TOP, epaint::vec2(0.0, 30.0))
         .show(&view.context.clone(), |ui| {
             for objective in &view.objectives {
                 objective.draw(view, ui);

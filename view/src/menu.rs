@@ -1,9 +1,9 @@
-use std::sync::{Arc, Mutex};
+use std::{collections::HashSet, sync::{Arc, Mutex}};
 
 use eframe::{egui::{CentralPanel, Context, CursorIcon, Key, Rect, Sense, Ui, Vec2, Window}, glow};
 use log::trace;
 
-use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer, storyteller::stories::{story_01_welcome::Story01Welcome, StoryBuilder}}, resources::Resources};
+use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer, storyteller::stories::{story_1_01::Story1_01, story_1_02::Story1_02, StoryBuilder}}, resources::Resources};
 
 impl CustomImage {
     pub fn new_menu(view: &View, texture_name: &str, width: f32, height: f32) -> Self {
@@ -35,21 +35,29 @@ impl View {
         Self { gl, previous_screen_rect, screen_rect, resources, screen_texture_renderer, debug_window_open }
     }
 
-    fn draw_level(&self, context: &Context, ui: &mut Ui, events: &mut Vec<ControllerEvent>, level: &str, story_builder: Box<dyn StoryBuilder>) {
+    fn draw_level(&self, context: &Context, ui: &mut Ui, events: &mut Vec<ControllerEvent>, completed_levels: &HashSet<String>, level: &str, story_builder: Box<dyn StoryBuilder>) {
+        let mut level = level.to_string();
+        let prerequisite_met = story_builder.prerequisite().map_or_else(|| true, |prerequisite| completed_levels.contains(&prerequisite));
         let (rect, _) = ui.allocate_exact_size(Vec2::new(300.0, 150.0), Sense::click());
         let hovered = ui.rect_contains_pointer(rect);
         let clicked = hovered && ui.input(|input| input.pointer.primary_clicked());
-        if clicked {
+        if prerequisite_met && clicked {
             events.push(ControllerEvent::NewGame { story_builder });
         }
-        if hovered {
+        if prerequisite_met && hovered {
             context.set_cursor_icon(CursorIcon::PointingHand);
         }
 
         ui.allocate_ui_at_rect(rect, |ui| {
-            let mut image = CustomImage::new_menu(self, level, 300.0, 150.0);
+            if completed_levels.contains(&level) {
+                level += "-complete";
+            }
+            let mut image = CustomImage::new_menu(self, &level, 300.0, 150.0);
             if !hovered {
                 image = image.with_alpha(0.7);
+            }
+            if !prerequisite_met {
+                image = image.with_alpha(0.4);
             }
             ui.add(image);
         });
@@ -57,7 +65,7 @@ impl View {
         ui.add_space(10.0);
     }
 
-    pub fn update(&mut self, context: &Context) -> Vec<ControllerEvent> {
+    pub fn update(&mut self, context: &Context, completed_levels: &HashSet<String>) -> Vec<ControllerEvent> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("View update");
 
@@ -96,17 +104,12 @@ impl View {
                 ui.vertical(|ui| {
                     ui.add(CustomImage::new_menu(self, "title-1", 215.0, 70.0));
                     ui.horizontal(|ui| {
-                        self.draw_level(context, ui, &mut events, "01-welcome", Box::new(Story01Welcome::default()));
-                        // self.draw_level(context, ui, &mut events, "02-orbits");
-                        // self.draw_level(context, ui, &mut events, "01-welcome");
-                        // self.draw_level(context, ui, &mut events, "02-orbits");
+                        self.draw_level(context, ui, &mut events, completed_levels, "1-01", Box::new(Story1_01));
+                        self.draw_level(context, ui, &mut events, completed_levels, "1-02", Box::new(Story1_02));
                     });
                     // ui.add_space(15.0);
                     // ui.horizontal(|ui| {
-                        // self.draw_level(context, ui, &mut events, "01-welcome");
-                        // self.draw_level(context, ui, &mut events, "02-orbits");
-                        // self.draw_level(context, ui, &mut events, "01-welcome");
-                        // self.draw_level(context, ui, &mut events, "02-orbits");
+
                     // });
                 })
             })

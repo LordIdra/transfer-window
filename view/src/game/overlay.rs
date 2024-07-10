@@ -5,6 +5,7 @@ use crate::styles;
 use super::View;
 
 pub mod dialogue;
+pub mod exit_modal;
 mod explorer;
 mod fps;
 pub mod objectives;
@@ -22,13 +23,19 @@ pub fn draw(view: &View) {
 
     styles::DefaultWindow::apply(&view.context);
 
-    explorer::update(view);
+    if view.config.draw_explorer {
+        explorer::update(view);
+    }
     fps::update(view);
     objectives::update(view);
     scale::update(view);
     time::update(view);
     selected::update(view);
     right_click_menu::update(view);
+
+    styles::ExitModal::apply(&view.context);
+    exit_modal::update(view);
+    view.context.set_style(Style::default());
 
     styles::DialogueWindow::apply(&view.context);
     dialogue::update(view);

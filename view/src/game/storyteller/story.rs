@@ -33,7 +33,7 @@ impl Story {
     }
 
     pub(super) fn add(&mut self, name: &'static str, factory: impl Fn(&Model) -> State + 'static) {
-        assert!(!self.state_creators.contains_key(name), "Duplicate state {}", name);
+        assert!(!self.state_creators.contains_key(name), "Duplicate state {name}");
         self.state_creators.insert(name, StateCreator::new(Box::new(factory)));
     }
 
@@ -43,7 +43,7 @@ impl Story {
         if let Some((state_string, objective)) = self.state.try_transition(events) {
             self.state_string = state_string;
             self.state = self.state_creators.get(state_string)
-                .expect(&format!("State does not exist {}", state_string))
+                .unwrap_or_else(|| panic!("State does not exist {state_string}"))
                 .create(model);
             
             let (new_model_events, new_view_events) = self.state.trigger();
@@ -54,7 +54,6 @@ impl Story {
                 view_events.push(ViewEvent::FinishObjective(objective));
             }
         }
-        self.state = self.state_creators[self.state_string].create(model);
         (model_events, view_events)
     }
     

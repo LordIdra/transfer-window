@@ -2,9 +2,9 @@
 use log::debug;
 use log::error;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{api::builder::VesselBuilder, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity, story_event::StoryEvent};
+use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity, story_event::StoryEvent};
 
-use crate::game::overlay::{dialogue::Dialogue, objectives::Objective};
+use crate::{controller_events::ControllerEvent, game::overlay::{dialogue::Dialogue, objectives::Objective}};
 
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
@@ -19,7 +19,9 @@ pub enum ModelEvent {
     IncreaseTimeStepLevel,
     DecreaseTimeStepLevel,
     StartWarp { end_time: f64 },
+    SetTimeStep { time_step: TimeStep },
     BuildVessel { vessel_builder: VesselBuilder },
+    DeleteVessel { entity: Entity },
     CreateBurn { entity: Entity, time: f64 },
     AdjustBurn { entity: Entity, time: f64, amount: DVec2 },
     SetTarget { entity: Entity, target: Option<Entity> },
@@ -57,6 +59,9 @@ pub enum ViewEvent {
     CloseDialogue,
     StartObjective(&'static str),
     FinishObjective(&'static str),
+    FinishLevel(String),
+    ExitLevel,
+    ToggleExitModal,
 }
 
 impl View {
@@ -77,7 +82,9 @@ impl View {
                 ModelEvent::IncreaseTimeStepLevel => self.increase_time_step_level(),
                 ModelEvent::DecreaseTimeStepLevel => self.decrease_time_step_level(),
                 ModelEvent::StartWarp { end_time } => self.start_warp(end_time),
+                ModelEvent::SetTimeStep { time_step } => self.set_time_step(time_step),
                 ModelEvent::BuildVessel { vessel_builder } => self.build_vessel(vessel_builder),
+                ModelEvent::DeleteVessel { entity } => self.delete_vessel(entity),
                 ModelEvent::CreateBurn { entity, time } => self.create_burn(entity, time),
                 ModelEvent::AdjustBurn { entity, time, amount } => self.adjust_burn(entity, time, amount),
                 ModelEvent::SetTarget { entity, target } => self.set_target(entity, target),
@@ -110,9 +117,13 @@ impl View {
                 ViewEvent::SetCameraZoom(zoom) => self.camera.set_zoom(zoom),
                 ViewEvent::SetCameraFocus(focus) => {
                     self.add_story_event(StoryEvent::ChangeFocus(focus));
-                    self.camera.set_focus(focus, self.model.absolute_position(focus))
+                    self.camera.set_focus(focus, self.model.absolute_position(focus));
                 },
-                ViewEvent::SetSelected(selected) => self.selected = selected,
+                ViewEvent::SetSelected(selected) => {
+                    if self.config.can_select {
+                        self.selected = selected;
+                    }
+                }
                 ViewEvent::SetVesselEditor(vessel_editor) => self.vessel_editor = vessel_editor,
                 ViewEvent::SetDebugWindowOpen(debug_window_open) => self.debug_window_open = debug_window_open,
                 ViewEvent::SetDebugWindowTab(debug_window_tab) => self.debug_window_tab = debug_window_tab,
@@ -125,8 +136,11 @@ impl View {
                 ViewEvent::FinishObjective(objective) => {
                     self.objectives.iter_mut()
                         .find(|x| x.objective() == objective)
-                        .map_or_else(|| error!("Attempt to complete nonexistent objective {}", objective), |objective| objective.set_complete());
+                        .map_or_else(|| error!("Attempt to complete nonexistent objective {}", objective), Objective::set_complete);
                 },
+                ViewEvent::ExitLevel => self.add_controller_event(ControllerEvent::ExitLevel),
+                ViewEvent::FinishLevel(level) => self.add_controller_event(ControllerEvent::FinishLevel { level }),
+                ViewEvent::ToggleExitModal => self.exit_modal_open = !self.exit_modal_open,
             }
         }
     }

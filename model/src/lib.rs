@@ -83,7 +83,6 @@ impl Model {
     pub fn update(&mut self, dt: f64) -> Vec<StoryEvent> {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Model update");
-        self.story_events = Mutex::new(vec![]);
         self.explosions_started_this_frame.clear();
         self.update_warp(dt);
         self.update_time(dt);
@@ -95,7 +94,9 @@ impl Model {
         self.update_fuel();
         self.update_trajectory();
         self.update_guidance();
-        self.story_events.lock().unwrap().clone()
+        let story_events = self.story_events.lock().unwrap().clone();
+        self.story_events = Mutex::new(vec![]);
+        story_events
     }
 
     pub fn entities(&self, mut with_component_types: Vec<ComponentType>) -> HashSet<Entity> {

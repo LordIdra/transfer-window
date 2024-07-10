@@ -50,10 +50,12 @@ pub struct VesselBuilder {
 impl VesselBuilder {
     pub fn build(self, model: &mut Model) -> Entity {
         let orbit = self.orbit_builder.build(model, self.vessel_component.mass());
-        model.allocate(EntityBuilder::default()
+        let entity =model.allocate(EntityBuilder::default()
             .with_name_component(NameComponent::new(self.name.to_string()))
             .with_vessel_component(self.vessel_component)
-            .with_path_component(PathComponent::new_with_orbit(orbit)))
+            .with_path_component(PathComponent::new_with_orbit(orbit)));
+        model.recompute_trajectory(entity);
+        entity
     }
 }
 

@@ -15,7 +15,7 @@ uniform sampler2D texture_sampler;
 vec2 otho_projection(vec2 tex_coords, float rotation_angle) {
     // https://math.stackexchange.com/questions/2357999/mapping-a-circle-to-a-hemisphere
     // Map the coordinate onto a hemisphere
-    vec3 cart = vec3(tex_coords, sqrt(0.25 - tex_coords.x * tex_coords.x - tex_coords.y * tex_coords.y));
+    vec3 cart = vec3(tex_coords, sqrt(0.258 - tex_coords.x * tex_coords.x - tex_coords.y * tex_coords.y));
     cart = cart.zxy; // swizzler
 
     // Convert the cartesian coordinates to spherical coordinates
@@ -27,8 +27,8 @@ vec2 otho_projection(vec2 tex_coords, float rotation_angle) {
 
     // Normalize the spherical coordinates
     // Doing this creates a 1-pixel wide seam, but not doing it seems to be fine
-    // theta = mod(mod(theta, TAU) + TAU, TAU);
-    // phi = mod(mod(phi, TAU) + TAU, TAU);
+    //theta = mod(mod(theta, TAU) + TAU, TAU);
+    //phi = mod(mod(phi, TAU) + TAU, TAU);
 
     // Since the texure is an equirectangular projection, we can map the
     // spherical coordinates directly to the texture coordinates

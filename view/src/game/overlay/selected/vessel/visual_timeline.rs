@@ -219,6 +219,10 @@ fn generate_burn_guidance_end(view: &View, entity: Entity, events: &mut Vec<Visu
 }
 
 pub fn draw_visual_timeline(view: &View, ui: &mut Ui, entity: Entity, center_time: f64, draw_center_time_point: bool) {
+    if !view.config.draw_timeline {
+        return;
+    }
+    
     let mut events = vec![];
     let faction = view.model.vessel_component(entity).faction();
     let has_intel = Faction::Player.has_intel_for(faction);

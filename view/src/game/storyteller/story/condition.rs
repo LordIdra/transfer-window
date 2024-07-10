@@ -1,12 +1,14 @@
 use click_continue_condition::ClickContinueCondition;
 use focus_condition::FocusCondition;
 use none_condition::NoneCondition;
+use pause_condition::PauseCondition;
 use time_condition::TimeCondition;
 use transfer_window_model::{storage::entity_allocator::Entity, story_event::StoryEvent};
 
 pub mod click_continue_condition;
 pub mod focus_condition;
 pub mod none_condition;
+mod pause_condition;
 pub mod time_condition;
 
 pub struct Condition {
@@ -25,6 +27,10 @@ impl Condition {
 
     pub fn none() -> Self {
         Self { check: NoneCondition::new(), objective: None }
+    }
+
+    pub fn pause() -> Self {
+        Self { check: PauseCondition::new(), objective: None }
     }
 
     pub fn time(time: f64) -> Self {
