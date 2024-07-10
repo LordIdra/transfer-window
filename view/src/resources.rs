@@ -103,12 +103,7 @@ impl Resources {
             trace!("Building celestial object renderer for {}", texture_name);
             let clouds = self.textures.iter()
                 .filter(|(name, _)| name.starts_with(texture_name) && name.ends_with(".clouds"))
-                .sorted_by_key(|(name, _)|
-                    name.trim_start_matches(texture_name)
-                        .trim_start_matches('.')
-                        .parse::<u32>()
-                        .unwrap()
-                )
+                .sorted_by_key(|(name, _)| cloud_sorter(name))
                 .map(|(_, texture)| texture.gl_texture.texture())
                 .collect::<Vec<_>>();
             trace!("Cloud layers: {:?}", clouds.len());
@@ -124,4 +119,9 @@ impl Resources {
             texture.gl_texture.destroy(gl);
         }
     }
+}
+
+fn cloud_sorter(name: &str) -> u32 {
+    let split = name.split('.').collect::<Vec<_>>();
+    split[1].parse::<u32>().unwrap()
 }
