@@ -29,7 +29,8 @@ impl StoryBuilder for Story1_01 {
                 Color32::from_hex("#a0b5ff").unwrap(),
                 0.95,
                 0.3,
-                4.0
+                4.0,
+                vec![0.7]
             )
         }.build(&mut model);
 

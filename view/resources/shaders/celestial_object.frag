@@ -8,6 +8,8 @@ in float rotation_angle;
 
 uniform sampler2D texture_sampler;
 
+out vec4 FragColor;
+
 #define TAU 6.28318530718
 
 // This is magic, it is not to be touched at risk of sanity loss, world distortion,
@@ -39,5 +41,5 @@ void main() {
     vec2 tex_coords = otho_projection(v_tex_coord, rotation_angle);
     vec4 texture_color = texture(texture_sampler, tex_coords);
     float alpha = texture_color.a * v_alpha;
-    gl_FragColor = vec4(texture_color.rgb * alpha, alpha);
+    FragColor = vec4(texture_color.rgb * alpha, alpha);
 }

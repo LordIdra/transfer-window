@@ -36,7 +36,8 @@ impl StoryBuilder for Story1_02 {
                 Color32::from_hex("#a0b5ff").unwrap(),
                 0.95,
                 0.3,
-                4.0
+                4.0,
+                vec![0.7]
             )
         }.build(&mut model);
 
@@ -161,11 +162,11 @@ impl StoryBuilder for Story1_02 {
                 .action(CreateVesselAction::new(VesselBuilder {
                     name: "Demo Ship",
                     vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                    orbit_builder: OrbitBuilder::Circular { 
+                    orbit_builder: OrbitBuilder::Circular {
                         parent: centralia,
                         distance: 1.576e7,
                         angle: PI,
-                        direction: OrbitDirection::AntiClockwise, 
+                        direction: OrbitDirection::AntiClockwise,
                     },
                 }))
                 .action(ShowDialogueAction::new(
