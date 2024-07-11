@@ -1,9 +1,9 @@
-use std::f64::consts::PI;
-
 use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::api::time::TimeStep;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
+use transfer_window_model::components::vessel_component::engine::EngineType;
+use transfer_window_model::components::vessel_component::fuel_tank::FuelTankType;
 use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
 use crate::controller_events::ControllerEvent;
@@ -156,54 +156,46 @@ impl StoryBuilder for Story1_02 {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("First, select a new point where you wish to create the burn.")
-                    .with_continue()
             ));
             State::new("create-burn", Condition::select_any_orbit_point().objective("Select a point to create the burn"))
         });
 
-        story.add("create-burn-circularise", move |view| {
-            view.add_model_event(ModelEvent::BuildVessel { 
-                vessel_builder: VesselBuilder {
-                    name: "Demo Ship",
-                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                    orbit_builder: OrbitBuilder::Circular {
-                        parent: centralia,
-                        distance: 1.576e7,
-                        angle: PI,
-                        direction: OrbitDirection::AntiClockwise,
-                    },
-                }
-            });
+        story.add("create-burn", move |view| {
+            view.add_model_event(ModelEvent::SetEngine { entity: ship, type_: Some(EngineType::Regular) });
+            view.add_model_event(ModelEvent::SetFuelTank { entity: ship, type_: Some(FuelTankType::FuelTank1) });
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Great. Now, let's say we want to take this elliptical orbit and make it circular at the apoapsis. I've created a temporary vessel on the orbit we're aiming for to show you what I mean. How do we get to that orbit?")
-                    .with_continue()
+                    .normal("Now, click the ")
+                    .image("create-burn")
+                    .normal(" button to create a burn.")
             ));
-            State::new("create-burn-engines", Condition::click_continue())
+            State::new("start-burn-adjustment", Condition::create_burn_condition(ship).objective("Create a burn at your selected point"))
         });
 
-        story.add("create-burn-engines", |view| {
-            let demo_ship = view.model.entity_by_name("Demo Ship").unwrap();
-            view.add_model_event(ModelEvent::DeleteVessel { entity: demo_ship });
+        story.add("start-burn-adjustment", move |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Well, we'll need to fire the ship's engine at the apoapsis.")
-                    .with_continue()
+                    .normal("You'll notice the ")
+                    .image("burn")
+                    .normal(" icon that's now appeared at the selected point. Click that to start adjusting the burn.")
             ));
-            State::new("end", Condition::click_continue())
+            State::new("adjust-burn", Condition::start_burn_adjust().objective("Click the burn icon to start adjusting the burn"))
         });
 
-        story.add("create-burn", |view| {
+        story.add("adjust-burn", move |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("We'll need to fire the ship's engines somewhere. But where?")
+                    .normal("Now, you can drag the arrows to change the direction and length of the burn. Try adjusting the burn and see how the orbit will change when the burn's executed. When you're done, use ")
+                    .bold("escape")
+                    .normal(" to exit this mission and move on to the next one. We'll go through burns in much more depth there by creating a transfer orbit.")
                     .with_continue()
             ));
+            view.add_controller_event(ControllerEvent::FinishLevel { level: "1-02".to_string() });
             State::new("end", Condition::click_continue())
         });
 
         story.add("end", |view| {
-            view.add_controller_event(ControllerEvent::FinishLevel { level: "1-02".to_string() });
+            view.add_view_event(ViewEvent::CloseDialogue);
             State::default()
         });
 

@@ -20,7 +20,7 @@ pub fn update(view: &View) {
         .show(&view.context.clone(), |ui| {
             ui.vertical_centered(|ui| {
                 ui.add(CustomImage::new(view, "alert", 60.0));
-                ui.label(RichText::new("Exit to main menu? Your progress will be lost!").strong());
+                ui.label(RichText::new("Exit to main menu?").strong());
                 ui.add_space(20.0);
                 ui.horizontal(|ui| {
                     styles::DialogueContinueButton::apply(ui);

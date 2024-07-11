@@ -1,4 +1,7 @@
 use click_continue_condition::ClickContinueCondition;
+use create_burn_condition::CreateBurnCondition;
+use enable_guidance_condition::EnableGuidanceCondition;
+use fire_torpedo_condition::FireTorpedoCondition;
 use focus_condition::FocusCondition;
 use none_condition::NoneCondition;
 use pause_condition::PauseCondition;
@@ -6,10 +9,14 @@ use select_any_orbit_point_condition::SelectAnyOrbitPointCondition;
 use select_any_periapsis_condition::SelectAnyApoapsisCondition;
 use select_vessel_condition::SelectVesselCondition;
 use start_any_warp_condition::StartAnyWarpCondition;
+use start_burn_adjust_condition::StartBurnAdjustCondition;
 use time_condition::TimeCondition;
 use transfer_window_model::{storage::entity_allocator::Entity, story_event::StoryEvent};
 
 mod click_continue_condition;
+mod create_burn_condition;
+mod enable_guidance_condition;
+mod fire_torpedo_condition;
 mod focus_condition;
 mod none_condition;
 mod pause_condition;
@@ -17,6 +24,7 @@ mod select_any_orbit_point_condition;
 mod select_any_periapsis_condition;
 mod select_vessel_condition;
 mod start_any_warp_condition;
+mod start_burn_adjust_condition;
 mod time_condition;
 
 pub struct Condition {
@@ -27,6 +35,18 @@ pub struct Condition {
 impl Condition {
     pub fn click_continue() -> Self {
         Self { check: ClickContinueCondition::new(), objective: None }
+    }
+
+    pub fn create_burn_condition(entity: Entity) -> Self {
+        Self { check: CreateBurnCondition::new(entity), objective: None }
+    }
+
+    pub fn enable_guidance_condition(entity: Entity) -> Self {
+        Self { check: EnableGuidanceCondition::new(entity), objective: None }
+    }
+
+    pub fn fire_torpedo_condition(entity: Entity) -> Self {
+        Self { check: FireTorpedoCondition::new(entity), objective: None }
     }
 
     pub fn focus(entity: Entity) -> Self {
@@ -55,6 +75,10 @@ impl Condition {
 
     pub fn start_any_warp() -> Self {
         Self { check: StartAnyWarpCondition::new(), objective: None }
+    }
+
+    pub fn start_burn_adjust() -> Self {
+        Self { check: StartBurnAdjustCondition::new(), objective: None }
     }
 
     pub fn time(time: f64) -> Self {

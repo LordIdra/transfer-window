@@ -57,7 +57,7 @@ pub struct FuelTank {
 
 impl FuelTank {
     pub fn new(type_: FuelTankType) -> Self {
-        let remaining_litres = type_.capacity_litres() / 2.0;
+        let remaining_litres = type_.capacity_litres();
         FuelTank { type_, remaining_litres }
     }
 

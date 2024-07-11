@@ -189,14 +189,15 @@
 [x] Storyteller triggers
 [x] Storyteller events
 [x] Storyteller dialogue
-[x] 01 Welcome
+[x] 1-01
 [x] Vessel constructor
 [x] Orbitable constructor
 [x] Storyteller objectives
 [x] Persist completed levels
 [x] Different texture for completed/locked levels
 [x] Hide aspects of UI
-[ ] Exit to menu option
+[x] Exit to menu option
+[x] 1-02
 
 
 
@@ -208,13 +209,12 @@
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
 
 # Levels
-Chapter 1: Intro
-[ ] 02 Burns
-  - periapsis, apoapsis
-  - warp to point, pause
-  - get into elliptical orbit
-
-[ ] 03 Hohman
+[ ] 03 Hohmann
+  - start in low circular orbit, want to get to higher circular orbit
+  - only need to use tangent arrows (normal next time)
+  - create elliptical orbit to start with target apoapsis
+  - create another burn at apoapsis and circularise
+  - delta-v
 
 [ ] 04 Chase
   - set target
@@ -229,6 +229,7 @@ Chapter 1: Intro
   - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
   - fly by the moon
 
+MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT GOES
 - 06 Moon Orbit
   - open ended
   - orbit the moon and come back into LEO

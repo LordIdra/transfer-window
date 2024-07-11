@@ -212,7 +212,7 @@ impl Station {
         let target = None;
         let timeline = Timeline::default();
         let docking_ports = class.default_docking_ports();
-        let fuel_litres = class.max_fuel_litres() / 2.0;
+        let fuel_litres = class.max_fuel_litres();
         let torpedoes = class.max_torpedoes() / 2;
         Self { class, faction, target, timeline, docking_ports, fuel_litres, torpedoes }
     }
