@@ -52,6 +52,18 @@ impl View {
         self.model.set_time_step(time_step);
     }
 
+    pub fn force_pause(&mut self) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Force pause");
+        self.model.force_pause();
+    }
+
+    pub fn force_unpause(&mut self) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Force unpause");
+        self.model.force_unpause();
+    }
+
     pub fn build_vessel(&mut self, vessel_builder: VesselBuilder) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Build vessel");

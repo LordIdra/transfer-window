@@ -37,6 +37,13 @@ impl TimeStep {
         }
     }
 
+    pub(crate) fn set_paused(&mut self, new_paused: bool) {
+        match self {
+            TimeStep::Warp { speed: _, paused } | TimeStep::Level { level: _, paused } => *paused = new_paused
+        }
+        trace!("New time state: {:?}", self);
+    }
+
     pub(crate) fn toggle_paused(&mut self) {
         match self {
             TimeStep::Warp { speed: _, paused } | TimeStep::Level { level: _, paused } => *paused = !*paused,
@@ -79,6 +86,9 @@ impl TimeStep {
 
 impl Model {
     pub fn toggle_paused(&mut self) {
+        if self.force_paused {
+            return;
+        }
         self.time_step.toggle_paused();
         if self.time_step.paused() {
             self.add_story_event(StoryEvent::Paused);
@@ -86,18 +96,30 @@ impl Model {
     }
 
     pub fn increase_time_step_level(&mut self) {
+        if self.force_paused {
+            return;
+        }
         self.time_step.increase_level();
     }
 
     pub fn decrease_time_step_level(&mut self) {
+        if self.force_paused {
+            return;
+        }
         self.time_step.decrease_level();
     }
 
     pub fn set_time_step(&mut self, time_step: TimeStep) {
+        if self.force_paused {
+            return;
+        }
         self.time_step = time_step;
     }
 
     pub fn start_warp(&mut self, end_time: f64) {
+        if self.force_paused {
+            return;
+        }
         self.add_story_event(StoryEvent::WarpStarted);
         self.warp = Some(TimeWarp::new(self.time, end_time));
     }
@@ -116,5 +138,15 @@ impl Model {
 
     pub fn warp(&self) -> Option<&TimeWarp> {
         self.warp.as_ref()
+    }
+
+    pub fn force_pause(&mut self) {
+        self.time_step.set_paused(true);
+        self.force_paused = true;
+    }
+
+    pub fn force_unpause(&mut self) {
+        self.time_step.set_paused(false);
+        self.force_paused = false;
     }
 }

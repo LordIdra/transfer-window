@@ -1,4 +1,4 @@
-use transfer_window_model::story_event::StoryEvent;
+use crate::game::View;
 
 use super::ConditionCheck;
 
@@ -11,7 +11,7 @@ impl NoneCondition {
 }
 
 impl ConditionCheck for NoneCondition {
-    fn met(&self, _story_events: &Vec<StoryEvent>) -> bool {
+    fn met(&self, _view: &View) -> bool {
         true
     }
 }

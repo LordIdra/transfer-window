@@ -43,9 +43,18 @@ impl StoryBuilder for Story1_02 {
             )
         }.build(&mut model);
 
+        let view_config = ViewConfig {
+            draw_apsis_icons: true,
+            can_select: true,
+            draw_explorer: false,
+            draw_timeline: false,
+        };
+
         let ship = VesselBuilder {
             name: "Ship",
-            vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
+            vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
+                .with_engine(EngineType::Regular)
+                .with_fuel_tank(FuelTankType::FuelTank1),
             orbit_builder: OrbitBuilder::Freeform { 
                 parent: centralia,
                 distance: 1.0e7,
@@ -75,8 +84,6 @@ impl StoryBuilder for Story1_02 {
         });
 
         story.add("create-burn", move |view| {
-            view.add_model_event(ModelEvent::SetEngine { entity: ship, type_: Some(EngineType::Regular) });
-            view.add_model_event(ModelEvent::SetFuelTank { entity: ship, type_: Some(FuelTankType::FuelTank1) });
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("Now, click the ")
@@ -99,24 +106,180 @@ impl StoryBuilder for Story1_02 {
         story.add("adjust-burn", move |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Now, you can drag the arrows to change the direction and length of the burn. Try adjusting the burn and see how the orbit will change when the burn's executed. When you're starting to get the hang of it, press continue and we'll move on.")
+                    .normal("Now, you can drag the arrows to change the direction and length of the burn. Try adjusting the burn a bit to see how the orbit changes.\n\n")
+                    .normal("When you're ready to move on, press continue.")
                     .with_continue()
             ));
-            view.add_controller_event(ControllerEvent::FinishLevel { level: "1-02".to_string() });
-            State::new("hohmann-explanation", Condition::click_continue())
+            State::new("hohmann-1", Condition::click_continue())
+        });
+
+        story.add("hohmann-1", move |view| {
+            view.add_model_event(ModelEvent::ForcePause);
+            view.add_model_event(ModelEvent::DeleteVessel { entity: ship });
+            view.add_model_event(ModelEvent::BuildVessel { 
+                vessel_builder: VesselBuilder {
+                    name: "Ship",
+                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
+                        .with_engine(EngineType::Regular)
+                        .with_fuel_tank(FuelTankType::FuelTank1),
+                    orbit_builder: OrbitBuilder::Circular { 
+                        parent: centralia,
+                        distance: 1.0e7,
+                        angle: 0.0,
+                        direction: OrbitDirection::AntiClockwise, 
+                    },
+                }
+            });
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Let's now try our first orbital transfer. I've recreated the ship on a circular orbit at ")
+                    .bold("10,000km.")
+                    .normal("We're going to create a transfer to get to a circular orbit at ")
+                    .bold("15,000km.")
+                    .with_continue()
+            ));
+            State::new("hohmann-2", Condition::click_continue())
+        });
+
+        story.add("hohmann-2", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("We'll need to do this in two stages. Why? Well, if we fire our engines at any given point on the orbit, the resulting orbit will always include the point where we turn off our engines. So when we turn off our engines, we'd have to already be on the circular orbit!")
+                    .with_continue()
+            ));
+            State::new("hohmann-3", Condition::click_continue())
+        });
+
+        story.add("hohmann-3", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("In the first stage, we'll have to raise our apoapsis to 15,000km. In the second stage, we'll raise our periapsis to 15,000km. If both our periapsis and apoapsis are at the same height, the orbit will be circular.")
+                    .with_continue()
+            ));
+            State::new("hohmann-4", Condition::click_continue())
+        });
+
+        story.add("hohmann-4", |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Create a burn that injects us onto an orbit with an apoapsis at roughly 15,000km.")
+            ));
+            State::new("hohmann-5", Condition::last_orbit_apoapsis(ship, 14.7e6, 15.3e6)
+                .objective("Create a burn that injects the ship onto an orbit with an apoapsis between 14,700km and 15,300km"))
+        });
+
+        story.add("hohmann-5", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Great work! Now, we'll want to raise our periapsis to roughly 15,000km while keeping our apoapsis roughly the same to circularise our orbit.")
+                    .with_continue()
+            ));
+            State::new("hohmann-6", Condition::click_continue())
+        });
+
+        story.add("hohmann-6", |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Create a burn near the apoapsis that raises the periapsis to about 15,000km.")
+            ));
+            State::new("hohmann-7", Condition::last_orbit_circular(ship, 14.0e6, 16.0e6)
+                .objective("Create a burn that injects the ship onto an orbit with both periapsis and apoapsis between 14,000km and 15,000km"))
+        });
+
+        story.add("hohmann-7", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("And done! The transfer we just architected is called a 'Hohmann transfer.'")
+                    .with_continue()
+            ));
+            State::new("dv-1", Condition::click_continue())
+        });
+
+        story.add("dv-1", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Oh, I guess I should also explain Delta-V at this point.")
+                    .with_continue()
+            ));
+            State::new("dv-2", Condition::click_continue())
+        });
+
+        story.add("dv-2", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("When we perform a burn, we change the ship's velocity. That change in velocity is called the Delta-V, or ΔV, of the burn, and gives us a way to quantify how 'expensive' a burn is.")
+                    .with_continue()
+            ));
+            State::new("dv-3", Condition::click_continue())
+        });
+
+        story.add("dv-3", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("We could try and quantify burns by how much fuel is burnt, but as we burn fuel, the mass of the ship is reduced. That means we need to burn less fuel to achieve the same change in velocity, so the amount of fuel burnt for the same change in velocity depends on your starting fuel.")
+                    .with_continue()
+            )); 
+            State::new("warp-first-burn", Condition::click_continue())
+        });
+
+        story.add("warp-first-burn", |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
+            let time = view.model.future_burns(ship, Some(Faction::Player)).first().unwrap().start_point().time() - 10.0;
+            view.add_model_event(ModelEvent::ForceUnpause);
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Anyway, enough of that. Let's watch the transfer happen. Go ahead and warp to the first burn. Careful not to overshoot if you're doing it manually - but I recommend using the ")
+                    .image("warp-here")
+                    .normal(" button when you have the burn selected.")
+            ));
+            State::new("select-ship", Condition::time(time))
+        });
+
+        story.add("select-ship", |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
+            let time = view.model.future_burns(ship, Some(Faction::Player)).first().map_or_else(|| view.model.time(), |burn| burn.end_point().time());
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Now, select the ship, and watch the fuel tanks deplete as it executes this first burn.")
+            ));
+            State::new("warp-to-circle", Condition::time(time))
+        });
+
+        story.add("warp-to-circle", |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
+            let time = view.model.future_segments(ship, Some(Faction::Player)).last().unwrap().start_time();
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Now warp until the ship is on its final orbit.")
+            ));
+            State::new("conclusion-1", Condition::time(time))
+        });
+
+        story.add("conclusion-1", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Fantastic! That concludes this training level. You've done well.")
+                    .with_continue()
+            ));
+            State::new("conclusion-2", Condition::click_continue())
+        });
+
+        story.add("conclusion-2", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Next, we'll use what you've learnt here to rendezvous with a spacecraft.")
+                    .with_continue()
+            ));
+            State::new("end", Condition::click_continue())
         });
 
         story.add("end", |view| {
-            view.add_view_event(ViewEvent::CloseDialogue);
+            view.add_controller_event(ControllerEvent::FinishLevel { level: "1-02".to_string() });
+            view.add_controller_event(ControllerEvent::ExitLevel);
             State::default()
         });
-
-        let view_config = ViewConfig {
-            draw_apsis_icons: true,
-            can_select: true,
-            draw_explorer: false,
-            draw_timeline: false,
-        };
 
         (model, story, view_config, Some(centralia))
     }

@@ -1,5 +1,3 @@
-use transfer_window_model::story_event::StoryEvent;
-
 use crate::game::View;
 
 use super::condition::Condition;
@@ -36,8 +34,8 @@ impl State {
         self
     }
 
-    pub fn try_transition(&self, events: &Vec<StoryEvent>) -> Option<(&'static str, Option<&'static str>)> {
-        if self.transition.as_ref().is_some_and(|transition| transition.can_transition(events)) {
+    pub fn try_transition(&self, view: &View) -> Option<(&'static str, Option<&'static str>)> {
+        if self.transition.as_ref().is_some_and(|transition| transition.can_transition(view)) {
             Some((self.transition.as_ref().unwrap().to(), self.transition.as_ref().unwrap().objective()))
         } else {
             None

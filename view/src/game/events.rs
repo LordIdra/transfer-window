@@ -22,6 +22,8 @@ pub enum ModelEvent {
     DecreaseTimeStepLevel,
     StartWarp { end_time: f64 },
     SetTimeStep { time_step: TimeStep },
+    ForcePause,
+    ForceUnpause,
     BuildVessel { vessel_builder: VesselBuilder },
     DeleteVessel { entity: Entity },
     CreateBurn { entity: Entity, time: f64 },
@@ -67,7 +69,7 @@ pub enum ViewEvent {
 
 impl View {
     pub(crate) fn handle_events(&mut self) {
-        self.story.update(&self);
+        self.story.update(self);
         self.story_events.lock().unwrap().clear();
 
         let model_events = self.model_events.clone();
@@ -82,6 +84,8 @@ impl View {
                 ModelEvent::DecreaseTimeStepLevel => self.decrease_time_step_level(),
                 ModelEvent::StartWarp { end_time } => self.start_warp(end_time),
                 ModelEvent::SetTimeStep { time_step } => self.set_time_step(time_step),
+                ModelEvent::ForcePause => self.force_pause(),
+                ModelEvent::ForceUnpause => self.force_unpause(),
                 ModelEvent::BuildVessel { vessel_builder } => self.build_vessel(vessel_builder),
                 ModelEvent::DeleteVessel { entity } => self.delete_vessel(entity),
                 ModelEvent::CreateBurn { entity, time } => self.create_burn(entity, time),

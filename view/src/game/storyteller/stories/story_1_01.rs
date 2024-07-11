@@ -43,6 +43,13 @@ impl StoryBuilder for Story1_01 {
             )
         }.build(&mut model);
 
+        let view_config = ViewConfig {
+            draw_apsis_icons: false,
+            can_select: false,
+            draw_explorer: false,
+            draw_timeline: false,
+        };
+
         let mut story = Story::new("intro-1");
 
         story.add("intro-1", |view| {
@@ -343,13 +350,6 @@ impl StoryBuilder for Story1_01 {
             view.add_controller_event(ControllerEvent::ExitLevel);
             State::default()
         });
-
-        let view_config = ViewConfig {
-            draw_apsis_icons: false,
-            can_select: false,
-            draw_explorer: false,
-            draw_timeline: false,
-        };
 
         (model, story, view_config, Some(centralia))
     }

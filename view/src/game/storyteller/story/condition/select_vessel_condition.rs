@@ -1,6 +1,8 @@
 use transfer_window_model::storage::entity_allocator::Entity;
 use transfer_window_model::story_event::StoryEvent;
 
+use crate::game::View;
+
 use super::{story_events_contains, ConditionCheck};
 
 pub struct SelectVesselCondition {
@@ -14,7 +16,7 @@ impl SelectVesselCondition {
 }
 
 impl ConditionCheck for SelectVesselCondition {
-    fn met(&self, story_events: &Vec<StoryEvent>) -> bool {
+    fn met(&self, view: &View) -> bool {
         let condition = |event: &StoryEvent| {
             if let StoryEvent::VesselSelected(entity) = event {
                 *entity == self.entity
@@ -22,7 +24,7 @@ impl ConditionCheck for SelectVesselCondition {
                 false
             }
         };
-        story_events_contains(story_events, condition)
+        story_events_contains(view, condition)
     }
 }
 

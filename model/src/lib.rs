@@ -36,6 +36,7 @@ pub struct Model {
     time: f64,
     time_step: TimeStep,
     warp: Option<TimeWarp>,
+    force_paused: bool,
     explosions_started_this_frame: Vec<Explosion>,
 }
 
@@ -51,6 +52,7 @@ impl Default for Model {
             time: 0.0,
             time_step: TimeStep::Level{ level: 1, paused: false },
             warp: None,
+            force_paused: false,
             explosions_started_this_frame: vec![],
         }
     }

@@ -41,7 +41,7 @@ impl Default for ViewConfig {
             draw_apsis_icons: true, 
             can_select: true, 
             draw_explorer: true,
-            draw_timeline: false,
+            draw_timeline: true,
         }
     }
 }

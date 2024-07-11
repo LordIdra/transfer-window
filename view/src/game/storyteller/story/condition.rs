@@ -3,6 +3,8 @@ use create_burn_condition::CreateBurnCondition;
 use enable_guidance_condition::EnableGuidanceCondition;
 use fire_torpedo_condition::FireTorpedoCondition;
 use focus_condition::FocusCondition;
+use last_orbit_apoapsis_condition::LastOrbitApoapsis;
+use last_orbit_circular_condition::LastOrbitCircular;
 use none_condition::NoneCondition;
 use pause_condition::PauseCondition;
 use select_any_orbit_point_condition::SelectAnyOrbitPointCondition;
@@ -13,11 +15,15 @@ use start_burn_adjust_condition::StartBurnAdjustCondition;
 use time_condition::TimeCondition;
 use transfer_window_model::{storage::entity_allocator::Entity, story_event::StoryEvent};
 
+use crate::game::View;
+
 mod click_continue_condition;
 mod create_burn_condition;
 mod enable_guidance_condition;
 mod fire_torpedo_condition;
 mod focus_condition;
+mod last_orbit_apoapsis_condition;
+mod last_orbit_circular_condition;
 mod none_condition;
 mod pause_condition;
 mod select_any_orbit_point_condition;
@@ -51,6 +57,14 @@ impl Condition {
 
     pub fn focus(entity: Entity) -> Self {
         Self { check: FocusCondition::new(entity), objective: None }
+    }
+
+    pub fn last_orbit_apoapsis(entity: Entity, min: f64, max: f64) -> Self {
+        Self { check: LastOrbitApoapsis::new(entity, min, max), objective: None }
+    }
+
+    pub fn last_orbit_circular(entity: Entity, min: f64, max: f64) -> Self {
+        Self { check: LastOrbitCircular::new(entity, min, max), objective: None }
     }
 
     pub fn none() -> Self {
@@ -90,8 +104,8 @@ impl Condition {
         self
     }
 
-    pub(super) fn met(&self, story_events: &Vec<StoryEvent>) -> bool {
-        self.check.met(story_events)
+    pub(super) fn met(&self, view: &View) -> bool {
+        self.check.met(view)
     }
 
     pub(super) fn get_objective(&self) -> Option<&'static str> {
@@ -100,9 +114,9 @@ impl Condition {
 }
 
 pub trait ConditionCheck {
-    fn met(&self, story_events: &Vec<StoryEvent>) -> bool;
+    fn met(&self, view: &View) -> bool;
 }
 
-fn story_events_contains<T: Fn(&StoryEvent) -> bool>(story_events: &Vec<StoryEvent>, condition: T) -> bool {
-    story_events.iter().any(condition)
+fn story_events_contains<T: Fn(&StoryEvent) -> bool>(view: &View, condition: T) -> bool {
+    view.story_events.lock().unwrap().iter().any(condition)
 }

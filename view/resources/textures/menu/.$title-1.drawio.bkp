@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-07-11T22:50:21.758Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.5.3 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="FThbgWu8E3IPq622Jq7E" version="24.5.3" type="device">
+<mxfile host="Electron" modified="2024-07-11T22:50:17.078Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.5.3 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="lZUQydalUn2CXo7ylZFG" version="24.5.3" type="device">
   <diagram name="Page-1" id="bXB1TlRVmh4tXXcqfVWb">
     <mxGraphModel dx="1348" dy="830" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -10,7 +10,7 @@
         <mxCell id="Heeshr9j2n27mW7Kai5F-1" value="TRAINING" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=80;fontFamily=Courier New;fontStyle=1;fontColor=#00E8F0;" parent="1" vertex="1">
           <mxGeometry x="360" y="320" width="390" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="Heeshr9j2n27mW7Kai5F-3" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;CHAPTER 1&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=30;fontFamily=Courier New;fontStyle=1;fontColor=#077287;" parent="1" vertex="1">
+        <mxCell id="Heeshr9j2n27mW7Kai5F-3" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;CHAPTER 1&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=30;fontFamily=Courier New;fontStyle=1;fontColor=#008709;" parent="1" vertex="1">
           <mxGeometry x="380" y="390" width="390" height="37" as="geometry" />
         </mxCell>
       </root>

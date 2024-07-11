@@ -3,7 +3,6 @@ use std::{collections::HashSet, sync::{Arc, Mutex}};
 use eframe::{egui::{CentralPanel, Context, CursorIcon, Key, Rect, Sense, Ui, Vec2, Window}, glow};
 use log::trace;
 
-use crate::game::storyteller::stories::story_1_03::Story1_03;
 use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer, storyteller::stories::{story_1_01::Story1_01, story_1_02::Story1_02, StoryBuilder}}, resources::Resources};
 
 impl CustomImage {
@@ -107,7 +106,7 @@ impl View {
                     ui.horizontal(|ui| {
                         self.draw_level(context, ui, &mut events, completed_levels, "1-01", Box::new(Story1_01));
                         self.draw_level(context, ui, &mut events, completed_levels, "1-02", Box::new(Story1_02));
-                        self.draw_level(context, ui, &mut events, completed_levels, "1-03", Box::new(Story1_03));
+                        // self.draw_level(context, ui, &mut events, completed_levels, "1-03", Box::new(Story1_03));
                     });
                     // ui.add_space(15.0);
                     // ui.horizontal(|ui| {

@@ -1,5 +1,7 @@
 use transfer_window_model::story_event::StoryEvent;
 
+use crate::game::View;
+
 use super::{story_events_contains, ConditionCheck};
 
 pub struct TimeCondition{
@@ -13,7 +15,7 @@ impl TimeCondition {
 }
 
 impl ConditionCheck for TimeCondition {
-    fn met(&self, story_events: &Vec<StoryEvent>) -> bool {
+    fn met(&self, view: &View) -> bool {
         let condition = |event: &StoryEvent| {
             if let StoryEvent::NewTime(time) = event {
                 *time >= self.time
@@ -21,7 +23,7 @@ impl ConditionCheck for TimeCondition {
                 false
             }
         };
-        story_events_contains(story_events, condition)
+        story_events_contains(view, condition)
     }
 }
 

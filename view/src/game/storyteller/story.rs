@@ -38,7 +38,7 @@ impl Story {
     }
 
     pub fn update(&self, view: &View) {
-        let Some((state_string, objective)) = self.state.lock().unwrap().try_transition(&view.story_events.lock().unwrap()) else { 
+        let Some((state_string, objective)) = self.state.lock().unwrap().try_transition(view) else { 
             return 
         };
 
@@ -49,7 +49,7 @@ impl Story {
         
         if let Some(transition) = self.state.lock().unwrap().get_transition() {
             if let Some(objective) = transition.objective() {
-                view.add_view_event(ViewEvent::StartObjective(objective))
+                view.add_view_event(ViewEvent::StartObjective(objective));
             }
         }
 

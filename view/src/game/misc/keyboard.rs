@@ -49,12 +49,10 @@ pub fn update(view: &View) {
         if input.key_pressed(Key::Escape) {
             if view.vessel_editor.is_some() {
                 view.add_view_event(ViewEvent::SetVesselEditor(None));
+            } else if matches!(view.selected, Selected::None) {
+                view.add_view_event(ViewEvent::ToggleExitModal);
             } else {
-                if matches!(view.selected, Selected::None) {
-                    view.add_view_event(ViewEvent::ToggleExitModal);
-                } else {
-                    view.add_view_event(ViewEvent::SetSelected(Selected::None));
-                }
+                view.add_view_event(ViewEvent::SetSelected(Selected::None));
             }
         }
     });

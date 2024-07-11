@@ -1,4 +1,4 @@
-use transfer_window_model::story_event::StoryEvent;
+use crate::game::View;
 
 use super::condition::Condition;
 
@@ -12,8 +12,8 @@ impl Transition {
         Self { to, condition }
     }
 
-    pub fn can_transition(&self, events: &Vec<StoryEvent>) -> bool {
-        self.condition.met(events)
+    pub fn can_transition(&self, view: &View) -> bool {
+        self.condition.met(view)
     }
     
     pub fn to(&self) -> &'static str {

@@ -1,5 +1,7 @@
 use transfer_window_model::{storage::entity_allocator::Entity, story_event::StoryEvent};
 
+use crate::game::View;
+
 use super::{story_events_contains, ConditionCheck};
 
 pub struct FocusCondition {
@@ -13,7 +15,7 @@ impl FocusCondition {
 }
 
 impl ConditionCheck for FocusCondition {
-    fn met(&self,story_events: &Vec<StoryEvent>) -> bool {
+    fn met(&self, view: &View) -> bool {
         let condition = |event: &StoryEvent| {
             if let StoryEvent::ChangeFocus(entity) = event {
                 *entity == self.entity
@@ -21,7 +23,7 @@ impl ConditionCheck for FocusCondition {
                 false
             }
         };
-        story_events_contains(story_events, condition)
+        story_events_contains(view, condition)
     }
 }
 
