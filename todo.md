@@ -219,11 +219,13 @@
 [ ] 04 Chase
   - set target
   - explanation of closest approaches
+  - enable timeline
   - catch up to a spacecraft in front
   - then drop back to a spacecraft behind
   - get within X km
 
 - 05 Translunar
+  - unlock explorer
   - spheres of influence
   - first intercept not necessarily the best, keep going
   - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)

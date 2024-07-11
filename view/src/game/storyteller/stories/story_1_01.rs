@@ -1,5 +1,7 @@
 use eframe::epaint::Color32;
 use nalgebra_glm::vec2;
+use transfer_window_model::components::vessel_component::engine::EngineType;
+use transfer_window_model::components::vessel_component::fuel_tank::FuelTankType;
 use transfer_window_model::{api::{builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 
@@ -134,7 +136,7 @@ impl StoryBuilder for Story1_01 {
                     .bold("Right click ")
                     .normal("the ship and click the ")
                     .image("focus")
-                    .normal(" button to focus the camera on it.")
+                    .normal(" button to focus the camera on it. When an object is focused, the camera will move with it.")
             ));
             State::new("basic-controls-end", Condition::focus(ship).objective("Focus the ship"))
         });
@@ -216,16 +218,121 @@ impl StoryBuilder for Story1_01 {
         story.add("orbit-ellipse-explanation", |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Notice how it moves much slower when it gets further from the planet? I started it off at the exact same position, but moving faster than the first spacecraft. And yet, it takes much longer to complete an orbit than the first spacecraft. Take a moment to think about that.")
+                    .normal("Notice how it moves much slower when it gets further from the planet? I started it off at the exact same position, but moving faster than the first spacecraft. And yet, it takes much longer to complete an orbit than the first spacecraft. This is one of the many counterintuitive things about orbital mechanics.")
                     .with_continue()
             ));
-            State::new("orbit-conclusion", Condition::click_continue())
+            State::new("orbit-apsis", Condition::click_continue())
         });
 
-        story.add("orbit-conclusion", |view| {
+        story.add("orbit-apsis", move |view| {
+            let ship_1 = view.model.entity_by_name("Ship 1").unwrap();
+            let ship_2 = view.model.entity_by_name("Ship 2").unwrap();
+            view.add_view_event(ViewEvent::SetCameraFocus(centralia));
+            view.add_model_event(ModelEvent::DeleteVessel { entity: ship_1 });
+            view.add_model_event(ModelEvent::DeleteVessel { entity: ship_2 });
+            view.add_model_event(ModelEvent::SetTimeStep { time_step: TimeStep::Level { level: 1, paused: false } });
+            view.add_view_event(ViewEvent::SetConfig(ViewConfig { 
+                draw_apsis_icons: true, 
+                can_select: true, 
+                draw_explorer: false, 
+                draw_timeline: false 
+            }));
+            view.add_model_event(ModelEvent::BuildVessel { 
+                vessel_builder: VesselBuilder {
+                    name: "Ship",
+                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
+                        .with_fuel_tank(FuelTankType::FuelTank1)
+                        .with_engine(EngineType::Regular),
+                    orbit_builder: OrbitBuilder::Freeform {
+                        parent: centralia,
+                        distance: 1.0e7,
+                        speed: 7.0e3,
+                        angle: 0.0,
+                        direction: OrbitDirection::AntiClockwise, 
+                    },
+                }
+            });
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("There are lots of counterintuitive things about orbits, and you might find it hard to wrap your head around some of them. The rest of this training will help you learn how to reason about orbits, and soon you'll be using them to your advantage on the battlefield.")
+                    .normal("I've created a new ship, and enabled apoapsis (")
+                    .image("apoapsis")
+                    .normal(") and periapsis (")
+                    .image("periapsis")
+                    .normal(") indicators.\n")
+                    .normal("- The apoapsis is the")
+                    .bold(" highest ")
+                    .normal("point in an orbit\n")
+                    .normal("- The periapsis is the")
+                    .bold(" lowest ")
+                    .normal("point in an orbit\n")
+                    .normal("Don't worry about too much about remembering which one is which - you can always check on the fly.")
+                    .with_continue()
+            ));
+            State::new("apsis-explanation", Condition::click_continue())
+        });
+
+        story.add("apsis-explanation", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("The periapsis and apoapsis give us a useful way to think about orbits. Most orbits you'll be dealing with won't be circular, so it helps to know what the lowest and highest points are. You'll see what I mean when we start constructing orbits ourselves.")
+                    .with_continue()
+            ));
+            State::new("select-vessel", Condition::click_continue())
+        });
+
+        story.add("select-vessel", move |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Anyway, let's observe what happens to the ship as it reaches the periapsis and apoapsis. Click the ship to select it, so we can see its altitude and speed.")
+            ));
+            State::new("warp-one-orbit", Condition::select_vessel(ship).objective("Select the ship"))
+        });
+
+        story.add("warp-one-orbit", move |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
+            let ship_period = view.model.current_segment(ship).as_orbit().unwrap().period().unwrap();
+            let time = view.model.time() + ship_period;
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Try speeding up the simulation again and watch how the altitude and speed change as we reach the periapsis and apoapsis.")
+            ));
+            State::new("select-apoapsis", Condition::time(time).objective("Warp forwards one orbit"))
+        });
+
+        story.add("select-apoapsis", |view| {
+            view.add_model_event(ModelEvent::SetTimeStep { time_step: TimeStep::Level { level: 1, paused: false } });
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("We can check what the altitude and speed is at an apsis by selecting it. Try clicking the ")
+                    .image("apoapsis")
+                    .normal(" symbol to select the apoapsis.")
+            ));
+            State::new("select-orbit-point", Condition::select_any_apoapsis().objective("Select the apoapsis"))
+        });
+
+        story.add("select-orbit-point", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("In fact, we can find out the altitude and speed at any point on the orbit. Try selecting a point on the orbit by clicking somewhere on it.")
+            ));
+            State::new("warp-to-point", Condition::select_any_orbit_point().objective("Select a point on the orbit"))
+        });
+
+        story.add("warp-to-point", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("You can also warp to the point you selected - it's much more precise to do that rather than fiddling around with manual warps. Try clicking the ")
+                    .image("warp-here")
+                    .normal(" button to warp to your selected point.")
+            ));
+            State::new("conclusion", Condition::start_any_warp().objective("Warp to the selected point on the orbit"))
+        });
+
+        story.add("conclusion", |view| {
+            view.add_view_event(ViewEvent::ShowDialogue(
+                Dialogue::new("jake")
+                    .normal("Great work. That concludes the first training level. Next, we'll look at how to use the ship's engines to perform adjustments and transfers.")
                     .with_continue()
             ));
             State::new("end", Condition::click_continue())

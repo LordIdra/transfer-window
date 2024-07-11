@@ -7,6 +7,7 @@ use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, compo
 use crate::game::selected::util::BurnState;
 use crate::game::{overlay::{dialogue::Dialogue, objectives::Objective}, util::ApsisType};
 
+use super::ViewConfig;
 use super::{debug::DebugWindowTab, overlay::vessel_editor::VesselEditor, selected::Selected, View};
 
 mod model;
@@ -61,6 +62,7 @@ pub enum ViewEvent {
     StartObjective(&'static str),
     FinishObjective(&'static str),
     ToggleExitModal,
+    SetConfig(ViewConfig),
 }
 
 impl View {
@@ -150,6 +152,7 @@ impl View {
                         .map_or_else(|| error!("Attempt to complete nonexistent objective {}", objective), Objective::set_complete);
                 },
                 ViewEvent::ToggleExitModal => self.exit_modal_open = !self.exit_modal_open,
+                ViewEvent::SetConfig(config) => self.config = config,
             }
         }
     }

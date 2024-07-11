@@ -27,6 +27,7 @@ pub mod storyteller;
 mod underlay;
 mod util;
 
+#[derive(Debug, Clone)]
 pub struct ViewConfig {
     draw_apsis_icons: bool,
     can_select: bool,

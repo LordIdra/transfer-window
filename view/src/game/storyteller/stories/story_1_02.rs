@@ -1,6 +1,5 @@
 use eframe::egui::Color32;
 use nalgebra_glm::vec2;
-use transfer_window_model::api::time::TimeStep;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 use transfer_window_model::components::vessel_component::engine::EngineType;
 use transfer_window_model::components::vessel_component::fuel_tank::FuelTankType;
@@ -61,92 +60,7 @@ impl StoryBuilder for Story1_02 {
         story.add("intro", |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Welcome back. Let's discuss some more about orbits.")
-                    .with_continue()
-            ));
-            State::new("apsis-icons", Condition::click_continue())
-        });
-
-        story.add("apsis-icons", |view| {
-            view.add_view_event(ViewEvent::ShowDialogue(
-                Dialogue::new("jake")
-                    .normal("I've enabled apoapsis (")
-                    .image("apoapsis")
-                    .normal(") and periapsis (")
-                    .image("periapsis")
-                    .normal(") indicators.\n")
-                    .normal("- The apoapsis is the")
-                    .bold(" highest ")
-                    .normal("point in an orbit\n")
-                    .normal("- The periapsis is the")
-                    .bold(" lowest ")
-                    .normal("point in an orbit\n")
-                    .normal("Don't worry about too much about remembering which one is which - you can always check on the fly.")
-                    .with_continue()
-            ));
-            State::new("apsis-explanation", Condition::click_continue())
-        });
-
-        story.add("apsis-explanation", |view| {
-            view.add_view_event(ViewEvent::ShowDialogue(
-                Dialogue::new("jake")
-                    .normal("The periapsis and apoapsis give us a useful way to think about orbits. Most orbits you'll be dealing with won't be circular, so it helps to know what the lowest and highest points are. You'll see what I mean when we start constructing orbits ourselves.")
-                    .with_continue()
-            ));
-            State::new("select-vessel", Condition::click_continue())
-        });
-
-        story.add("select-vessel", move |view| {
-            view.add_view_event(ViewEvent::ShowDialogue(
-                Dialogue::new("jake")
-                    .normal("Anyway, let's observe what happens to the ship as it reaches the periapsis and apoapsis. Click the ship to select it, so we can see its altitude and speed.")
-            ));
-            State::new("warp-one-orbit", Condition::select_vessel(ship).objective("Select the ship"))
-        });
-
-        story.add("warp-one-orbit", move |view| {
-            let ship_period = view.model.current_segment(ship).as_orbit().unwrap().period().unwrap();
-            let time = view.model.time() + ship_period;
-            view.add_view_event(ViewEvent::ShowDialogue(
-                Dialogue::new("jake")
-                    .normal("Try speeding up the simulation again and watch how the altitude and speed change as we reach the periapsis and apoapsis.")
-            ));
-            State::new("select-apoapsis", Condition::time(time).objective("Warp forwards one orbit"))
-        });
-
-        story.add("select-apoapsis", |view| {
-            view.add_model_event(ModelEvent::SetTimeStep { time_step: TimeStep::Level { level: 1, paused: false } });
-            view.add_view_event(ViewEvent::ShowDialogue(
-                Dialogue::new("jake")
-                    .normal("We can check what the altitude and speed is at an apsis by selecting it. Try clicking the ")
-                    .image("apoapsis")
-                    .normal(" symbol to select the apoapsis.")
-            ));
-            State::new("select-orbit-point", Condition::select_any_apoapsis().objective("Select the apoapsis"))
-        });
-
-        story.add("select-orbit-point", |view| {
-            view.add_view_event(ViewEvent::ShowDialogue(
-                Dialogue::new("jake")
-                    .normal("In fact, we can find out the altitude and speed at any point on the orbit. Try selecting a point on the orbit by clicking somewhere on it.")
-            ));
-            State::new("warp-to-point", Condition::select_any_orbit_point().objective("Select a point on the orbit"))
-        });
-
-        story.add("warp-to-point", |view| {
-            view.add_view_event(ViewEvent::ShowDialogue(
-                Dialogue::new("jake")
-                    .normal("You can also warp to the point you selected - it's much more precise to do that rather than fiddling around with manual warps. Try clicking the ")
-                    .image("warp-here")
-                    .normal(" button to warp to your selected point.")
-            ));
-            State::new("burn-explanation", Condition::start_any_warp().objective("Warp to the selected point on the orbit"))
-        });
-
-        story.add("burn-explanation", |view| {
-            view.add_view_event(ViewEvent::ShowDialogue(
-                Dialogue::new("jake")
-                    .normal("Great. Now, let's try firing the ship's engines to adjust our orbit. We call this a 'burn' since we're burning fuel.")
+                    .normal("Let's fire the ship's engines to adjust an orbit. We often call this adjustment a 'burn' since, well, we're burning fuel to do it.")
                     .with_continue()
             ));
             State::new("select-point-for-burn", Condition::click_continue())
@@ -185,13 +99,11 @@ impl StoryBuilder for Story1_02 {
         story.add("adjust-burn", move |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Now, you can drag the arrows to change the direction and length of the burn. Try adjusting the burn and see how the orbit will change when the burn's executed. When you're done, use ")
-                    .bold("escape")
-                    .normal(" to exit this mission and move on to the next one. We'll go through burns in much more depth there by creating a transfer orbit.")
+                    .normal("Now, you can drag the arrows to change the direction and length of the burn. Try adjusting the burn and see how the orbit will change when the burn's executed. When you're starting to get the hang of it, press continue and we'll move on.")
                     .with_continue()
             ));
             view.add_controller_event(ControllerEvent::FinishLevel { level: "1-02".to_string() });
-            State::new("end", Condition::click_continue())
+            State::new("hohmann-explanation", Condition::click_continue())
         });
 
         story.add("end", |view| {
