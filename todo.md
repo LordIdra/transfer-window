@@ -198,38 +198,32 @@
 [x] Hide aspects of UI
 [x] Exit to menu option
 [x] 1-02
+[x] Planet textures/generation, atmosphere shaders?
+[x] Measure altitude in km from SURFACE not centre
+[x] 1-03
 
 
 
 # ------------------------------------ #
 # CAMPAIGN PLANNING AREA
 # ------------------------------------ #
-# Backend
 - Remember to upgrade ship and unlock new equipment
 - Satellite which loses power every so often, small window to intercept, reverse orbit direction
+- Low DV for torpedoes so have to accelerate ship?
 
 # Levels
-[ ] 03 Hohmann
-  - start in low circular orbit, want to get to higher circular orbit
-  - only need to use tangent arrows (normal next time)
-  - create elliptical orbit to start with target apoapsis
-  - create another burn at apoapsis and circularise
-  - delta-v
-
-[ ] 04 Chase
-  - set target
-  - explanation of closest approaches
-  - enable timeline
-  - catch up to a spacecraft in front
-  - then drop back to a spacecraft behind
-  - get within X km
-
-- 05 Translunar
+[ ] 1-04 Translunar
+  - centralia has moon
   - unlock explorer
   - spheres of influence
-  - first intercept not necessarily the best, keep going
+  - first encounter not necessarily the best, keep going
   - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
-  - fly by the moon
+  - orbit moon to finish mission
+
+[ ] 1-05 Review
+  - review of previous missions
+  - get to moon, get into orbit, drop orbit, intercept ship, then get back into LEO
+  - be careful with delta-v - always want to maximise dv efficiency
 
 MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT GOES
 - 06 Moon Orbit
@@ -296,8 +290,8 @@ MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT 
 # PROJECTS AREA
 # ------------------------------------ #
 # Projects
-[ ] Planet textures/generation, atmosphere shaders?
 [ ] Proper planet texture sourcing
+[ ] Main menu background GIFs
 [ ] Collisions with planets (nearly forgot about that lmao)
 [ ] Ballistic weaponry
 [ ] Point defense
@@ -306,7 +300,6 @@ MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT 
 [ ] PDC shells not affected by gravity?
 [ ] Different fuel/lox mixtures
 [ ] Energy production/storage/consumptiongit pull
-[ ] Main menu background GIFs
 
 # Before release
 [ ] Versioning!

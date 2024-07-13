@@ -2,6 +2,7 @@ use std::fs;
 
 use log::error;
 use nalgebra_glm::DVec2;
+use transfer_window_model::story_event::StoryEvent;
 use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, engine::EngineType, fuel_tank::FuelTankType, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}, torpedo_launcher::TorpedoLauncherType, torpedo_storage::TorpedoStorageType}, storage::entity_allocator::Entity};
 
 use crate::game::View;
@@ -102,6 +103,9 @@ impl View {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Set target");
         self.model.vessel_component_mut(entity).set_target(target);
+        if let Some(target) = target {
+            self.add_story_event(StoryEvent::SetTarget { entity, target });
+        }
     }
 
     pub fn set_fuel_tank(&mut self, entity: Entity, type_: Option<FuelTankType>) {
@@ -141,7 +145,7 @@ impl View {
 
     pub fn adjust_fire_torpedo(&mut self, entity: Entity, time: f64, amount: DVec2) {
         #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Adjust burn");
+        let _span = tracy_client::span!("Adjust fire torpedo");
         self.model.timeline_event_at_time(entity, time)
             .as_fire_torpedo()
             .unwrap()

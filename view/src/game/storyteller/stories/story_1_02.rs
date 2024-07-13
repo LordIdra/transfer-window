@@ -57,7 +57,7 @@ impl StoryBuilder for Story1_02 {
                 .with_fuel_tank(FuelTankType::FuelTank1),
             orbit_builder: OrbitBuilder::Freeform { 
                 parent: centralia,
-                distance: 1.0e7,
+                distance: 9.371e6,
                 speed: 7.0e3,
                 angle: 0.0,
                 direction: OrbitDirection::AntiClockwise, 
@@ -75,12 +75,12 @@ impl StoryBuilder for Story1_02 {
             State::new("select-point-for-burn", Condition::click_continue())
         });
 
-        story.add("select-point-for-burn", |view| {
+        story.add("select-point-for-burn", move |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("First, select a new point where you wish to create the burn.")
             ));
-            State::new("create-burn", Condition::select_any_orbit_point().objective("Select a point to create the burn"))
+            State::new("create-burn", Condition::select_any_orbit_point(ship).objective("Select a point to create the burn"))
         });
 
         story.add("create-burn", move |view| {
@@ -90,7 +90,7 @@ impl StoryBuilder for Story1_02 {
                     .image("create-burn")
                     .normal(" button to create a burn.")
             ));
-            State::new("start-burn-adjustment", Condition::create_burn_condition(ship).objective("Create a burn at your selected point"))
+            State::new("start-burn-adjustment", Condition::create_burn(ship).objective("Create a burn at your selected point"))
         });
 
         story.add("start-burn-adjustment", move |view| {
@@ -124,7 +124,7 @@ impl StoryBuilder for Story1_02 {
                         .with_fuel_tank(FuelTankType::FuelTank1),
                     orbit_builder: OrbitBuilder::Circular { 
                         parent: centralia,
-                        distance: 1.0e7,
+                        distance: 9.371e6,
                         angle: 0.0,
                         direction: OrbitDirection::AntiClockwise, 
                     },
@@ -132,10 +132,10 @@ impl StoryBuilder for Story1_02 {
             });
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Let's now try our first orbital transfer. I've recreated the ship on a circular orbit at ")
-                    .bold("10,000km.")
-                    .normal("We're going to create a transfer to get to a circular orbit at ")
-                    .bold("15,000km.")
+                    .normal("Let's now try our first orbital transfer. I've recreated the ship on a circular orbit at about ")
+                    .bold("3,000km.")
+                    .normal("We're going to create a transfer to get to a circular orbit at about ")
+                    .bold("6,000km.")
                     .with_continue()
             ));
             State::new("hohmann-2", Condition::click_continue())
@@ -153,7 +153,7 @@ impl StoryBuilder for Story1_02 {
         story.add("hohmann-3", |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("In the first stage, we'll have to raise our apoapsis to 15,000km. In the second stage, we'll raise our periapsis to 15,000km. If both our periapsis and apoapsis are at the same height, the orbit will be circular.")
+                    .normal("In the first stage, we'll have to raise our apoapsis to 6,000km. In the second stage, we'll raise our periapsis to 6,000km. If both our periapsis and apoapsis are at the same height, the orbit will be circular.")
                     .with_continue()
             ));
             State::new("hohmann-4", Condition::click_continue())
@@ -163,16 +163,16 @@ impl StoryBuilder for Story1_02 {
             let ship = view.model.entity_by_name("Ship").unwrap();
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Create a burn that injects us onto an orbit with an apoapsis at roughly 15,000km.")
+                    .normal("Create a burn that injects us onto an orbit with an apoapsis at roughly 6,000km.")
             ));
-            State::new("hohmann-5", Condition::last_orbit_apoapsis(ship, 14.7e6, 15.3e6)
-                .objective("Create a burn that injects the ship onto an orbit with an apoapsis between 14,700km and 15,300km"))
+            State::new("hohmann-5", Condition::last_orbit_apoapsis(ship, 5.8e6, 6.2e6)
+                .objective("Create a burn that injects the ship onto an orbit with an apoapsis between 5,800km and 6,200km"))
         });
 
         story.add("hohmann-5", |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Great work! Now, we'll want to raise our periapsis to roughly 15,000km while keeping our apoapsis roughly the same to circularise our orbit.")
+                    .normal("Great work! Now, we'll want to raise our periapsis to roughly 6,000km while keeping our apoapsis roughly the same to circularise our orbit.")
                     .with_continue()
             ));
             State::new("hohmann-6", Condition::click_continue())
@@ -182,10 +182,10 @@ impl StoryBuilder for Story1_02 {
             let ship = view.model.entity_by_name("Ship").unwrap();
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Create a burn near the apoapsis that raises the periapsis to about 15,000km.")
+                    .normal("Create a burn near the apoapsis that raises the periapsis to about 6,000km.")
             ));
-            State::new("hohmann-7", Condition::last_orbit_circular(ship, 14.0e6, 16.0e6)
-                .objective("Create a burn that injects the ship onto an orbit with both periapsis and apoapsis between 14,000km and 15,000km"))
+            State::new("hohmann-7", Condition::last_orbit_circular(ship, 5.5e6, 6.5e6)
+                .objective("Create a burn that injects the ship onto an orbit with both periapsis and apoapsis between 5,500km and 6,500km"))
         });
 
         story.add("hohmann-7", |view| {

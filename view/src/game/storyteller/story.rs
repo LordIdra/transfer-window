@@ -3,6 +3,7 @@ use std::sync::Mutex;
 
 use condition::Condition;
 use state::{State, StateCreator};
+use transfer_window_model::storage::entity_allocator::Entity;
 use transition::Transition;
 
 use crate::game::events::ViewEvent;
@@ -16,6 +17,7 @@ pub struct Story {
     state_creators: HashMap<&'static str, StateCreator>,
     state: Mutex<State>,
     state_string: Mutex<&'static str>,
+    persistent_data: HashMap<String, Entity>,
 }
 
 impl Story {
@@ -23,7 +25,8 @@ impl Story {
         let state_creators = HashMap::new();
         let state = Mutex::new(State::default().transition(Transition::new(root, Condition::none())));
         let state_string = Mutex::new("uninitialized");
-        Self { state_creators, state, state_string }
+        let persistent_data = HashMap::new();
+        Self { state_creators, state, state_string, persistent_data }
     }
 
     pub fn empty() -> Self {
@@ -35,6 +38,14 @@ impl Story {
     pub(super) fn add(&mut self, name: &'static str, factory: impl Fn(&View) -> State + 'static) {
         assert!(!self.state_creators.contains_key(name), "Duplicate state {name}");
         self.state_creators.insert(name, StateCreator::new(Box::new(factory)));
+    }
+
+    pub fn add_persistent_data(&mut self, key: &str, entity: Entity) {
+        self.persistent_data.insert(key.to_string(), entity);
+    }
+
+    pub(super) fn get_persistent_data(&self, key: &str) -> Entity {
+        *self.persistent_data.get(key).unwrap_or_else(|| panic!("Attempt to get nonexistent persistent data with key {}", key))
     }
 
     pub fn update(&self, view: &View) {

@@ -17,7 +17,7 @@ impl Model {
     }
 
     /// # Panics
-    /// Panics if there is no create torpedo event at the specified time
+    /// Panics if there is no timeline event at the specified time
     pub fn timeline_event_at_time(&self, entity: Entity, time: f64) -> &TimelineEvent {
         self.vessel_component(entity)
             .timeline()

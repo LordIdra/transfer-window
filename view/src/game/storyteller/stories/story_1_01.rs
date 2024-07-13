@@ -308,6 +308,7 @@ impl StoryBuilder for Story1_01 {
         });
 
         story.add("select-apoapsis", |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
             view.add_model_event(ModelEvent::SetTimeStep { time_step: TimeStep::Level { level: 1, paused: false } });
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
@@ -315,15 +316,16 @@ impl StoryBuilder for Story1_01 {
                     .image("apoapsis")
                     .normal(" symbol to select the apoapsis.")
             ));
-            State::new("select-orbit-point", Condition::select_any_apoapsis().objective("Select the apoapsis"))
+            State::new("select-orbit-point", Condition::select_any_apoapsis(ship).objective("Select the apoapsis"))
         });
 
         story.add("select-orbit-point", |view| {
+            let ship = view.model.entity_by_name("Ship").unwrap();
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("In fact, we can find out the altitude and speed at any point on the orbit. Try selecting a point on the orbit by clicking somewhere on it.")
             ));
-            State::new("warp-to-point", Condition::select_any_orbit_point().objective("Select a point on the orbit"))
+            State::new("warp-to-point", Condition::select_any_orbit_point(ship).objective("Select a point on the orbit"))
         });
 
         story.add("warp-to-point", |view| {

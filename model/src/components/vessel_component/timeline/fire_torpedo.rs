@@ -26,7 +26,7 @@ impl FireTorpedoEvent {
         let orbit = Orbit::new(
             fire_from_orbit.parent(), rocket_equation_function.mass(), parent_mass, 
             point_at_time.position(), point_at_time.velocity(), time);
-
+        
         let ghost = model.allocate(EntityBuilder::default()
             .with_name_component(NameComponent::new("Torpedo".to_string()))
             .with_path_component(PathComponent::new_with_orbit(orbit))

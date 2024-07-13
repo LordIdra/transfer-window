@@ -23,10 +23,10 @@ impl ConditionCheck for LastOrbitCircular {
         let orbit = &view.model.path_component(self.entity).final_orbit().unwrap();
 
         let argument_of_periapsis = orbit.argument_of_periapsis();
-        let periapsis = orbit.position_from_theta(argument_of_periapsis).magnitude();
+        let periapsis = orbit.position_from_theta(argument_of_periapsis).magnitude() - view.model.orbitable_component(orbit.parent()).radius();
 
         let argument_of_apoapsis = orbit.argument_of_periapsis() + PI;
-        let apoapsis = orbit.position_from_theta(argument_of_apoapsis).magnitude();
+        let apoapsis = orbit.position_from_theta(argument_of_apoapsis).magnitude() - view.model.orbitable_component(orbit.parent()).radius();
 
         apoapsis >= self.min && apoapsis <= self.max && periapsis >= self.min && periapsis <= self.max
     }

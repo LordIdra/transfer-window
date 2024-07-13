@@ -1,10 +1,11 @@
 use eframe::{egui::{Align2, Ui, Window}, epaint};
+use transfer_window_model::storage::entity_allocator::Entity;
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::draw_select_vessel, custom_image_button::CustomCircularImageButton, labels::{draw_subtitle, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
 use super::{burn::draw_burn_labels, vessel::visual_timeline::draw_visual_timeline};
 
-fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: transfer_window_model::storage::entity_allocator::Entity) {
+fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
     ui.horizontal(|ui| {
         styles::SelectedMenuButton::apply(ui);
         ui.set_height(36.0);
@@ -39,11 +40,10 @@ pub fn update(view: &View) {
         return
     };
 
-    if view.model.fire_torpedo_event_at_time(entity, time).is_none() {
+    let Some(fire_torpedo_event) = view.model.fire_torpedo_event_at_time(entity, time) else {
         return;
     };
 
-    let fire_torpedo_event = view.model.fire_torpedo_event_at_time(entity, time).unwrap();
     let vessel_component = view.model.vessel_component(fire_torpedo_event.ghost());
     let burn = view.model.burn_starting_at_time(fire_torpedo_event.ghost(), fire_torpedo_event.burn_time());
     let max_dv = vessel_component.max_dv();
@@ -61,6 +61,6 @@ pub fn update(view: &View) {
             draw_controls(ui, view, time, entity);
             draw_subtitle(ui, "Burn");
             draw_burn_labels(view, ui, max_dv, start_dv, end_dv, duration);
-            draw_visual_timeline(view, ui, entity, time, false);
+            draw_visual_timeline(view, ui, fire_torpedo_event.ghost(), time, false);
         });
 }

@@ -1,21 +1,28 @@
+use transfer_window_model::storage::entity_allocator::Entity;
 use transfer_window_model::story_event::StoryEvent;
 
 use crate::game::View;
 
 use super::{story_events_contains, ConditionCheck};
 
-pub struct SelectAnyApoapsisCondition;
+pub struct SelectAnyApoapsisCondition {
+    entity: Entity,
+}
 
 impl SelectAnyApoapsisCondition {
-    pub fn new() -> Box<dyn ConditionCheck> {
-        Box::new(Self {})
+    pub fn new(entity: Entity) -> Box<dyn ConditionCheck> {
+        Box::new(Self { entity })
     }
 }
 
 impl ConditionCheck for SelectAnyApoapsisCondition {
     fn met(&self, view: &View) -> bool {
         let condition = |event: &StoryEvent| {
-            matches!(event, StoryEvent::AnyApoapsisSelected)
+            if let StoryEvent::ApoapsisSelected(entity) = event {
+                *entity == self.entity
+            } else {
+                false
+            }
         };
         story_events_contains(view, condition)
     }

@@ -7,7 +7,7 @@ use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImag
 
 enum VisualTimelineEvent {
     TimelineEvent(TimelineEvent),
-    Apsis { type_: ApsisType, time: f64, distance: f64 },
+    Apsis { type_: ApsisType, time: f64, altitude: f64 },
     Approach { type_: ApproachType, target: Entity, time: f64, distance: f64 },
     Encounter { type_: EncounterType, time: f64, from: Entity, to: Entity },
     Point { time: f64 },
@@ -79,7 +79,7 @@ impl VisualTimelineEvent {
                 TimelineEvent::Burn(_) => "Burn Start".to_string(),
                 TimelineEvent::EnableGuidance(_) => "Guidance Start".to_string(),
             }
-            VisualTimelineEvent::Apsis { type_, distance, .. } => match type_ {
+            VisualTimelineEvent::Apsis { type_, altitude: distance, .. } => match type_ {
                 ApsisType::Periapsis => format!("Periapsis - {}", format_distance(*distance)),
                 ApsisType::Apoapsis => format!("Apoapsis - {}", format_distance(*distance)),
             }
@@ -102,7 +102,7 @@ impl VisualTimelineEvent {
                 TimelineEvent::Burn(burn) => Selected::Burn { entity, time: burn.time(), state: BurnState::Selected },
                 TimelineEvent::EnableGuidance(enable_guidance) => Selected::EnableGuidance { entity, time: enable_guidance.time() },
             }),
-            VisualTimelineEvent::Apsis { type_, time, distance: _ } => Some(Selected::Apsis { type_: *type_, entity, time: *time }),
+            VisualTimelineEvent::Apsis { type_, time, altitude: _ } => Some(Selected::Apsis { type_: *type_, entity, time: *time }),
             VisualTimelineEvent::Approach { type_, target, time, distance: _ } => Some(Selected::Approach { type_: *type_, entity, target: *target, time: *time }),
             VisualTimelineEvent::Encounter { type_, time, from, to } => Some(Selected::Encounter { type_: *type_, entity, time: *time, from: *from, to: *to }),
             VisualTimelineEvent::Point { .. } 
@@ -172,13 +172,13 @@ fn generate_timeline_events(view: &View, entity: Entity, events: &mut Vec<Visual
 fn generate_apoapsis_periapsis(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
     for orbit in view.model.future_orbits(entity, Some(Faction::Player)) {
         if let Some(time) = orbit.next_periapsis_time() {
-            let distance = orbit.point_at_time(time).position().magnitude();
-            events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Periapsis, time, distance });
+            let altitude = view.model.altitude_at_time(entity, time, Some(Faction::Player));
+            events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Periapsis, time, altitude });
         }
 
         if let Some(time) = orbit.next_apoapsis_time() {
-            let distance = orbit.point_at_time(time).position().magnitude();
-            events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Apoapsis, time, distance });
+            let altitude = view.model.altitude_at_time(entity, time, Some(Faction::Player));
+            events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Apoapsis, time, altitude });
         }
     }
 }

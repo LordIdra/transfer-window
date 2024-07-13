@@ -31,7 +31,7 @@ pub fn draw_subtitle(ui: &mut Ui, name: &str) {
 
 pub fn draw_altitude_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_key(ui, "Altitude");
-    draw_value(ui, &format_distance(view.model.position_at_time(entity, time, Some(Faction::Player)).magnitude()));
+    draw_value(ui, &format_distance(view.model.altitude_at_time(entity, time, Some(Faction::Player))));
     ui.end_row();
 }
 
@@ -49,7 +49,7 @@ pub fn draw_mass(view: &View, ui: &mut Ui, entity: Entity) {
 
 pub fn draw_altitude(view: &View, ui: &mut Ui, entity: Entity) {
     ui.label(RichText::new("Altitude").size(12.0).strong());
-    ui.label(RichText::new(format_distance(view.model.position(entity).magnitude())).size(12.0));
+    ui.label(RichText::new(format_distance(view.model.altitude(entity))).size(12.0));
     ui.end_row();
 }
 

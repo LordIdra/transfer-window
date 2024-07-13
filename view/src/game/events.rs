@@ -65,11 +65,16 @@ pub enum ViewEvent {
     FinishObjective(&'static str),
     ToggleExitModal,
     SetConfig(ViewConfig),
+    SetPersistentData(&'static str, Entity),
 }
 
 impl View {
     pub(crate) fn handle_events(&mut self) {
+        // Unfortunate workaround where some conditions will execute before the action has been carried out
+        // For example, fire torpedo event created -> condition fires before the event is actually created
+        // To solve this, we buffer story events by a frame
         self.story.update(self);
+        self.previous_story_events = self.story_events.lock().unwrap().clone();
         self.story_events.lock().unwrap().clear();
 
         let model_events = self.model_events.clone();
@@ -124,20 +129,30 @@ impl View {
                 },
                 ViewEvent::SetSelected(selected) => {
                     if self.config.can_select {
-                        if matches!(selected, Selected::Apsis { type_: ApsisType::Apoapsis, .. }) {
-                            self.add_story_event(StoryEvent::AnyApoapsisSelected);
+                        if let Selected::Apsis { type_: ApsisType::Apoapsis, entity, .. } = selected {
+                            self.add_story_event(StoryEvent::ApoapsisSelected(entity));
                         }
-                        if matches!(selected, Selected::OrbitPoint { .. }) {
-                            self.add_story_event(StoryEvent::AnyOrbitPointSelected);
+                        
+                        if let Selected::OrbitPoint { entity, .. } = selected {
+                            self.add_story_event(StoryEvent::OrbitPointSelected(entity));
                         }
+                        
                         if let Selected::Vessel(entity) = selected {
                             self.add_story_event(StoryEvent::VesselSelected(entity));
                         }
+
                         if let Selected::Burn { state, .. } = &selected {
                             if matches!(state, BurnState::Adjusting) {
                                 self.add_story_event(StoryEvent::StartBurnAdjust);
                             }
                         }
+
+                        if let Selected::FireTorpedo { state, .. } = &selected {
+                            if matches!(state, BurnState::Adjusting) {
+                                self.add_story_event(StoryEvent::FireTorpedoAdjust);
+                            }
+                        }
+
                         self.selected = selected;
                     }
                 }
@@ -157,6 +172,7 @@ impl View {
                 },
                 ViewEvent::ToggleExitModal => self.exit_modal_open = !self.exit_modal_open,
                 ViewEvent::SetConfig(config) => self.config = config,
+                ViewEvent::SetPersistentData(key, entity) => self.story.add_persistent_data(key, entity),
             }
         }
     }

@@ -264,12 +264,24 @@ impl Model {
         (self.absolute_position_at_time(entity, time, observer) - self.absolute_position_at_time(other_entity, time, observer)).magnitude()
     }
 
+    pub fn altitude_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> f64 {
+        let parent = self.parent_at_time(entity, time, observer);
+        let parent_radius = self.orbitable_component(parent.unwrap()).radius();
+        self.position_at_time(entity, time, observer).magnitude() - parent_radius
+    }
+
     pub fn relative_speed_at_time(&self, entity: Entity, other_entity: Entity, time: f64, observer: Option<Faction>) -> f64 {
         (self.absolute_velocity_at_time(entity, time, observer) - self.absolute_velocity_at_time(other_entity, time, observer)).magnitude()
     }
 
     pub fn distance(&self, entity: Entity, other_entity: Entity) -> f64 {
         (self.absolute_position(entity) - self.absolute_position(other_entity)).magnitude()
+    }
+
+    pub fn altitude(&self, entity: Entity) -> f64 {
+        let parent = self.parent(entity);
+        let parent_radius = self.orbitable_component(parent.unwrap()).radius();
+        self.position(entity).magnitude() - parent_radius
     }
 
     pub fn relative_speed(&self, entity: Entity, other_entity: Entity) -> f64 {

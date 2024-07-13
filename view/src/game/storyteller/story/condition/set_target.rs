@@ -5,21 +5,22 @@ use crate::game::View;
 
 use super::{story_events_contains, ConditionCheck};
 
-pub struct SelectAnyOrbitPointCondition {
+pub struct SetTargetCondition {
     entity: Entity,
+    target: Entity,
 }
 
-impl SelectAnyOrbitPointCondition {
-    pub fn new(entity: Entity) -> Box<dyn ConditionCheck> {
-        Box::new(Self { entity })
+impl SetTargetCondition {
+    pub fn new(entity: Entity, target: Entity) -> Box<dyn ConditionCheck> {
+        Box::new(Self { entity, target })
     }
 }
 
-impl ConditionCheck for SelectAnyOrbitPointCondition {
+impl ConditionCheck for SetTargetCondition {
     fn met(&self, view: &View) -> bool {
         let condition = |event: &StoryEvent| {
-            if let StoryEvent::OrbitPointSelected(entity) = event {
-                *entity == self.entity
+            if let StoryEvent::SetTarget { entity, target } = event {
+                *entity == self.entity && *target == self.target
             } else {
                 false
             }
@@ -27,4 +28,3 @@ impl ConditionCheck for SelectAnyOrbitPointCondition {
         story_events_contains(view, condition)
     }
 }
-
