@@ -269,7 +269,7 @@ impl StoryBuilder for Story1_02 {
         story.add("conclusion-2", |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("Next, we'll use what you've learnt here to rendezvous with a spacecraft.")
+                    .normal("Next, we'll use what you've learnt so far to intercept an enemy spacecraft.")
                     .with_continue()
             ));
             State::new("end", Condition::click_continue())

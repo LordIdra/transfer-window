@@ -213,17 +213,20 @@
 
 # Levels
 [ ] 1-04 Translunar
+  - watch your dv in this mission
   - centralia has moon
   - unlock explorer
   - spheres of influence
   - first encounter not necessarily the best, keep going
+  - get into moon orbit
   - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
-  - orbit moon to finish mission
+  - escape moon orbit to finish mission
 
 [ ] 1-05 Review
-  - review of previous missions
-  - get to moon, get into orbit, drop orbit, intercept ship, then get back into LEO
+  - final review of previous missions before you go into the 'real world'
   - be careful with delta-v - always want to maximise dv efficiency
+  - less guidance than the last few missions
+  - get to moon, get into orbit, drop orbit, intercept ship, then get back into LEO
 
 MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT GOES
 - 06 Moon Orbit

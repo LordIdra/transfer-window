@@ -64,7 +64,7 @@ impl StoryBuilder for Story1_01 {
         story.add("intro-2", |view| {
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
-                    .normal("My name's Jake, and I'll be training you on the basics of using the Interface. Once you've finished your training, you'll work to solve real-world orbital warfare problems.")
+                    .normal("My name's Jake, and I'll be training you on the basics of using the Interface and orbital mechanics. Please bear with me if you've covered orbital mechanics beforehand; there is still a lot to learn with regards to the Interface. Once you've finished your training, you'll work to solve real-world orbital warfare problems.")
                     .with_continue()
             ));
             State::new("intro-3", Condition::click_continue())
