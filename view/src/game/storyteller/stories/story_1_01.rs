@@ -1,7 +1,5 @@
 use eframe::epaint::Color32;
 use nalgebra_glm::vec2;
-use transfer_window_model::components::vessel_component::engine::EngineType;
-use transfer_window_model::components::vessel_component::fuel_tank::FuelTankType;
 use transfer_window_model::{api::{builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 
@@ -247,9 +245,7 @@ impl StoryBuilder for Story1_01 {
             view.add_model_event(ModelEvent::BuildVessel { 
                 vessel_builder: VesselBuilder {
                     name: "Ship",
-                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
-                        .with_fuel_tank(FuelTankType::Tank1)
-                        .with_engine(EngineType::Regular),
+                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
                     orbit_builder: OrbitBuilder::Freeform {
                         parent: centralia,
                         distance: 1.0e7,

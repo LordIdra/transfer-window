@@ -1,7 +1,7 @@
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::class::VesselClass}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, PathComponent}, vessel_component::{class::VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 const TIME_BEFORE_BURN_START: f64 = 0.1;
 const INITIAL_DV: DVec2 = DVec2::new(0.0, 1.0);
@@ -16,13 +16,13 @@ pub struct FireTorpedoEvent {
 
 impl FireTorpedoEvent {
     pub fn new(model: &mut Model, fire_from: Entity, time: f64) -> Self {
-        let mut vessel_component = VesselClass::Torpedo.build(model.vessel_component(fire_from).faction());
+        let mut vessel_component = VesselComponent::new(VesselClass::Torpedo, model.vessel_component(fire_from).faction());
         vessel_component.set_target(model.vessel_component(fire_from).target());
 
         let fire_from_orbit = model.orbit_at_time(fire_from, time, None);
         let point_at_time = fire_from_orbit.point_at_time(time);
         let parent_mass = model.mass(fire_from_orbit.parent());
-        let rocket_equation_function = RocketEquationFunction::from_vessel_component(&vessel_component);
+        let rocket_equation_function = RocketEquationFunction::fuel_from_vessel_component(&vessel_component);
         let orbit = Orbit::new(
             fire_from_orbit.parent(), rocket_equation_function.mass(), parent_mass, 
             point_at_time.position(), point_at_time.velocity(), time);

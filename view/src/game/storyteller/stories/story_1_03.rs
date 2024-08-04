@@ -1,10 +1,6 @@
 use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
-use transfer_window_model::components::vessel_component::engine::EngineType;
-use transfer_window_model::components::vessel_component::fuel_tank::FuelTankType;
-use transfer_window_model::components::vessel_component::torpedo_launcher::TorpedoLauncherType;
-use transfer_window_model::components::vessel_component::torpedo_storage::TorpedoStorageType;
 use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
 use crate::controller_events::ControllerEvent;
@@ -47,11 +43,7 @@ impl StoryBuilder for Story1_03 {
 
         let player_ship = VesselBuilder {
             name: "Ship",
-            vessel_component: VesselComponent::new(VesselClass::Frigate1, Faction::Player)
-                .with_engine(EngineType::Regular)
-                .with_fuel_tank(FuelTankType::Tank1)
-                .with_torpedo_storage(TorpedoStorageType::TorpedoStorage1)
-                .with_torpedo_launcher(TorpedoLauncherType::TorpedoLauncher1),
+            vessel_component: VesselComponent::new(VesselClass::Frigate1, Faction::Player),
             orbit_builder: OrbitBuilder::Circular {
                 parent: centralia,
                 distance: 9.371e6,

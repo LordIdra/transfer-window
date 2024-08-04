@@ -6,10 +6,8 @@ fn get_ship_size(class: VesselClass) -> f64 {
     match class {
         VesselClass::Scout1 => 100.0,
         VesselClass::Torpedo => todo!(),
-        VesselClass::Hub => todo!(),
-        VesselClass::Scout2 => todo!(),
+        VesselClass::Station => todo!(),
         VesselClass::Frigate1 => todo!(),
-        VesselClass::Frigate2 => todo!(),
     }
 }
 

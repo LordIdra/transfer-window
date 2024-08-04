@@ -27,12 +27,15 @@ pub mod timeline;
 pub mod torpedo_launcher;
 pub mod torpedo_storage;
 
+
 /// Must have `MassComponent` and (if undocked) `PathComponent`
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct VesselComponent {
     class: VesselClass,
     faction: Faction,
+    dry_mass: f64,
     is_ghost: bool,
+    can_dock: bool,
     timeline: Timeline,
     target: Option<Entity>,
     fuel_tank: Option<FuelTank>,
@@ -46,45 +49,71 @@ pub struct VesselComponent {
 
 impl VesselComponent {
     pub fn new(class: VesselClass, faction: Faction) -> Self {
-        let is_ghost = false;
-        let timeline = Timeline::default();
-        let target = None;
-        let fuel_tank = None;
-        let engine = None;
-        let monopropellant_tank = None;
-        let rcs = None;
-        let torpedo_storage = None;
-        let torpedo_launcher = None;
-        let docking = None;
-        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, monopropellant_tank, rcs, torpedo_storage, torpedo_launcher, docking }
-    }
+        match class {
+            VesselClass::Torpedo => Self { 
+                class, faction,
+                dry_mass: 2.0e3,
+                is_ghost: true,
+                can_dock: false,
+                timeline: Timeline::default(),
+                target: None,
+                fuel_tank: Some(FuelTank::new(FuelTankType::Torpedo)),
+                engine: Some(Engine::new(EngineType::Torpedo)),
+                monopropellant_tank: Some(MonopropellantTank::new(MonopropellantTankType::Torpedo)),
+                rcs: Some(Rcs::new(RcsType::LightRcs)),
+                torpedo_storage: None,
+                torpedo_launcher: None,
+                docking: None,
+            },
 
-    // ------------------------
-    // Builders
-    // ------------------------
-    pub fn with_fuel_tank(mut self, type_: FuelTankType) -> Self {
-        self.set_fuel_tank(Some(type_));
-        self
-    }
+            VesselClass::Station => Self { 
+                class, faction,
+                dry_mass: 380.0e3,
+                is_ghost: false,
+                can_dock: false,
+                timeline: Timeline::default(),
+                target: None,
+                fuel_tank: Some(FuelTank::new(FuelTankType::Hub)),
+                engine: None,
+                monopropellant_tank: None,
+                rcs: None,
+                torpedo_storage: Some(TorpedoStorage::new(TorpedoStorageType::Hub)),
+                torpedo_launcher: None,
+                docking: Some(Docking::new(DockingType::Quadruple)),
+            },
 
-    pub fn with_engine(mut self, type_: EngineType) -> Self {
-        self.set_engine(Some(type_));
-        self
-    }
+            VesselClass::Scout1 => Self {
+                class, faction,
+                dry_mass: 10.0e3,
+                is_ghost: false,
+                can_dock: true,
+                timeline: Timeline::default(),
+                target: None,
+                fuel_tank: Some(FuelTank::new(FuelTankType::Tank1)),
+                engine: Some(Engine::new(EngineType::Regular)),
+                monopropellant_tank: Some(MonopropellantTank::new(MonopropellantTankType::Tank1)),
+                rcs: Some(Rcs::new(RcsType::LightRcs)),
+                torpedo_storage: None,
+                torpedo_launcher: None,
+                docking: None,
+            },
 
-    pub fn with_torpedo_storage(mut self, type_: TorpedoStorageType) -> Self {
-        self.set_torpedo_storage(Some(type_));
-        self
-    }
-
-    pub fn with_torpedo_launcher(mut self, type_: TorpedoLauncherType) -> Self {
-        self.set_torpedo_launcher(Some(type_));
-        self
-    }
-
-    pub fn with_docking(mut self, type_: DockingType) -> Self {
-        self.set_docking(Some(type_));
-        self
+            VesselClass::Frigate1 => Self {
+                class, faction,
+                dry_mass: 30.0e3,
+                is_ghost: false,
+                can_dock: true,
+                timeline: Timeline::default(),
+                target: None,
+                fuel_tank: Some(FuelTank::new(FuelTankType::Tank2)),
+                engine: Some(Engine::new(EngineType::Regular)),
+                monopropellant_tank: Some(MonopropellantTank::new(MonopropellantTankType::Tank2)),
+                rcs: Some(Rcs::new(RcsType::LightRcs)),
+                torpedo_storage: Some(TorpedoStorage::new(TorpedoStorageType::TorpedoStorage1)),
+                torpedo_launcher: Some(TorpedoLauncher::new(TorpedoLauncherType::TorpedoLauncher1)),
+                docking: None,
+            },
+        }
     }
 
     // ------------------------
@@ -105,10 +134,6 @@ impl VesselComponent {
 
     pub fn faction(&self) -> Faction {
         self.faction
-    }
-
-    pub fn is_editable(&self) -> bool {
-        self.class.editable()
     }
 
     pub fn is_ghost(&self) -> bool {
@@ -147,14 +172,6 @@ impl VesselComponent {
     // ------------------------
     pub fn has_fuel_tank(&self) -> bool {
         self.fuel_tank.is_some()
-    }
-
-    pub fn fuel_tank_type(&self) -> Option<FuelTankType> {
-        self.fuel_tank.as_ref().map(FuelTank::type_)
-    }
-
-    pub fn set_fuel_tank(&mut self, type_: Option<FuelTankType>) {
-        self.fuel_tank = type_.map(FuelTank::new);
     }
 
     pub fn fuel_capacity_litres(&self) -> f64 {
@@ -206,14 +223,6 @@ impl VesselComponent {
         self.monopropellant_tank.is_some()
     }
 
-    pub fn monopropellant_tank_type(&self) -> Option<MonopropellantTankType> {
-        self.monopropellant_tank.as_ref().map(MonopropellantTank::type_)
-    }
-
-    pub fn set_monopropellant_tank(&mut self, type_: Option<MonopropellantTankType>) {
-        self.monopropellant_tank = type_.map(MonopropellantTank::new);
-    }
-
     pub fn monopropellant_capacity_litres(&self) -> f64 {
         match &self.monopropellant_tank {
             Some(monopropellant_tank) => monopropellant_tank.capacity_litres(),
@@ -260,7 +269,7 @@ impl VesselComponent {
     // Mass
     // ------------------------
     pub fn dry_mass(&self) -> f64 {
-        self.class.mass()
+        self.dry_mass
             + self.docking.as_ref().map_or(0.0, |x| x.type_().mass())
             + self.fuel_tank.as_ref().map_or(0.0, |x| x.type_().mass())
             + self.monopropellant_tank.as_ref().map_or(0.0, |x| x.type_().mass())
@@ -274,6 +283,14 @@ impl VesselComponent {
         self.dry_mass() + self.fuel_capacity_kg() + self.monopropellant_capacity_kg()
     }
 
+    pub fn fuel_wet_mass(&self) -> f64 {
+        self.dry_mass() + self.fuel_capacity_kg()
+    }
+
+    pub fn monopropellant_wet_mass(&self) -> f64 {
+        self.dry_mass() + self.monopropellant_capacity_kg()
+    }
+
     pub fn mass(&self) -> f64 {
         self.dry_mass() + self.fuel_kg() + self.monopropellant_kg()
     }
@@ -283,14 +300,6 @@ impl VesselComponent {
     // ------------------------
     pub fn has_engine(&self) -> bool {
         self.engine.is_some()
-    }
-
-    pub fn engine_type(&self) -> Option<EngineType> {
-        self.engine.as_ref().map(Engine::type_)
-    }
-
-    pub fn set_engine(&mut self, type_: Option<EngineType>) {
-        self.engine = type_.map(Engine::new);
     }
 
     pub fn specific_impulse(&self) -> Option<f64> {
@@ -335,27 +344,11 @@ impl VesselComponent {
         self.rcs.is_some()
     }
 
-    pub fn rcs_type(&self) -> Option<RcsType> {
-        self.rcs.as_ref().map(Rcs::type_)
-    }
-
-    pub fn set_rcs(&mut self, type_: Option<RcsType>) {
-        self.rcs = type_.map(Rcs::new);
-    }
-
     // ------------------------
     // Torpedo storage
     // ------------------------
     pub fn has_torpedo_storage(&self) -> bool {
         self.torpedo_storage.is_some()
-    }
-
-    pub fn torpedo_storage_type(&self) -> Option<TorpedoStorageType> {
-        self.torpedo_storage.as_ref().map(TorpedoStorage::type_)
-    }
-
-    pub fn set_torpedo_storage(&mut self, type_: Option<TorpedoStorageType>) {
-        self.torpedo_storage = type_.map(TorpedoStorage::new);
     }
 
     pub fn torpedo_capacity(&self) -> usize {
@@ -405,14 +398,6 @@ impl VesselComponent {
         self.torpedo_launcher.is_some()
     }
 
-    pub fn torpedo_launcher_type(&self) -> Option<TorpedoLauncherType> {
-        self.torpedo_launcher.as_ref().map(TorpedoLauncher::type_)
-    }
-
-    pub fn set_torpedo_launcher(&mut self, type_: Option<TorpedoLauncherType>) {
-        self.torpedo_launcher = type_.map(TorpedoLauncher::new);
-    }
-
     pub fn step_torpedo_launcher(&mut self, dt: f64) {
         self.torpedo_launcher.as_mut().unwrap().step_time_to_reload(dt);
     }
@@ -426,14 +411,6 @@ impl VesselComponent {
     // ------------------------
     pub fn has_docking(&self) -> bool {
         self.docking.is_some()
-    }
-
-    pub fn docking_type(&self) -> Option<DockingType> {
-        self.docking.as_ref().map(Docking::type_)
-    }
-
-    pub fn set_docking(&mut self, type_: Option<DockingType>) {
-        self.docking = type_.map(Docking::new);
     }
 
     pub fn docking_ports(&self) -> Option<&BTreeMap<DockingPortLocation, DockingPort>> {
@@ -459,7 +436,7 @@ impl VesselComponent {
     }
 
     pub fn can_dock(&self) -> bool {
-        self.class.dockable()
+        self.can_dock
     }
 
     pub fn dock(&mut self, location: DockingPortLocation, entity: Entity) {

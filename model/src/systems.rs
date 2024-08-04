@@ -1,4 +1,3 @@
-pub mod update_fuel;
 pub mod update_guidance;
 pub mod update_stations;
 mod update_target;

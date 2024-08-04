@@ -1,8 +1,6 @@
 use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
-use transfer_window_model::components::vessel_component::engine::EngineType;
-use transfer_window_model::components::vessel_component::fuel_tank::FuelTankType;
 use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
 use crate::controller_events::ControllerEvent;
@@ -52,9 +50,7 @@ impl StoryBuilder for Story1_02 {
 
         let ship = VesselBuilder {
             name: "Ship",
-            vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
-                .with_engine(EngineType::Regular)
-                .with_fuel_tank(FuelTankType::Tank1),
+            vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
             orbit_builder: OrbitBuilder::Freeform { 
                 parent: centralia,
                 distance: 9.371e6,
@@ -119,9 +115,7 @@ impl StoryBuilder for Story1_02 {
             view.add_model_event(ModelEvent::BuildVessel { 
                 vessel_builder: VesselBuilder {
                     name: "Ship",
-                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
-                        .with_engine(EngineType::Regular)
-                        .with_fuel_tank(FuelTankType::Tank1),
+                    vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
                     orbit_builder: OrbitBuilder::Circular { 
                         parent: centralia,
                         distance: 9.371e6,

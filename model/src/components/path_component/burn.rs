@@ -8,7 +8,7 @@ use self::{burn_point::BurnPoint, rocket_equation_function::RocketEquationFuncti
 pub mod burn_point;
 pub mod rocket_equation_function;
 
-const BURN_TIME_STEP: f64 = 0.1;
+const BURN_TIME_STEP: f64 = 0.001;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Burn {

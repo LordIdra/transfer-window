@@ -134,6 +134,6 @@ impl Model {
             return rocket_equation_function;
         }
 
-        RocketEquationFunction::from_vessel_component(self.vessel_component(entity))
+        RocketEquationFunction::fuel_from_vessel_component(self.vessel_component(entity))
     }
 }
