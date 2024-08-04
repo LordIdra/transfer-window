@@ -48,6 +48,12 @@ pub enum RcsType {
 }
 
 impl RcsType {
+    pub fn mass(self) -> f64 {
+        match self {
+            RcsType::LightRcs => 20.0,
+        }
+    }
+
     fn thrusters(self) -> Vec<RcsThruster> {
         match self {
             RcsType::LightRcs => vec![

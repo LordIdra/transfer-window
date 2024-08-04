@@ -64,7 +64,7 @@ impl StoryBuilder for Story1_04 {
             name: "Ship",
             vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
                 .with_engine(EngineType::Regular)
-                .with_fuel_tank(FuelTankType::FuelTank2),
+                .with_fuel_tank(FuelTankType::Tank2),
             orbit_builder: OrbitBuilder::Circular {
                 parent: centralia,
                 distance: 9.371e6,

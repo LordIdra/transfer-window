@@ -18,10 +18,10 @@ impl TexturedSlot for EngineType {
 impl TexturedSlot for FuelTankType {
     fn texture(&self) -> &'static str {
         match self {
-            FuelTankType::FuelTank1 => "fuel-tank-1",
-            FuelTankType::FuelTank2 => "fuel-tank-2",
-            FuelTankType::FuelTank3 => "fuel-tank-3",
-            FuelTankType::FuelTank4 => "fuel-tank-4",
+            FuelTankType::Tank1 => "fuel-tank-1",
+            FuelTankType::Tank2 => "fuel-tank-2",
+            FuelTankType::Tank3 => "fuel-tank-3",
+            FuelTankType::Tank4 => "fuel-tank-4",
             FuelTankType::Torpedo => panic!("Attempt to get torpedo fuel tank texture"),
             FuelTankType::Hub => panic!("Attempt to get hub fuel tank texture"),
         }

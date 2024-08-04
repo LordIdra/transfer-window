@@ -248,7 +248,7 @@ impl StoryBuilder for Story1_01 {
                 vessel_builder: VesselBuilder {
                     name: "Ship",
                     vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
-                        .with_fuel_tank(FuelTankType::FuelTank1)
+                        .with_fuel_tank(FuelTankType::Tank1)
                         .with_engine(EngineType::Regular),
                     orbit_builder: OrbitBuilder::Freeform {
                         parent: centralia,

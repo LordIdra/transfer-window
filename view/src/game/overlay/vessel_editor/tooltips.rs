@@ -55,10 +55,10 @@ pub fn show_tooltip_fuel_tank(type_: Option<FuelTankType>) -> TooltipFn {
         };
 
         let name = match type_ {
-            FuelTankType::FuelTank1 => "Fuel Tank I",
-            FuelTankType::FuelTank2 => "Fuel Tank II",
-            FuelTankType::FuelTank3 => "Fuel Tank III",
-            FuelTankType::FuelTank4 => "Fuel Tank IV",
+            FuelTankType::Tank1 => "Fuel Tank I",
+            FuelTankType::Tank2 => "Fuel Tank II",
+            FuelTankType::Tank3 => "Fuel Tank III",
+            FuelTankType::Tank4 => "Fuel Tank IV",
             FuelTankType::Torpedo | FuelTankType::Hub => unreachable!(),
         };
 

@@ -1,9 +1,10 @@
 use std::collections::VecDeque;
 
+use burn::rocket_equation_function::RocketEquationFunction;
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use self::{burn::{rocket_equation_function::RocketEquationFunction, Burn}, guidance::Guidance, orbit::Orbit, segment::Segment};
+use self::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment};
 
 #[cfg(test)]
 mod brute_force_tester;

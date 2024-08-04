@@ -19,7 +19,7 @@ fn test_burn_without_engine_or_fuel_tank() {
 
     assert!(!StartBurnEvent::can_create_ever(&model, vessel));
 
-    model.vessel_component_mut(vessel).set_fuel_tank(Some(FuelTankType::FuelTank2));
+    model.vessel_component_mut(vessel).set_fuel_tank(Some(FuelTankType::Tank2));
     model.vessel_component_mut(vessel).set_engine(Some(EngineType::Regular));
 
     assert!(StartBurnEvent::can_create_ever(&model, vessel));
@@ -36,7 +36,7 @@ fn test_create_burn_with_zero_dv() {
 
     let class = VesselClass::Scout1;
     let vessel_component = class.build(Faction::Player)
-        .with_fuel_tank(FuelTankType::FuelTank2)
+        .with_fuel_tank(FuelTankType::Tank2)
         .with_engine(EngineType::Regular);
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
@@ -79,7 +79,7 @@ fn test_create_and_adjust_burn() {
         .with_name_component(NameComponent::new("Earth".to_string()))
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)), None)));
 
-    let fuel_tank = FuelTankType::FuelTank2;
+    let fuel_tank = FuelTankType::Tank2;
     let engine = EngineType::Booster;
     let vessel_component = VesselClass::Scout1.build(Faction::Player)
         .with_fuel_tank(fuel_tank)

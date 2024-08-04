@@ -7,6 +7,7 @@ use faction::Faction;
 use fuel_tank::{FuelTank, FuelTankType};
 use log::error;
 use rcs::{Rcs, RcsType};
+use monopropellant_tank::{MonopropellantTank, MonopropellantTankType};
 use serde::{Deserialize, Serialize};
 use timeline::Timeline;
 use torpedo_launcher::{TorpedoLauncher, TorpedoLauncherType};
@@ -20,7 +21,7 @@ pub mod docking;
 pub mod engine;
 pub mod faction;
 pub mod fuel_tank;
-pub mod rcs_fuel_tank;
+pub mod monopropellant_tank;
 pub mod rcs;
 pub mod timeline;
 pub mod torpedo_launcher;
@@ -35,6 +36,7 @@ pub struct VesselComponent {
     timeline: Timeline,
     target: Option<Entity>,
     fuel_tank: Option<FuelTank>,
+    monopropellant_tank: Option<MonopropellantTank>,
     engine: Option<Engine>,
     rcs: Option<Rcs>,
     torpedo_storage: Option<TorpedoStorage>,
@@ -49,11 +51,12 @@ impl VesselComponent {
         let target = None;
         let fuel_tank = None;
         let engine = None;
+        let monopropellant_tank = None;
         let rcs = None;
         let torpedo_storage = None;
         let torpedo_launcher = None;
         let docking = None;
-        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, rcs, torpedo_storage, torpedo_launcher, docking }
+        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, monopropellant_tank, rcs, torpedo_storage, torpedo_launcher, docking }
     }
 
     // ------------------------
@@ -197,22 +200,82 @@ impl VesselComponent {
     }
 
     // ------------------------
+    // Monopropellant Tank
+    // ------------------------
+    pub fn has_monopropellant_tank(&self) -> bool {
+        self.monopropellant_tank.is_some()
+    }
+
+    pub fn monopropellant_tank_type(&self) -> Option<MonopropellantTankType> {
+        self.monopropellant_tank.as_ref().map(MonopropellantTank::type_)
+    }
+
+    pub fn set_monopropellant_tank(&mut self, type_: Option<MonopropellantTankType>) {
+        self.monopropellant_tank = type_.map(MonopropellantTank::new);
+    }
+
+    pub fn monopropellant_capacity_litres(&self) -> f64 {
+        match &self.monopropellant_tank {
+            Some(monopropellant_tank) => monopropellant_tank.capacity_litres(),
+            None => 0.0,
+        }
+    }
+
+    pub fn monopropellant_capacity_kg(&self) -> f64 {
+        match &self.monopropellant_tank {
+            Some(monopropellant_tank) => monopropellant_tank.capacity_kg(),
+            None => 0.0,
+        }
+    }
+
+    pub fn monopropellant_litres(&self) -> f64 {
+        match &self.monopropellant_tank {
+            Some(monopropellant_tank) => monopropellant_tank.fuel_litres(),
+            None => 0.0,
+        }
+    }
+
+    pub fn monopropellant_kg(&self) -> f64 {
+        match &self.monopropellant_tank {
+            Some(monopropellant_tank) => monopropellant_tank.fuel_kg(),
+            None => 0.0,
+        }
+    }
+
+    pub fn is_monopropellant_empty(&self) -> bool {
+        self.monopropellant_kg() < 1.0e-3
+    }
+
+    pub fn is_monopropellant_full(&self) -> bool {
+        (self.monopropellant_capacity_kg() - self.monopropellant_kg()) < 1.0e-3
+    }
+
+    pub fn set_monopropellant_kg(&mut self, new_monopropellant_kg: f64) {
+        self.monopropellant_tank.as_mut()
+            .expect("Attempt to set monopropellant on vessel without monopropellant tank")
+            .set_fuel_kg(new_monopropellant_kg);
+    }
+
+    // ------------------------
     // Mass
     // ------------------------
     pub fn dry_mass(&self) -> f64 {
         self.class.mass()
+            + self.docking.as_ref().map_or(0.0, |x| x.type_().mass())
             + self.fuel_tank.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.monopropellant_tank.as_ref().map_or(0.0, |x| x.type_().mass())
             + self.engine.as_ref().map_or(0.0, |x| x.type_().mass())
+            + self.rcs.as_ref().map_or(0.0, |x| x.type_().mass())
             + self.torpedo_storage.as_ref().map_or(0.0, |x| x.type_().mass())
             + self.torpedo_launcher.as_ref().map_or(0.0, |x| x.type_().mass())
     }
 
     pub fn wet_mass(&self) -> f64 {
-        self.dry_mass() + self.fuel_capacity_kg()
+        self.dry_mass() + self.fuel_capacity_kg() + self.monopropellant_capacity_kg()
     }
 
     pub fn mass(&self) -> f64 {
-        self.dry_mass() + self.fuel_kg()
+        self.dry_mass() + self.fuel_kg() + self.monopropellant_kg()
     }
 
     // ------------------------

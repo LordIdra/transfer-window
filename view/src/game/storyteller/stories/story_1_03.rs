@@ -49,7 +49,7 @@ impl StoryBuilder for Story1_03 {
             name: "Ship",
             vessel_component: VesselComponent::new(VesselClass::Frigate1, Faction::Player)
                 .with_engine(EngineType::Regular)
-                .with_fuel_tank(FuelTankType::FuelTank1)
+                .with_fuel_tank(FuelTankType::Tank1)
                 .with_torpedo_storage(TorpedoStorageType::TorpedoStorage1)
                 .with_torpedo_launcher(TorpedoLauncherType::TorpedoLauncher1),
             orbit_builder: OrbitBuilder::Circular {
