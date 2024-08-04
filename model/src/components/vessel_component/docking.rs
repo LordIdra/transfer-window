@@ -28,25 +28,6 @@ impl DockingPortLocation {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum DockingType {
-    Quadruple
-}
-
-impl DockingType {
-    pub fn docking_port_locations(&self) -> Vec<DockingPortLocation> {
-        match self {
-            DockingType::Quadruple => vec![DockingPortLocation::North, DockingPortLocation::East, DockingPortLocation::South, DockingPortLocation::West],
-        }
-    }
-
-    pub fn mass(&self) -> f64 {
-        match self {
-            DockingType::Quadruple => 20.0e3,
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub enum ResourceTransferDirection {
     ToDocked,
@@ -190,21 +171,15 @@ impl DockingPort {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Docking {
-    type_: DockingType,
     docking_ports: BTreeMap<DockingPortLocation, DockingPort>,
 }
 
 impl Docking {
-    pub fn new(type_: DockingType) -> Self {
-        let docking_ports = type_.docking_port_locations()
-            .into_iter()
+    pub fn new(locations: Vec<DockingPortLocation>) -> Self {
+        let docking_ports = locations.into_iter()
             .map(|location| (location, DockingPort::default()))
             .collect();
-        Self { type_, docking_ports }
-    }
-
-    pub fn type_(&self) -> DockingType {
-        self.type_
+        Self { docking_ports }
     }
 
     pub fn docking_ports(&self) -> &BTreeMap<DockingPortLocation, DockingPort> {

@@ -1,51 +1,19 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub enum TorpedoLauncherType {
-    TorpedoLauncher1,
-    TorpedoLauncher2,
-}
-
-impl TorpedoLauncherType {
-    pub fn mass(&self) -> f64 {
-        match self {
-            TorpedoLauncherType::TorpedoLauncher1 => 2.0e3,
-            TorpedoLauncherType::TorpedoLauncher2 => 5.0e3,
-        }
-    }
-
-    pub fn ship_types() -> [Self; 2] {
-        [
-            TorpedoLauncherType::TorpedoLauncher1,
-            TorpedoLauncherType::TorpedoLauncher2,
-        ]
-    }
-
-    pub fn cooldown(&self) -> f64 {
-        match self {
-            TorpedoLauncherType::TorpedoLauncher1 => 6.0 * 60.0 * 60.0,
-            TorpedoLauncherType::TorpedoLauncher2 => 2.0 * 60.0 * 60.0,
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TorpedoLauncher {
-    type_: TorpedoLauncherType,
+    cooldown: f64,
     time_to_reload: f64,
 }
 
 impl TorpedoLauncher {
-    pub fn new(type_: TorpedoLauncherType) -> TorpedoLauncher {
+    pub fn new(cooldown: f64) -> TorpedoLauncher {
         let time_to_reload = 0.0;
-        TorpedoLauncher {
-            type_,
-            time_to_reload,
-        }
+        TorpedoLauncher { cooldown, time_to_reload,}
     }
-    
-    pub fn type_(&self) -> TorpedoLauncherType {
-        self.type_
+
+    pub fn cooldown(&self) -> f64 {
+        self.cooldown
     }
     
     pub fn time_to_reload(&self) -> f64 {
@@ -57,6 +25,6 @@ impl TorpedoLauncher {
     }
 
     pub fn reset_time_to_reload(&mut self) {
-        self.time_to_reload = self.type_.cooldown();
+        self.time_to_reload = self.cooldown;
     }
 }

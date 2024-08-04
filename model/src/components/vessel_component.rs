@@ -1,17 +1,17 @@
 use std::collections::BTreeMap;
 
 use class::VesselClass;
-use docking::{Docking, DockingPort, DockingPortLocation, DockingType};
-use engine::{Engine, EngineType};
+use docking::{Docking, DockingPort, DockingPortLocation};
+use engine::Engine;
 use faction::Faction;
-use fuel_tank::{FuelTank, FuelTankType};
+use fuel_tank::FuelTank;
 use log::error;
 use rcs::{Rcs, RcsType};
-use monopropellant_tank::{MonopropellantTank, MonopropellantTankType};
+use monopropellant_tank::MonopropellantTank;
 use serde::{Deserialize, Serialize};
 use timeline::Timeline;
-use torpedo_launcher::{TorpedoLauncher, TorpedoLauncherType};
-use torpedo_storage::{TorpedoStorage, TorpedoStorageType};
+use torpedo_launcher::TorpedoLauncher;
+use torpedo_storage::TorpedoStorage;
 use crate::storage::entity_allocator::Entity;
 
 use super::path_component::orbit::scary_math::STANDARD_GRAVITY;
@@ -57,9 +57,9 @@ impl VesselComponent {
                 can_dock: false,
                 timeline: Timeline::default(),
                 target: None,
-                fuel_tank: Some(FuelTank::new(FuelTankType::Torpedo)),
-                engine: Some(Engine::new(EngineType::Torpedo)),
-                monopropellant_tank: Some(MonopropellantTank::new(MonopropellantTankType::Torpedo)),
+                fuel_tank: Some(FuelTank::new(10_000.0)),
+                engine: Some(Engine::new(7.0, 15_000.0)),
+                monopropellant_tank: Some(MonopropellantTank::new(100.0)),
                 rcs: Some(Rcs::new(RcsType::LightRcs)),
                 torpedo_storage: None,
                 torpedo_launcher: None,
@@ -73,13 +73,13 @@ impl VesselComponent {
                 can_dock: false,
                 timeline: Timeline::default(),
                 target: None,
-                fuel_tank: Some(FuelTank::new(FuelTankType::Hub)),
+                fuel_tank: Some(FuelTank::new(140_000.0)),
                 engine: None,
                 monopropellant_tank: None,
                 rcs: None,
-                torpedo_storage: Some(TorpedoStorage::new(TorpedoStorageType::Hub)),
+                torpedo_storage: Some(TorpedoStorage::new(5)),
                 torpedo_launcher: None,
-                docking: Some(Docking::new(DockingType::Quadruple)),
+                docking: Some(Docking::new(vec![DockingPortLocation::West, DockingPortLocation::East])),
             },
 
             VesselClass::Scout1 => Self {
@@ -89,9 +89,9 @@ impl VesselComponent {
                 can_dock: true,
                 timeline: Timeline::default(),
                 target: None,
-                fuel_tank: Some(FuelTank::new(FuelTankType::Tank1)),
-                engine: Some(Engine::new(EngineType::Regular)),
-                monopropellant_tank: Some(MonopropellantTank::new(MonopropellantTankType::Tank1)),
+                fuel_tank: Some(FuelTank::new(30_000.0)),
+                engine: Some(Engine::new(30.0, 70_000.0)),
+                monopropellant_tank: Some(MonopropellantTank::new(300.0)),
                 rcs: Some(Rcs::new(RcsType::LightRcs)),
                 torpedo_storage: None,
                 torpedo_launcher: None,
@@ -105,12 +105,12 @@ impl VesselComponent {
                 can_dock: true,
                 timeline: Timeline::default(),
                 target: None,
-                fuel_tank: Some(FuelTank::new(FuelTankType::Tank2)),
-                engine: Some(Engine::new(EngineType::Regular)),
-                monopropellant_tank: Some(MonopropellantTank::new(MonopropellantTankType::Tank2)),
+                fuel_tank: Some(FuelTank::new(60_000.0)),
+                engine: Some(Engine::new(30.0, 70_000.0)),
+                monopropellant_tank: Some(MonopropellantTank::new(600.0)),
                 rcs: Some(Rcs::new(RcsType::LightRcs)),
-                torpedo_storage: Some(TorpedoStorage::new(TorpedoStorageType::TorpedoStorage1)),
-                torpedo_launcher: Some(TorpedoLauncher::new(TorpedoLauncherType::TorpedoLauncher1)),
+                torpedo_storage: Some(TorpedoStorage::new(2)),
+                torpedo_launcher: Some(TorpedoLauncher::new(2.0 * 60.0 * 60.0)),
                 docking: None,
             },
         }
@@ -270,13 +270,6 @@ impl VesselComponent {
     // ------------------------
     pub fn dry_mass(&self) -> f64 {
         self.dry_mass
-            + self.docking.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self.fuel_tank.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self.monopropellant_tank.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self.engine.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self.rcs.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self.torpedo_storage.as_ref().map_or(0.0, |x| x.type_().mass())
-            + self.torpedo_launcher.as_ref().map_or(0.0, |x| x.type_().mass())
     }
 
     pub fn wet_mass(&self) -> f64 {

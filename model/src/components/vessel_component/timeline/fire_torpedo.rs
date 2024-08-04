@@ -80,7 +80,7 @@ impl FireTorpedoEvent {
 
     pub fn can_create(model: &Model, entity: Entity, time: f64) -> bool {
         let vessel_component = &model.vessel_component(entity);
-        let cooldown = vessel_component.torpedo_launcher.as_ref().unwrap().type_().cooldown();
+        let cooldown = vessel_component.torpedo_launcher.as_ref().unwrap().cooldown();
         if let Some(event) = vessel_component.timeline.last_fire_torpedo_event() {
             if event.time + cooldown > time {
                 return false;
