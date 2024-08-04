@@ -4,11 +4,7 @@ use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_co
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_enable_guidance, draw_fire_torpedo, draw_next, draw_previous, draw_select_vessel, draw_warp_to}, labels::{draw_info_at_time_with_orbits, draw_key, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
 
-// use self::weapons::draw_weapons;
-
 use super::vessel::visual_timeline::draw_visual_timeline;
-
-// mod weapons;
 
 fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
     ui.horizontal(|ui| {
