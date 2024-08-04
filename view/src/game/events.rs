@@ -74,7 +74,7 @@ impl View {
         // For example, fire torpedo event created -> condition fires before the event is actually created
         // To solve this, we buffer story events by a frame
         self.story.update(self);
-        self.previous_story_events = self.story_events.lock().unwrap().clone();
+        self.previous_story_events.clone_from(&self.story_events.lock().unwrap());
         self.story_events.lock().unwrap().clear();
 
         let model_events = self.model_events.clone();

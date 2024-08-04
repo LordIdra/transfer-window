@@ -30,7 +30,7 @@ impl StoryBuilder for Story1_03 {
 
         let centralia = OrbitableBuilder {
             name: "Centralia",
-            mass: 6.0 * 10.0e23,
+            mass: 5.972e24,
             radius: 6.371e6,
             rotation_period: 1.0,
             rotation_angle: 100.0,
@@ -47,7 +47,7 @@ impl StoryBuilder for Story1_03 {
 
         let player_ship = VesselBuilder {
             name: "Ship",
-            vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player)
+            vessel_component: VesselComponent::new(VesselClass::Frigate1, Faction::Player)
                 .with_engine(EngineType::Regular)
                 .with_fuel_tank(FuelTankType::FuelTank1)
                 .with_torpedo_storage(TorpedoStorageType::TorpedoStorage1)

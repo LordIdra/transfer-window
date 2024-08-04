@@ -203,61 +203,14 @@
 [x] 1-03
 
 
-
 # ------------------------------------ #
-# CAMPAIGN PLANNING AREA
+# CAMPAIGN PLANNING AREA - PROJECT SPHINX
 # ------------------------------------ #
-- Remember to upgrade ship and unlock new equipment
-- Satellite which loses power every so often, small window to intercept, reverse orbit direction
-- Low DV for torpedoes so have to accelerate ship?
+- 01 Awakening
+  - Why am I here? I'm alone on a station
+  - Sensors indicate an incoming torpedo
+  - The station doesn't have any offensive measures of its own. There's a frigate, I need to undock and 
 
-# Levels
-[ ] 1-04 Translunar
-  - watch your dv in this mission
-  - centralia has moon
-  - unlock explorer
-  - spheres of influence
-  - first encounter not necessarily the best, keep going
-  - get into moon orbit
-  - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
-  - escape moon orbit to finish mission
-
-[ ] 1-05 Review
-  - final review of previous missions before you go into the 'real world'
-  - be careful with delta-v - always want to maximise dv efficiency
-  - less guidance than the last few missions
-  - get to moon, get into orbit, drop orbit, intercept ship, then get back into LEO
-
-MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT GOES
-- 06 Moon Orbit
-  - open ended
-  - orbit the moon and come back into LEO
-
-- 07 Rendezvous
-  - use your knowledge of closest approaches to get an intercept
-  - then try and match its orbit
-  - patience! this might be more difficult than the last few missions
-  - dock
-
-- 08 Station
-  - takes place entirely at allied hub
-  - upgrade to frigate
-  - allied ship also docked
-  - equip new frigate
-  - resource transfers
-  - torpedo transfers
-  - we'll be using those torpedoes next time
-
-- 09 Destroy
-  - fire torpedoes
-  - guidance explanation
-  - destroy dummy targets
-  - target behind and in front - is there an advantage to being in front / behind?
-
-- 10 Evade
-  - evade enemies torpedo
-  - can't evade that one, time to deploy our own torpedo against it, but leaves us without offensive capability...
-  - the end, time for real life
 
 ## Optional Levels
 [ ] Scientific notation
@@ -269,6 +222,28 @@ MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT 
 [ ] Proportional guidance
 [ ] Integration techniques (euler RK4 etc)
 [ ] Joules, watts, energy
+
+
+
+# ------------------------------------ #
+# DOCKING AREA
+# ------------------------------------ #
+[x] Ship texture
+[x] Scaling per class
+[x] Draw ship in-game
+[ ] Vessel rotation
+[ ] Angular momentum
+[ ] Turning segments (fuck)
+[ ] Icons show rotation
+[ ] Rotation at time queries
+[ ] RcsFacility (with center of mass and RCS thruster locations)
+[ ] Manual piloting mode
+[ ] Monopropellant
+[ ] Monopropellant textures
+[ ] Thruster textures
+[ ] Bounding boxes
+[ ] Collision detection system
+[ ] Hull integrity system?
 
 
 
@@ -334,3 +309,60 @@ MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT 
 - Fog of war
 - Passive/active radar
 - Information networking
+
+
+
+# ------------------------------------ #
+# CAMPAIGN PLANNING AREA [ SHELVED ]
+# ------------------------------------ #
+- Remember to upgrade ship and unlock new equipment
+- Satellite which loses power every so often, small window to intercept, reverse orbit direction
+- Low DV for torpedoes so have to accelerate ship?
+
+# Levels
+[ ] 1-04 Translunar
+  - watch your dv in this mission
+  - centralia has moon
+  - unlock explorer
+  - spheres of influence
+  - first encounter not necessarily the best, keep going
+  - get into moon orbit
+  - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
+  - escape moon orbit to finish mission
+
+[ ] 1-05 Review
+  - final review of previous missions before you go into the 'real world'
+  - be careful with delta-v - always want to maximise dv efficiency
+  - less guidance than the last few missions
+  - get to moon, get into orbit, drop orbit, intercept ship, then get back into LEO
+
+MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT GOES
+- 06 Moon Orbit
+  - open ended
+  - orbit the moon and come back into LEO
+
+- 07 Rendezvous
+  - use your knowledge of closest approaches to get an intercept
+  - then try and match its orbit
+  - patience! this might be more difficult than the last few missions
+  - dock
+
+- 08 Station
+  - takes place entirely at allied hub
+  - upgrade to frigate
+  - allied ship also docked
+  - equip new frigate
+  - resource transfers
+  - torpedo transfers
+  - we'll be using those torpedoes next time
+
+- 09 Destroy
+  - fire torpedoes
+  - guidance explanation
+  - destroy dummy targets
+  - target behind and in front - is there an advantage to being in front / behind?
+
+- 10 Evade
+  - evade enemies torpedo
+  - can't evade that one, time to deploy our own torpedo against it, but leaves us without offensive capability...
+  - the end, time for real life

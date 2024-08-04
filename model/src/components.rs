@@ -10,3 +10,4 @@ pub enum ComponentType {
     PathComponent,
     VesselComponent,
 }
+

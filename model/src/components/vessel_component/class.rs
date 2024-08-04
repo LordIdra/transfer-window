@@ -42,10 +42,10 @@ impl VesselClass {
         match self {
             VesselClass::Torpedo => 2.0e3,
             VesselClass::Hub => 380.0e3,
-            VesselClass::Scout1 => 20.0e3,
-            VesselClass::Scout2 => 24.0e3,
-            VesselClass::Frigate1 => 60.0e3,
-            VesselClass::Frigate2 => 72.0e3,
+            VesselClass::Scout1 => 10.0e3,
+            VesselClass::Scout2 => 12.0e3,
+            VesselClass::Frigate1 => 30.0e3,
+            VesselClass::Frigate2 => 36.0e3,
         }
     }
 

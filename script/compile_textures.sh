@@ -2,9 +2,14 @@
 
 root=$(pwd)
 
-export_image() {
+export_image_lowres() {
     # rm "$output"
     drawio --export --scale 0.5 --transparent --output "$root/view/resources/final_textures/${1%.*}.png" "$1" 2>/dev/null
+}
+
+export_image_highres() {
+    # rm "$output"
+    drawio --export --scale 2.0 --transparent --output "$root/view/resources/final_textures/${1%.*}.png" "$1" 2>/dev/null
 }
 
 bloom_system() {
@@ -21,8 +26,8 @@ bloom_ship() {
     blur_image="$root/view/resources/final_textures/blur_${1%.*}.png"
     convert "$image" -channel RGBA -gaussian-blur 0x8 "$blur_image"
     convert "$image" "$blur_image" -compose screen -composite "$image"
-    convert "$image" -channel RGBA -gaussian-blur 0x8 "$blur_image"
-    convert "$image" "$blur_image" -compose screen -composite "$image"
+   # convert "$image" -channel RGBA -gaussian-blur 0x8 "$blur_image"
+   # convert "$image" "$blur_image" -compose screen -composite "$image"
     rm "$blur_image"
 }
 
@@ -35,17 +40,17 @@ bloom_menu() {
 }
 
 export_and_bloom_system() {
-    export_image "$1"
+    export_image_lowres "$1"
     bloom_system "$1"
 }
 
 export_and_bloom_ship() {
-    export_image "$1"
+    export_image_highres "$1"
     bloom_ship "$1"
 }
 
 export_and_bloom_menu() {
-    export_image "$1"
+    export_image_lowres "$1"
     bloom_menu "$1"
 }
 
@@ -60,29 +65,29 @@ export_and_bloom_menu() {
 # )
 # wait
 
-# cd "$root/view/resources/textures/ship" || exit
+cd "$root/view/resources/textures/ship" || exit
+for file in *.drawio; do
+    [ -f "$file" ] || break
+    export_and_bloom_ship "$file" &
+done
+wait
+
+# cd "$root/view/resources/textures/menu" || exit
 # for file in *.drawio; do
 #     [ -f "$file" ] || break
-#     export_and_bloom_ship "$file" &
+#     export_and_bloom_menu "$file" &
 # done
 # wait
 
-cd "$root/view/resources/textures/menu" || exit
-for file in *.drawio; do
-    [ -f "$file" ] || break
-    export_and_bloom_menu "$file" &
-done
-wait
+# cd "$root/view/resources/textures/character" || exit
+# for file in *.drawio; do
+#     [ -f "$file" ] || break
+#     export_and_bloom_menu "$file" &
+# done
+# wait
 
-cd "$root/view/resources/textures/character" || exit
-for file in *.drawio; do
-    [ -f "$file" ] || break
-    export_and_bloom_menu "$file" &
-done
-wait
+# cd "$root/view/resources/textures/icon" || exit
+# cp ./*.png "$root/view/resources/final_textures"
 
-cd "$root/view/resources/textures/icon" || exit
-cp ./*.png "$root/view/resources/final_textures"
-
-cd "$root/view/resources/textures/celestial_object" || exit
-cp ./*.png "$root/view/resources/final_textures"
+# cd "$root/view/resources/textures/celestial_object" || exit
+# cp ./*.png "$root/view/resources/final_textures"

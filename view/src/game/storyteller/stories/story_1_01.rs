@@ -28,7 +28,7 @@ impl StoryBuilder for Story1_01 {
 
         let centralia = OrbitableBuilder {
             name: "Centralia",
-            mass: 6.0 * 10.0e23,
+            mass: 5.972e24,
             radius: 6.371e6,
             rotation_period: 1.0,
             rotation_angle: 100.0,

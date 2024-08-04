@@ -100,7 +100,7 @@ impl View {
         let pointer_over_ui = false;
         let pointer_over_icon = false;
         let objectives = vec![];
-        Self { gl, model, story, config, context, previous_screen_rect, screen_rect, controller_events, model_events, view_events, previous_story_events, story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, exit_modal_open, pointer_over_ui, pointer_over_icon, objectives }
+        Self { gl, model, story, config, context, previous_screen_rect, screen_rect, controller_events, model_events, view_events, story_events, previous_story_events, camera, resources, renderers, selected, right_click_menu, vessel_editor, dialogue, frame_history, debug_window_open, debug_window_tab, exit_modal_open, pointer_over_ui, pointer_over_icon, objectives }
     }
 
     fn update_camera_focus_position(&mut self) {

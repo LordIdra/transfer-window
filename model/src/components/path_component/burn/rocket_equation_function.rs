@@ -35,10 +35,6 @@ impl RocketEquationFunction {
         RocketEquationFunction::new(dry_mass_kg, initial_fuel_mass_kg, fuel_consumption_kg_per_second, specific_impulse, 0.0)
     }
 
-    pub fn start(&self) -> Self {
-        Self::new(self.dry_mass_kg, self.initial_fuel_mass_kg, self.fuel_consumption_kg_per_second, self.specific_impulse, 0.0)
-    }
-
     pub fn end(&self) -> Self {
         let end_time = self.initial_fuel_mass_kg / self.fuel_consumption_kg_per_second;
         Self::new(self.dry_mass_kg, self.initial_fuel_mass_kg, self.fuel_consumption_kg_per_second, self.specific_impulse, end_time)
@@ -109,7 +105,6 @@ mod test {
     fn test_basic() {
         let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 1.0, 0.0);
         assert_eq!(rocket_equation_function.end().burn_time(), 100.0);
-        assert_eq!(rocket_equation_function.end().start().mass(), 200.0);
     }
 
     #[test]

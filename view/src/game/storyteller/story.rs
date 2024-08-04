@@ -45,7 +45,7 @@ impl Story {
     }
 
     pub(super) fn get_persistent_data(&self, key: &str) -> Entity {
-        *self.persistent_data.get(key).unwrap_or_else(|| panic!("Attempt to get nonexistent persistent data with key {}", key))
+        *self.persistent_data.get(key).unwrap_or_else(|| panic!("Attempt to get nonexistent persistent data with key {key}"))
     }
 
     pub fn update(&self, view: &View) {

@@ -6,6 +6,7 @@ use engine::{Engine, EngineType};
 use faction::Faction;
 use fuel_tank::{FuelTank, FuelTankType};
 use log::error;
+use rcs::{Rcs, RcsType};
 use serde::{Deserialize, Serialize};
 use timeline::Timeline;
 use torpedo_launcher::{TorpedoLauncher, TorpedoLauncherType};
@@ -19,6 +20,8 @@ pub mod docking;
 pub mod engine;
 pub mod faction;
 pub mod fuel_tank;
+pub mod rcs_fuel_tank;
+pub mod rcs;
 pub mod timeline;
 pub mod torpedo_launcher;
 pub mod torpedo_storage;
@@ -33,6 +36,7 @@ pub struct VesselComponent {
     target: Option<Entity>,
     fuel_tank: Option<FuelTank>,
     engine: Option<Engine>,
+    rcs: Option<Rcs>,
     torpedo_storage: Option<TorpedoStorage>,
     torpedo_launcher: Option<TorpedoLauncher>,
     docking: Option<Docking>,
@@ -45,10 +49,11 @@ impl VesselComponent {
         let target = None;
         let fuel_tank = None;
         let engine = None;
+        let rcs = None;
         let torpedo_storage = None;
         let torpedo_launcher = None;
         let docking = None;
-        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, torpedo_storage, torpedo_launcher, docking }
+        Self { class, faction, is_ghost, timeline, target, fuel_tank, engine, rcs, torpedo_storage, torpedo_launcher, docking }
     }
 
     // ------------------------
@@ -258,6 +263,21 @@ impl VesselComponent {
             },
             None =>0.0,
         }
+    }
+
+    // ------------------------
+    // RCS
+    // ------------------------
+    pub fn has_rcs(&self) -> bool {
+        self.rcs.is_some()
+    }
+
+    pub fn rcs_type(&self) -> Option<RcsType> {
+        self.rcs.as_ref().map(Rcs::type_)
+    }
+
+    pub fn set_rcs(&mut self, type_: Option<RcsType>) {
+        self.rcs = type_.map(Rcs::new);
     }
 
     // ------------------------

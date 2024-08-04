@@ -12,9 +12,7 @@ pub const STANDARD_GRAVITY: f64 = 9.81;
 
 /// Returns Component of velocity perpendicular to the displacement
 pub fn transverse_velocity(position: DVec2, velocity: DVec2) -> f64 {
-    let angle = -f64::atan2(position.y, position.x);
-    let normalized_velocity = vec2(velocity.x * angle.cos() - velocity.y * angle.sin(), velocity.y * angle.cos() + velocity.x * angle.sin());
-    normalized_velocity.y
+    (velocity.y * position.x - velocity.x * position.y) / position.magnitude()
 }
 
 pub fn semi_major_axis(position: DVec2, velocity: DVec2, standard_gravitational_parameter: f64) -> f64 {
