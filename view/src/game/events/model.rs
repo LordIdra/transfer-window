@@ -110,28 +110,28 @@ impl View {
 
     pub fn set_fuel_tank(&mut self, entity: Entity, type_: Option<FuelTankType>) {
         #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Set slot");
+        let _span = tracy_client::span!("Set fuel tank");
         self.model.vessel_component_mut(entity).set_fuel_tank(type_);
         self.model.recompute_entire_trajectory(entity);
     }
 
     pub fn set_engine(&mut self, entity: Entity, type_: Option<EngineType>) {
         #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Set slot");
+        let _span = tracy_client::span!("Set enging");
         self.model.vessel_component_mut(entity).set_engine(type_);
         self.model.recompute_entire_trajectory(entity);
     }
 
     pub fn set_torpedo_storage(&mut self, entity: Entity, type_: Option<TorpedoStorageType>) {
         #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Set slot");
+        let _span = tracy_client::span!("Set torpedo storage");
         self.model.vessel_component_mut(entity).set_torpedo_storage(type_);
         self.model.recompute_entire_trajectory(entity);
     }
 
     pub fn set_torpedo_launcher(&mut self, entity: Entity, type_: Option<TorpedoLauncherType>) {
         #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Set slot");
+        let _span = tracy_client::span!("Set torpedo launcher");
         self.model.vessel_component_mut(entity).set_torpedo_launcher(type_);
         self.model.recompute_entire_trajectory(entity);
     }

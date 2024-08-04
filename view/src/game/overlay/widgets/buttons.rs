@@ -101,12 +101,6 @@ pub fn draw_fire_torpedo(view: &View, ui: &mut Ui, entity: Entity, time: f64) ->
     ui.add_enabled(enabled, button).on_hover_text("Fire torpedo").clicked()
 }
 
-pub fn draw_edit_vessel(view: &View, ui: &mut Ui) -> bool {
-    let button = CustomCircularImageButton::new(view, "edit", 36.0)
-        .with_padding(8.0);
-    ui.add(button).on_hover_text("Edit").clicked()
-}
-
 pub fn draw_cancel_burn(view: &View, ui: &mut Ui) -> bool {
     let button = CustomCircularImageButton::new(view, "cancel", 36.0)
         .with_padding(8.0);

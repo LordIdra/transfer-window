@@ -41,7 +41,7 @@ impl FireTorpedoEvent {
     }
 
     /// # Panics
-    /// Panics if the weapon slot requested does not in fact contain a weapon or is not a torpedo
+    /// Panics if the vessel does not have a torpedo launcher
     pub fn execute(&self, model: &mut Model) {
         model.vessel_component_mut(self.ghost).unset_ghost();
         model.vessel_component_mut(self.fire_from).decrement_torpedoes();

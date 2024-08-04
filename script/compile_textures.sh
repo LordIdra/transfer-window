@@ -12,15 +12,6 @@ export_image_highres() {
     drawio --export --scale 2.0 --transparent --output "$root/view/resources/final_textures/${1%.*}.png" "$1" 2>/dev/null
 }
 
-bloom_system() {
-    image="$root/view/resources/final_textures/${1%.*}.png"
-    blur_image="$root/view/resources/final_textures/blur_${1%.*}.png"
-    convert "$image" -channel RGBA -gaussian-blur 0x4 "$blur_image"
-    convert "$image" "$blur_image" -compose screen -composite "$image"
-    convert "$image" "$blur_image" -compose screen -composite "$image"
-    rm "$blur_image"
-}
-
 bloom_ship() {
     image="$root/view/resources/final_textures/${1%.*}.png"
     blur_image="$root/view/resources/final_textures/blur_${1%.*}.png"
@@ -37,11 +28,6 @@ bloom_menu() {
     convert "$image" -channel RGBA -gaussian-blur 0x2 "$blur_image"
     convert "$image" "$blur_image" -compose screen -composite "$image"
     rm "$blur_image"
-}
-
-export_and_bloom_system() {
-    export_image_lowres "$1"
-    bloom_system "$1"
 }
 
 export_and_bloom_ship() {

@@ -12,9 +12,7 @@ pub mod objectives;
 mod right_click_menu;
 mod scale;
 mod selected;
-mod slot_textures;
 mod time;
-pub mod vessel_editor;
 pub mod widgets;
 
 pub fn draw(view: &View) {
@@ -42,6 +40,5 @@ pub fn draw(view: &View) {
     view.context.set_style(Style::default());
 
     styles::VesselEditor::apply(&view.context);
-    vessel_editor::update(view);
     view.context.set_style(Style::default());
 }

@@ -1,7 +1,7 @@
 use eframe::egui::{Color32, Grid, Pos2, Rect, RichText, Rounding, Stroke, Ui};
 use transfer_window_model::{components::vessel_component::docking::{ContinuousResourceTransfer, DiscreteResourceTransfer, DockingPort, DockingPortLocation, ResourceTransferDirection}, storage::entity_allocator::Entity};
 
-use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{explorer::vessel_normal_circle_color, vessel_editor::VesselEditor, widgets::{buttons::{draw_edit_vessel, draw_undock}, custom_image_button::CustomCircularImageButton, labels::{draw_subtitle, draw_value}, util::{advance_cursor_to, should_draw_dv, should_draw_fuel, should_draw_torpedoes}}}, selected::Selected, util::{format_time, vessel_texture}, View}, styles};
+use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::{explorer::vessel_normal_circle_color, widgets::{buttons::draw_undock, custom_image_button::CustomCircularImageButton, labels::{draw_subtitle, draw_value}, util::{advance_cursor_to, should_draw_dv, should_draw_fuel, should_draw_torpedoes}}}, selected::Selected, util::{format_time, vessel_texture}, View}, styles};
 
 use super::{draw_dv, draw_fuel, draw_torpedoes};
 
@@ -94,11 +94,6 @@ fn draw_controls(view: &View, station: Entity, entity: Entity, ui: &mut Ui) {
             view.add_model_event(ModelEvent::Undock { station, entity });
             view.add_view_event(ViewEvent::SetCameraFocus(entity));
             view.add_view_event(ViewEvent::SetSelected(Selected::Vessel(entity)));
-        }
-
-        if draw_edit_vessel(view, ui) {
-            let vessel_editor = Some(VesselEditor::new(entity));
-            view.add_view_event(ViewEvent::SetVesselEditor(vessel_editor));
         }
     });
 }
