@@ -1,4 +1,4 @@
-use crate::{components::{path_component::{guidance::Guidance, orbit::Orbit, segment::Segment}, vessel_component::timeline::{intercept::InterceptEvent, TimelineEvent}}, storage::entity_allocator::Entity, Model};
+use crate::{components::{path_component::{guidance::{builder::GuidanceBuilder, Guidance}, orbit::builder::OrbitBuilder, segment::Segment}, vessel_component::timeline::{intercept::InterceptEvent, TimelineEvent}}, storage::entity_allocator::Entity, Model};
 
 impl Model {
     fn add_guidance(&mut self, entity: Entity, parent: Entity, guidance: Guidance) {
@@ -16,7 +16,16 @@ impl Model {
         }
         
         let parent_mass = self.mass(parent);
-        let orbit = Orbit::new(parent, end_point.mass(), parent_mass, end_point.position(), end_point.velocity(), end_point.time());
+        let orbit = OrbitBuilder {
+            parent,
+            mass: end_point.mass(),
+            parent_mass,
+            rotation: end_point.rotation(),
+            position: end_point.position(),
+            velocity: end_point.velocity(),
+            time: end_point.time(),
+        }.build();
+
         self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
         self.recompute_trajectory(entity);
     }
@@ -26,19 +35,23 @@ impl Model {
         let _span = tracy_client::span!("Create guidance");
         assert!(self.vessel_component_mut(entity).class().is_torpedo());
 
-        let target = self.vessel_component(entity).target()
-            .expect("Cannot enable guidance on torpedo without a target");
-        let faction = self.vessel_component(entity).faction();
-        let path_component = self.path_component_mut(entity);
-        path_component.remove_segments_after(time);
+        self.path_component_mut(entity).remove_segments_after(time);
 
-        let last_segment = path_component.final_segment();
+        let last_segment = self.path_component(entity).final_segment();
         let parent = last_segment.parent();
-        let start_position = last_segment.end_position();
-        let start_velocity = last_segment.end_velocity();
-        let parent_mass = self.mass(parent);
-        let rocket_equation_function = self.rocket_equation_function_at_end_of_trajectory(entity);
-        let guidance = Guidance::new(self, parent, target, faction, parent_mass, time, &rocket_equation_function, start_position, start_velocity);
+        let guidance = GuidanceBuilder {
+            parent,
+            parent_mass: self.mass(parent),
+            target: self.vessel_component(entity).target().expect("Cannot enable guidance on torpedo without a target"),
+            faction: self.vessel_component(entity).faction(),
+            rocket_equation_function: self.rocket_equation_function_at_end_of_trajectory(entity),
+            time,
+            rotation: last_segment.end_rotation(),
+            position: last_segment.end_position(),
+            velocity: last_segment.end_velocity(),
+        }.build(self);
+
+        // let guidance = Guidance::new(self, parent, target, faction, parent_mass, time, &rocket_equation_function, start_rotation, start_position, start_velocity);
         self.add_guidance(entity, parent, guidance);
     }
 
@@ -52,14 +65,20 @@ impl Model {
             .current_segment()
             .as_guidance()
             .unwrap();
+
         let parent = guidance.parent();
-        let target = guidance.target();
-        let faction = self.vessel_component(entity).faction();
-        let start_position = guidance.current_point().position();
-        let start_velocity = guidance.current_point().velocity();
-        let parent_mass = self.mass(parent);
-        let rocket_equation_function = guidance.rocket_equation_function_at_time(self.time);
-        let guidance = Guidance::new(self, parent, target, faction, parent_mass, self.time, &rocket_equation_function, start_position, start_velocity);
+        let guidance = GuidanceBuilder {
+            parent,
+            parent_mass: self.mass(parent),
+            target: guidance.target(),
+            faction: self.vessel_component(entity).faction(),
+            rocket_equation_function: guidance.rocket_equation_function_at_time(self.time),
+            time: self.time,
+            rotation: guidance.current_point().rotation(),
+            position: guidance.current_point().position(),
+            velocity: guidance.current_point().velocity(),
+        }.build(self);
+
         self.path_component_mut(entity).clear_future_segments();
         self.add_guidance(entity, parent, guidance);
     }

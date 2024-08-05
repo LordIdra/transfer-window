@@ -1,4 +1,4 @@
-use crate::{components::{path_component::{orbit::Orbit, PathComponent}, vessel_component::docking::{DockingPort, DockingPortLocation, DOCKING_DISTANCE, DOCKING_SPEED}, ComponentType}, storage::entity_allocator::Entity, Model};
+use crate::{components::{path_component::{orbit::builder::OrbitBuilder, PathComponent}, vessel_component::docking::{DockingPort, DockingPortLocation, DOCKING_DISTANCE, DOCKING_SPEED}, ComponentType}, storage::entity_allocator::Entity, Model};
 
 const EXTRA_UNDOCK_VELOCITY: f64 = 1.0;
 
@@ -54,14 +54,20 @@ impl Model {
         assert!(self.docked(entity));
         let docking_port_location = self.find_docking_port(station, entity).unwrap();
         self.vessel_component_mut(station).undock(docking_port_location);
+
         let parent = self.parent(station).unwrap();
-        let mass = self.vessel_component(entity).mass();
-        let parent_mass = self.mass(parent);
-        let position = self.position(station);
         let extra_velocity = self.velocity(station).normalize() * EXTRA_UNDOCK_VELOCITY;
         let velocity = self.velocity(station) + extra_velocity;
-        let time = self.time;
-        let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, time);
+        let orbit = OrbitBuilder {
+            parent,
+            mass: self.vessel_component(entity).mass(),
+            parent_mass: self.mass(parent),
+            rotation: f64::atan2(velocity.y, velocity.x),
+            position: self.position(station),
+            velocity,
+            time: self.time,
+        }.build();
+
         self.path_components.set(entity, Some(PathComponent::new_with_orbit(orbit)));
         self.recompute_trajectory(entity);
     }

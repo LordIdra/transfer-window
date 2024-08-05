@@ -49,7 +49,7 @@ pub fn update(view: &View) {
         if input.key_pressed(Key::Escape) {
             if !matches!(view.selected, Selected::None) {
                 view.add_view_event(ViewEvent::SetSelected(Selected::None));
-            } else if view.exit_modal_open {
+            } else {
                 view.add_view_event(ViewEvent::ToggleExitModal);
             }
         }

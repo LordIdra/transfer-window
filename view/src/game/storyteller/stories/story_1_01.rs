@@ -1,6 +1,6 @@
 use eframe::epaint::Color32;
 use nalgebra_glm::vec2;
-use transfer_window_model::{api::{builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{api::{builder::{OrbitableBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::{builder::OrbitablePhysicsBuilder, OrbitableType}, path_component::orbit::{builder::InitialOrbitBuilder, orbit_direction::OrbitDirection}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 
 use crate::controller_events::ControllerEvent;
@@ -94,7 +94,7 @@ impl StoryBuilder for Story1_01 {
                 vessel_builder: VesselBuilder {
                     name: "Ship 1",
                     vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                    orbit_builder: OrbitBuilder::Circular { 
+                    orbit_builder: InitialOrbitBuilder::Circular { 
                         parent: centralia,
                         distance: 1.0e7,
                         angle: 0.0, 
@@ -188,7 +188,7 @@ impl StoryBuilder for Story1_01 {
                 vessel_builder: VesselBuilder {
                     name: "Ship 2",
                     vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                    orbit_builder: OrbitBuilder::Freeform { 
+                    orbit_builder: InitialOrbitBuilder::Freeform { 
                         parent: centralia,
                         distance: 1.0e7,
                         speed: 8.0e3,
@@ -246,7 +246,7 @@ impl StoryBuilder for Story1_01 {
                 vessel_builder: VesselBuilder {
                     name: "Ship",
                     vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Player),
-                    orbit_builder: OrbitBuilder::Freeform {
+                    orbit_builder: InitialOrbitBuilder::Freeform {
                         parent: centralia,
                         distance: 1.0e7,
                         speed: 7.0e3,

@@ -1,4 +1,4 @@
-use crate::{components::path_component::{orbit::Orbit, segment::Segment}, Model, storage::entity_allocator::Entity};
+use crate::{components::path_component::{orbit::{builder::OrbitBuilder, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -7,25 +7,31 @@ pub mod solver;
 
 pub fn calculate_exit_encounter(model: &Model, orbit: &Orbit, new_parent: Entity, time: f64) -> Orbit {
     let old_parent = orbit.parent();
-    let new_parent_mass = model.mass(new_parent);
-    let mass = orbit.mass();
-
     let old_parent_point = &model.orbitable_component(old_parent).orbit().unwrap().point_at_time(time);
-    let position = orbit.end_point().position() + old_parent_point.position();
-    let velocity = orbit.end_point().velocity() + old_parent_point.velocity();
-
-    Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time)
+    
+    OrbitBuilder {
+        parent: new_parent,
+        mass: orbit.mass(),
+        parent_mass: model.mass(new_parent),
+        rotation: orbit.rotation(),
+        position: orbit.end_point().position() + old_parent_point.position(),
+        velocity: orbit.end_point().velocity() + old_parent_point.velocity(),
+        time,
+    }.build()
 }
 
 pub fn calculate_entrance_encounter(model: &Model, orbit: &Orbit, new_parent: Entity, time: f64) -> Orbit {
-    let new_parent_mass = model.mass(new_parent);
-    let mass = orbit.mass();
-
     let new_parent_point = &model.orbitable_component(new_parent).orbit().unwrap().point_at_time(time);
-    let position = orbit.end_point().position() - new_parent_point.position();
-    let velocity = orbit.end_point().velocity() - new_parent_point.velocity();
 
-    Orbit::new(new_parent, mass, new_parent_mass, position, velocity, time)
+    OrbitBuilder {
+        parent: new_parent,
+        mass: orbit.mass(),
+        parent_mass: model.mass(new_parent),
+        rotation: orbit.rotation(),
+        position: orbit.end_point().position() - new_parent_point.position(),
+        velocity: orbit.end_point().velocity() - new_parent_point.velocity(),
+        time,
+    }.build()
 }
 
 fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {

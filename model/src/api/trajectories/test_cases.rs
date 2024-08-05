@@ -3,7 +3,7 @@ use std::{collections::{HashMap, VecDeque}, fs};
 use nalgebra_glm::vec2;
 use serde::Deserialize;
 
-use crate::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::Orbit, segment::Segment, PathComponent}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::builder::OrbitBuilder, segment::Segment, PathComponent}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -103,9 +103,15 @@ pub fn load_case(name: &str) -> (Model, VecDeque<CaseEncounter>, Entity, f64, f6
                     panic!("An object has parent but not velocity");
                 };
 
-                let parent_mass = model.mass(*parent);
-                let velocity = vec2(velocity[0], velocity[1]);
-                let orbit = Orbit::new(*parent, data.mass, parent_mass, position, velocity, 0.0);
+                let orbit = OrbitBuilder {
+                    parent: *parent,
+                    mass: data.mass,
+                    parent_mass: model.mass(*parent),
+                    rotation: 0.0,
+                    position,
+                    velocity: vec2(velocity[0], velocity[1]),
+                    time: 0.0,
+                }.build();
 
                 if data.orbitable {
                     let orbitable_component = OrbitableComponent::new(data.mass, 0.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Orbit(Segment::Orbit(orbit)), None);

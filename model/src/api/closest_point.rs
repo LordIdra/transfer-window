@@ -209,12 +209,20 @@ mod test {
 
     use nalgebra_glm::vec2;
 
-    use crate::{api::closest_point::find_closest_point_on_orbit, components::path_component::orbit::Orbit, storage::entity_allocator::Entity};
+    use crate::{api::closest_point::find_closest_point_on_orbit, components::path_component::orbit::builder::OrbitBuilder, storage::entity_allocator::Entity};
 
     #[test]
     fn test_find_closest_point_on_orbit_ellipse() {
         // Earth orbiting sun
-        let orbit = Orbit::new(Entity::mock(), 5.9722e24, 1_988_500e24, vec2(147.095e9, 0.0), vec2(0.0, 30.29e3), 0.0);
+        let orbit = OrbitBuilder {
+            parent: Entity::mock(),
+            mass: 5.9722e24,
+            parent_mass: 1_988_500e24,
+            rotation: 0.0,
+            position: vec2(147.095e9, 0.0),
+            velocity: vec2(0.0, 30.29e3),
+            time: 0.0,
+        }.build();
 
         let c = find_closest_point_on_orbit(&orbit, vec2(1.5e11, 0.0), 1.0e10).unwrap();
         assert!(f64::atan2(c.y, c.x).abs() < 1.0e-2);
@@ -229,7 +237,15 @@ mod test {
     #[test]
     fn test_find_closest_point_on_orbit_hyperbola() {
         // Hyperbolic moon
-        let orbit = Orbit::new(Entity::mock(), 0.07346e24, 5.9722e24, vec2(0.3633e9, 0.0), vec2(0.0, 2.082e3), 0.0);
+        let orbit = OrbitBuilder {
+            parent: Entity::mock(),
+            mass: 0.07346e24,
+            parent_mass: 5.9722e24,
+            rotation: 0.0,
+            position: vec2(0.3633e9, 0.0),
+            velocity: vec2(0.0, 2.082e3),
+            time: 0.0,
+        }.build();
 
         let c = find_closest_point_on_orbit(&orbit, vec2(0.36e9, 0.0), 1.0e7).unwrap();
         assert!(f64::atan2(c.y, c.x).abs() < 1.0e-2);

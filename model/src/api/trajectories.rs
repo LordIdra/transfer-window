@@ -2,7 +2,7 @@ use encounter::EncounterType;
 use fast_solver::{calculate_entrance_encounter, calculate_exit_encounter};
 use log::{error, trace};
 
-use crate::{components::path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::Orbit, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use crate::{components::path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{builder::OrbitBuilder, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
 
 use self::fast_solver::{apply_encounter, solver::find_next_encounter};
 
@@ -75,11 +75,15 @@ impl Model {
     pub fn recompute_entire_trajectory(&mut self, entity: Entity) {
         let current_segment = self.path_component(entity).current_segment();
         let parent = current_segment.parent();
-        let position = current_segment.current_position();
-        let velocity = current_segment.current_velocity();
-        let parent_mass = self.mass(parent);
-        let mass = self.vessel_component(entity).mass();
-        let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, self.time);
+        let orbit = OrbitBuilder {
+            parent,
+            mass: self.vessel_component(entity).mass(),
+            parent_mass: self.mass(parent),
+            rotation: current_segment.current_rotation(),
+            position: current_segment.current_position(),
+            velocity: current_segment.current_velocity(),
+            time: self.time,
+        }.build();
 
         self.path_component_mut(entity).clear_future_segments();
         self.path_component_mut(entity).add_segment(Segment::Orbit(orbit));
@@ -110,11 +114,16 @@ impl Model {
     pub(crate) fn compute_perceived_path(&self, entity: Entity) -> Vec<Segment> {
         let current_segment = self.path_component(entity).current_segment();
         let parent = current_segment.parent();
-        let parent_mass = self.mass(parent);
-        let mass = current_segment.current_mass();
-        let position = current_segment.current_position();
-        let velocity = current_segment.current_velocity();
-        let orbit = Orbit::new(parent, mass, parent_mass, position, velocity, self.time);
+        let orbit = OrbitBuilder {
+            parent,
+            mass: current_segment.current_mass(),
+            parent_mass: self.mass(parent),
+            rotation: current_segment.current_rotation(),
+            position: current_segment.current_position(),
+            velocity: current_segment.current_velocity(),
+            time: self.time,
+        }.build();
+        
         let mut segments = Vec::new();
         segments.push(Segment::Orbit(orbit));
 

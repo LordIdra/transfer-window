@@ -5,14 +5,16 @@ use crate::storage::entity_allocator::Entity;
 
 use self::{burn_point::BurnPoint, rocket_equation_function::RocketEquationFunction};
 
+pub mod builder;
 pub mod burn_point;
 pub mod rocket_equation_function;
 
-const BURN_TIME_STEP: f64 = 0.001;
+const BURN_TIME_STEP: f64 = 0.1;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Burn {
     parent: Entity,
+    rotation: f64,
     rocket_equation_function: RocketEquationFunction,
     tangent: DVec2,
     delta_v: DVec2, // (tangent, normal)
@@ -22,10 +24,11 @@ pub struct Burn {
 
 impl Burn {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(parent: Entity, parent_mass: f64, tangent: DVec2, delta_v: DVec2, start_time: f64, rocket_equation_function: RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
-        let start_point = BurnPoint::new(parent_mass, rocket_equation_function.mass(), start_time, start_position, start_velocity);
+    pub(self) fn new(parent: Entity, parent_mass: f64, rocket_equation_function: RocketEquationFunction, tangent: DVec2, delta_v: DVec2, time: f64, position: DVec2, velocity: DVec2) -> Self {
+        let start_point = BurnPoint::new(parent_mass, rocket_equation_function.mass(), time, position, velocity);
         let mut burn = Self { 
             parent,
+            rotation: 0.0, // initialised later
             rocket_equation_function,
             tangent,
             delta_v,
@@ -33,7 +36,12 @@ impl Burn {
             points: vec![],
         };
         burn.recompute_burn_points(&start_point);
+        burn.rotation = f64::atan2(burn.absolute_delta_v().y, burn.absolute_delta_v().x);
         burn
+    }
+
+    pub fn rotation(&self) -> f64 {
+        self.rotation
     }
 
     #[allow(clippy::missing_panics_doc)]
@@ -180,43 +188,50 @@ impl Burn {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::path_component::{brute_force_tester::BruteForceTester, burn::{rocket_equation_function::RocketEquationFunction, Burn, BURN_TIME_STEP}}, storage::entity_allocator::Entity};
+    use crate::{components::path_component::{brute_force_tester::BruteForceTester, burn::{builder::BurnBuilder, rocket_equation_function::RocketEquationFunction, BURN_TIME_STEP}}, storage::entity_allocator::Entity};
 
     #[test]
     pub fn test() {
-        let duration = 100.0;
-        let parent = Entity::mock();
         let parent_mass = 5.972e24; // earth's mass
+        let duration = 100.0;
         let tangent = vec2(1.0, 0.0);
         let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 1.0, 0.0);
         let rocket_equation_function_clone = rocket_equation_function.clone();
         let acceleration_from_time = move |time: f64| rocket_equation_function_clone.step_by_time(time).unwrap().acceleration() * tangent;
-        let delta_v = rocket_equation_function.end().used_dv() * tangent;
-        let start_time = 0.0;
-        let start_position = vec2(2.00e6, 0.0);
-        let start_velocity = vec2(0.0, 1.0e3);
-        let mut burn = Burn::new(parent, parent_mass, tangent, delta_v, start_time, rocket_equation_function, start_position, start_velocity);
+        let position = vec2(2.00e6, 0.0);
+        let velocity = vec2(0.0, 1.0e3);
+
+        let mut burn = BurnBuilder{
+            parent: Entity::mock(),
+            parent_mass,
+            tangent,
+            delta_v: rocket_equation_function.end().used_dv() * tangent,
+            time: 0.0,
+            rocket_equation_function,
+            position,
+            velocity
+        }.build();
         
-        let mut tester = BruteForceTester::new(parent_mass, start_position, start_velocity, acceleration_from_time.clone(), BURN_TIME_STEP);
+        let mut tester = BruteForceTester::new(parent_mass, position, velocity, acceleration_from_time.clone(), BURN_TIME_STEP);
         tester.update(duration);
         assert!((tester.time() - burn.end_point().time()).abs() < 1.0);
         assert!((tester.position() - burn.end_point().position()).magnitude() < 1.0);
         assert!((tester.velocity() - burn.end_point().velocity()).magnitude() < 1.0);
         
-        let mut tester = BruteForceTester::new(parent_mass, start_position, start_velocity, acceleration_from_time.clone(), BURN_TIME_STEP);
+        let mut tester = BruteForceTester::new(parent_mass, position, velocity, acceleration_from_time.clone(), BURN_TIME_STEP);
         tester.update(0.5 * duration);
         assert!((tester.time() - burn.point_at_time(0.5 * duration).time()).abs() < 1.0);
         assert!((tester.position() - burn.point_at_time(0.5 * duration).position()).magnitude() < 1.0);
         assert!((tester.velocity() - burn.point_at_time(0.5 * duration).velocity()).magnitude() < 1.0);
 
-        let mut tester = BruteForceTester::new(parent_mass, start_position, start_velocity, acceleration_from_time.clone(), BURN_TIME_STEP);
+        let mut tester = BruteForceTester::new(parent_mass, position, velocity, acceleration_from_time.clone(), BURN_TIME_STEP);
         tester.update(0.5 * duration);
         burn.next(0.5 * duration);
         assert!((tester.time() - burn.current_point().time()).abs() < 1.0);
         assert!((tester.position() - burn.current_point().position()).magnitude() < 1.0);
         assert!((tester.velocity() - burn.current_point().velocity()).magnitude() < 1.0);
 
-        let tester = BruteForceTester::new(parent_mass, start_position, start_velocity, acceleration_from_time, BURN_TIME_STEP);
+        let tester = BruteForceTester::new(parent_mass, position, velocity, acceleration_from_time, BURN_TIME_STEP);
         burn.reset();
         assert!((tester.time() - burn.current_point().time()).abs() < 1.0);
         assert!((tester.position() - burn.current_point().position()).magnitude() < 1.0);

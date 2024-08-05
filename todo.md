@@ -231,7 +231,7 @@
 [x] Ship texture
 [x] Scaling per class
 [x] Draw ship in-game
-[ ] Vessel rotation
+[x] Vessel rotation
 [ ] Angular momentum
 [ ] Turning segments (fuck)
 [ ] Icons show rotation

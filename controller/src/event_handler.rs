@@ -14,7 +14,7 @@ pub fn quit(context: &Context) {
     context.send_viewport_cmd(ViewportCommand::Close);
 }
 
-pub fn new_game(controller: &mut Controller, context: &Context, story_builder: &dyn StoryBuilder) {
+pub fn new_game<T: StoryBuilder + ?Sized>(controller: &mut Controller, context: &Context, story_builder: &T) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("New game");
 

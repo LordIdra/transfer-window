@@ -5,9 +5,9 @@ use crate::game::{util::add_textured_square, View};
 fn get_ship_size(class: VesselClass) -> f64 {
     match class {
         VesselClass::Scout1 => 100.0,
-        VesselClass::Torpedo => todo!(),
-        VesselClass::Station => todo!(),
-        VesselClass::Frigate1 => todo!(),
+        VesselClass::Torpedo => 100.0,
+        VesselClass::Station => 100.0,
+        VesselClass::Frigate1 => 100.0,
     }
 }
 

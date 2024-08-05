@@ -136,7 +136,7 @@ impl Model {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::entity_builder::EntityBuilder, Model};
+    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{builder::OrbitBuilder, orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
 
     #[test]
     fn test_find_same_parent_orbit_pairs() {
@@ -156,17 +156,27 @@ mod test {
 
         
         let mut path_component = PathComponent::default();
+
+        let mut orbit_template = OrbitBuilder {
+            parent: Entity::mock(),
+            mass: 1.0e3,
+            parent_mass: 1.0e23,
+            rotation: 0.0,
+            position: vec2(1.0e9, 0.0),
+            velocity: vec2(0.0, 1.0e3),
+            time: 0.0,
+        };
     
-        let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 0.0).with_end_at(10.0);
-        let segment_d_1 = Segment::Orbit(orbit);
+        orbit_template.parent = entity_c;
+        let segment_d_1 = Segment::Orbit(orbit_template.clone().build().with_end_at(10.0));
         path_component.add_segment(segment_d_1.clone());
 
-        let orbit = Orbit::new(entity_b, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 10.0).with_end_at(50.0);
-        let segment_d_2 = Segment::Orbit(orbit);
+        orbit_template.parent = entity_b;
+        let segment_d_2 = Segment::Orbit(orbit_template.clone().build().with_end_at(50.0));
         path_component.add_segment(segment_d_2.clone());
 
-        let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 50.0).with_end_at(100.0);
-        let segment_d_3 = Segment::Orbit(orbit);
+        orbit_template.parent = entity_c;
+        let segment_d_3 = Segment::Orbit(orbit_template.clone().build().with_end_at(100.0));
         path_component.add_segment(segment_d_3.clone());
 
         let entity_d = model.allocate(EntityBuilder::default().with_path_component(path_component));
@@ -174,24 +184,24 @@ mod test {
 
         let mut path_component = PathComponent::default();
 
-        let orbit = Orbit::new(entity_a, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 0.0).with_end_at(5.0);
-        let segment_e_1 = Segment::Orbit(orbit);
+        orbit_template.parent = entity_a;
+        let segment_e_1 = Segment::Orbit(orbit_template.clone().build().with_end_at(5.0));
         path_component.add_segment(segment_e_1.clone());
 
-        let orbit = Orbit::new(entity_b, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 5.0).with_end_at(15.0);
-        let segment_e_2 = Segment::Orbit(orbit);
+        orbit_template.parent = entity_b;
+        let segment_e_2 = Segment::Orbit(orbit_template.clone().build().with_end_at(15.0));
         path_component.add_segment(segment_e_2.clone());
 
-        let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 15.0).with_end_at(55.0);
-        let segment_e_3 = Segment::Orbit(orbit);
+        orbit_template.parent = entity_c;
+        let segment_e_3 = Segment::Orbit(orbit_template.clone().build().with_end_at(55.0));
         path_component.add_segment(segment_e_3.clone());
 
-        let orbit = Orbit::new(entity_a, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 55.0).with_end_at(70.0);
-        let segment_e_4 = Segment::Orbit(orbit);
+        orbit_template.parent = entity_a;
+        let segment_e_4 = Segment::Orbit(orbit_template.clone().build().with_end_at(70.0));
         path_component.add_segment(segment_e_4.clone());
 
-        let orbit = Orbit::new(entity_c, 1.0e3, 1.0e23, vec2(1.0e9, 0.0), vec2(0.0, 1.0e3), 70.0).with_end_at(100.0);
-        let segment_e_5 = Segment::Orbit(orbit);
+        orbit_template.parent = entity_c;
+        let segment_e_5 = Segment::Orbit(orbit_template.clone().build().with_end_at(100.0));
         path_component.add_segment(segment_e_5.clone());
 
         let entity_e = model.allocate(EntityBuilder::default().with_path_component(path_component));

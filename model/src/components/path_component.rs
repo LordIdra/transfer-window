@@ -12,6 +12,7 @@ pub mod burn;
 pub mod guidance;
 pub mod orbit;
 pub mod segment;
+pub mod turn;
 
 /// Must have `MassComponent`, cannot have `StationaryComponent`
 #[derive(Debug, Serialize, Deserialize, Default, Clone)]
@@ -290,37 +291,35 @@ impl PathComponent {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{storage::entity_allocator::Entity, components::path_component::PathComponent};
+    use crate::{components::path_component::{orbit::builder::OrbitBuilder, PathComponent}, storage::entity_allocator::Entity};
 
-    use super::{segment::Segment, orbit::Orbit};
+    use super::segment::Segment;
 
 
     #[test]
     pub fn test() {
         let mut path_component = PathComponent::default();
 
-        let orbit_1 = {
-            let parent = Entity::mock();
-            let mass = 100.0;
-            let parent_mass = 5.9722e24;
-            let position = vec2(2.0e6, 0.0);
-            let velocity = vec2(0.0, 1.0e5);
-            let start_time = 0.0;
-            let end_time = 99.9;
-            Orbit::new(parent, mass, parent_mass, position, velocity, start_time).with_end_at(end_time)
-        };
+        let orbit_1 = OrbitBuilder {
+            parent: Entity::mock(),
+            mass: 100.0,
+            parent_mass: 5.9722e24,
+            rotation: 0.0,
+            position: vec2(2.0e6, 0.0),
+            velocity: vec2(0.0, 1.0e5),
+            time: 0.0,
+        }.build().with_end_at(99.0);
 
-        let orbit_2 = {
+        let orbit_2 = OrbitBuilder {
             // Exact same start point but opposite velocity, so same end velocity/position magnitude
-            let parent = Entity::mock();
-            let mass = 100.0;
-            let parent_mass = 5.9722e24;
-            let position = vec2(2.0e6, 0.0);
-            let velocity = vec2(0.0, -1.0e5); 
-            let start_time = 99.9;
-            let end_time = 200.0;
-            Orbit::new(parent, mass, parent_mass, position, velocity, start_time).with_end_at(end_time)
-        };
+            parent: Entity::mock(),
+            mass: 100.0,
+            parent_mass: 5.9722e24,
+            rotation: 0.0,
+            position: vec2(2.0e6, 0.0),
+            velocity: vec2(0.0, -1.0e5),
+            time: 99.9,
+        }.build().with_end_at(200.0);
 
         path_component.add_segment(Segment::Orbit(orbit_1));
         path_component.add_segment(Segment::Orbit(orbit_2));

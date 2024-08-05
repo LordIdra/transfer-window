@@ -16,6 +16,7 @@ const LINE_OF_SIGHT_RATE_DELTA: f64 = 0.1;
 const PROPORTIONALITY_CONSTANT: f64 = 3.0;
 const DISTANCE_DERIVATIVE_DELTA: f64 = 0.001;
 
+pub mod builder;
 pub mod guidance_point;
 
 pub fn will_intercept(intercept_distance: f64) -> bool {
@@ -110,14 +111,14 @@ pub struct Guidance {
 
 impl Guidance {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(model: &Model, parent: Entity, target: Entity, faction: Faction, parent_mass: f64, start_time: f64, rocket_equation_function: &RocketEquationFunction, start_position: DVec2, start_velocity: DVec2) -> Self {
-        let start_point = GuidancePoint::new(parent_mass, rocket_equation_function.mass(), start_time, start_position, start_velocity, vec2(0.0, 0.0), 0.0);
-        let (will_intercept, points) = compute_guidance_points(model, parent, target, faction, rocket_equation_function, &start_point);
+    pub(self) fn new(model: &Model, parent: Entity, parent_mass: f64, target: Entity, faction: Faction, rocket_equation_function: RocketEquationFunction, start_time: f64, start_rotation: f64, start_position: DVec2, start_velocity: DVec2) -> Self {
+        let start_point = GuidancePoint::new(parent_mass, rocket_equation_function.mass(), start_time, start_rotation, start_position, start_velocity, vec2(0.0, 0.0), 0.0);
+        let (will_intercept, points) = compute_guidance_points(model, parent, target, faction, &rocket_equation_function, &start_point);
         Self { 
             parent,
             target,
             faction,
-            rocket_equation_function: rocket_equation_function.clone(),
+            rocket_equation_function,
             current_point: start_point.clone(),
             points,
             will_intercept,

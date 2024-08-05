@@ -1,7 +1,9 @@
 use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
-use transfer_window_model::{api::builder::{OrbitBuilder, OrbitableBuilder, OrbitablePhysicsBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::components::orbitable_component::builder::OrbitablePhysicsBuilder;
+use transfer_window_model::components::path_component::orbit::builder::InitialOrbitBuilder;
+use transfer_window_model::{api::builder::{OrbitableBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 
 use crate::controller_events::ControllerEvent;
 use crate::game::events::ViewEvent;
@@ -44,7 +46,7 @@ impl StoryBuilder for Story1_03 {
         let player_ship = VesselBuilder {
             name: "Ship",
             vessel_component: VesselComponent::new(VesselClass::Frigate1, Faction::Player),
-            orbit_builder: OrbitBuilder::Circular {
+            orbit_builder: InitialOrbitBuilder::Circular {
                 parent: centralia,
                 distance: 9.371e6,
                 angle: 0.0,
@@ -55,7 +57,7 @@ impl StoryBuilder for Story1_03 {
         let enemy_ship = VesselBuilder {
             name: "Ship",
             vessel_component: VesselComponent::new(VesselClass::Scout1, Faction::Enemy),
-            orbit_builder: OrbitBuilder::Circular {
+            orbit_builder: InitialOrbitBuilder::Circular {
                 parent: centralia,
                 distance: 10.371e6,
                 angle: 0.2,

@@ -7,6 +7,7 @@ use crate::{storage::entity_allocator::Entity, util::normalize_angle};
 
 use self::{conic::Conic, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{sphere_of_influence, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT}};
 
+pub mod builder;
 pub mod conic;
 pub mod orbit_direction;
 pub mod orbit_point;
@@ -16,6 +17,7 @@ pub mod scary_math;
 pub struct Orbit {
     parent: Entity,
     mass: f64,
+    rotation: f64,
     conic: Conic,
     sphere_of_influence: f64,
     start_point: OrbitPoint,
@@ -24,28 +26,33 @@ pub struct Orbit {
 }
 
 impl Orbit {
-    pub fn new(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
+    pub(self) fn new(parent: Entity, mass: f64, parent_mass: f64, rotation: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
         let conic = Conic::new(parent_mass, position, velocity);
         let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, mass, conic, sphere_of_influence, start_point, end_point, current_point }
+        Self { parent, mass, rotation, conic, sphere_of_influence, start_point, end_point, current_point }
     }
 
     pub fn circle(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, time: f64, direction: OrbitDirection) -> Self {
         let conic = Conic::circle(parent_mass, position, direction);
         let standard_gravitational_parameter = parent_mass * GRAVITATIONAL_CONSTANT;
         let velocity = velocity_to_obtain_eccentricity(position, conic.eccentricity(), standard_gravitational_parameter, conic.semi_major_axis(), direction);
+        let rotation = f64::atan2(velocity.y, velocity.x);
         let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, mass, conic, sphere_of_influence, start_point, end_point, current_point }
+        Self { parent, mass, rotation, conic, sphere_of_influence, start_point, end_point, current_point }
     }
 
     pub fn mass(&self) -> f64 {
         self.mass
+    }
+
+    pub fn rotation(&self) -> f64 {
+        self.rotation
     }
 
     pub fn start_point(&self) -> &OrbitPoint {
@@ -260,7 +267,7 @@ mod test {
         let velocity = vec2(0.0, 30.29e3);
         let start_time = 0.0;
         let end_time = 20.0 * 24.0 * 60.0 * 60.0;
-        let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
+        let mut orbit = Orbit::new(parent, mass, parent_mass, 0.0, position, velocity, start_time);
         orbit.end_at(end_time);
         let expected_angle = orbit.theta_from_time(end_time);
         assert!((orbit.remaining_angle() - expected_angle).abs() < 1.0e-1);
@@ -275,7 +282,7 @@ mod test {
         let velocity = vec2(0.0, 30.29e3);
         let start_time = 0.0;
         let end_time = 283.0 * 24.0 * 60.0 * 60.0;
-        let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
+        let mut orbit = Orbit::new(parent, mass, parent_mass, 0.0, position, velocity, start_time);
         orbit.end_at(end_time);
         let expected_angle = orbit.theta_from_time(end_time);
         assert!((orbit.remaining_angle() - expected_angle).abs() < 1.0e-1);
@@ -290,7 +297,7 @@ mod test {
         let velocity = vec2(0.0, 30.29e3);
         let start_time = 0.0;
         let end_time = 420.0 * 24.0 * 60.0 * 60.0;
-        let mut orbit = Orbit::new(parent, mass, parent_mass, position, velocity, start_time);
+        let mut orbit = Orbit::new(parent, mass, parent_mass, 0.0, position, velocity, start_time);
         orbit.end_at(end_time);
         let expected_angle = 2.0 * PI;
         assert!((orbit.remaining_angle() - expected_angle).abs() < 1.0e-1);

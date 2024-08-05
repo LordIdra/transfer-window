@@ -29,6 +29,14 @@ impl Segment {
         }
     }
 
+    pub fn start_rotation(&self) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.rotation(),
+            Segment::Burn(burn) => burn.rotation(),
+            Segment::Guidance(guidance) => guidance.start_point().rotation(),
+        }
+    }
+
     pub fn start_position(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.start_point().position(),
@@ -50,6 +58,14 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.current_point().mass(),
             Segment::Guidance(guidance) => guidance.current_point().mass(),
+        }
+    }
+
+    pub fn current_rotation(&self) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.rotation(),
+            Segment::Burn(burn) => burn.rotation(),
+            Segment::Guidance(guidance) => guidance.current_point().rotation(),
         }
     }
 
@@ -85,6 +101,14 @@ impl Segment {
         }
     }
 
+    pub fn end_rotation(&self) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.rotation(),
+            Segment::Burn(burn) => burn.rotation(),
+            Segment::Guidance(guidance) => guidance.end_point().rotation(),
+        }
+    }
+
     pub fn end_position(&self) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.end_point().position(),
@@ -101,6 +125,22 @@ impl Segment {
         }
     }
 
+    pub fn mass_at_time(&self, time: f64) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.mass(),
+            Segment::Burn(burn) => burn.point_at_time(time).mass(),
+            Segment::Guidance(guidance) => guidance.point_at_time(time).mass(),
+        }
+    }
+
+    pub fn rotation_at_time(&self, time: f64) -> f64 {
+        match self {
+            Segment::Orbit(orbit) => orbit.rotation(),
+            Segment::Burn(burn) => burn.rotation(),
+            Segment::Guidance(guidance) => guidance.point_at_time(time).rotation(),
+        }
+    }
+
     pub fn position_at_time(&self, time: f64) -> DVec2 {
         match self {
             Segment::Orbit(orbit) => orbit.position_from_theta(orbit.theta_from_time(time)),
@@ -114,14 +154,6 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.velocity_from_theta(orbit.theta_from_time(time)),
             Segment::Burn(burn) => burn.point_at_time(time).velocity(),
             Segment::Guidance(guidance) => guidance.point_at_time(time).velocity(),
-        }
-    }
-
-    pub fn mass_at_time(&self, time: f64) -> f64 {
-        match self {
-            Segment::Orbit(orbit) => orbit.mass(),
-            Segment::Burn(burn) => burn.point_at_time(time).mass(),
-            Segment::Guidance(guidance) => guidance.point_at_time(time).mass(),
         }
     }
 

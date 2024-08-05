@@ -8,6 +8,7 @@ pub struct GuidancePoint {
     parent_mass: f64,
     mass: f64,
     time: f64,
+    rotation: f64,
     position: DVec2,
     velocity: DVec2,
     guidance_acceleration: DVec2,
@@ -15,8 +16,8 @@ pub struct GuidancePoint {
 }
 
 impl GuidancePoint {
-    pub fn new(parent_mass: f64, mass: f64, time: f64, position: DVec2, velocity: DVec2, guidance_acceleration: DVec2, dv: f64) -> Self {
-        Self { parent_mass, mass, time, position, velocity, guidance_acceleration, dv }
+    pub fn new(parent_mass: f64, mass: f64, time: f64, rotation: f64, position: DVec2, velocity: DVec2, guidance_acceleration: DVec2, dv: f64) -> Self {
+        Self { parent_mass, mass, time, rotation, position, velocity, guidance_acceleration, dv }
     }
 
     pub fn next(&self, delta_time: f64, new_mass: f64) -> Self {
@@ -24,11 +25,12 @@ impl GuidancePoint {
         let acceleration = gravity_acceleration + self.guidance_acceleration;
         let parent_mass = self.parent_mass;
         let time = self.time + delta_time;
+        let rotation = f64::atan2(acceleration.y, acceleration.x);
         let velocity = self.velocity + acceleration * delta_time;
         let position = self.position + velocity * delta_time;
         let artificial_acceleration = self.guidance_acceleration;
         let dv = self.dv + self.guidance_acceleration.magnitude() * delta_time;
-        Self { parent_mass, mass: new_mass, time, position, velocity, guidance_acceleration: artificial_acceleration, dv }
+        Self { parent_mass, mass: new_mass, time, rotation, position, velocity, guidance_acceleration: artificial_acceleration, dv }
     }
 
     pub fn next_with_new_acceleration_and_dv(&self, delta_time: f64, new_mass: f64, guidance_acceleration: DVec2) -> Self {
@@ -43,6 +45,10 @@ impl GuidancePoint {
 
     pub fn time(&self) -> f64 {
         self.time
+    }
+
+    pub fn rotation(&self) -> f64 {
+        self.rotation
     }
 
     pub fn position(&self) -> DVec2 {

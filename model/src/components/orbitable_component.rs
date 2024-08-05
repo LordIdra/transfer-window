@@ -6,6 +6,7 @@ use super::path_component::{orbit::Orbit, segment::Segment};
 use self::atmosphere::Atmosphere;
 
 pub mod atmosphere;
+pub mod builder;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum OrbitableType {

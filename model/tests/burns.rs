@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{orbit_direction::OrbitDirection, Orbit}, PathComponent}, vessel_component::{class::VesselClass, faction::Faction, timeline::{start_burn::StartBurnEvent, TimelineEvent}, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{builder::OrbitBuilder, orbit_direction::OrbitDirection, Orbit}, PathComponent}, vessel_component::{class::VesselClass, faction::Faction, timeline::{start_burn::StartBurnEvent, TimelineEvent}, VesselComponent}}, storage::entity_builder::EntityBuilder, Model};
 
 #[test]
 fn test_burn_without_engine_or_fuel_tank() {
@@ -11,7 +11,15 @@ fn test_burn_without_engine_or_fuel_tank() {
         .with_orbitable_component(OrbitableComponent::new(earth_mass, 1.0, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)), None)));
 
     let vessel_component = VesselComponent::new(VesselClass::Station, Faction::Player);
-    let orbit = Orbit::new(earth, vessel_component.mass(), earth_mass, vec2(0.01041e9, 0.0), vec2(0.0, 8.250e3), 0.0);
+    let orbit = OrbitBuilder {
+        parent: earth,
+        mass: vessel_component.mass(),
+        parent_mass: earth_mass,
+        rotation: 0.0,
+        position: vec2(0.01041e9, 0.0),
+        velocity: vec2(0.0, 8.250e3),
+        time: 0.0,
+    }.build();
     let vessel = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Vessel".to_string()))
         .with_vessel_component(vessel_component)
