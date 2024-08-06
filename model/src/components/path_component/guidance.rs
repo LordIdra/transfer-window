@@ -185,8 +185,12 @@ impl Guidance {
         absolute_time - self.start_point().time()
     }
 
-    pub fn rocket_equation_function(&self) -> RocketEquationFunction {
+    pub fn start_rocket_equation_function(&self) -> RocketEquationFunction {
         self.rocket_equation_function.clone()
+    }
+
+    pub fn rocket_equation_function(&self) -> RocketEquationFunction {
+        self.rocket_equation_function_at_time(self.current_point.time())
     }
 
     pub fn dv_at_time(&self, time: f64) -> f64 {

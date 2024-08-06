@@ -110,8 +110,12 @@ impl Burn {
         absolute_time - self.start_point().time()
     }
 
-    pub fn rocket_equation_function(&self) -> RocketEquationFunction {
+    pub fn start_rocket_equation_function(&self) -> RocketEquationFunction {
         self.rocket_equation_function.clone()
+    }
+
+    pub fn rocket_equation_function(&self) -> RocketEquationFunction {
+        self.rocket_equation_function_at_time(self.current_point.time())
     }
 
     /// `time` is absolute

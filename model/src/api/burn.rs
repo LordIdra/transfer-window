@@ -88,7 +88,7 @@ impl Model {
     pub fn calculate_burn_dv(&self, entity: Entity, time: f64, change: DVec2) -> Option<DVec2> {
         let burn = self.burn_starting_at_time(entity, time);
         let new_dv = (burn.delta_v() + change).magnitude();
-        if new_dv > burn.rocket_equation_function().remaining_dv() {
+        if new_dv > burn.start_rocket_equation_function().remaining_dv() {
             if burn.final_rocket_equation_function().remaining_dv() < MIN_DV_TO_ADJUST_BURN {
                 None
             } else {

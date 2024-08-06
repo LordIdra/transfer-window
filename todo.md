@@ -201,6 +201,7 @@
 [x] Planet textures/generation, atmosphere shaders?
 [x] Measure altitude in km from SURFACE not centre
 [x] 1-03
+[ ] Don't allow selecting ghosts with top left button
 
 
 # ------------------------------------ #
@@ -208,8 +209,9 @@
 # ------------------------------------ #
 - 01 Awakening
   - Why am I here? I'm alone on a station
+  - This isn't anything like the training
   - Sensors indicate an incoming torpedo
-  - The station doesn't have any offensive measures of its own. There's a frigate, I need to undock and 
+  - The station doesn't have any offensive measures of its own. There's a frigate, I need to undock and intercept, quickly...
 
 
 ## Optional Levels
@@ -232,15 +234,16 @@
 [x] Scaling per class
 [x] Draw ship in-game
 [x] Vessel rotation
+[x] RcsFacility (with center of mass and RCS thruster locations)
+[x] Monopropellant
+[x] Thruster textures
+[ ] Rotation at time queries
+[ ] Icons show rotation
+[ ] Ship width/height instead of just size
 [ ] Angular momentum
 [ ] Turning segments (fuck)
-[ ] Icons show rotation
-[ ] Rotation at time queries
-[ ] RcsFacility (with center of mass and RCS thruster locations)
 [ ] Manual piloting mode
-[ ] Monopropellant
 [ ] Monopropellant textures
-[ ] Thruster textures
 [ ] Bounding boxes
 [ ] Collision detection system
 [ ] Hull integrity system?
