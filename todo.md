@@ -240,7 +240,9 @@
 [x] Rotation at time queries
 [x] Fix burn selection???????
 [x] Icons show rotation
-[ ] Ship width/height instead of just size
+[x] Ship texture rotation
+[x] Ship width/height instead of just size
+[ ] Fix segments overlaying ship (lol what)
 [ ] Angular momentum
 [ ] Monopropellant depletion
 [ ] Turning segments (fuck)

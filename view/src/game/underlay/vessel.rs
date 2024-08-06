@@ -1,15 +1,7 @@
-use transfer_window_model::components::{vessel_component::class::VesselClass, ComponentType};
+use nalgebra_glm::vec2;
+use transfer_window_model::components::ComponentType;
 
-use crate::game::{util::add_textured_square, View};
-
-fn get_ship_size(class: VesselClass) -> f64 {
-    match class {
-        VesselClass::Scout1 => 100.0,
-        VesselClass::Torpedo => 100.0,
-        VesselClass::Station => 100.0,
-        VesselClass::Frigate1 => 100.0,
-    }
-}
+use crate::game::{util::add_textured_rectangle_facing, View};
 
 pub fn draw(view: &View) {
     #[cfg(feature = "profiling")]
@@ -18,10 +10,12 @@ pub fn draw(view: &View) {
     for entity in view.entities_should_render(vec![ComponentType::VesselComponent]) {
         let vessel = view.model.vessel_component(entity);
         let position = view.model.absolute_position(entity);
-        let radius = get_ship_size(vessel.class());
+        let rotation = view.model.rotation(entity);
+        let dimensions = vessel.dimensions();
+        let facing = vec2(f64::cos(rotation), f64::sin(rotation));
 
         let mut vertices = vec![];
-        add_textured_square(&mut vertices, position, radius, 1.0);
+        add_textured_rectangle_facing(&mut vertices, position, dimensions, 1.0, facing);
         view.renderers.add_texture_vertices(vessel.class().name(), &mut vertices);
     }
 }

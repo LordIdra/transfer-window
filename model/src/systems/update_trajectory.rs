@@ -8,12 +8,12 @@ fn update_path_component(model: &mut Model, entity: Entity, time: f64) {
     loop {
         if let Some(burn) = model.path_component(entity).current_segment().as_burn() {
             let new_fuel_kg = burn.rocket_equation_function().remaining_fuel_kg();
-            model.vessel_component_mut(entity).set_fuel_kg(new_fuel_kg)
+            model.vessel_component_mut(entity).set_fuel_kg(new_fuel_kg);
         }
 
         if let Some(guidance) = model.path_component(entity).current_segment().as_guidance() {
             let new_fuel_kg = guidance.rocket_equation_function().remaining_fuel_kg();
-            model.vessel_component_mut(entity).set_fuel_kg(new_fuel_kg)
+            model.vessel_component_mut(entity).set_fuel_kg(new_fuel_kg);
         }
 
         if !model.path_component(entity).current_segment().is_finished() {

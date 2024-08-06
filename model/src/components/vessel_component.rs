@@ -6,6 +6,7 @@ use engine::Engine;
 use faction::Faction;
 use fuel_tank::FuelTank;
 use log::error;
+use nalgebra_glm::{vec2, DVec2};
 use rcs::{Rcs, RcsType};
 use monopropellant_tank::MonopropellantTank;
 use serde::{Deserialize, Serialize};
@@ -36,6 +37,7 @@ pub struct VesselComponent {
     dry_mass: f64,
     is_ghost: bool,
     can_dock: bool,
+    dimensions: DVec2,
     timeline: Timeline,
     target: Option<Entity>,
     fuel_tank: Option<FuelTank>,
@@ -55,6 +57,7 @@ impl VesselComponent {
                 dry_mass: 2.0e3,
                 is_ghost: true,
                 can_dock: false,
+                dimensions: vec2(0.0, 0.0),
                 timeline: Timeline::default(),
                 target: None,
                 fuel_tank: Some(FuelTank::new(10_000.0)),
@@ -71,6 +74,7 @@ impl VesselComponent {
                 dry_mass: 380.0e3,
                 is_ghost: false,
                 can_dock: false,
+                dimensions: vec2(2680.0, 2000.0),
                 timeline: Timeline::default(),
                 target: None,
                 fuel_tank: Some(FuelTank::new(140_000.0)),
@@ -87,6 +91,7 @@ impl VesselComponent {
                 dry_mass: 10.0e3,
                 is_ghost: false,
                 can_dock: true,
+                dimensions: vec2(540.0, 200.0),
                 timeline: Timeline::default(),
                 target: None,
                 fuel_tank: Some(FuelTank::new(30_000.0)),
@@ -103,6 +108,7 @@ impl VesselComponent {
                 dry_mass: 30.0e3,
                 is_ghost: false,
                 can_dock: true,
+                dimensions: vec2(0.0, 0.0),
                 timeline: Timeline::default(),
                 target: None,
                 fuel_tank: Some(FuelTank::new(60_000.0)),
@@ -438,5 +444,9 @@ impl VesselComponent {
 
     pub fn undock(&mut self, location: DockingPortLocation) {
         self.docking.as_mut().expect("Attempt to dock to vessel without docking ports").undock(location);
+    }
+
+    pub fn dimensions(&self) -> DVec2 {
+        self.dimensions
     }
 }

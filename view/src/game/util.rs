@@ -56,6 +56,16 @@ pub fn add_textured_square_facing(vertices: &mut Vec<f32>, position: DVec2, radi
     add_textured_triangle(vertices, v4, v2, v3, color, vec2(1.0, 0.0), vec2(0.0, 0.0), vec2(1.0, 1.0));
 }
 
+pub fn add_textured_rectangle_facing(vertices: &mut Vec<f32>, position: DVec2, dimensions: DVec2, color: f32, facing_unit: DVec2) {
+    let perpendicular_unit = vec2(-facing_unit.y, facing_unit.x);
+    let v1 = position + (perpendicular_unit * dimensions.y - facing_unit * dimensions.x);
+    let v2 = position + (perpendicular_unit * dimensions.y + facing_unit * dimensions.x);
+    let v3 = position - (perpendicular_unit * dimensions.y + facing_unit * dimensions.x);
+    let v4 = position - (perpendicular_unit * dimensions.y - facing_unit * dimensions.x);
+    add_textured_triangle(vertices, v1, v2, v3, color, vec2(0.0, 1.0), vec2(0.0, 0.0), vec2(1.0, 1.0));
+    add_textured_triangle(vertices, v4, v2, v3, color, vec2(1.0, 0.0), vec2(0.0, 0.0), vec2(1.0, 1.0));
+}
+
 fn dvec2_to_f32_tuple(vec: DVec2) -> ((f32, f32), (f32, f32)) {
     (f64_to_f32_pair(vec.x), f64_to_f32_pair(vec.y))
 }

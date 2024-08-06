@@ -16,6 +16,7 @@ pub struct GuidancePoint {
 }
 
 impl GuidancePoint {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(parent_mass: f64, mass: f64, time: f64, rotation: f64, position: DVec2, velocity: DVec2, guidance_acceleration: DVec2, dv: f64) -> Self {
         Self { parent_mass, mass, time, rotation, position, velocity, guidance_acceleration, dv }
     }

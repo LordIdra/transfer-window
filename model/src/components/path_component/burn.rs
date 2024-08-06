@@ -154,6 +154,7 @@ impl Burn {
     pub fn adjust(&mut self, adjustment: DVec2) {
         self.delta_v += adjustment;
         let start_point = self.start_point().clone();
+        self.rotation = f64::atan2(self.absolute_delta_v().y, self.absolute_delta_v().x);
         self.recompute_burn_points(&start_point);
     }
 
