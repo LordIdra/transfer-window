@@ -116,7 +116,7 @@ fn itp_to_find_turning_point(initial_points: &[(f64, f64)], derivative: impl Fn(
 }
 
 fn process_burn(burn: &Burn, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
-    if burn.duration() < 0.03 {
+    if burn.remaining_time() < 0.03 {
         return;
     }
 
@@ -126,7 +126,7 @@ fn process_burn(burn: &Burn, entity: Entity, point: DVec2, max_distance: f64, cl
     // Sample 10 evenly distributed points from burn start to end, finding their derivatives
     let mut initial_points = vec![];
     for i in 0..=10 {
-        let mut time = burn.start_point().time() + (i as f64 / 10.0) * burn.duration();
+        let mut time = burn.current_point().time() + (i as f64 / 10.0) * burn.duration();
         if i == 10 {
             // Derivative calculations would otherwise go beyond end of guidance
             time -= 0.0001;
@@ -138,7 +138,7 @@ fn process_burn(burn: &Burn, entity: Entity, point: DVec2, max_distance: f64, cl
 }
 
 fn process_guidance(guidance: &Guidance, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
-    if guidance.duration() < 0.03 {
+    if guidance.remaining_time() < 0.03 {
         return;
     }
 
@@ -148,7 +148,7 @@ fn process_guidance(guidance: &Guidance, entity: Entity, point: DVec2, max_dista
     // Sample 10 evenly distributed points from burn start to end, finding their derivatives
     let mut initial_points = vec![];
     for i in 0..=10 {
-        let mut time = guidance.start_point().time() + (i as f64 / 10.0) * guidance.duration();
+        let mut time = guidance.current_point().time() + (i as f64 / 10.0) * guidance.duration();
         if i == 10 {
             // Derivative calculations would otherwise go beyond end of guidance
             time -= 0.0001;

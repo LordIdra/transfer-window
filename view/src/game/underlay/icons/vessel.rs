@@ -1,5 +1,5 @@
 use eframe::egui::PointerState;
-use nalgebra_glm::DVec2;
+use nalgebra_glm::{vec2, DVec2};
 use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::vessel_texture, View};
@@ -70,7 +70,8 @@ impl Icon for Vessel {
     }
 
     fn facing(&self, view: &View) -> Option<DVec2> {
-        Some(view.model.velocity(self.entity).normalize())
+        let rotation = view.model.rotation(self.entity);
+        Some(vec2(f64::cos(rotation), f64::sin(rotation)))
     }
 
     fn is_selected(&self, view: &View) -> bool {

@@ -237,10 +237,12 @@
 [x] RcsFacility (with center of mass and RCS thruster locations)
 [x] Monopropellant
 [x] Thruster textures
-[ ] Rotation at time queries
-[ ] Icons show rotation
+[x] Rotation at time queries
+[x] Fix burn selection???????
+[x] Icons show rotation
 [ ] Ship width/height instead of just size
 [ ] Angular momentum
+[ ] Monopropellant depletion
 [ ] Turning segments (fuck)
 [ ] Manual piloting mode
 [ ] Monopropellant textures

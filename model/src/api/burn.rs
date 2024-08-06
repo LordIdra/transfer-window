@@ -53,15 +53,13 @@ impl Model {
         burn.adjust(amount);
         
         let parent = burn.parent();
-        let velocity = burn.end_point().velocity();
-
         let orbit = OrbitBuilder {
             parent: burn.parent(),
             mass: burn.end_point().mass(),
             parent_mass: self.mass(parent),
-            rotation: f64::atan2(velocity.y, velocity.x),
+            rotation: burn.rotation(),
             position: burn.end_point().position(),
-            velocity,
+            velocity: burn.end_point().velocity(),
             time: burn.end_point().time(),
         }.build();
 

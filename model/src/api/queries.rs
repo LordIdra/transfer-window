@@ -162,6 +162,20 @@ impl Model {
         Some(self.segment_at_time(entity, time, observer).parent())
     }
 
+    pub fn rotation(&self, entity: Entity) -> f64 {
+        if self.try_orbitable_component(entity).is_some() {
+            return 0.0;
+        }
+        self.current_segment(entity).current_rotation()
+    }
+
+    pub fn rotation_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> f64 {
+        if self.try_orbitable_component(entity).is_some() {
+            return 0.0;
+        }
+        self.segment_at_time(entity, time, observer).rotation_at_time(time)
+    }
+
     /// # Panics
     /// Panics if entity does not have a position
     pub fn position(&self, entity: Entity) -> DVec2 {
