@@ -1,4 +1,183 @@
-# Current tasks
+
+# ------------------------------------ #
+# CURRENT TASKS
+# ------------------------------------ #
+[ ] Turn/burn integration
+[ ] Turn/guidance integration
+[ ] Don't allow selecting ghosts with top left button
+[ ] Loading screen
+[ ] Load resources async
+[ ] Investigate loading memory leak?
+[ ] Fix segments overlaying ship (lol what)
+[ ] Build pipeline with texture caching
+
+# ------------------------------------ #
+# DOCKING AREA
+# ------------------------------------ #
+[x] Ship texture
+[x] Scaling per class
+[x] Draw ship in-game
+[x] Vessel rotation
+[x] RcsFacility (with center of mass and RCS thruster locations)
+[x] Monopropellant
+[x] Thruster textures
+[x] Rotation at time queries
+[x] Fix burn selection???????
+[x] Icons show rotation
+[x] Ship texture rotation
+[x] Ship width/height instead of just size
+[x] Angular momentum
+[x] Monopropellant depletion
+[x] Turning segments (fuck)
+[ ] Inbuilt force calculations for RCS schemes
+[ ] Monopropellant particles
+[ ] Engine particles
+[ ] Manual piloting mode
+[ ] Bounding boxes
+[ ] Collision detection system
+[ ] Hull integrity system?
+
+
+# ------------------------------------ #
+# TECHNICAL AREA
+# ------------------------------------ #
+# Performance
+[ ] Texture atlas
+[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
+[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
+[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
+[ ] Smaller screen texture renderer framebuffer
+
+# Technical debt tracker
+- Docking port view logic is horrible, needs more cleanup when we have more transfers maybe
+- Timeline view logic is not great
+- Hardcoded end time lol
+
+
+# ------------------------------------ #
+# PROJECTS AREA
+# ------------------------------------ #
+# Projects
+[ ] Proper planet texture sourcing
+[ ] Main menu background GIFs
+[ ] Collisions with planets (nearly forgot about that lmao)
+[ ] Ballistic weaponry
+[ ] Point defense
+[ ] PDC automatic targeting system
+[ ] PDC range or time dropoff after which they are deleted to prevent bullet lag
+[ ] PDC shells not affected by gravity?
+[ ] Different fuel/lox mixtures
+[ ] Energy production/storage/consumptiongit pull
+
+# Before release
+[ ] Versioning!
+[ ] Icon/branding
+[ ] Dev mode compiles in debug menu
+[ ] Profiling + performance testing on different devices
+[ ] Test compatibility on different devices
+[ ] Website
+[ ] Add licenses
+[ ] Log to multiple files
+
+
+# ------------------------------------ #
+# SPECULATION AREA
+# ------------------------------------ #
+# Artificial Intelligence
+- 3 independent neural networks
+- targeting
+- navigation
+- guidance
+
+# Comms
+- Comms equipment
+- Comms line overlay
+- Comms routing algorithm based on line of sight
+
+# Radar
+- Fog of war
+- Passive/active radar
+- Information networking
+
+
+# ------------------------------------ #
+# CAMPAIGN PLANNING AREA - PROJECT SPHINX [SHELVED]
+# ------------------------------------ #
+- 01 Awakening
+  - Why am I here? I'm alone on a station
+  - This isn't anything like the training
+  - Sensors indicate an incoming torpedo
+  - The station doesn't have any offensive measures of its own. There's a frigate, I need to undock and intercept, quickly...
+
+
+## Optional Levels
+[ ] Scientific notation
+[ ] Orbital parameters
+[ ] ISP
+[ ] Kepler's equation
+[ ] N-Body simulations (vs patched conics)
+[ ] Rocket fuels overview
+[ ] Proportional guidance
+[ ] Integration techniques (euler RK4 etc)
+[ ] Joules, watts, energy
+
+
+# ------------------------------------ #
+# CAMPAIGN PLANNING AREA [ SHELVED ]
+# ------------------------------------ #
+- Remember to upgrade ship and unlock new equipment
+- Satellite which loses power every so often, small window to intercept, reverse orbit direction
+- Low DV for torpedoes so have to accelerate ship?
+
+# Levels
+[ ] 1-04 Translunar
+  - watch your dv in this mission
+  - centralia has moon
+  - unlock explorer
+  - spheres of influence
+  - first encounter not necessarily the best, keep going
+  - get into moon orbit
+  - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
+  - escape moon orbit to finish mission
+
+[ ] 1-05 Review
+  - final review of previous missions before you go into the 'real world'
+  - be careful with delta-v - always want to maximise dv efficiency
+  - less guidance than the last few missions
+  - get to moon, get into orbit, drop orbit, intercept ship, then get back into LEO
+
+MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT GOES
+- 06 Moon Orbit
+  - open ended
+  - orbit the moon and come back into LEO
+
+- 07 Rendezvous
+  - use your knowledge of closest approaches to get an intercept
+  - then try and match its orbit
+  - patience! this might be more difficult than the last few missions
+  - dock
+
+- 08 Station
+  - takes place entirely at allied hub
+  - upgrade to frigate
+  - allied ship also docked
+  - equip new frigate
+  - resource transfers
+  - torpedo transfers
+  - we'll be using those torpedoes next time
+
+- 09 Destroy
+  - fire torpedoes
+  - guidance explanation
+  - destroy dummy targets
+  - target behind and in front - is there an advantage to being in front / behind?
+
+- 10 Evade
+  - evade enemies torpedo
+  - can't evade that one, time to deploy our own torpedo against it, but leaves us without offensive capability...
+  - the end, time for real life
+
+# Done
 [x] MVC split
 [x] Rendering backend
 [x] Primitive planet rendering as sphere
@@ -201,175 +380,5 @@
 [x] Planet textures/generation, atmosphere shaders?
 [x] Measure altitude in km from SURFACE not centre
 [x] 1-03
-[ ] Don't allow selecting ghosts with top left button
+[x] Test burn using all available DV
 
-
-# ------------------------------------ #
-# CAMPAIGN PLANNING AREA - PROJECT SPHINX
-# ------------------------------------ #
-- 01 Awakening
-  - Why am I here? I'm alone on a station
-  - This isn't anything like the training
-  - Sensors indicate an incoming torpedo
-  - The station doesn't have any offensive measures of its own. There's a frigate, I need to undock and intercept, quickly...
-
-
-## Optional Levels
-[ ] Scientific notation
-[ ] Orbital parameters
-[ ] ISP
-[ ] Kepler's equation
-[ ] N-Body simulations (vs patched conics)
-[ ] Rocket fuels overview
-[ ] Proportional guidance
-[ ] Integration techniques (euler RK4 etc)
-[ ] Joules, watts, energy
-
-
-
-# ------------------------------------ #
-# DOCKING AREA
-# ------------------------------------ #
-[x] Ship texture
-[x] Scaling per class
-[x] Draw ship in-game
-[x] Vessel rotation
-[x] RcsFacility (with center of mass and RCS thruster locations)
-[x] Monopropellant
-[x] Thruster textures
-[x] Rotation at time queries
-[x] Fix burn selection???????
-[x] Icons show rotation
-[x] Ship texture rotation
-[x] Ship width/height instead of just size
-[ ] Fix segments overlaying ship (lol what)
-[ ] Angular momentum
-[ ] Monopropellant depletion
-[ ] Turning segments (fuck)
-[ ] Manual piloting mode
-[ ] Monopropellant textures
-[ ] Bounding boxes
-[ ] Collision detection system
-[ ] Hull integrity system?
-
-
-
-# ------------------------------------ #
-# TECHNICAL AREA
-# ------------------------------------ #
-# Performance
-[ ] Texture atlas
-[ ] Switch to RK4 for burn/guidance integration (allows lower time step as well)
-[ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
-[ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
-[ ] Smaller screen texture renderer framebuffer
-
-# Technical debt tracker
-- Docking port view logic is horrible, needs more cleanup when we have more transfers maybe
-- Timeline view logic is not great
-- Hardcoded end time lol
-
-
-
-# ------------------------------------ #
-# PROJECTS AREA
-# ------------------------------------ #
-# Projects
-[ ] Proper planet texture sourcing
-[ ] Main menu background GIFs
-[ ] Collisions with planets (nearly forgot about that lmao)
-[ ] Ballistic weaponry
-[ ] Point defense
-[ ] PDC automatic targeting system
-[ ] PDC range or time dropoff after which they are deleted to prevent bullet lag
-[ ] PDC shells not affected by gravity?
-[ ] Different fuel/lox mixtures
-[ ] Energy production/storage/consumptiongit pull
-
-# Before release
-[ ] Versioning!
-[ ] Icon/branding
-[ ] Dev mode compiles in debug menu
-[ ] Profiling + performance testing on different devices
-[ ] Test compatibility on different devices
-[ ] Website
-[ ] Add licenses
-[ ] Log to multiple files
-
-
-
-# ------------------------------------ #
-# SPECULATION AREA
-# ------------------------------------ #
-# Artificial Intelligence
-- 3 independent neural networks
-- targeting
-- navigation
-- guidance
-
-# Comms
-- Comms equipment
-- Comms line overlay
-- Comms routing algorithm based on line of sight
-
-# Radar
-- Fog of war
-- Passive/active radar
-- Information networking
-
-
-
-# ------------------------------------ #
-# CAMPAIGN PLANNING AREA [ SHELVED ]
-# ------------------------------------ #
-- Remember to upgrade ship and unlock new equipment
-- Satellite which loses power every so often, small window to intercept, reverse orbit direction
-- Low DV for torpedoes so have to accelerate ship?
-
-# Levels
-[ ] 1-04 Translunar
-  - watch your dv in this mission
-  - centralia has moon
-  - unlock explorer
-  - spheres of influence
-  - first encounter not necessarily the best, keep going
-  - get into moon orbit
-  - hyperbolic orbits (aaaaaaaaaaaaaaaaaa) (will it come back down? it won't! there's a cutoff point)
-  - escape moon orbit to finish mission
-
-[ ] 1-05 Review
-  - final review of previous missions before you go into the 'real world'
-  - be careful with delta-v - always want to maximise dv efficiency
-  - less guidance than the last few missions
-  - get to moon, get into orbit, drop orbit, intercept ship, then get back into LEO
-
-MAYBE NOT FROM HERE TO END - JUST DO IN CAMPAIGN MISSIONS, BUT WE'LL SEE HOW IT GOES
-- 06 Moon Orbit
-  - open ended
-  - orbit the moon and come back into LEO
-
-- 07 Rendezvous
-  - use your knowledge of closest approaches to get an intercept
-  - then try and match its orbit
-  - patience! this might be more difficult than the last few missions
-  - dock
-
-- 08 Station
-  - takes place entirely at allied hub
-  - upgrade to frigate
-  - allied ship also docked
-  - equip new frigate
-  - resource transfers
-  - torpedo transfers
-  - we'll be using those torpedoes next time
-
-- 09 Destroy
-  - fire torpedoes
-  - guidance explanation
-  - destroy dummy targets
-  - target behind and in front - is there an advantage to being in front / behind?
-
-- 10 Evade
-  - evade enemies torpedo
-  - can't evade that one, time to deploy our own torpedo against it, but leaves us without offensive capability...
-  - the end, time for real life

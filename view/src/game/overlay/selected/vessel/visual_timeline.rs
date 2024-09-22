@@ -12,6 +12,7 @@ enum VisualTimelineEvent {
     Encounter { type_: EncounterType, time: f64, from: Entity, to: Entity },
     Point { time: f64 },
     BurnEnd { time: f64 },
+    TurnEnd { time: f64 },
     GuidanceEnd { time: f64 },
 }
 
@@ -24,6 +25,7 @@ impl VisualTimelineEvent {
                 | VisualTimelineEvent::Point { time }
                 | VisualTimelineEvent::Encounter { time, .. } 
                 | VisualTimelineEvent::BurnEnd { time } 
+                | VisualTimelineEvent::TurnEnd { time } 
                 | VisualTimelineEvent::GuidanceEnd { time } => *time,
         }
     }
@@ -34,6 +36,7 @@ impl VisualTimelineEvent {
                 TimelineEvent::Intercept(_) => "intercept",
                 TimelineEvent::FireTorpedo(_) => "torpedo",
                 TimelineEvent::Burn(_) => "burn",
+                TimelineEvent::Turn(_) => "turn",
                 TimelineEvent::EnableGuidance(_) => "enable-guidance",
             }
             VisualTimelineEvent::Apsis { type_, .. } => match type_ {
@@ -50,6 +53,7 @@ impl VisualTimelineEvent {
             }
             VisualTimelineEvent::Point { .. } => "circle",
             VisualTimelineEvent::BurnEnd { .. } => "timeline-burn-end",
+            VisualTimelineEvent::TurnEnd { .. } => "timeline-turn-end",
             VisualTimelineEvent::GuidanceEnd { .. } => "timeline-guidance-end",
         }
     }
@@ -60,6 +64,7 @@ impl VisualTimelineEvent {
                 TimelineEvent::Intercept(_) => 3.0,
                 TimelineEvent::FireTorpedo(_) => 0.0,
                 TimelineEvent::Burn(_) => 0.0,
+                TimelineEvent::Turn(_) => 0.0,
                 TimelineEvent::EnableGuidance(_) => 0.0,
             }
             VisualTimelineEvent::Apsis { .. } => 3.0,
@@ -67,6 +72,7 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::Encounter { .. } => 3.0,
             VisualTimelineEvent::Point { .. } => 5.0,
             VisualTimelineEvent::BurnEnd { .. } => 0.0,
+            VisualTimelineEvent::TurnEnd { .. } => 0.0,
             VisualTimelineEvent::GuidanceEnd { .. } => 0.0,
         }
     }
@@ -77,6 +83,7 @@ impl VisualTimelineEvent {
                 TimelineEvent::Intercept(_) => "Intercept".to_string(),
                 TimelineEvent::FireTorpedo(_) => "Torpedo Launch".to_string(),
                 TimelineEvent::Burn(_) => "Burn Start".to_string(),
+                TimelineEvent::Turn(_) => "Turn Start".to_string(),
                 TimelineEvent::EnableGuidance(_) => "Guidance Start".to_string(),
             }
             VisualTimelineEvent::Apsis { type_, altitude: distance, .. } => match type_ {
@@ -90,6 +97,7 @@ impl VisualTimelineEvent {
             }
             VisualTimelineEvent::Point { .. } => "Selected point".to_string(),
             VisualTimelineEvent::BurnEnd { .. } => "Burn end".to_string(),
+            VisualTimelineEvent::TurnEnd { .. } => "Turn end".to_string(),
             VisualTimelineEvent::GuidanceEnd { .. } => "Guidance end".to_string(),
         }
     }
@@ -100,6 +108,7 @@ impl VisualTimelineEvent {
                 TimelineEvent::Intercept(intercept) => Selected::Intercept { entity, time: intercept.time() },
                 TimelineEvent::FireTorpedo(fire_torpedo) => Selected::FireTorpedo { entity, time: fire_torpedo.time(), state: BurnState::Selected },
                 TimelineEvent::Burn(burn) => Selected::Burn { entity, time: burn.time(), state: BurnState::Selected },
+                TimelineEvent::Turn(turn) => Selected::Turn { entity, time: turn.time() },
                 TimelineEvent::EnableGuidance(enable_guidance) => Selected::EnableGuidance { entity, time: enable_guidance.time() },
             }),
             VisualTimelineEvent::Apsis { type_, time, altitude: _ } => Some(Selected::Apsis { type_: *type_, entity, time: *time }),
@@ -107,6 +116,7 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::Encounter { type_, time, from, to } => Some(Selected::Encounter { type_: *type_, entity, time: *time, from: *from, to: *to }),
             VisualTimelineEvent::Point { .. } 
                 | VisualTimelineEvent::BurnEnd { .. } 
+                | VisualTimelineEvent::TurnEnd { .. } 
                 | VisualTimelineEvent::GuidanceEnd { .. } => None,
         }
     }
@@ -121,6 +131,7 @@ impl VisualTimelineEvent {
             Selected::Orbitable(_) => false,
             Selected::Vessel(_) => false,
             Selected::BurnPoint { .. } 
+                | Selected::TurnPoint { .. } 
                 | Selected::GuidancePoint { .. } 
                 | Selected::OrbitPoint { .. } => matches!(self, VisualTimelineEvent::Point { .. }),
             Selected::Apsis { type_, time, .. } => {
@@ -149,6 +160,10 @@ impl VisualTimelineEvent {
             }
             Selected::Burn { time, .. } => match self {
                 VisualTimelineEvent::TimelineEvent(TimelineEvent::Burn(event)) => event.time() == time,
+                _ => false,
+            }
+            Selected::Turn { time, .. } => match self {
+                VisualTimelineEvent::TimelineEvent(TimelineEvent::Turn(event)) => event.time() == time,
                 _ => false,
             }
             Selected::FireTorpedo { time, .. } => match self {
@@ -207,10 +222,15 @@ fn generate_encounters(view: &View, entity: Entity, events: &mut Vec<VisualTimel
     }
 }
 
-fn generate_burn_guidance_end(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
+fn generate_segment_end(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
     if let Segment::Burn(burn) = view.model.path_component(entity).current_segment() {
         events.push(VisualTimelineEvent::BurnEnd { time: burn.end_point().time() });
     }
+
+    if let Segment::Turn(turn) = view.model.path_component(entity).current_segment() {
+        events.push(VisualTimelineEvent::TurnEnd { time: turn.end_point().time() });
+    }
+
     if let Segment::Guidance(guidance) = view.model.path_component(entity).current_segment() {
         if !guidance.will_intercept() {
             events.push(VisualTimelineEvent::GuidanceEnd { time: guidance.end_point().time() });
@@ -236,7 +256,7 @@ pub fn draw_visual_timeline(view: &View, ui: &mut Ui, entity: Entity, center_tim
     }
     generate_encounters(view, entity, &mut events);
     if has_intel {
-        generate_burn_guidance_end(view, entity, &mut events);
+        generate_segment_end(view, entity, &mut events);
     }
 
     if draw_center_time_point {

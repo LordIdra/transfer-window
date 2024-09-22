@@ -28,7 +28,7 @@ impl StoryBuilder for Story1_01 {
             name: "Centralia",
             mass: 5.972e24,
             radius: 6.371e6,
-            rotation_period: 1.0,
+            rotation_period: 24.0 * 60.0 * 60.0,
             rotation_angle: 100.0,
             type_: OrbitableType::Planet,
             physics: OrbitablePhysicsBuilder::Stationary(vec2(0.0, 0.0)),
@@ -37,7 +37,7 @@ impl StoryBuilder for Story1_01 {
                 0.95,
                 0.3,
                 4.0,
-                vec![0.7]
+                vec![]
             )
         }.build(&mut model);
 

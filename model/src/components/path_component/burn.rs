@@ -1,37 +1,58 @@
-use nalgebra_glm::{vec2, DMat2, DVec2};
+use nalgebra_glm::{DMat2, DVec2};
 use serde::{Deserialize, Serialize};
 
-use crate::storage::entity_allocator::Entity;
+use crate::{components::vessel_component::engine::Engine, storage::entity_allocator::Entity};
 
-use self::{burn_point::BurnPoint, rocket_equation_function::RocketEquationFunction};
+use self::burn_point::BurnPoint;
+
+use super::rocket_equation_function::RocketEquationFunction;
 
 pub mod builder;
 pub mod burn_point;
-pub mod rocket_equation_function;
 
 const BURN_TIME_STEP: f64 = 0.1;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Burn {
     parent: Entity,
+    engine: Engine,
     rotation: f64,
-    rocket_equation_function: RocketEquationFunction,
     tangent: DVec2,
-    delta_v: DVec2, // (tangent, normal)
+    dv: DVec2, // (tangent, normal)
+    max_dv: f64,
     current_point: BurnPoint,
     points: Vec<BurnPoint>,
 }
 
 impl Burn {
     #[allow(clippy::too_many_arguments)]
-    pub(self) fn new(parent: Entity, parent_mass: f64, rocket_equation_function: RocketEquationFunction, tangent: DVec2, delta_v: DVec2, time: f64, position: DVec2, velocity: DVec2) -> Self {
-        let start_point = BurnPoint::new(parent_mass, rocket_equation_function.mass(), time, position, velocity);
+    pub(self) fn new(
+        parent: Entity, 
+        parent_mass: f64, 
+        mass: f64, 
+        fuel_kg: f64, 
+        engine: &Engine, 
+        tangent: DVec2, 
+        mut dv: DVec2, 
+        time: f64, 
+        position: DVec2, 
+        velocity: DVec2
+    ) -> Self {
+        let mass_without_fuel = mass - fuel_kg;
+        let max_dv = RocketEquationFunction::new(mass_without_fuel, fuel_kg, engine.fuel_kg_per_second(), engine.specific_impulse())
+            .remaining_dv();
+        if dv.magnitude() > max_dv {
+            dv = dv.normalize() * max_dv;
+        }
+
+        let start_point = BurnPoint::new(parent_mass, mass_without_fuel, fuel_kg, time, position, velocity);
         let mut burn = Self { 
             parent,
+            engine: engine.clone(),
             rotation: 0.0, // initialised later
-            rocket_equation_function,
             tangent,
-            delta_v,
+            dv,
+            max_dv,
             current_point: start_point.clone(),
             points: vec![],
         };
@@ -66,18 +87,18 @@ impl Burn {
         if let Some(closest_previous_point) = self.points.get(index) {
             let base_time = closest_previous_point.time();
             let undershot_time = time - base_time;
-            closest_previous_point.next(undershot_time, closest_previous_point.mass(), self.absolute_acceleration(base_time))
+            closest_previous_point.next(undershot_time, &self.engine, self.absolute_delta_v())
         } else {
             self.end_point().clone()
         }
     }
 
     pub fn total_dv(&self) -> f64 {
-        self.delta_v.magnitude()
+        self.dv.magnitude()
     }
 
     pub fn delta_v(&self) -> DVec2 {
-        self.delta_v
+        self.dv
     }
 
     pub fn remaining_time(&self) -> f64 {
@@ -94,8 +115,7 @@ impl Burn {
 
     #[allow(clippy::missing_panics_doc)]
     pub fn duration(&self) -> f64 {
-        let final_rocket_equation_function = self.rocket_equation_function.step_by_dv(self.total_dv()).unwrap();
-        final_rocket_equation_function.burn_time() - self.rocket_equation_function.burn_time()
+        self.end_point().time() - self.start_point().time()
     }
 
     pub fn parent(&self) -> Entity {
@@ -110,28 +130,6 @@ impl Burn {
         absolute_time - self.start_point().time()
     }
 
-    pub fn start_rocket_equation_function(&self) -> RocketEquationFunction {
-        self.rocket_equation_function.clone()
-    }
-
-    pub fn rocket_equation_function(&self) -> RocketEquationFunction {
-        self.rocket_equation_function_at_time(self.current_point.time())
-    }
-
-    /// `time` is absolute
-    pub fn rocket_equation_function_at_time(&self, time: f64) -> RocketEquationFunction {
-        // Slightly annoying workaround to make sure that if the burn expends all our DV, there won't be a panic
-        match self.rocket_equation_function.step_by_time(time - self.start_point().time()) {
-            Some(rocket_equation_function) => rocket_equation_function,
-            None => self.rocket_equation_function.end(),
-        }
-    }
-
-    #[allow(clippy::missing_panics_doc)]
-    pub fn final_rocket_equation_function(&self) -> RocketEquationFunction {
-        self.rocket_equation_function_at_time(self.end_point().time())
-    }
-
     pub fn rotation_matrix(&self) -> DMat2 {
         DMat2::new(
             self.tangent.x, -self.tangent.y, 
@@ -139,20 +137,63 @@ impl Burn {
     }
 
     fn absolute_delta_v(&self) -> DVec2 {
-        self.rotation_matrix() * self.delta_v
+        self.rotation_matrix() * self.dv
     }
 
-    fn absolute_acceleration(&self, time: f64) -> DVec2 {
-        let dv = self.absolute_delta_v();
-        if dv.magnitude() == 0.0 {
-            vec2(0.0, 0.0)
-        } else {
-            dv.normalize() * self.rocket_equation_function_at_time(time).acceleration()
-        }
+    fn start_rocket_equation(&self) -> RocketEquationFunction {
+        RocketEquationFunction::new(
+            self.start_point().mass_without_fuel(),
+            self.start_point().fuel_kg(), 
+            self.engine.fuel_kg_per_second(), 
+            self.engine.specific_impulse())
+    }
+
+    fn end_rocket_equation(&self) -> RocketEquationFunction {
+        RocketEquationFunction::new(
+            self.end_point().mass_without_fuel(),
+            self.end_point().fuel_kg(), 
+            self.engine.fuel_kg_per_second(), 
+            self.engine.specific_impulse())
+    }
+
+    fn rocket_equation_at_time(&self, time: f64) -> RocketEquationFunction {
+        RocketEquationFunction::new(
+            self.point_at_time(time).mass_without_fuel(),
+            self.point_at_time(time).fuel_kg(), 
+            self.engine.fuel_kg_per_second(), 
+            self.engine.specific_impulse())
+    }
+
+    pub fn start_remaining_dv(&self) -> f64 {
+        self.start_rocket_equation().remaining_dv()
+    }
+
+    pub fn start_fuel_kg(&self) -> f64 {
+        self.start_rocket_equation().fuel_kg()
+    }
+
+    pub fn end_remaining_dv(&self) -> f64 {
+        self.end_rocket_equation().remaining_dv()
+    }
+
+    pub fn end_fuel_kg(&self) -> f64 {
+        self.end_rocket_equation().fuel_kg()
+    }
+
+    pub fn remaining_dv_at_time(&self, time: f64) -> f64 {
+        self.rocket_equation_at_time(time).remaining_dv()
+    }
+
+    pub fn fuel_kg_at_time(&self, time: f64) -> f64 {
+        self.rocket_equation_at_time(time).fuel_kg()
     }
 
     pub fn adjust(&mut self, adjustment: DVec2) {
-        self.delta_v += adjustment;
+        self.dv += adjustment;
+        if self.dv.magnitude() > self.max_dv {
+            self.dv = self.dv.normalize() * (self.max_dv - 0.000_000_1);
+        }
+
         let start_point = self.start_point().clone();
         self.rotation = f64::atan2(self.absolute_delta_v().y, self.absolute_delta_v().x);
         self.recompute_burn_points(&start_point);
@@ -161,21 +202,27 @@ impl Burn {
     fn recompute_burn_points(&mut self, start_point: &BurnPoint) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Recompute burn points");
+        let duration = RocketEquationFunction::new(
+            start_point.mass_without_fuel(), 
+            start_point.fuel_kg(), 
+            self.engine.fuel_kg_per_second(), 
+            self.engine.specific_impulse(), 
+        ).time_to_step_dv(self.dv.magnitude()).unwrap();
+
+        let end_time = start_point.time() + duration;
+
         self.points.clear();
-        let end_time = start_point.time() + self.duration();
         self.points.push(start_point.clone());
         
         while self.end_point().time() + BURN_TIME_STEP < end_time {
             let last = self.points.last().unwrap();
-            let mass = self.rocket_equation_function_at_time(last.time()).mass();
-            self.points.push(last.next(BURN_TIME_STEP, mass, self.absolute_acceleration(last.time())));
+            self.points.push(last.next(BURN_TIME_STEP, &self.engine, self.absolute_delta_v()));
         }
 
-        if self.duration() != 0.0 {
+        if duration != 0.0 {
             let undershot_dt = end_time - self.end_point().time();
             let last = self.points.last().unwrap();
-            let mass = self.rocket_equation_function_at_time(end_time).mass();
-            self.points.push(last.next(undershot_dt, mass, self.absolute_acceleration(end_time)));
+            self.points.push(last.next(undershot_dt, &self.engine, self.absolute_delta_v()));
         }
     }
 
@@ -184,8 +231,7 @@ impl Burn {
     }
 
     pub fn next(&mut self, time: f64) {
-        let delta_time = time - self.current_point.time();
-        self.current_point = self.point_at_time(self.current_point.time() + delta_time);
+        self.current_point = self.point_at_time(time);
     }
 }
 
@@ -193,14 +239,17 @@ impl Burn {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::path_component::{brute_force_tester::BruteForceTester, burn::{builder::BurnBuilder, rocket_equation_function::RocketEquationFunction, BURN_TIME_STEP}}, storage::entity_allocator::Entity};
+    use crate::{components::{path_component::{brute_force_tester::BruteForceTester, burn::{builder::BurnBuilder, RocketEquationFunction, BURN_TIME_STEP}}, vessel_component::engine::Engine}, storage::entity_allocator::Entity};
 
     #[test]
     pub fn test() {
         let parent_mass = 5.972e24; // earth's mass
         let duration = 100.0;
         let tangent = vec2(1.0, 0.0);
-        let rocket_equation_function = RocketEquationFunction::new(100.0, 100.0, 1.0, 1.0, 0.0);
+        let dry_mass = 100.0; 
+        let fuel_mass = 100.0;
+        let engine = Engine::new(1.0, 1.0);
+        let rocket_equation_function = RocketEquationFunction::new(dry_mass, fuel_mass, engine.fuel_kg_per_second(), engine.specific_impulse());
         let rocket_equation_function_clone = rocket_equation_function.clone();
         let acceleration_from_time = move |time: f64| rocket_equation_function_clone.step_by_time(time).unwrap().acceleration() * tangent;
         let position = vec2(2.00e6, 0.0);
@@ -210,9 +259,11 @@ mod test {
             parent: Entity::mock(),
             parent_mass,
             tangent,
-            delta_v: rocket_equation_function.end().used_dv() * tangent,
+            delta_v: rocket_equation_function.remaining_dv() * tangent,
             time: 0.0,
-            rocket_equation_function,
+            mass: dry_mass + fuel_mass,
+            fuel_mass,
+            engine,
             position,
             velocity
         }.build();

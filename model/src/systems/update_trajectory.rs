@@ -2,20 +2,15 @@ use crate::{components::ComponentType, storage::entity_allocator::Entity, Model}
 
 fn update_path_component(model: &mut Model, entity: Entity, time: f64) {
     #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Update path component");
-    let mut should_recompute_perceived_segments = model.path_component(entity).perceived_segments().is_empty() || !model.path_component(entity).current_segment().is_orbit();
+    let _span = tracy_client::span!("Update path component");
+    let new_fuel_kg = model.fuel_kg_at_time(entity, time);
+    model.vessel_component_mut(entity).set_fuel_kg(new_fuel_kg);
+
+    let mut should_recompute_perceived_segments = model.path_component(entity).perceived_segments().is_empty() 
+        || !model.path_component(entity).current_segment().is_orbit();
     model.path_component_mut(entity).current_segment_mut().next(time);
+
     loop {
-        if let Some(burn) = model.path_component(entity).current_segment().as_burn() {
-            let new_fuel_kg = burn.rocket_equation_function().remaining_fuel_kg();
-            model.vessel_component_mut(entity).set_fuel_kg(new_fuel_kg);
-        }
-
-        if let Some(guidance) = model.path_component(entity).current_segment().as_guidance() {
-            let new_fuel_kg = guidance.rocket_equation_function().remaining_fuel_kg();
-            model.vessel_component_mut(entity).set_fuel_kg(new_fuel_kg);
-        }
-
         if !model.path_component(entity).current_segment().is_finished() {
             break;
         }

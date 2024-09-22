@@ -2,8 +2,9 @@ use std::f64::consts::PI;
 
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
+use transfer_window_common::normalize_angle;
 
-use crate::{storage::entity_allocator::Entity, util::normalize_angle};
+use crate::storage::entity_allocator::Entity;
 
 use self::{conic::Conic, orbit_direction::OrbitDirection, orbit_point::OrbitPoint, scary_math::{sphere_of_influence, velocity_to_obtain_eccentricity, GRAVITATIONAL_CONSTANT}};
 
@@ -16,6 +17,7 @@ pub mod scary_math;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Orbit {
     parent: Entity,
+    parent_mass: f64,
     mass: f64,
     rotation: f64,
     conic: Conic,
@@ -26,13 +28,13 @@ pub struct Orbit {
 }
 
 impl Orbit {
-    pub(self) fn new(parent: Entity, mass: f64, parent_mass: f64, rotation: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
+    pub fn new(parent: Entity, mass: f64, parent_mass: f64, rotation: f64, position: DVec2, velocity: DVec2, time: f64) -> Self {
         let conic = Conic::new(parent_mass, position, velocity);
         let sphere_of_influence = sphere_of_influence(mass, parent_mass, position, velocity);
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, mass, rotation, conic, sphere_of_influence, start_point, end_point, current_point }
+        Self { parent, parent_mass, mass, rotation, conic, sphere_of_influence, start_point, end_point, current_point }
     }
 
     pub fn circle(parent: Entity, mass: f64, parent_mass: f64, position: DVec2, time: f64, direction: OrbitDirection) -> Self {
@@ -44,11 +46,15 @@ impl Orbit {
         let start_point = OrbitPoint::new(&conic, position, time);
         let end_point = start_point.clone();
         let current_point = start_point.clone();
-        Self { parent, mass, rotation, conic, sphere_of_influence, start_point, end_point, current_point }
+        Self { parent, parent_mass, mass, rotation, conic, sphere_of_influence, start_point, end_point, current_point }
     }
 
     pub fn mass(&self) -> f64 {
         self.mass
+    }
+
+    pub fn parent_mass(&self) -> f64 {
+        self.parent_mass
     }
 
     pub fn rotation(&self) -> f64 {

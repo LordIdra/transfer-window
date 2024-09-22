@@ -1,21 +1,29 @@
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{components::path_component::{burn::{builder::BurnBuilder, rocket_equation_function::RocketEquationFunction, Burn}, orbit::builder::OrbitBuilder, segment::Segment}, storage::entity_allocator::Entity, Model};
+use crate::{components::path_component::{burn::{builder::BurnBuilder, Burn}, orbit::builder::OrbitBuilder, segment::Segment}, storage::entity_allocator::Entity, Model};
 
 const MIN_DV_TO_ADJUST_BURN: f64 = 1.0e-2;
 
 impl Model {
-    pub(crate) fn create_burn(&mut self, entity: Entity, time: f64, rocket_equation_function: RocketEquationFunction) {
+    pub(crate) fn create_burn(&mut self, entity: Entity, time: f64) {
         self.path_component_mut(entity).remove_segments_after(time);
 
-        let last_segment = self.path_component(entity).final_segment();
+        let last_segment = self.path_component(entity).end_segment();
         let parent = last_segment.parent();
         let parent_mass = self.mass(parent);
+        let mass = self.mass_at_time(entity, time, None);
+        let fuel_mass = self.fuel_kg_at_time(entity, time);
+        let engine = self.vessel_component(entity)
+            .engine()
+            .expect("Attempt to create a burn on a vessel without an engine")
+            .clone();
 
         let burn = BurnBuilder {
             parent,
             parent_mass,
-            rocket_equation_function,
+            mass,
+            fuel_mass,
+            engine,
             tangent: last_segment.end_velocity().normalize(),
             delta_v: vec2(0.0, 0.0),
             time,
@@ -86,11 +94,11 @@ impl Model {
     pub fn calculate_burn_dv(&self, entity: Entity, time: f64, change: DVec2) -> Option<DVec2> {
         let burn = self.burn_starting_at_time(entity, time);
         let new_dv = (burn.delta_v() + change).magnitude();
-        if new_dv > burn.start_rocket_equation_function().remaining_dv() {
-            if burn.final_rocket_equation_function().remaining_dv() < MIN_DV_TO_ADJUST_BURN {
+        if new_dv > burn.start_remaining_dv() {
+            if burn.end_remaining_dv() < MIN_DV_TO_ADJUST_BURN {
                 None
             } else {
-                Some(change.normalize() * burn.final_rocket_equation_function().remaining_dv() * 0.999)
+                Some(change.normalize() * burn.end_remaining_dv() * 0.999)
             }
         } else {
             Some(change)

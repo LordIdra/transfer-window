@@ -31,6 +31,9 @@ fn log_gl_info(gl: &Arc<glow::Context>) {
 impl Controller {
     #[allow(clippy::unnecessary_wraps)]
     pub fn init(creation_context: &CreationContext) -> Result<Box<dyn App>, DynError> {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Controller initialisation");
+
         info!("Initialising controller");
 
         log_gl_info(creation_context.gl.as_ref().unwrap());
@@ -68,7 +71,7 @@ impl App for Controller {
     fn update(&mut self, context: &Context, frame: &mut Frame) {
         #[cfg(feature = "profiling")]
         tracy_client::frame_mark();
-        
+
         let dt = self.last_frame.elapsed().as_secs_f64();
         self.last_frame = Instant::now();
 

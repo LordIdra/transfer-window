@@ -136,7 +136,7 @@ impl Model {
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{builder::OrbitBuilder, orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{builder::OrbitBuilder, orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, test_util, Model};
 
     #[test]
     fn test_find_same_parent_orbit_pairs() {
@@ -227,9 +227,8 @@ mod test {
     fn test_find_next_closest_approach() {
         let mut model = Model::default();
 
-        let orbitable = OrbitableComponent::new(5.9722e24, 6.371e3, 10.0, 0.0, OrbitableType::Planet, OrbitableComponentPhysics::Stationary(vec2(0.0, 0.0)), None);
-        let entity_builder = EntityBuilder::default();
-        let earth = model.allocate(entity_builder.with_orbitable_component(orbitable));
+        let sun = test_util::sun(&mut model);
+        let earth = test_util::earth(&mut model, sun);
 
         let mut path_component = PathComponent::default();
         let orbit = Orbit::circle(earth, 3.0e2, 5.9722e24, vec2(0.1e9, 0.0), 0.0, OrbitDirection::Clockwise).with_end_at(1.0e10);

@@ -71,7 +71,7 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        let enabled = view.model.timeline_event_at_time(entity, time).can_delete(&view.model);
+        let enabled = view.model.can_delete_event_at_time(entity, time);
         let button = CustomCircularImageButton::new(view, "cancel", 36.0)
             .with_enabled(enabled)
             .with_padding(8.0);
@@ -100,8 +100,8 @@ pub fn update(view: &View) {
     let vessel_component = view.model.vessel_component(entity);
     let burn = view.model.burn_starting_at_time(entity, time);
     let max_dv = vessel_component.max_dv();
-    let start_dv = burn.start_rocket_equation_function().remaining_dv();
-    let end_dv = burn.final_rocket_equation_function().remaining_dv();
+    let start_dv = burn.start_remaining_dv();
+    let end_dv = burn.end_remaining_dv();
     let duration = burn.duration();
     
     Window::new("Selected burn")

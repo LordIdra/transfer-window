@@ -49,8 +49,7 @@ impl Default for ViewConfig {
 pub struct View {
     gl: Arc<glow::Context>,
     model: Model,
-    story: Story,
-    config: ViewConfig,
+    story: Story, config: ViewConfig,
     context: Context,
     previous_screen_rect: Rect,
     screen_rect: Rect,

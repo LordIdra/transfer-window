@@ -1,5 +1,5 @@
 use eframe::egui::Ui;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent}}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, start_turn::StartTurnEvent}}}, storage::entity_allocator::Entity};
 
 use crate::game::{util::{orbitable_texture, vessel_texture}, View};
 
@@ -76,6 +76,18 @@ pub fn draw_create_burn(view: &View, ui: &mut Ui, entity: Entity, time: f64) -> 
         .with_enabled(enabled)
         .with_padding(5.0);
     ui.add_enabled(enabled, button).on_hover_text("Create burn").clicked()
+}
+
+/// Returns true if could create and was clicked
+pub fn draw_create_turn(view: &View, ui: &mut Ui, entity: Entity, time: f64) -> bool {
+    if !StartTurnEvent::can_create_ever(&view.model, entity) {
+        return false;
+    }
+    let enabled = StartTurnEvent::can_create(&view.model, entity, time);
+    let button = CustomCircularImageButton::new(view, "create-turn", 36.0)
+        .with_enabled(enabled)
+        .with_padding(5.0);
+    ui.add_enabled(enabled, button).on_hover_text("Create turn").clicked()
 }
 
 /// Returns true if could create and was clicked

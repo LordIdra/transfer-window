@@ -4,7 +4,7 @@ use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::{path_component::{burn::Burn, guidance::Guidance, orbit::Orbit}, vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
+use crate::{components::{path_component::{burn::Burn, guidance::Guidance, orbit::Orbit, turn::Turn}, vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity, util::make_closest_point_on_ellipse_orbit_function, Model};
 
 /// Returns the closest point to `point` on the given orbit if it is less than `radius` away from the orbit
 /// Returns none if the closest distance to `point` is further than the radius
@@ -137,6 +137,28 @@ fn process_burn(burn: &Burn, entity: Entity, point: DVec2, max_distance: f64, cl
     itp_to_find_turning_point(&initial_points, derivative, distance, max_distance, closest_distance, closest_point, entity);
 }
 
+fn process_turn(turn: &Turn, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
+    if turn.remaining_time() < 0.03 {
+        return;
+    }
+
+    let distance = |time: f64| (turn.point_at_time(time).position() - point).magnitude();
+    let derivative = |time: f64| (distance(time + 0.0001) - distance(time)) / 0.0001;
+
+    // Sample 10 evenly distributed points from burn start to end, finding their derivatives
+    let mut initial_points = vec![];
+    for i in 0..=10 {
+        let mut time = turn.current_point().time() + (i as f64 / 10.0) * turn.duration();
+        if i == 10 {
+            // Derivative calculations would otherwise go beyond end of guidance
+            time -= 0.0001;
+        }
+        initial_points.push((time, derivative(time)));
+    }
+
+    itp_to_find_turning_point(&initial_points, derivative, distance, max_distance, closest_distance, closest_point, entity);
+}
+
 fn process_guidance(guidance: &Guidance, entity: Entity, point: DVec2, max_distance: f64, closest_distance: &mut f64, closest_point: &mut Option<(Entity, f64)>) {
     if guidance.remaining_time() < 0.03 {
         return;
@@ -183,6 +205,20 @@ impl Model {
             let point = point - self.absolute_position(self.parent(entity).unwrap());
             for burn in self.future_burns(entity, observer) {
                 process_burn(burn, entity, point, max_distance, &mut closest_distance, &mut closest_point);
+            }
+        }
+        closest_point
+    }
+
+    /// Returns the entity and time of the closest point on ANY vessel turn provided the closest
+    /// distance from the point to a segment is less than `max_distance.`
+    pub fn closest_turn_point(&self, point: DVec2, max_distance: f64, observer: Option<Faction>) -> Option<(Entity, f64)> {
+        let mut closest_point = None;
+        let mut closest_distance = f64::MAX;
+        for entity in self.entities(vec![ComponentType::PathComponent, ComponentType::VesselComponent]) {
+            let point = point - self.absolute_position(self.parent(entity).unwrap());
+            for turn in self.future_turns(entity, observer) {
+                process_turn(turn, entity, point, max_distance, &mut closest_distance, &mut closest_point);
             }
         }
         closest_point

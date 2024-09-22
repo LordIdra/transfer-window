@@ -2,6 +2,7 @@ use std::fs;
 
 use log::error;
 use nalgebra_glm::DVec2;
+use transfer_window_model::components::vessel_component::timeline::start_turn::StartTurnEvent;
 use transfer_window_model::story_event::StoryEvent;
 use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}}, storage::entity_allocator::Entity};
 
@@ -93,8 +94,22 @@ impl View {
     pub fn adjust_burn(&mut self, entity: Entity, time: f64, amount: DVec2) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Adjust burn");
-        self.model.timeline_event_at_time(entity, time)
-            .as_start_burn()
+        self.model.start_burn_event_at_time(entity, time)
+            .unwrap()
+            .adjust(&mut self.model, amount);
+    }
+
+    pub fn create_turn(&mut self, entity: Entity, time: f64) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Create turn");
+        let event = TimelineEvent::Turn(StartTurnEvent::new(&mut self.model, entity, time));
+        self.model.add_event(entity, event);
+    }
+
+    pub fn adjust_turn(&mut self, entity: Entity, time: f64, amount: f64) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Adjust turn");
+        self.model.start_turn_event_at_time(entity, time)
             .unwrap()
             .adjust(&mut self.model, amount);
     }
@@ -118,8 +133,7 @@ impl View {
     pub fn adjust_fire_torpedo(&mut self, entity: Entity, time: f64, amount: DVec2) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Adjust fire torpedo");
-        self.model.timeline_event_at_time(entity, time)
-            .as_fire_torpedo()
+        self.model.fire_torpedo_event_at_time(entity, time)
             .unwrap()
             .adjust(&mut self.model, amount);
     }

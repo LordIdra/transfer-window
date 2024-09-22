@@ -1,8 +1,8 @@
 use std::f64::consts::PI;
 
-use transfer_window_common::numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point};
+use transfer_window_common::{anticlockwise_angular_distance, normalize_angle, numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point}};
 
-use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectories::fast_solver::bounding::util::{angle_window_to_time_window, angular_distance, make_range_containing}, util::normalize_angle};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectories::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
 
 use super::{sdf::make_sdf, util::find_other_stationary_point, window::Window};
 
@@ -109,12 +109,12 @@ impl<'a> BounderData<'a> {
         let f_inner = |theta: f64| (sdf)(theta) - self.soi;
         let f_outer = |theta: f64| (sdf)(theta) + self.soi;
         #[cfg(feature = "profiling")]
-        let _span1 = tracy_client::span!("Finding intersections");
+        let span1 = tracy_client::span!("Finding intersections");
         let inner_intersections = find_intersections(&f_inner, self.min_theta, self.max_theta)?;
         let outer_intersections = find_intersections(&f_outer, self.min_theta, self.max_theta)?;
         let zero_intersections = find_intersections(&sdf, self.min_theta, self.max_theta)?;
         #[cfg(feature = "profiling")]
-        drop(_span1);
+        drop(span1);
 
         // We have 4 points, and know where the orbits intersect
         // Now we need to create two windows that cover exactly one intersection
@@ -124,7 +124,7 @@ impl<'a> BounderData<'a> {
         let mut min_distance = f64::MAX;
         for (i, possible_to) in possible_tos.iter().enumerate() {
             let window = make_range_containing(from, *possible_to, zero_intersections.0);
-            let distance = angular_distance(window.0, window.1);
+            let distance = anticlockwise_angular_distance(window.0, window.1);
             if distance < min_distance {
                 min_distance = distance;
                 to_index = i;

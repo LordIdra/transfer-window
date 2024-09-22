@@ -20,7 +20,7 @@ impl LastOrbitCircular {
 
 impl ConditionCheck for LastOrbitCircular {
     fn met(&self, view: &View) -> bool {
-        let orbit = &view.model.path_component(self.entity).final_orbit().unwrap();
+        let orbit = &view.model.path_component(self.entity).end_orbit().unwrap();
 
         let argument_of_periapsis = orbit.argument_of_periapsis();
         let periapsis = orbit.position_from_theta(argument_of_periapsis).magnitude() - view.model.orbitable_component(orbit.parent()).radius();

@@ -2,7 +2,7 @@ use encounter::EncounterType;
 use fast_solver::{calculate_entrance_encounter, calculate_exit_encounter};
 use log::{error, trace};
 
-use crate::{components::path_component::{burn::rocket_equation_function::RocketEquationFunction, orbit::{builder::OrbitBuilder, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use crate::{components::path_component::{orbit::{builder::OrbitBuilder, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
 
 use self::fast_solver::{apply_encounter, solver::find_next_encounter};
 
@@ -31,12 +31,12 @@ impl Model {
         // A spacecraft that is for example in LEO will never have any
         // encounters, but without this, the predictor would keep on going every single frame
         // and rediscovering the exact same orbits
-        if self.path_component(entity).final_orbit().unwrap().end_point().time() == end_time {
+        if self.path_component(entity).end_orbit().unwrap().end_point().time() == end_time {
             return false;
         }
 
         loop {
-            match find_next_encounter(self, self.path_component(entity).final_orbit().unwrap(), entity, end_time) {
+            match find_next_encounter(self, self.path_component(entity).end_orbit().unwrap(), entity, end_time) {
                 Ok(encounter) => {
                     if let Some(encounter) = encounter {
                         trace!("Found encounter {encounter:?}");
@@ -58,7 +58,7 @@ impl Model {
         
         if segments < segment_count {
             self.path_component_mut(entity)
-                .final_segment_mut()
+                .end_segment_mut()
                 .as_orbit_mut()
                 .expect("Attempt to predict when the last segment is a burn!")
                 .end_at(end_time);
@@ -68,7 +68,7 @@ impl Model {
 
     pub fn recompute_trajectory(&mut self, entity: Entity) -> bool {
         // Add 1 because the final orbit will have duration 0
-        let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - self.path_component(entity).future_orbits_after_final_non_orbit().len();
+        let segments_to_predict = SEGMENTS_TO_PREDICT + 1 - self.path_component(entity).future_orbits_after_last_non_orbit().len();
         self.predict(entity, 1.0e10, segments_to_predict)
     }
 
@@ -136,13 +136,5 @@ impl Model {
         }
 
         segments
-    }
-
-    pub(crate) fn rocket_equation_function_at_end_of_trajectory(&self, entity: Entity) -> RocketEquationFunction {
-        if let Some(rocket_equation_function) = self.path_component(entity).final_rocket_equation_function() {
-            return rocket_equation_function;
-        }
-
-        RocketEquationFunction::fuel_from_vessel_component(self.vessel_component(entity))
     }
 }

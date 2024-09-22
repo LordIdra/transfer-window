@@ -1,27 +1,35 @@
 use eframe::egui::{ScrollArea, Ui};
-use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::{burn_point::BurnPoint, Burn}, guidance::{guidance_point::GuidancePoint, Guidance}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment, PathComponent}}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::{burn_point::BurnPoint, Burn}, guidance::{guidance_point::GuidancePoint, Guidance}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment, turn::{turn_point::TurnPoint, Turn}, PathComponent}}, storage::entity_allocator::Entity, Model};
 
 use crate::game::util::format_time;
 
-fn draw_burn_point(ui: &mut Ui, burn_point: &BurnPoint) {
-    ui.label(format!("Position: {:.3?}", burn_point.position()));
-    ui.label(format!("Velocity: {:.3?}", burn_point.velocity()));
-    ui.label(format!("Time: {:.3?}", burn_point.time()));
+fn draw_burn_point(ui: &mut Ui, point: &BurnPoint) {
+    ui.label(format!("Position: {:.3?}", point.position()));
+    ui.label(format!("Velocity: {:.3?}", point.velocity()));
+    ui.label(format!("Time: {:.3?}", point.time()));
 }
 
-fn draw_orbit_point(ui: &mut Ui, orbit_point: &OrbitPoint) {
-    ui.label(format!("Position: {:.3?}", orbit_point.position()));
-    ui.label(format!("Velocity: {:.3?}", orbit_point.velocity()));
-    ui.label(format!("Time: {:.3?}", orbit_point.time()));
-    ui.label(format!("Time since periapsis: {:.3?}", orbit_point.time_since_periapsis()));
-    ui.label(format!("Theta: {:.3?}", orbit_point.theta()));
+fn draw_orbit_point(ui: &mut Ui, point: &OrbitPoint) {
+    ui.label(format!("Position: {:.3?}", point.position()));
+    ui.label(format!("Velocity: {:.3?}", point.velocity()));
+    ui.label(format!("Time: {:.3?}", point.time()));
+    ui.label(format!("Time since periapsis: {:.3?}", point.time_since_periapsis()));
+    ui.label(format!("Theta: {:.3?}", point.theta()));
 }
 
-fn draw_guidance_point(ui: &mut Ui, burn_point: &GuidancePoint) {
-    ui.label(format!("Position: {:.3?}", burn_point.position()));
-    ui.label(format!("Velocity: {:.3?}", burn_point.velocity()));
-    ui.label(format!("PN Acceleration: {:.3?}", burn_point.guidance_acceleration()));
-    ui.label(format!("Time: {:.3?}", burn_point.time()));
+fn draw_guidance_point(ui: &mut Ui, point: &GuidancePoint) {
+    ui.label(format!("Position: {:.3?}", point.position()));
+    ui.label(format!("Velocity: {:.3?}", point.velocity()));
+    ui.label(format!("PN Acceleration: {:.3?}", point.guidance_acceleration()));
+    ui.label(format!("Time: {:.3?}", point.time()));
+}
+
+fn draw_turn_point(ui: &mut Ui, point: &TurnPoint) {
+    ui.label(format!("Position: {:.3?}", point.position()));
+    ui.label(format!("Velocity: {:.3?}", point.velocity()));
+    ui.label(format!("Rotation: {:.3?}", point.rotation()));
+    ui.label(format!("Mass: {:.3?}", point.mass()));
+    ui.label(format!("Time: {:.3?}", point.time()));
 }
 
 fn draw_orbit(ui: &mut Ui, orbit: &Orbit) {
@@ -72,12 +80,20 @@ fn draw_guidance(ui: &mut Ui, guidance: &Guidance) {
     ui.collapsing("End", |ui| draw_guidance_point(ui, guidance.end_point()));
 }
 
+fn draw_turn(ui: &mut Ui, turn: &Turn) {
+    ui.label(format!("Duration: {}", format_time(turn.duration())));
+    ui.collapsing("Start", |ui| draw_turn_point(ui, turn.start_point()));
+    ui.collapsing("Current", |ui| draw_turn_point(ui, turn.current_point()));
+    ui.collapsing("End", |ui| draw_turn_point(ui, turn.end_point()));
+}
+
 fn draw_path(ui: &mut Ui, path_component: &PathComponent) {
     for segment in path_component.future_segments() {
         match segment {
             Segment::Orbit(orbit) => draw_orbit(ui, orbit),
             Segment::Burn(burn) => draw_burn(ui, burn),
             Segment::Guidance(guidance) => draw_guidance(ui, guidance),
+            Segment::Turn(turn) => draw_turn(ui, turn),
         }
     } 
 }

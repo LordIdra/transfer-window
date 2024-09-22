@@ -22,8 +22,8 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
 fn draw_burn(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     let burn = view.model.burn_at_time(entity, time, Some(Faction::Player));
     let max_dv = view.model.vessel_component(entity).max_dv();
-    let start_dv = burn.start_rocket_equation_function().remaining_dv();
-    let end_dv = burn.final_rocket_equation_function().remaining_dv();
+    let start_dv = burn.start_remaining_dv();
+    let end_dv = burn.end_remaining_dv();
     let duration = burn.duration();
     draw_subtitle(ui, "Burn");
     draw_burn_labels(view, ui, max_dv, start_dv, end_dv, duration);

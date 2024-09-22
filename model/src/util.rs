@@ -1,16 +1,7 @@
-use std::f64::consts::PI;
-
 use nalgebra_glm::{vec2, DMat2, DVec2};
 use transfer_window_common::numerical_methods::closest_ellipse_point::solve_for_closest_point_on_ellipse;
 
 use crate::components::path_component::orbit::Orbit;
-
-/// Normalizes between 0 and 2pi
-/// <https://stackoverflow.com/questions/31210357/is-there-a-modulus-not-remainder-function-operation>
-pub fn normalize_angle(mut theta: f64) -> f64 {
-    theta %= 2.0 * PI;
-    (theta + 2.0 * PI) % (2.0 * PI)
-}
 
 /// Returns a function that will return the closest point on the given orbit from an arbitrary point
 pub fn make_closest_point_on_ellipse_orbit_function(orbit: &Orbit) -> impl Fn(DVec2) -> DVec2 + '_ {
@@ -31,19 +22,3 @@ pub fn make_closest_point_on_ellipse_orbit_function(orbit: &Orbit) -> impl Fn(DV
     }
 }
 
-
-
-#[cfg(test)]
-mod test {
-    use std::f64::consts::PI;
-
-    use crate::util::normalize_angle;
-
-    #[test]
-    fn test_normalize_angle() {
-        assert!((normalize_angle(2.01 * PI) - 0.01 * PI).abs() < 1.0e-5);
-        assert!((normalize_angle(3.789 * PI) - 1.789 * PI).abs() < 1.0e-5);
-        assert!((normalize_angle(-1.345 * PI) - 0.655 * PI).abs() < 1.0e-5);
-        assert!((normalize_angle(-6.0 * PI + 0.2) - 0.2).abs() < 1.0e-5);
-    }
-}

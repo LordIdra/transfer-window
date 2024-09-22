@@ -6,6 +6,8 @@ pub enum VesselClass {
     Station,
     Scout1,
     Frigate1,
+    /// Ship with a high thrust, high fuel consumption, and lots of facilities for testing
+    TestShip,
 }
 
 impl VesselClass {
@@ -15,6 +17,7 @@ impl VesselClass {
             VesselClass::Station => "Hub",
             VesselClass::Scout1 => "Scout I",
             VesselClass::Frigate1 => "Frigate I",
+            VesselClass::TestShip => "Test Ship"
         }
     }
 

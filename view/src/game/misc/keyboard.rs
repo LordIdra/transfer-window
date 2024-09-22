@@ -35,9 +35,11 @@ pub fn update(view: &View) {
                     | Selected::Encounter { .. }
                     | Selected::Intercept { .. }
                     | Selected::BurnPoint { .. }
+                    | Selected::TurnPoint { .. }
                     | Selected::GuidancePoint { .. }
                     | Selected::OrbitPoint { .. } => (),
                 Selected::Burn { entity, .. }
+                    | Selected::Turn { entity, .. }
                     | Selected::FireTorpedo { entity, .. } 
                     | Selected::EnableGuidance { entity, .. } => {
                         view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });

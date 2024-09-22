@@ -1,131 +1,59 @@
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-struct RcsThruster {
+pub struct RcsThruster {
     throttle: f64,
     thrust: f64,
+    fuel_kg_per_second: f64,
     position: DVec2,
     force_unit: DVec2,
 }
 impl RcsThruster {
-    pub fn new(thrust: f64, position: DVec2, force_unit: DVec2) -> Self {
-        Self { throttle: 0.0, thrust, position, force_unit }
+    pub fn new(thrust: f64, fuel_kg_per_second: f64, position: DVec2, force_unit: DVec2) -> Self {
+        Self { throttle: 0.0, thrust, fuel_kg_per_second, position, force_unit }
+    }
+
+    pub fn fuel_kg_per_second(&self) -> f64 {
+        self.fuel_kg_per_second
     }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RcsControlScheme {
-    thruster_throttles: Vec<f64>,
     force: Option<f64>,
     angular_force: Option<f64>,
+    thruster_throttles_positive: Vec<f64>,
+    thruster_throttles_negative: Vec<f64>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub enum RcsControlSchemeType {
-    Clockwise,
-    Anticlockwise,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-struct RcsControlSchemes {
-    clockwise: RcsControlScheme,
-    anticlockwise: RcsControlScheme,
-}
-
-impl RcsControlSchemes {
-    pub fn get(&self, type_: RcsControlSchemeType) -> &RcsControlScheme {
-        match type_ {
-            RcsControlSchemeType::Clockwise => &self.clockwise,
-            RcsControlSchemeType::Anticlockwise => &self.anticlockwise,
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
-pub enum RcsType {
-    LightRcs
-}
-
-impl RcsType {
-    pub fn mass(self) -> f64 {
-        match self {
-            RcsType::LightRcs => 20.0,
-        }
-    }
-
-    fn thrusters(self) -> Vec<RcsThruster> {
-        match self {
-            RcsType::LightRcs => vec![
-                RcsThruster::new(1.0, vec2(10.0, 78.0), vec2(0.0, -1.0)),
-                RcsThruster::new(1.0, vec2(10.0, 78.0), vec2(1.0, 0.0)),
-                RcsThruster::new(1.0, vec2(10.0, 78.0), vec2(-1.0, 0.0)),
-
-                RcsThruster::new(1.0, vec2(10.0, -78.0), vec2(0.0, 1.0)),
-                RcsThruster::new(1.0, vec2(10.0, -78.0), vec2(1.0, 0.0)),
-                RcsThruster::new(1.0, vec2(10.0, -78.0), vec2(-1.0, 0.0)),
-
-                RcsThruster::new(1.0, vec2(-199.0, 88.0), vec2(0.0, -1.0)),
-                RcsThruster::new(1.0, vec2(-199.0, 88.0), vec2(1.0, 0.0)),
-                RcsThruster::new(1.0, vec2(-199.0, 88.0), vec2(-1.0, 0.0)),
-
-                RcsThruster::new(1.0, vec2(-199.0, -88.0), vec2(0.0, 1.0)),
-                RcsThruster::new(1.0, vec2(-199.0, -88.0), vec2(1.0, 0.0)),
-                RcsThruster::new(1.0, vec2(-199.0, -88.0), vec2(-1.0, 0.0)),
-            ],
-        }
-    }
-
-    fn control_scheme(self) -> RcsControlSchemes {
-        match self {
-            RcsType::LightRcs => RcsControlSchemes {
-                clockwise: RcsControlScheme {
-                    force: None,
-                    angular_force: Some(541.0),
-                    thruster_throttles: vec![
-                        0.0, 0.0, 1.0,
-                        1.0, 1.0, 0.0,
-                        1.0, 0.0, 1.0,
-                        0.0, 1.0, 0.0
-                    ],
-                },
-
-                anticlockwise: RcsControlScheme {
-                    force: None,
-                    angular_force: Some(-541.0),
-                    thruster_throttles: vec![
-                        1.0, 1.0, 0.0,
-                        0.0, 0.0, 1.0,
-                        0.0, 1.0, 0.0,
-                        1.0, 0.0, 1.0
-                    ],
-                },
-            }
-        }
+impl RcsControlScheme {
+    pub fn new(force: Option<f64>, angular_force: Option<f64>, thruster_throttles_positive: Vec<f64>, thruster_throttles_negative: Vec<f64>) -> Self {
+        Self { force, angular_force, thruster_throttles_positive, thruster_throttles_negative  }
     }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Rcs {
-    rcs_type: RcsType,
+    mass: f64,
     thrusters: Vec<RcsThruster>,
-    control_scheme: RcsControlSchemes,
+    turn: RcsControlScheme,
 }
 
 impl Rcs {
-    pub fn new(rcs_type: RcsType) -> Self {
-        Rcs { 
-            rcs_type,
-            thrusters: rcs_type.thrusters() ,
-            control_scheme: rcs_type.control_scheme(),
+    pub fn new(mass: f64, thrusters: Vec<RcsThruster>, turn: RcsControlScheme) -> Self {
+        Rcs { mass, thrusters, turn }
+    }
+
+    pub fn turn_fuel_kg_per_second(&self) -> f64 {
+        let mut fuel_use = 0.0;
+        for i in 0..self.thrusters.len() {
+            fuel_use += self.thrusters[i].fuel_kg_per_second() * self.turn.thruster_throttles_positive[i];
         }
+        fuel_use
     }
 
-    pub fn type_(&self) -> RcsType {
-        self.rcs_type
-    }
-
-    pub fn control_scheme(&self, type_: RcsControlSchemeType) -> &RcsControlScheme {
-        self.control_scheme.get(type_)
+    pub fn turn_force(&self) -> f64 {
+        self.turn.angular_force.expect("Turn scheme must specify an angular force")
     }
 }

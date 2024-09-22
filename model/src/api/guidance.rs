@@ -37,14 +37,16 @@ impl Model {
 
         self.path_component_mut(entity).remove_segments_after(time);
 
-        let last_segment = self.path_component(entity).final_segment();
+        let last_segment = self.path_component(entity).end_segment();
         let parent = last_segment.parent();
         let guidance = GuidanceBuilder {
             parent,
             parent_mass: self.mass(parent),
             target: self.vessel_component(entity).target().expect("Cannot enable guidance on torpedo without a target"),
             faction: self.vessel_component(entity).faction(),
-            rocket_equation_function: self.rocket_equation_function_at_end_of_trajectory(entity),
+            engine: self.vessel_component(entity).engine().unwrap().clone(),
+            mass: self.mass_at_time(entity, time, None),
+            fuel_kg: self.fuel_kg_at_time(entity, time),
             time,
             rotation: last_segment.end_rotation(),
             position: last_segment.end_position(),
@@ -72,7 +74,9 @@ impl Model {
             parent_mass: self.mass(parent),
             target: guidance.target(),
             faction: self.vessel_component(entity).faction(),
-            rocket_equation_function: guidance.rocket_equation_function_at_time(self.time),
+            engine: self.vessel_component(entity).engine().unwrap().clone(),
+            mass: self.mass_at_time(entity, self.time, None),
+            fuel_kg: self.fuel_kg_at_time(entity, self.time),
             time: self.time,
             rotation: guidance.current_point().rotation(),
             position: guidance.current_point().position(),

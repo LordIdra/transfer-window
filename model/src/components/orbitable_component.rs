@@ -66,13 +66,12 @@ impl OrbitableComponent {
     pub fn new(
         mass: f64,
         radius: f64,
-        rotation_period_in_days: f64,
+        rotation_period: f64,
         rotation_angle: f64,
         type_: OrbitableType,
         physics: OrbitableComponentPhysics,
         atmosphere: Option<Atmosphere>,
     ) -> Self {
-        let rotation_period = rotation_period_in_days * 24.0 * 60.0 * 60.0;
         Self { mass, radius, rotation_period, rotation_angle, type_, physics, atmosphere }
     }
 

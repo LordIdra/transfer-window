@@ -3,11 +3,11 @@ use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::{engine::Engine, faction::Faction}, storage::entity_allocator::Entity, Model};
 
 use self::guidance_point::GuidancePoint;
 
-use super::burn::rocket_equation_function::RocketEquationFunction;
+use super::rocket_equation_function::RocketEquationFunction;
 
 const MAX_INTERCEPT_DISTANCE: f64 = 50.0;
 const MAX_GUIDANCE_TIME: f64 = 60.0 * 60.0;
@@ -27,34 +27,47 @@ fn proportional_guidance_acceleration(absolute_position: DVec2, target_absolute_
     let displacement = absolute_position - target_absolute_position;
     let closing_speed = -(absolute_velocity - target_absolute_velocity).dot(&displacement) / displacement.magnitude();
 
-    let future_displacement = ((absolute_position + absolute_velocity * LINE_OF_SIGHT_RATE_DELTA) - (target_absolute_position + target_absolute_velocity * LINE_OF_SIGHT_RATE_DELTA)) / LINE_OF_SIGHT_RATE_DELTA;
+    let future_position = absolute_position + absolute_velocity * LINE_OF_SIGHT_RATE_DELTA;
+    let future_target_position = target_absolute_position + target_absolute_velocity * LINE_OF_SIGHT_RATE_DELTA;
+    let future_displacement = (future_position - future_target_position) / LINE_OF_SIGHT_RATE_DELTA;
     let line_of_sight_rate = (f64::atan2(displacement.y, displacement.x) - f64::atan2(future_displacement.y, future_displacement.x)) / LINE_OF_SIGHT_RATE_DELTA;
 
     let acceleration_unit = vec2(-displacement.y, displacement.x).normalize();
     acceleration_unit * PROPORTIONALITY_CONSTANT * closing_speed * line_of_sight_rate
 }
 
-fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, faction: Faction, start_rocket_equation_function: &RocketEquationFunction, start_point: &GuidancePoint) -> (bool, Vec<GuidancePoint>) {
+fn compute_guidance_points(
+    model: &Model, 
+    parent: Entity, 
+    target: Entity, 
+    faction: Faction, 
+    engine: &Engine,
+    start_point: &GuidancePoint,
+) -> (bool, Vec<GuidancePoint>) {
     #[cfg(feature = "profiling")]
     let _span = tracy_client::span!("Compute guidance points");
     let mut points = vec![start_point.clone()];
 
-    let mut dv = 0.0;
-    
     loop {
         let last = points.last().unwrap();
         let time = last.time();
 
-        let Some(rocket_equation_function) = start_rocket_equation_function.step_by_dv(dv) else {
-            // We've run out of fuel
+        // Check we're not out of fuel
+        if last.fuel_kg() < engine.fuel_kg_per_second() * GUIDANCE_TIME_STEP {
             return (false, points);
         };
 
+        // Check we're not over max guidance time
+        if time - start_point.time() > MAX_GUIDANCE_TIME {
+            return (false, points);
+        }
+
         // Check if we are on an intercept trajectory
         let distance_at_delta_time = |delta_time: f64| {
-            // Mass is technically not correct, but the difference is almost certainly negligible, and it's not really important anyway
-            let point = last.next(delta_time, rocket_equation_function.mass());
-            (model.absolute_position_at_time(parent, point.time(), Some(faction)) + point.position() - model.absolute_position_at_time(target, point.time(), Some(faction))).magnitude()
+            let point = last.next(delta_time, engine);
+            let parent_absolute_position = model.absolute_position_at_time(parent, point.time(), Some(faction));
+            let target_absolute_position = model.absolute_position_at_time(target, point.time(), Some(faction));
+            (parent_absolute_position + point.position() - target_absolute_position).magnitude()
         };
         let distance_prime_at_delta_time = |delta_time: f64| {
             (distance_at_delta_time(delta_time + DISTANCE_DERIVATIVE_DELTA) - distance_at_delta_time(delta_time)) / DISTANCE_DERIVATIVE_DELTA
@@ -67,34 +80,33 @@ fn compute_guidance_points(model: &Model, parent: Entity, target: Entity, factio
                     let intercept_distance = distance_at_delta_time(intercept_delta_time);
                     if will_intercept(intercept_distance) {
                         // We have an intercept
-                        points.push(last.next(intercept_delta_time, rocket_equation_function.mass()));
+                        points.push(last.next(intercept_delta_time, engine));
                         return (true, points);
                     }
                 },
             }
         }
 
-        if time - start_point.time() > MAX_GUIDANCE_TIME {
-            return (false, points);
-        }
-
+        // Calculate acceleration
         let absolute_position = model.absolute_position_at_time(parent, time, Some(faction)) + last.position();
         let absolute_velocity = model.absolute_velocity_at_time(parent, time, Some(faction)) + last.velocity();
         let target_absolute_position = model.absolute_position_at_time(target, time, Some(faction));
         let target_absolute_velocity = model.absolute_velocity_at_time(target, time, Some(faction));
-        let mass = rocket_equation_function.mass();
-
         let requested_acceleration = proportional_guidance_acceleration(absolute_position, target_absolute_position, absolute_velocity, target_absolute_velocity);
 
         // Make sure guidance acceleration does not exceed max acceleration
-        let actual_acceleration = if requested_acceleration.magnitude() < rocket_equation_function.acceleration() {
+        let max_acceleration = engine.thrust_newtons() / last.mass();
+        let actual_acceleration = if requested_acceleration.magnitude() < max_acceleration {
             requested_acceleration
         } else {
-            requested_acceleration.normalize() * rocket_equation_function.acceleration()
+            requested_acceleration.normalize() * max_acceleration
         };
 
-        dv += actual_acceleration.magnitude() * GUIDANCE_TIME_STEP;
-        points.push(last.next_with_new_acceleration_and_dv(GUIDANCE_TIME_STEP, mass, actual_acceleration));
+        // Finally, set acceleration and construct the next point
+        let last = points.last_mut().unwrap();
+        last.set_acceleration(actual_acceleration);
+        let next = last.next(GUIDANCE_TIME_STEP, engine);
+        points.push(next);
     }
 }
 
@@ -103,7 +115,7 @@ pub struct Guidance {
     parent: Entity,
     target: Entity,
     faction: Faction,
-    rocket_equation_function: RocketEquationFunction,
+    engine: Engine,
     current_point: GuidancePoint,
     points: Vec<GuidancePoint>,
     will_intercept: bool,
@@ -111,14 +123,28 @@ pub struct Guidance {
 
 impl Guidance {
     #[allow(clippy::too_many_arguments)]
-    pub(self) fn new(model: &Model, parent: Entity, parent_mass: f64, target: Entity, faction: Faction, rocket_equation_function: RocketEquationFunction, start_time: f64, start_rotation: f64, start_position: DVec2, start_velocity: DVec2) -> Self {
-        let start_point = GuidancePoint::new(parent_mass, rocket_equation_function.mass(), start_time, start_rotation, start_position, start_velocity, vec2(0.0, 0.0), 0.0);
-        let (will_intercept, points) = compute_guidance_points(model, parent, target, faction, &rocket_equation_function, &start_point);
+    pub(self) fn new(
+        model: &Model, 
+        parent: Entity, 
+        parent_mass: f64, 
+        target: Entity, 
+        faction: Faction, 
+        engine: &Engine, 
+        mass: f64,
+        fuel_kg: f64,
+        start_time: f64, 
+        start_rotation: f64, 
+        start_position: DVec2, 
+        start_velocity: DVec2
+    ) -> Self {
+        let mass_without_fuel = mass - fuel_kg;
+        let start_point = GuidancePoint::new(parent_mass, mass_without_fuel, fuel_kg, start_time, start_rotation, start_position, start_velocity, vec2(0.0, 0.0));
+        let (will_intercept, points) = compute_guidance_points(model, parent, target, faction, engine, &start_point);
         Self { 
             parent,
             target,
             faction,
-            rocket_equation_function,
+            engine: engine.clone(),
             current_point: start_point.clone(),
             points,
             will_intercept,
@@ -146,7 +172,7 @@ impl Guidance {
         let index = (time_since_start / GUIDANCE_TIME_STEP) as usize;
         if let Some(closest_previous_point) = self.points.get(index) {
             let undershot_time = time - closest_previous_point.time();
-            closest_previous_point.next(undershot_time, closest_previous_point.mass())
+            closest_previous_point.next(undershot_time, &self.engine)
         } else {
             self.end_point().clone()
         }
@@ -185,31 +211,49 @@ impl Guidance {
         absolute_time - self.start_point().time()
     }
 
-    pub fn start_rocket_equation_function(&self) -> RocketEquationFunction {
-        self.rocket_equation_function.clone()
+    fn start_rocket_equation_function(&self) -> RocketEquationFunction {
+        RocketEquationFunction::new(self.start_point().dry_mass(), 
+            self.start_point().fuel_kg(), 
+            self.engine.fuel_kg_per_second(), 
+            self.engine.specific_impulse())
     }
 
-    pub fn rocket_equation_function(&self) -> RocketEquationFunction {
-        self.rocket_equation_function_at_time(self.current_point.time())
+    fn end_rocket_equation_function(&self) -> RocketEquationFunction {
+        RocketEquationFunction::new(self.end_point().dry_mass(), 
+            self.end_point().fuel_kg(), 
+            self.engine.fuel_kg_per_second(), 
+            self.engine.specific_impulse())
     }
 
-    pub fn dv_at_time(&self, time: f64) -> f64 {
-        self.point_at_time(time).dv()
+    fn rocket_equation_function_at_time(&self, time: f64) -> RocketEquationFunction {
+        RocketEquationFunction::new(self.point_at_time(time).dry_mass(), 
+            self.point_at_time(time).fuel_kg(), 
+            self.engine.fuel_kg_per_second(), 
+            self.engine.specific_impulse())
     }
 
-    /// `time` is absolute
-    pub fn rocket_equation_function_at_time(&self, time: f64) -> RocketEquationFunction {
-        // Slightly annoying workaround to make sure that if the guidance expends all our DV, there won't be a panic
-        let dv = self.dv_at_time(time);
-        match self.rocket_equation_function.step_by_dv(dv) {
-            Some(rocket_equation_function) => rocket_equation_function,
-            None => self.rocket_equation_function.end(),
-        }
+    pub fn start_remaining_dv(&self) -> f64 {
+        self.start_rocket_equation_function().remaining_dv()
     }
 
-    #[allow(clippy::missing_panics_doc)]
-    pub fn final_rocket_equation_function(&self) -> RocketEquationFunction {
-        self.rocket_equation_function_at_time(self.end_point().time())
+    pub fn start_fuel_kg(&self) -> f64 {
+        self.start_rocket_equation_function().remaining_fuel_kg()
+    }
+
+    pub fn end_remaining_dv(&self) -> f64 {
+        self.end_rocket_equation_function().remaining_dv()
+    }
+
+    pub fn end_fuel_kg(&self) -> f64 {
+        self.end_rocket_equation_function().remaining_fuel_kg()
+    }
+
+    pub fn remaining_dv_at_time(&self, time: f64) -> f64 {
+        self.rocket_equation_function_at_time(time).remaining_dv()
+    }
+
+    pub fn fuel_kg_at_time(&self, time: f64) -> f64 {
+        self.rocket_equation_function_at_time(time).remaining_fuel_kg()
     }
 
     pub fn will_intercept(&self) -> bool {

@@ -13,6 +13,7 @@ pub enum StoryEvent {
     VesselSelected(Entity),
     WarpStarted,
     CreateBurn(Entity),
+    CreateTurn(Entity),
     EnableGuidance(Entity),
     FireTorpedo(Entity),
     StartBurnAdjust,

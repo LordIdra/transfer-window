@@ -7,8 +7,7 @@ use faction::Faction;
 use fuel_tank::FuelTank;
 use log::error;
 use nalgebra_glm::{vec2, DVec2};
-use rcs::{Rcs, RcsType};
-use monopropellant_tank::MonopropellantTank;
+use rcs::{Rcs, RcsControlScheme, RcsThruster};
 use serde::{Deserialize, Serialize};
 use timeline::Timeline;
 use torpedo_launcher::TorpedoLauncher;
@@ -22,7 +21,6 @@ pub mod docking;
 pub mod engine;
 pub mod faction;
 pub mod fuel_tank;
-pub mod monopropellant_tank;
 pub mod rcs;
 pub mod timeline;
 pub mod torpedo_launcher;
@@ -41,7 +39,6 @@ pub struct VesselComponent {
     timeline: Timeline,
     target: Option<Entity>,
     fuel_tank: Option<FuelTank>,
-    monopropellant_tank: Option<MonopropellantTank>,
     engine: Option<Engine>,
     rcs: Option<Rcs>,
     torpedo_storage: Option<TorpedoStorage>,
@@ -62,8 +59,7 @@ impl VesselComponent {
                 target: None,
                 fuel_tank: Some(FuelTank::new(10_000.0)),
                 engine: Some(Engine::new(7.0, 15_000.0)),
-                monopropellant_tank: Some(MonopropellantTank::new(100.0)),
-                rcs: Some(Rcs::new(RcsType::LightRcs)),
+                rcs: None,
                 torpedo_storage: None,
                 torpedo_launcher: None,
                 docking: None,
@@ -79,7 +75,6 @@ impl VesselComponent {
                 target: None,
                 fuel_tank: Some(FuelTank::new(140_000.0)),
                 engine: None,
-                monopropellant_tank: None,
                 rcs: None,
                 torpedo_storage: Some(TorpedoStorage::new(5)),
                 torpedo_launcher: None,
@@ -96,8 +91,39 @@ impl VesselComponent {
                 target: None,
                 fuel_tank: Some(FuelTank::new(30_000.0)),
                 engine: Some(Engine::new(30.0, 70_000.0)),
-                monopropellant_tank: Some(MonopropellantTank::new(300.0)),
-                rcs: Some(Rcs::new(RcsType::LightRcs)),
+                rcs: Some(Rcs::new(5.0, 
+                    vec![
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, 78.0), vec2(0.0, -1.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, 78.0), vec2(1.0, 0.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, 78.0), vec2(-1.0, 0.0)),
+
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, -78.0), vec2(0.0, 1.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, -78.0), vec2(1.0, 0.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, -78.0), vec2(-1.0, 0.0)),
+
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, 88.0), vec2(0.0, -1.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, 88.0), vec2(1.0, 0.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, 88.0), vec2(-1.0, 0.0)),
+
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, -88.0), vec2(0.0, 1.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, -88.0), vec2(1.0, 0.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, -88.0), vec2(-1.0, 0.0)),
+                    ],
+                    RcsControlScheme::new(None, Some(541.0), 
+                        vec![
+                            0.0, 0.0, 1.0,
+                            1.0, 1.0, 0.0,
+                            1.0, 0.0, 1.0,
+                            0.0, 1.0, 0.0
+                        ],
+                        vec![
+                            1.0, 1.0, 0.0,
+                            0.0, 0.0, 1.0,
+                            0.0, 1.0, 0.0,
+                            1.0, 0.0, 1.0
+                        ])
+                    )
+                ),
                 torpedo_storage: None,
                 torpedo_launcher: None,
                 docking: None,
@@ -113,12 +139,27 @@ impl VesselComponent {
                 target: None,
                 fuel_tank: Some(FuelTank::new(60_000.0)),
                 engine: Some(Engine::new(30.0, 70_000.0)),
-                monopropellant_tank: Some(MonopropellantTank::new(600.0)),
-                rcs: Some(Rcs::new(RcsType::LightRcs)),
+                rcs: None,
                 torpedo_storage: Some(TorpedoStorage::new(2)),
                 torpedo_launcher: Some(TorpedoLauncher::new(2.0 * 60.0 * 60.0)),
                 docking: None,
             },
+
+            VesselClass::TestShip => Self {
+                class, faction,
+                dry_mass: 50.0e3,
+                is_ghost: false,
+                can_dock: true,
+                dimensions: vec2(0.0, 0.0),
+                timeline: Timeline::default(),
+                target: None,
+                fuel_tank: Some(FuelTank::new(60_000.0)),
+                engine: Some(Engine::new(10000.0, 10_000_000.0)),
+                rcs: None,
+                torpedo_storage: Some(TorpedoStorage::new(8)),
+                torpedo_launcher: Some(TorpedoLauncher::new(60.0 * 60.0)),
+                docking: None,
+            }
         }
     }
 
@@ -221,56 +262,7 @@ impl VesselComponent {
             .expect("Attempt to set fuel on vessel without fuel tank")
             .set_fuel_kg(new_fuel_kg);
     }
-
-    // ------------------------
-    // Monopropellant Tank
-    // ------------------------
-    pub fn has_monopropellant_tank(&self) -> bool {
-        self.monopropellant_tank.is_some()
-    }
-
-    pub fn monopropellant_capacity_litres(&self) -> f64 {
-        match &self.monopropellant_tank {
-            Some(monopropellant_tank) => monopropellant_tank.capacity_litres(),
-            None => 0.0,
-        }
-    }
-
-    pub fn monopropellant_capacity_kg(&self) -> f64 {
-        match &self.monopropellant_tank {
-            Some(monopropellant_tank) => monopropellant_tank.capacity_kg(),
-            None => 0.0,
-        }
-    }
-
-    pub fn monopropellant_litres(&self) -> f64 {
-        match &self.monopropellant_tank {
-            Some(monopropellant_tank) => monopropellant_tank.fuel_litres(),
-            None => 0.0,
-        }
-    }
-
-    pub fn monopropellant_kg(&self) -> f64 {
-        match &self.monopropellant_tank {
-            Some(monopropellant_tank) => monopropellant_tank.fuel_kg(),
-            None => 0.0,
-        }
-    }
-
-    pub fn is_monopropellant_empty(&self) -> bool {
-        self.monopropellant_kg() < 1.0e-3
-    }
-
-    pub fn is_monopropellant_full(&self) -> bool {
-        (self.monopropellant_capacity_kg() - self.monopropellant_kg()) < 1.0e-3
-    }
-
-    pub fn set_monopropellant_kg(&mut self, new_monopropellant_kg: f64) {
-        self.monopropellant_tank.as_mut()
-            .expect("Attempt to set monopropellant on vessel without monopropellant tank")
-            .set_fuel_kg(new_monopropellant_kg);
-    }
-
+    
     // ------------------------
     // Mass
     // ------------------------
@@ -279,19 +271,11 @@ impl VesselComponent {
     }
 
     pub fn wet_mass(&self) -> f64 {
-        self.dry_mass() + self.fuel_capacity_kg() + self.monopropellant_capacity_kg()
-    }
-
-    pub fn fuel_wet_mass(&self) -> f64 {
         self.dry_mass() + self.fuel_capacity_kg()
     }
 
-    pub fn monopropellant_wet_mass(&self) -> f64 {
-        self.dry_mass() + self.monopropellant_capacity_kg()
-    }
-
     pub fn mass(&self) -> f64 {
-        self.dry_mass() + self.fuel_kg() + self.monopropellant_kg()
+        self.dry_mass() + self.fuel_kg()
     }
 
     // ------------------------
@@ -299,6 +283,10 @@ impl VesselComponent {
     // ------------------------
     pub fn has_engine(&self) -> bool {
         self.engine.is_some()
+    }
+
+    pub fn engine(&self) -> Option<&Engine> {
+        self.engine.as_ref()
     }
 
     pub fn specific_impulse(&self) -> Option<f64> {
@@ -341,6 +329,10 @@ impl VesselComponent {
     // ------------------------
     pub fn has_rcs(&self) -> bool {
         self.rcs.is_some()
+    }
+
+    pub fn rcs(&self) -> Option<&Rcs> {
+        self.rcs.as_ref()
     }
 
     // ------------------------

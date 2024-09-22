@@ -51,12 +51,12 @@ export_and_bloom_menu() {
 # )
 # wait
 
-cd "$root/view/resources/textures/ship" || exit
-for file in *.drawio; do
-    [ -f "$file" ] || break
-    export_and_bloom_ship "$file" &
-done
-wait
+# cd "$root/view/resources/textures/ship" || exit
+# for file in *.drawio; do
+#     [ -f "$file" ] || break
+#     export_and_bloom_ship "$file" &
+# done
+# wait
 
 # cd "$root/view/resources/textures/menu" || exit
 # for file in *.drawio; do
@@ -72,8 +72,8 @@ wait
 # done
 # wait
 
-# cd "$root/view/resources/textures/icon" || exit
-# cp ./*.png "$root/view/resources/final_textures"
+cd "$root/view/resources/textures/icon" || exit
+cp ./*.png "$root/view/resources/final_textures"
 
 # cd "$root/view/resources/textures/celestial_object" || exit
 # cp ./*.png "$root/view/resources/final_textures"

@@ -3,6 +3,7 @@ use std::collections::VecDeque;
 use intercept::InterceptEvent;
 use log::trace;
 use serde::{Deserialize, Serialize};
+use start_turn::StartTurnEvent;
 
 use crate::Model;
 
@@ -11,6 +12,7 @@ use self::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent,
 pub mod intercept;
 pub mod enable_guidance;
 pub mod start_burn;
+pub mod start_turn;
 pub mod fire_torpedo;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -18,6 +20,7 @@ pub enum TimelineEvent {
     Intercept(InterceptEvent),
     FireTorpedo(FireTorpedoEvent),
     Burn(StartBurnEvent),
+    Turn(StartTurnEvent),
     EnableGuidance(EnableGuidanceEvent),
 }
 
@@ -25,6 +28,7 @@ impl TimelineEvent {
     pub fn execute(&self, model: &mut Model) {
         match self {
             TimelineEvent::Burn(event) => event.execute(model),
+            TimelineEvent::Turn(event) => event.execute(model),
             TimelineEvent::Intercept(event) => event.execute(model),
             TimelineEvent::EnableGuidance(event) => event.execute(model),
             TimelineEvent::FireTorpedo(event) => event.execute(model),
@@ -34,6 +38,7 @@ impl TimelineEvent {
     pub fn cancel(&self, model: &mut Model) {
         match self {
             TimelineEvent::Burn(event) => event.cancel(model),
+            TimelineEvent::Turn(event) => event.cancel(model),
             TimelineEvent::Intercept(event) => event.cancel(model),
             TimelineEvent::EnableGuidance(event) => event.cancel(model),
             TimelineEvent::FireTorpedo(event) => event.cancel(model),
@@ -43,6 +48,7 @@ impl TimelineEvent {
     pub fn time(&self) -> f64 {
         match self {
             TimelineEvent::Burn(event) => event.time(),
+            TimelineEvent::Turn(event) => event.time(),
             TimelineEvent::Intercept(event) => event.time(),
             TimelineEvent::EnableGuidance(event) => event.time(),
             TimelineEvent::FireTorpedo(event) => event.time(),
@@ -52,6 +58,7 @@ impl TimelineEvent {
     pub fn can_delete(&self, model: &Model) -> bool {
         match self {
             TimelineEvent::Burn(event) => event.can_remove(model),
+            TimelineEvent::Turn(event) => event.can_remove(model),
             TimelineEvent::Intercept(event) => event.can_remove(),
             TimelineEvent::EnableGuidance(event) => event.can_remove(model),
             TimelineEvent::FireTorpedo(event) => event.can_remove(),
@@ -61,6 +68,7 @@ impl TimelineEvent {
     pub fn can_adjust(&self, model: &Model) -> bool {
         match self {
             TimelineEvent::Burn(event) => event.can_remove(model),
+            TimelineEvent::Turn(event) => event.can_remove(model),
             TimelineEvent::Intercept(event) => event.can_remove(),
             TimelineEvent::EnableGuidance(event) => event.can_remove(model),
             TimelineEvent::FireTorpedo(event) => event.can_remove(),
@@ -71,6 +79,7 @@ impl TimelineEvent {
     pub fn is_blocking(&self) -> bool {
         match self {
             TimelineEvent::Burn(event) => event.is_blocking(),
+            TimelineEvent::Turn(event) => event.is_blocking(),
             TimelineEvent::Intercept(event) => event.is_blocking(),
             TimelineEvent::EnableGuidance(event) => event.is_blocking(),
             TimelineEvent::FireTorpedo(event) => event.is_blocking(),
@@ -79,6 +88,10 @@ impl TimelineEvent {
 
     pub fn is_start_burn(&self) -> bool {
         matches!(self, TimelineEvent::Burn(_))
+    }
+
+    pub fn is_start_turn(&self) -> bool {
+        matches!(self, TimelineEvent::Turn(_))
     }
 
     pub fn is_intercept(&self) -> bool {
@@ -95,6 +108,14 @@ impl TimelineEvent {
 
     pub fn as_start_burn(&self) -> Option<StartBurnEvent> {
         if let TimelineEvent::Burn(event_type) = self {
+            Some(event_type.clone())
+        } else {
+            None
+        }
+    }
+
+    pub fn as_start_turn(&self) -> Option<StartTurnEvent> {
+        if let TimelineEvent::Turn(event_type) = self {
             Some(event_type.clone())
         } else {
             None

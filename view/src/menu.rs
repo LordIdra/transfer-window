@@ -29,6 +29,8 @@ pub struct View {
 
 impl View {
     pub fn new(resources: Arc<Resources>, context: &Context, gl: Arc<glow::Context>) -> Self {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("View initialisation");
         let previous_screen_rect = context.screen_rect();
         let screen_rect = context.screen_rect();
         let screen_texture_renderer = Arc::new(Mutex::new(ScreenTextureRenderer::new(&gl, screen_rect)));

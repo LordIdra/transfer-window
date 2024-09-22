@@ -90,8 +90,7 @@ impl Icon for FireTorpedo {
         if let Selected::FireTorpedo { entity, time, state } = &view.selected {
             if *entity == self.entity 
                     && *time == self.time 
-                    && view.model.timeline_event_at_time(self.entity, self.time).can_adjust(&view.model)
-                    && view.model.timeline_event_at_time(*entity, *time).as_fire_torpedo().unwrap().can_adjust(&view.model) {
+                    && view.model.can_adjust_event_at_time(*entity, *time) {
                 let state = if state.is_selected() {
                     trace!("Burn icon clicked; switching Selected -> Adjusting");
                     BurnState::Adjusting

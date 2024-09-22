@@ -3,7 +3,7 @@ use nalgebra_glm::{vec2, DVec2};
 use crate::{
     components::{
         orbitable_component::OrbitableComponentPhysics,
-        path_component::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment},
+        path_component::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment, turn::Turn},
         vessel_component::faction::Faction,
     },
     storage::entity_allocator::Entity,
@@ -48,6 +48,17 @@ impl Model {
             }
         }
         burns
+    }
+
+    /// NOT safe to call for orbitables
+    pub fn future_turns(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Turn> {
+        let mut turns = vec![];
+        for segment in self.future_segments(entity, observer) {
+            if let Some(turn) = segment.as_turn() {
+                turns.push(turn);
+            }
+        }
+        turns
     }
 
     /// NOT safe to call for orbitables
@@ -121,6 +132,14 @@ impl Model {
     pub fn burn_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Burn {
         self.segment_at_time(entity, time, observer)
             .as_burn()
+            .expect("No burn exists at the given time")
+    }
+
+    /// # Panics
+    /// Panics if there is no burn at the given time
+    pub fn turn_at_time(&self, entity: Entity, time: f64, observer: Option<Faction>) -> &Turn {
+        self.segment_at_time(entity, time, observer)
+            .as_turn()
             .expect("No burn exists at the given time")
     }
 
@@ -305,21 +324,53 @@ impl Model {
             .mass_at_time(time)
     }
 
+    pub fn fuel_kg(&self, entity: Entity) -> f64 {
+        self.vessel_component(entity).fuel_kg()
+    }
+
+    /// # Panics
+    /// Panics if entity does not have fuel
+    pub fn fuel_kg_at_time(&self, entity: Entity, time: f64) -> f64 {
+        if let Some(fuel_kg) = self.path_component(entity).fuel_kg_at_time(time) {
+            return fuel_kg
+        }
+        
+        self.fuel_kg(entity)
+    }
+
+    /// # Panics
+    /// Panics if the entity does not have a vessel component
+    pub fn end_fuel(&self, entity: Entity) -> f64 {
+        if let Some(path_component) = self.try_path_component(entity) {
+            if let Some(end_fuel_kg) = path_component.end_fuel_kg() {
+                return end_fuel_kg
+            }
+        }
+
+        if let Some(vessel_component) = self.try_vessel_component(entity) {
+            return vessel_component.fuel_kg();
+        }
+
+        panic!("Attempt to get fuel of entity without vessel component");
+    }
+
     /// Returns none if the entity does not have an engine
     /// # Panics
     /// Panics if the entity does not have a vessel component
-    pub fn final_dv(&self, entity: Entity) -> Option<f64> {
+    pub fn end_dv(&self, entity: Entity) -> Option<f64> {
+        if let Some(path_component) = self.try_path_component(entity) {
+            if let Some(end_dv) = path_component.end_remaining_dv() {
+                return Some(end_dv)
+            }
+        }
+
         if let Some(vessel_component) = self.try_vessel_component(entity) {
             if !vessel_component.has_engine() {
                 return None;
             }
-            return Some(
-                match self.path_component(entity).final_rocket_equation_function() {
-                    Some(rocket_equation_function) => rocket_equation_function.remaining_dv(),
-                    None => vessel_component.dv(),
-                },
-            );
+            return Some(vessel_component.dv());
         }
+
         panic!("Attempt to get dv of entity without vessel component");
     }
 

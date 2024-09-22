@@ -31,7 +31,7 @@ pub fn update_adjustment(view: &View, pointer: &PointerState) {
     // Do scroll adjustment
     if let Selected::FireTorpedo { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
         if let Some(mouse_position) = pointer.latest_pos() {
-            let event = &view.model.timeline_event_at_time(entity, time).as_fire_torpedo().unwrap();
+            let event = &view.model.fire_torpedo_event_at_time(entity, time).unwrap();
             let amount = compute_drag_adjustment_amount(view, entity, time, direction, mouse_position);
             if let Some(amount) = view.model.calculate_burn_dv(event.ghost(), event.burn_time(), amount) {
                 view.add_model_event(ModelEvent::AdjustFireTorpedo { entity, time, amount });

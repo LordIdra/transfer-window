@@ -42,6 +42,10 @@ pub fn draw_hover(view: &View, pointer: &PointerState) {
         draw_selected_circle(view, entity, time, HOVERED_ALPHA);
         return;
     }
+    if let Some((entity, time)) = view.model.closest_turn_point(latest_world, select_distance, Some(Faction::Player)) {
+        draw_selected_circle(view, entity, time, HOVERED_ALPHA);
+        return;
+    }
     if let Some((entity, time)) = view.model.closest_guidance_point(latest_world, select_distance, Some(Faction::Player)) {
         draw_selected_circle(view, entity, time, HOVERED_ALPHA);
         return;

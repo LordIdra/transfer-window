@@ -3,13 +3,14 @@ use serde::{Deserialize, Serialize};
 
 use crate::storage::entity_allocator::Entity;
 
-use super::{burn::Burn, guidance::Guidance, orbit::Orbit};
+use super::{burn::Burn, guidance::Guidance, orbit::Orbit, turn::Turn};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Segment {
     Orbit(Orbit),
     Burn(Burn),
-    Guidance(Guidance)
+    Guidance(Guidance),
+    Turn(Turn),
 }
 
 impl Segment {
@@ -18,6 +19,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.start_point().time(),
             Segment::Burn(burn) => burn.start_point().time(),
             Segment::Guidance(guidance) => guidance.start_point().time(),
+            Segment::Turn(turn) => turn.start_point().time(),
         }
     }
 
@@ -26,6 +28,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.start_point().mass(),
             Segment::Guidance(guidance) => guidance.start_point().mass(),
+            Segment::Turn(turn) => turn.start_point().mass(),
         }
     }
 
@@ -34,6 +37,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.rotation(),
             Segment::Burn(burn) => burn.rotation(),
             Segment::Guidance(guidance) => guidance.start_point().rotation(),
+            Segment::Turn(turn) => turn.start_point().rotation(),
         }
     }
 
@@ -42,6 +46,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.start_point().position(),
             Segment::Burn(burn) => burn.start_point().position(),
             Segment::Guidance(guidance) => guidance.start_point().position(),
+            Segment::Turn(turn) => turn.start_point().position(),
         }
     }
 
@@ -50,6 +55,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.start_point().velocity(),
             Segment::Burn(burn) => burn.start_point().velocity(),
             Segment::Guidance(guidance) => guidance.start_point().velocity(),
+            Segment::Turn(turn) => turn.start_point().velocity(),
         }
     }
 
@@ -58,6 +64,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.current_point().mass(),
             Segment::Guidance(guidance) => guidance.current_point().mass(),
+            Segment::Turn(turn) => turn.current_point().mass(),
         }
     }
 
@@ -66,6 +73,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.rotation(),
             Segment::Burn(burn) => burn.rotation(),
             Segment::Guidance(guidance) => guidance.current_point().rotation(),
+            Segment::Turn(turn) => turn.current_point().rotation(),
         }
     }
 
@@ -74,6 +82,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.current_point().position(),
             Segment::Burn(burn) => burn.current_point().position(),
             Segment::Guidance(guidance) => guidance.current_point().position(),
+            Segment::Turn(turn) => turn.current_point().position(),
         }
     }
 
@@ -82,6 +91,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.current_point().velocity(),
             Segment::Burn(burn) => burn.current_point().velocity(),
             Segment::Guidance(guidance) => guidance.current_point().velocity(),
+            Segment::Turn(turn) => turn.current_point().velocity(),
         }
     }
 
@@ -90,6 +100,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.end_point().time(),
             Segment::Burn(burn) => burn.end_point().time(),
             Segment::Guidance(guidance) => guidance.end_point().time(),
+            Segment::Turn(turn) => turn.end_point().time(),
         }
     }
 
@@ -98,6 +109,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.end_point().mass(),
             Segment::Guidance(guidance) => guidance.end_point().mass(),
+            Segment::Turn(turn) => turn.end_point().mass(),
         }
     }
 
@@ -106,6 +118,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.rotation(),
             Segment::Burn(burn) => burn.rotation(),
             Segment::Guidance(guidance) => guidance.end_point().rotation(),
+            Segment::Turn(turn) => turn.end_point().rotation(),
         }
     }
 
@@ -114,6 +127,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.end_point().position(),
             Segment::Burn(burn) => burn.end_point().position(),
             Segment::Guidance(guidance) => guidance.end_point().position(),
+            Segment::Turn(turn) => turn.end_point().position(),
         }
     }
 
@@ -122,6 +136,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.end_point().velocity(),
             Segment::Burn(burn) => burn.end_point().velocity(),
             Segment::Guidance(guidance) => guidance.end_point().velocity(),
+            Segment::Turn(turn) => turn.end_point().velocity(),
         }
     }
 
@@ -130,6 +145,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.point_at_time(time).mass(),
             Segment::Guidance(guidance) => guidance.point_at_time(time).mass(),
+            Segment::Turn(turn) => turn.point_at_time(time).mass(),
         }
     }
 
@@ -138,6 +154,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.rotation(),
             Segment::Burn(burn) => burn.rotation(),
             Segment::Guidance(guidance) => guidance.point_at_time(time).rotation(),
+            Segment::Turn(turn) => turn.point_at_time(time).rotation(),
         }
     }
 
@@ -146,6 +163,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.position_from_theta(orbit.theta_from_time(time)),
             Segment::Burn(burn) => burn.point_at_time(time).position(),
             Segment::Guidance(guidance) => guidance.point_at_time(time).position(),
+            Segment::Turn(turn) => turn.point_at_time(time).position(),
         }
     }
 
@@ -154,6 +172,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.velocity_from_theta(orbit.theta_from_time(time)),
             Segment::Burn(burn) => burn.point_at_time(time).velocity(),
             Segment::Guidance(guidance) => guidance.point_at_time(time).velocity(),
+            Segment::Turn(turn) => turn.point_at_time(time).velocity(),
         }
     }
 
@@ -162,6 +181,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.parent(),
             Segment::Burn(burn) => burn.parent(),
             Segment::Guidance(guidance) => guidance.parent(),
+            Segment::Turn(turn) => turn.parent(),
         }
     }
 
@@ -170,6 +190,7 @@ impl Segment {
             Segment::Orbit(orbit) => orbit.is_finished(),
             Segment::Burn(burn) => burn.is_finished(),
             Segment::Guidance(guidance) => guidance.is_finished(),
+            Segment::Turn(turn) => turn.is_finished(),
         }
     }
 
@@ -183,6 +204,10 @@ impl Segment {
 
     pub fn is_guidance(&self) -> bool {
         matches!(self, Segment::Guidance(_))
+    }
+
+    pub fn is_turn(&self) -> bool {
+        matches!(self, Segment::Turn(_))
     }
 
     pub fn duration(&self) -> f64 {
@@ -237,11 +262,28 @@ impl Segment {
         }
     }
 
+    pub fn as_turn(&self) -> Option<&Turn> {
+        if let Segment::Turn(turn) = self {
+            Some(turn)
+        } else {
+            None
+        }
+    }
+
+    pub fn as_turn_mut(&mut self) -> Option<&mut Turn> {
+        if let Segment::Turn(turn) = self {
+            Some(turn)
+        } else {
+            None
+        }
+    }
+
     pub fn next(&mut self, delta_time: f64) {
         match self {
             Segment::Orbit(orbit) => orbit.next(delta_time),
             Segment::Burn(burn) => burn.next(delta_time),
             Segment::Guidance(guidance) => guidance.next(delta_time),
+            Segment::Turn(turn) => turn.next(delta_time),
         }
     }
 }

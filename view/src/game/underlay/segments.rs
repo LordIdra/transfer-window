@@ -7,6 +7,7 @@ use crate::game::{util::{add_line, should_render_parent}, View};
 mod burn;
 mod guidance;
 mod orbit;
+mod turn;
 
 /// Draws a line between two points so that all the lines on a segment are connected together
 /// This should be called multiple times with different i's to create a blur effect, where i represents how far away from the 'real' line this line is
@@ -60,6 +61,14 @@ fn draw_segment(view: &View, segment: &Segment, camera_centre: DVec2, zoom: f64,
             let points = guidance::compute_points(guidance, absolute_parent_position, camera_centre, zoom);
             let color = guidance::compute_color(view, entity);
             if should_render_parent(view, guidance.parent()) {
+                segment_points_data.push((points, color));
+            }
+        }
+
+        Segment::Turn(turn) => {
+            let points = turn::compute_points(turn, absolute_parent_position, camera_centre, zoom);
+            let color = turn::compute_color(view, entity);
+            if should_render_parent(view, turn.parent()) {
                 segment_points_data.push((points, color));
             }
         }

@@ -1,8 +1,8 @@
 use std::{f64::consts::PI, mem::swap};
 
-use crate::{components::path_component::orbit::Orbit, util::normalize_angle};
+use crate::components::path_component::orbit::Orbit;
 
-use transfer_window_common::numerical_methods::itp::itp;
+use transfer_window_common::{normalize_angle, numerical_methods::itp::itp};
 
 // Constructs a range with theta 1 and theta 2 containing 'containing'
 // This is harder than it first appears, because for example the range 5.9 to 5.8 contains the angle 1.4
@@ -19,17 +19,6 @@ pub fn make_range_containing(theta_1: f64, theta_2: f64, containing: f64) -> (f6
         in_order
     } else {
         out_of_order
-    }
-}
-
-// Returns the (smallest) distance from the first angle to the second, ie wrapping round if necessary
-pub fn angular_distance(from: f64, to: f64) -> f64 {
-    let from = normalize_angle(from);
-    let to = normalize_angle(to);
-    if from < to {
-        to - from
-    } else {
-        to + 2.0*PI - from
     }
 }
 

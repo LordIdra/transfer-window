@@ -8,6 +8,8 @@ pub struct CompletedLevels(HashSet<String>);
 
 impl CompletedLevels {
     pub fn load() -> Self {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Load completed levels");
         if !Path::new("data/completed_levels.json").exists() {
             Self::default().save();
         }

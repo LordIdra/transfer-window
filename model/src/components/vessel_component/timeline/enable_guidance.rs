@@ -48,6 +48,6 @@ impl EnableGuidanceEvent {
         vessel_component.timeline().is_time_after_last_blocking_event(time)
             && !vessel_component.timeline().last_event().is_some_and(|event| event.is_intercept())
             && vessel_component.target().is_some_and(|target| model.try_vessel_component(target).is_some())
-            && model.final_dv(entity).unwrap() > MIN_DV_TO_ENABLE_GUIDANCE
+            && model.end_dv(entity).unwrap() > MIN_DV_TO_ENABLE_GUIDANCE
     }
 }

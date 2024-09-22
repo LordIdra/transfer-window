@@ -17,7 +17,7 @@ impl Model {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Update guidance");
         for entity in self.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
-            let Some(guidance) = self.path_component(entity).final_guidance() else { 
+            let Some(guidance) = self.path_component(entity).end_guidance() else { 
                 continue;
             };
 
@@ -35,7 +35,7 @@ impl Model {
             assert!(self.vessel_component(entity).timeline().last_event().unwrap().is_intercept());
             self.cancel_last_event(entity);
 
-            let on_guidance_segment_to_recalculate = self.time >= self.path_component(entity).final_guidance().unwrap().start_point().time();
+            let on_guidance_segment_to_recalculate = self.time >= self.path_component(entity).end_guidance().unwrap().start_point().time();
             if on_guidance_segment_to_recalculate {
                 trace!("Recalculating guidance for current segment");
                 self.recalculate_current_guidance(entity);

@@ -88,7 +88,7 @@ impl Icon for Burn {
         }
         
         if let Selected::Burn { entity, time, state } = &view.selected {
-            if *entity == self.entity && *time == self.time && view.model.timeline_event_at_time(self.entity, self.time).can_adjust(&view.model) {
+            if *entity == self.entity && *time == self.time && view.model.can_adjust_event_at_time(self.entity, self.time) {
                 let state = if state.is_selected() {
                     trace!("Burn icon clicked; switching Selected -> Adjusting");
                     BurnState::Adjusting

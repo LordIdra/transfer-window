@@ -13,8 +13,7 @@ pub struct StartBurnEvent {
 
 impl StartBurnEvent {
     pub fn new(model: &mut Model, entity: Entity, time: f64) -> Self {
-        let rocket_equation_function = model.rocket_equation_function_at_end_of_trajectory(entity);
-        model.create_burn(entity, time, rocket_equation_function);
+        model.create_burn(entity, time);
         Self { entity, time }
     }
 
@@ -54,6 +53,6 @@ impl StartBurnEvent {
         let vessel_component = model.vessel_component(entity);
         vessel_component.timeline().is_time_after_last_blocking_event(time)
             && !vessel_component.timeline().last_event().is_some_and(|event| event.is_enable_guidance() || event.is_intercept())
-            && model.final_dv(entity).unwrap() > MIN_DV_TO_CREATE_BURN
+            && model.end_dv(entity).unwrap() > MIN_DV_TO_CREATE_BURN
     }
 }

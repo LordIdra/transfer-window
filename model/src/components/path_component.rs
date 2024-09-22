@@ -1,6 +1,5 @@
 use std::collections::VecDeque;
 
-use burn::rocket_equation_function::RocketEquationFunction;
 use log::trace;
 use serde::{Deserialize, Serialize};
 
@@ -11,6 +10,7 @@ mod brute_force_tester;
 pub mod burn;
 pub mod guidance;
 pub mod orbit;
+pub mod rocket_equation_function;
 pub mod segment;
 pub mod turn;
 
@@ -74,39 +74,79 @@ impl PathComponent {
             .collect()
     }
 
-    pub fn future_orbits_after_final_non_orbit(&self) -> Vec<&Orbit> {
+    pub fn future_orbits_after_last_non_orbit(&self) -> Vec<&Orbit> {
         let mut orbits = vec![];
         for segment in self.future_segments.iter().rev() {
             match segment {
                 Segment::Orbit(orbit) => orbits.push(orbit),
-                Segment::Burn(_) | Segment::Guidance(_) => break,
+                Segment::Burn(_) | Segment::Guidance(_) | Segment::Turn(_) => break,
             }
         }
         orbits
     }
 
-    pub fn final_burn(&self) -> Option<&Burn> {
+    pub fn end_burn(&self) -> Option<&Burn> {
         self.future_burns().last().copied()
     }
     
-    pub fn final_orbit(&self) -> Option<&Orbit> {
+    pub fn end_orbit(&self) -> Option<&Orbit> {
         self.future_orbits().last().copied()
     }
     
-    pub fn final_guidance(&self) -> Option<&Guidance> {
+    pub fn end_guidance(&self) -> Option<&Guidance> {
         self.future_guidances().last().copied()
     }
 
-    // Returns none if the path contains no burns or guidance segments
-    pub fn final_rocket_equation_function(&self) -> Option<RocketEquationFunction> {
+    pub fn end_remaining_dv(&self) -> Option<f64> {
         for segment in self.future_segments.iter().rev() {
             if let Segment::Burn(burn) = segment {
-                return Some(burn.final_rocket_equation_function());
+                return Some(burn.end_remaining_dv());
             }
             if let Segment::Guidance(guidance) = segment {
-                return Some(guidance.final_rocket_equation_function());
+                return Some(guidance.end_remaining_dv());
             }
         }
+        None
+    }
+
+    pub fn end_fuel_kg(&self) -> Option<f64> {
+        for segment in self.future_segments.iter().rev() {
+            if let Segment::Burn(burn) = segment {
+                return Some(burn.end_fuel_kg());
+            }
+            if let Segment::Guidance(guidance) = segment {
+                return Some(guidance.end_fuel_kg());
+            }
+        }
+        None
+    }
+
+    pub fn fuel_kg_at_time(&self, time: f64) -> Option<f64> {
+        if let Segment::Burn(burn) = self.future_segment_at_time(time) {
+            return Some(burn.fuel_kg_at_time(time));
+        }
+        if let Segment::Guidance(guidance) = self.future_segment_at_time(time) {
+            return Some(guidance.fuel_kg_at_time(time));
+        }
+        if let Segment::Turn(turn) = self.future_segment_at_time(time) {
+            return Some(turn.fuel_kg_at_time(time));
+        }
+
+        for segment in self.future_segments.iter().rev() {
+            if segment.start_time() > time {
+                continue;
+            }
+            if let Segment::Burn(burn) = segment {
+                return Some(burn.end_fuel_kg());
+            }
+            if let Segment::Guidance(guidance) = segment {
+                return Some(guidance.end_fuel_kg());
+            }
+            if let Segment::Turn(turn) = segment {
+                return Some(turn.end_fuel_kg());
+            }
+        }
+
         None
     }
 
@@ -147,7 +187,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no end segment
-    pub fn final_segment(&self) -> &Segment {
+    pub fn end_segment(&self) -> &Segment {
         self.future_segments
             .back()
             .as_ref()
@@ -156,7 +196,7 @@ impl PathComponent {
 
     /// # Panics
     /// Panics if the trajectory has no start segment
-    pub fn final_segment_mut(&mut self) -> &mut Segment {
+    pub fn end_segment_mut(&mut self) -> &mut Segment {
         self.future_segments
             .back_mut()
             .unwrap()
@@ -175,6 +215,7 @@ impl PathComponent {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.current_point().mass(),
             Segment::Guidance(guidance) => guidance.current_point().mass(),
+            Segment::Turn(turn) => turn.current_point().mass(),
         }
     }
 
@@ -183,6 +224,7 @@ impl PathComponent {
             Segment::Orbit(orbit) => orbit.mass(),
             Segment::Burn(burn) => burn.point_at_time(time).mass(),
             Segment::Guidance(guidance) => guidance.point_at_time(time).mass(),
+            Segment::Turn(turn) => turn.point_at_time(time).mass(),
         }
     }
 
@@ -220,6 +262,16 @@ impl PathComponent {
                         return;
                     }
                 },
+
+                Segment::Turn(turn) => {
+                    if turn.start_point().time() >= time {
+                        self.future_segments.pop_back();
+                    } else if turn.is_time_within_turn(time) {
+                        panic!("Attempt to split a turn segment");
+                    } else {
+                        return;
+                    }
+                }
 
                 Segment::Orbit(orbit) => {
                     if orbit.start_point().time() >= time {

@@ -4,6 +4,7 @@ use eframe::egui::{PointerState, Pos2, Vec2};
 use encounter::Encounter;
 use intercept::Intercept;
 use nalgebra_glm::DVec2;
+use turn::Turn;
 
 use crate::game::{events::ViewEvent, util::{add_textured_square, add_textured_square_facing}, View};
 
@@ -20,6 +21,7 @@ mod guidance;
 mod intercept;
 mod orbitable;
 mod vessel;
+mod turn;
 
 /// The icon trait represents a single 'type' of icon
 /// # Priority
@@ -83,8 +85,9 @@ fn compute_initial_icons(view: &View, pointer: &PointerState) -> Vec<Box<dyn Ico
     icons.append(&mut AdjustFireTorpedo::generate(view, pointer));
     if view.config.draw_apsis_icons {
         icons.append(&mut Apsis::generate(view));
-        icons.append(&mut Burn::generate(view));
     }
+    icons.append(&mut Burn::generate(view));
+    icons.append(&mut Turn::generate(view));
     icons.append(&mut ClosestApproach::generate(view));
     icons.append(&mut Encounter::generate(view));
     icons.append(&mut FireTorpedo::generate(view));

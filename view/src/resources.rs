@@ -32,6 +32,8 @@ struct Texture {
 
 impl Texture {
     fn new(context: &egui::Context, gl: &Arc<glow::Context>, entry: &DirEntry) -> Self {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Load texture");
         let uri = "file://".to_owned() + entry.path().as_path().as_os_str().to_str().unwrap();
         trace!("Loading texture {}", uri);
         let bytes = fs::read(entry.path()).expect("Failed to load file");
@@ -52,6 +54,8 @@ pub struct Resources {
 
 impl Resources {
     pub fn new(context: &egui::Context, gl: &Arc<glow::Context>) -> Self {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Resource loading");
         info!("Loading resources");
         let textures = directory_entries("view/resources/final_textures".to_string())
             .into_iter()

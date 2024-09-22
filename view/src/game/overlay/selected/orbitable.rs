@@ -25,12 +25,12 @@ fn draw_orbit(ui: &mut Ui, orbitable_component: &OrbitableComponent, view: &View
     
     draw_subtitle(ui, "Orbit");
     Grid::new("Orbitable orbit info grid").show(ui, |ui| {
-            draw_orbit_labels(view, ui, orbit);
-            draw_key(ui, "Sphere of influence");
-            draw_value(ui, &format_distance(orbit.sphere_of_influence()));
-            ui.end_row();
-        });
-        }
+        draw_orbit_labels(view, ui, orbit);
+        draw_key(ui, "Sphere of influence");
+        draw_value(ui, &format_distance(orbit.sphere_of_influence()));
+        ui.end_row();
+    });
+}
 
 fn draw_controls(view: &View, ui: &mut Ui, entity: Entity) {
     ui.horizontal(|ui| {

@@ -36,12 +36,12 @@ pub fn calculate_entrance_encounter(model: &Model, orbit: &Orbit, new_parent: En
 
 fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
     model.path_component_mut(entity)
-        .final_segment_mut()
+        .end_segment_mut()
         .as_orbit_mut()
         .expect("Attempt to do an exit encounter on a non-orbit")
         .end_at(time);
     let old_orbit = model.path_component(entity)
-        .final_segment()
+        .end_segment()
         .as_orbit()
         .expect("Attempt to do an exit encounter on a non-orbit");
 
@@ -52,12 +52,12 @@ fn do_exit(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
 
 fn do_entrance(model: &mut Model, entity: Entity, new_parent: Entity, time: f64) {
     model.path_component_mut(entity)
-        .final_segment_mut()
+        .end_segment_mut()
         .as_orbit_mut()
         .expect("Attempt to do an entrance encounter on a non-orbit")
         .end_at(time);
     let old_orbit = model.path_component(entity)
-        .final_segment()
+        .end_segment()
         .as_orbit()
         .expect("Attempt to do an entrance encounter on a non-orbit");
 
@@ -86,7 +86,7 @@ mod test {
         loop {
             let mut soonest_encounter: Option<Encounter> = None;
             for entity in model.entities(vec![ComponentType::PathComponent]) {
-                let orbit = model.path_component(entity).final_orbit().unwrap();
+                let orbit = model.path_component(entity).end_orbit().unwrap();
                 let encounter = find_next_encounter(&model, orbit, entity, end_time).unwrap();
                 if let Some(encounter) = encounter {
                     if let Some(soonest_encounter) = &mut soonest_encounter {
@@ -117,7 +117,7 @@ mod test {
 
             for entity in model.entities(vec![ComponentType::PathComponent]) {
                 model.path_component_mut(entity)
-                    .final_segment_mut()
+                    .end_segment_mut()
                     .as_orbit_mut()
                     .expect("Attempt to set end time of a segment that is not an orbit")
                     .end_at(encounter.time());
