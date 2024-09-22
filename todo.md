@@ -4,6 +4,8 @@
 # ------------------------------------ #
 [ ] Turn/burn integration
 [ ] Turn/guidance integration
+[ ] Proper turn icons
+[ ] Allow adjusting turns
 [ ] Don't allow selecting ghosts with top left button
 [ ] Loading screen
 [ ] Load resources async
