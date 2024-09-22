@@ -6,7 +6,14 @@ use crate::game::{util::{orbitable_texture, vessel_texture}, View};
 use super::custom_image_button::CustomCircularImageButton;
 
 pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
-    let vessel_component = view.model.vessel_component(entity);
+    let Some(vessel_component) = view.model.try_vessel_component(entity) else {
+        return false
+    };
+
+    if vessel_component.is_ghost() {
+        return false
+    }
+
     let icon = vessel_texture(vessel_component);
     let tooltip = "Select ".to_string() + vessel_component.class().name();
     let button = CustomCircularImageButton::new(view, icon, 36.0)
@@ -15,7 +22,11 @@ pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
 }
 
 pub fn draw_select_orbitable(view: &View, ui: &mut Ui, entity: Entity) -> bool {
-    let type_ = view.model.orbitable_component(entity).type_();
+    let Some(orbitable_component) = view.model.try_orbitable_component(entity) else {
+        return false
+    };
+
+    let type_ = orbitable_component.type_();
     let icon = orbitable_texture(type_);
     let tooltip = match type_ {
         OrbitableType::Star => "Select star",

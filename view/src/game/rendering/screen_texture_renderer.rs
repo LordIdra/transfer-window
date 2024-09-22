@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use eframe::{egui::{Pos2, Rect}, glow::{self, Framebuffer, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, READ_FRAMEBUFFER, RGBA, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, UNSIGNED_BYTE}};
+use eframe::{egui::{Pos2, Rect}, glow::{self, Framebuffer, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, UNSIGNED_BYTE}};
 use glow::{Context, HasContext};
 
 use super::{shader_program::ShaderProgram, util::{clear_framebuffer, create_multisample_color_attachment, create_normal_color_attachment, SAMPLES}, vertex_array_object::{VertexArrayObject, VertexAttribute}};
@@ -20,12 +20,17 @@ pub struct ScreenTextureRenderer {
 
 impl ScreenTextureRenderer {
     pub fn new(gl: &Arc<Context>, screen_rect: Rect) -> Self {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Screen texture renderer initialisation");
         let program = ShaderProgram::new(gl, include_str!("../../../resources/shaders/screen_texture.vert"), include_str!("../../../resources/shaders/screen_texture.frag"));
         let vertex_array_object = VertexArrayObject::new(gl, vec![
             VertexAttribute { index: 0, count: 2 }, // position
             VertexAttribute { index: 1, count: 2 }, // texture coordinates
         ]);
         unsafe {
+            #[cfg(feature = "profiling")]
+            let _span = tracy_client::span!("Framebuffer creation");
+
             let multisample_framebuffer = gl.create_framebuffer().expect("Failed to create framebuffer");
             let multisample_texture = create_multisample_color_attachment(gl, multisample_framebuffer, screen_rect);
 
@@ -37,12 +42,22 @@ impl ScreenTextureRenderer {
     }
 
     pub fn resize(&self, gl: &Arc<Context>, screen_rect: Rect) {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Screen texture renderer resizing");
         unsafe {
-            gl.bind_texture(TEXTURE_2D_MULTISAMPLE, Some(self.multisample_texture));
-            gl.tex_image_2d_multisample(TEXTURE_2D_MULTISAMPLE, SAMPLES, RGBA as i32, screen_rect.width() as i32, screen_rect.height() as i32, true);
+            {
+                #[cfg(feature = "profiling")]
+                let _span = tracy_client::span!("Resize multisample buffer");
+                gl.bind_texture(TEXTURE_2D_MULTISAMPLE, Some(self.multisample_texture));
+                gl.tex_image_2d_multisample(TEXTURE_2D_MULTISAMPLE, SAMPLES, RGBA as i32, screen_rect.width() as i32, screen_rect.height() as i32, true);
+            }
 
-            gl.bind_texture(TEXTURE_2D, Some(self.intermediate_texture));
-            gl.tex_image_2d(TEXTURE_2D, 0, RGBA as i32,  screen_rect.width() as i32, screen_rect.height() as i32, 0, RGBA, UNSIGNED_BYTE, None);
+            {
+                #[cfg(feature = "profiling")]
+                let _span = tracy_client::span!("Resize intermediate buffer");
+                gl.bind_texture(TEXTURE_2D, Some(self.intermediate_texture));
+                gl.tex_image_2d(TEXTURE_2D, 0, RGBA as i32,  screen_rect.width() as i32, screen_rect.height() as i32, 0, RGBA, UNSIGNED_BYTE, None);
+            }
         }
     }
 
@@ -80,7 +95,7 @@ impl ScreenTextureRenderer {
             gl.bind_framebuffer(DRAW_FRAMEBUFFER, Some(self.intermediate_framebuffer));
             let width = screen_rect.width() as i32;
             let height = screen_rect.height() as i32;
-            gl.blit_framebuffer(0, 0, width, height, 0, 0, width, height, COLOR_BUFFER_BIT, LINEAR);
+            gl.blit_framebuffer(0, 0, width, height, 0, 0, width, height, COLOR_BUFFER_BIT, NEAREST);
             gl.bind_framebuffer(FRAMEBUFFER, None);
             gl.bind_texture(TEXTURE_2D, Some(self.intermediate_texture));
         }

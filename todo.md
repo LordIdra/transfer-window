@@ -4,6 +4,7 @@
 # ------------------------------------ #
 [ ] Turn/burn integration
 [ ] Turn/guidance integration
+[ ] Inbuilt force calculations for RCS schemes
 [ ] Proper turn icons
 [ ] Allow adjusting turns
 [ ] Don't allow selecting ghosts with top left button
@@ -31,7 +32,6 @@
 [x] Angular momentum
 [x] Monopropellant depletion
 [x] Turning segments (fuck)
-[ ] Inbuilt force calculations for RCS schemes
 [ ] Monopropellant particles
 [ ] Engine particles
 [ ] Manual piloting mode

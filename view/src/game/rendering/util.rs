@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
-use eframe::{egui::Rect, glow::{Context, Framebuffer, HasContext, Texture, CLAMP_TO_EDGE, COLOR_ATTACHMENT0, COLOR_BUFFER_BIT, FRAMEBUFFER, NEAREST, RGBA, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T, UNSIGNED_BYTE}};
+use eframe::{egui::Rect, glow::{Context, Framebuffer, HasContext, Texture, CLAMP_TO_EDGE, COLOR_ATTACHMENT0, COLOR_BUFFER_BIT, FRAMEBUFFER, NEAREST, RGBA, RGBA8, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, TEXTURE_MAG_FILTER, TEXTURE_MIN_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T, UNSIGNED_BYTE}};
 
-pub const SAMPLES: i32 = 16;
+pub const SAMPLES: i32 = 4;
 
 pub unsafe fn create_multisample_color_attachment(gl: &Arc<Context>, framebuffer: Framebuffer, screen_rect: Rect) -> Texture {
     unsafe {

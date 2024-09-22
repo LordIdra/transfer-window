@@ -9,11 +9,11 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity, type_: Aps
     ui.horizontal(|ui| {
         styles::SelectedMenuButton::apply(ui);
 
-        if view.model.try_vessel_component(entity).is_some() {
-            if draw_select_vessel(view, ui, entity) {
-                view.add_view_event(ViewEvent::SetSelected(Selected::Vessel(entity)));
-            }
-        } else if draw_select_orbitable(view, ui, entity) {
+        if draw_select_vessel(view, ui, entity) {
+            view.add_view_event(ViewEvent::SetSelected(Selected::Vessel(entity)));
+        }
+
+        if draw_select_orbitable(view, ui, entity) {
             view.add_view_event(ViewEvent::SetSelected(Selected::Orbitable(entity)));
         }
 
