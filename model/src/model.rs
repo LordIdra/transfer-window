@@ -2,9 +2,11 @@ use std::{collections::HashSet, sync::Mutex};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{api::{explosion::Explosion, time::TimeStep}, components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent, vessel_component::VesselComponent}, storage::{component_storage::ComponentStorage, entity_allocator::EntityAllocator}, story_event::StoryEvent, systems::update_warp::TimeWarp};
+use crate::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent, vessel_component::VesselComponent}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}}, story_event::StoryEvent, systems::update_warp::TimeWarp};
 
 pub const SEGMENTS_TO_PREDICT: usize = 3;
+
+pub mod snapshot;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Model {
@@ -118,12 +120,40 @@ impl Model {
         self.vessel_components.remove_if_exists(entity);
     }
 
-    pub fn entity_exists(&self, entity: Entity) -> bool {
-        self.entity_allocator.entities().contains(&entity)
-    }
-
     pub fn add_story_event(&self, event: StoryEvent) {
         self.story_events.lock().unwrap().push(event);
+    }
+
+    pub fn name_component_mut(&mut self, entity: Entity) -> &mut NameComponent {
+        self.name_components.get_mut(entity)
+    }
+
+    pub fn try_name_component_mut(&mut self, entity: Entity) -> Option<&mut NameComponent> {
+        self.name_components.try_get_mut(entity)
+    }
+
+    pub fn orbitable_component_mut(&mut self, entity: Entity) -> &mut OrbitableComponent {
+        self.orbitable_components.get_mut(entity)
+    }
+
+    pub fn try_orbitable_component_mut(&mut self, entity: Entity) -> Option<&mut OrbitableComponent> {
+        self.orbitable_components.try_get_mut(entity)
+    }
+
+    pub fn path_component_mut(&mut self, entity: Entity) -> &mut PathComponent {
+        self.path_components.get_mut(entity)
+    }
+
+    pub fn try_path_component_mut(&mut self, entity: Entity) -> Option<&mut PathComponent> {
+        self.path_components.try_get_mut(entity)
+    }
+
+    pub fn vessel_component_mut(&mut self, entity: Entity) -> &mut VesselComponent {
+        self.vessel_components.get_mut(entity)
+    }
+
+    pub fn try_vessel_component_mut(&mut self, entity: Entity) -> Option<&mut VesselComponent> {
+        self.vessel_components.try_get_mut(entity)
     }
 }
 
