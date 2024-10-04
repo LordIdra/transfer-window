@@ -46,7 +46,7 @@ impl Objective {
             } else { 
                 "objective-incomplete"
             };
-            ui.add(CustomImage::new(view, texture, 12.0).with_alpha(self.opacity));
+            ui.add(CustomImage::new(view, texture, 12).with_alpha(self.opacity));
             ui.add_space(-5.0);
             ui.vertical(|ui| ui.add_space(22.0));
             ui.horizontal_wrapped(|ui| {

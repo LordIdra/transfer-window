@@ -13,10 +13,8 @@ pub struct CustomCircularImageButton {
     renderer: Arc<Mutex<ScreenTextureRenderer>>,
     texture: glow::Texture,
     screen_rect: Rect,
-    size: f32,
+    size: i32,
     sense: Sense,
-    padding: f32,
-    margin: f32,
     enabled: bool,
     normal_color: Color32,
     hover_color: Color32,
@@ -24,31 +22,17 @@ pub struct CustomCircularImageButton {
 }
 
 impl CustomCircularImageButton {
-    pub fn new(view: &View, texture_name: &str, size: f32) -> Self {
+    pub fn new(view: &View, texture_name: &str, size: i32) -> Self {
         let context = view.context.clone();
         let renderer = view.renderers.screen_texture_renderer();
         let texture = view.resources.gl_texture(texture_name);
         let screen_rect = view.screen_rect;
         let sense = Sense::union(Sense::click(), Sense::hover());
-        let padding = 0.0;
-        let margin = 0.0;
         let enabled = true;
         let normal_color = Color32::TRANSPARENT;
         let hover_color = Color32::from_rgb(HOVERED_CIRCLE_ALPHA, HOVERED_CIRCLE_ALPHA, HOVERED_CIRCLE_ALPHA);
         let pointer = true;
-        Self { context, renderer, texture, screen_rect, size, sense, padding, margin, enabled, normal_color, hover_color, pointer }
-    }
-
-    /// Space around the icon, not including circle
-    pub fn with_padding(mut self, padding: f32) -> Self {
-        self.padding = padding;
-        self
-    }
-
-    /// Space around the entire widget including circle
-    pub fn with_margin(mut self, margin: f32) -> Self {
-        self.margin = margin;
-        self
+        Self { context, renderer, texture, screen_rect, size, sense, enabled, normal_color, hover_color, pointer }
     }
 
     pub fn with_enabled(mut self, enabled: bool) -> Self {
@@ -77,7 +61,7 @@ impl Widget for CustomCircularImageButton {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Draw custom image button");
 
-        let (response, painter) = ui.allocate_painter(Vec2::splat(self.size), self.sense);
+        let (response, painter) = ui.allocate_painter(Vec2::splat(self.size as f32), self.sense);
         let to_screen = RectTransform::from_to(
             Rect::from_min_size(Pos2::ZERO, response.rect.size()),
             response.rect,
@@ -89,8 +73,8 @@ impl Widget for CustomCircularImageButton {
             DISABLED_ALPHA
         };
 
-        let center = to_screen.transform_pos(Pos2::new(self.size / 2.0, self.size / 2.0));
-        let radius = self.size / 2.0 - self.margin;
+        let center = to_screen.transform_pos(Pos2::new(self.size as f32 / 2.0, self.size as f32 / 2.0));
+        let radius = self.size as f32 / 2.0;
         let circle_color = if response.hovered() || response.clicked() {
             if self.pointer {
                 self.context.set_cursor_icon(CursorIcon::PointingHand);
@@ -101,13 +85,11 @@ impl Widget for CustomCircularImageButton {
         };
         painter.circle_filled(center, radius, circle_color);
 
-        let total_padding = self.margin + self.padding;
-        let from = Camera::window_space_to_screen_space(self.screen_rect, to_screen.transform_pos(Pos2::new(total_padding, total_padding)));
-        let to = Camera::window_space_to_screen_space(self.screen_rect, to_screen.transform_pos(Pos2::new(self.size - total_padding, self.size - total_padding)));
+        let corner = Camera::window_space_to_screen_space(self.screen_rect, to_screen.transform_pos(Pos2::new(0.0, 0.0)));
         let renderer = self.renderer.clone();
 
         let callback = Arc::new(CallbackFn::new(move |_info, painter| {
-            renderer.lock().unwrap().render(painter.gl(), self.texture, self.screen_rect, from, to, alpha);
+            renderer.lock().unwrap().render(painter.gl(), self.texture, self.screen_rect, corner, self.size, self.size, alpha);
         }));
 
         painter.add(PaintCallback { rect: self.screen_rect, callback});

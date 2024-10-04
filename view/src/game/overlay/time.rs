@@ -16,8 +16,7 @@ pub fn update(view: &View) {
         .show(&view.context.clone(), |ui| {
             ui.horizontal(|ui| {
                 ui.set_height(25.0);
-                ui.add(CustomImage::new(view, "time", 25.0)
-                    .with_padding(2.0));
+                ui.add(CustomImage::new(view, "time", 25));
                 ui.label(RichText::new(format_time(view.model.time())).strong().size(20.0));
             });
 
@@ -44,8 +43,8 @@ pub fn update(view: &View) {
                             },
                         }
                     };
-                    ui.add(CustomImage::new(view, texture, 24.0)
-                        .with_padding(2.0)).on_hover_text(format!("{}x", level.round()));
+                    ui.add(CustomImage::new(view, texture, 24))
+                        .on_hover_text(format!("{}x", level.round()));
                     ui.add_space(-9.0);
                 }
             })

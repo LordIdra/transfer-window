@@ -16,8 +16,7 @@ pub fn draw_select_vessel(view: &View, ui: &mut Ui, entity: Entity) -> bool {
 
     let icon = vessel_texture(vessel_component);
     let tooltip = "Select ".to_string() + vessel_component.class().name();
-    let button = CustomCircularImageButton::new(view, icon, 36.0)
-        .with_padding(8.0);
+    let button = CustomCircularImageButton::new(view, icon, 36);
     ui.add(button).on_hover_text(tooltip).clicked()
 }
 
@@ -33,8 +32,7 @@ pub fn draw_select_orbitable(view: &View, ui: &mut Ui, entity: Entity) -> bool {
         OrbitableType::Planet => "Select planet",
         OrbitableType::Moon => "Select moon",
     };
-    let button = CustomCircularImageButton::new(view, icon, 36.0)
-        .with_padding(8.0);
+    let button = CustomCircularImageButton::new(view, icon, 36);
     ui.add(button).on_hover_text(tooltip).clicked()
 }
 
@@ -43,9 +41,8 @@ pub fn draw_previous(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Opt
     let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
     let time = time - orbit.period()?;
     let enabled = time > orbit.current_point().time();
-    let button = CustomCircularImageButton::new(view, "previous-orbit", 36.0)
-        .with_enabled(enabled)
-        .with_padding(10.0);
+    let button = CustomCircularImageButton::new(view, "previous-orbit", 36)
+        .with_enabled(enabled);
     if ui.add_enabled(enabled, button).on_hover_text("Previous orbit").clicked() {
         Some(time)
     } else {
@@ -58,9 +55,8 @@ pub fn draw_next(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Option<
     let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
     let time = time + orbit.period()?;
     let enabled = time < orbit.end_point().time();
-    let button = CustomCircularImageButton::new(view, "next-orbit", 36.0)
-        .with_enabled(enabled)
-        .with_padding(10.0);
+    let button = CustomCircularImageButton::new(view, "next-orbit", 36)
+        .with_enabled(enabled);
     if ui.add_enabled(enabled, button).on_hover_text("Next orbit").clicked() {
         Some(time)
     } else {
@@ -71,9 +67,8 @@ pub fn draw_next(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Option<
 /// Returns true if was clicked
 pub fn draw_warp_to(view: &View, ui: &mut Ui, time: f64) -> bool {
     let enabled = view.model.can_warp_to(time);
-    let button = CustomCircularImageButton::new(view, "warp-here", 36.0)
-        .with_enabled(enabled)
-        .with_padding(8.0);
+    let button = CustomCircularImageButton::new(view, "warp-here", 36)
+        .with_enabled(enabled);
     ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked()
 }
 
@@ -83,9 +78,8 @@ pub fn draw_create_burn(view: &View, ui: &mut Ui, entity: Entity, time: f64) -> 
         return false;
     }
     let enabled = StartBurnEvent::can_create(&view.model, entity, time);
-    let button = CustomCircularImageButton::new(view, "create-burn", 36.0)
-        .with_enabled(enabled)
-        .with_padding(5.0);
+    let button = CustomCircularImageButton::new(view, "create-burn", 36)
+        .with_enabled(enabled);
     ui.add_enabled(enabled, button).on_hover_text("Create burn").clicked()
 }
 
@@ -95,9 +89,8 @@ pub fn draw_create_turn(view: &View, ui: &mut Ui, entity: Entity, time: f64) -> 
         return false;
     }
     let enabled = StartTurnEvent::can_create(&view.model, entity, time);
-    let button = CustomCircularImageButton::new(view, "create-turn", 36.0)
-        .with_enabled(enabled)
-        .with_padding(5.0);
+    let button = CustomCircularImageButton::new(view, "create-turn", 36)
+        .with_enabled(enabled);
     ui.add_enabled(enabled, button).on_hover_text("Create turn").clicked()
 }
 
@@ -107,9 +100,8 @@ pub fn draw_enable_guidance(view: &View, ui: &mut Ui, entity: Entity, time: f64)
         return false;
     }
     let enabled = EnableGuidanceEvent::can_create(&view.model, entity, time);
-    let button = CustomCircularImageButton::new(view, "enable-guidance", 36.0)
-        .with_enabled(enabled)
-        .with_padding(5.0);
+    let button = CustomCircularImageButton::new(view, "enable-guidance", 36)
+        .with_enabled(enabled);
     ui.add_enabled(enabled, button).on_hover_text("Enable guidance").clicked()
 }
 
@@ -118,40 +110,34 @@ pub fn draw_fire_torpedo(view: &View, ui: &mut Ui, entity: Entity, time: f64) ->
         return false;
     }
     let enabled = FireTorpedoEvent::can_create(&view.model, entity, time);
-    let button = CustomCircularImageButton::new(view, "fire-torpedo", 36.0)
-        .with_enabled(enabled)
-        .with_padding(5.0);
+    let button = CustomCircularImageButton::new(view, "fire-torpedo", 36)
+        .with_enabled(enabled);
     ui.add_enabled(enabled, button).on_hover_text("Fire torpedo").clicked()
 }
 
 pub fn draw_cancel_burn(view: &View, ui: &mut Ui) -> bool {
-    let button = CustomCircularImageButton::new(view, "cancel", 36.0)
-        .with_padding(8.0);
+    let button = CustomCircularImageButton::new(view, "cancel", 36);
     ui.add(button).on_hover_text("Cancel burn").clicked()
 }
 
 pub fn draw_cancel_guidance(view: &View, ui: &mut Ui) -> bool {
-    let button = CustomCircularImageButton::new(view, "cancel", 36.0)
-        .with_padding(8.0);
+    let button = CustomCircularImageButton::new(view, "cancel", 36);
     ui.add(button).on_hover_text("Cancel guidance").clicked()
 }
 
 pub fn draw_focus(view: &View, ui: &mut Ui) -> bool {
-    let button = CustomCircularImageButton::new(view, "focus", 36.0)
-        .with_padding(8.0);
+    let button = CustomCircularImageButton::new(view, "focus", 36);
     ui.add(button).on_hover_text("Focus").clicked()
 }
 
 pub fn draw_dock(view: &View, ui: &mut Ui, entity: Entity) -> bool {
     let enabled = view.model.can_dock(entity);
-    let button = CustomCircularImageButton::new(view, "dock", 36.0)
-        .with_enabled(enabled)
-        .with_padding(8.0);
+    let button = CustomCircularImageButton::new(view, "dock", 36)
+        .with_enabled(enabled);
     ui.add_enabled(enabled, button).on_hover_text("Dock").clicked()
 }
 
 pub fn draw_undock(view: &View, ui: &mut Ui) -> bool {
-    let button = CustomCircularImageButton::new(view, "undock", 36.0)
-        .with_padding(8.0);
+    let button = CustomCircularImageButton::new(view, "undock", 36);
     ui.add(button).on_hover_text("Undock").clicked()
 }

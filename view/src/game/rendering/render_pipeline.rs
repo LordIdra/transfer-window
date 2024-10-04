@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use eframe::{egui::Rect, glow::{self, Context, Framebuffer, HasContext, Texture, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE0, TEXTURE1, TEXTURE2, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, UNSIGNED_BYTE}};
+use eframe::{egui::Rect, glow::{self, Context, Framebuffer, HasContext, Texture, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE0, TEXTURE1, TEXTURE2, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, UNSIGNED_BYTE}};
 
 use super::{shader_program::ShaderProgram, util::{clear_framebuffer, create_multisample_color_attachment, create_normal_color_attachment, SAMPLES}, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 

@@ -1,18 +1,14 @@
-
 # ------------------------------------ #
 # CURRENT TASKS
 # ------------------------------------ #
+[x] Build pipeline with texture caching
 [ ] Turn/burn integration
 [ ] Turn/guidance integration
 [ ] Inbuilt force calculations for RCS schemes
 [ ] Proper turn icons
 [ ] Allow adjusting turns
 [ ] Don't allow selecting ghosts with top left button
-[ ] Loading screen
-[ ] Load resources async
-[ ] Investigate loading memory leak?
 [ ] Fix segments overlaying ship (lol what)
-[ ] Build pipeline with texture caching
 
 # ------------------------------------ #
 # DOCKING AREA
@@ -49,6 +45,9 @@
 [ ] Computing closest encounters on terminal hyperbola orbits is extremely slow, maybe model as straight lines beyond certain range depending on mission design, or other restrictions?
 [ ] Switch to Pade approximation of EKE for better performance in singular corner (https://www.sciencedirect.com/science/article/pii/S0094576522005999)
 [ ] Smaller screen texture renderer framebuffer
+[ ] Loading screen
+[ ] Load resources async
+[ ] Investigate loading memory leak?
 
 # Technical debt tracker
 - Docking port view logic is horrible, needs more cleanup when we have more transfers maybe

@@ -8,13 +8,13 @@ use super::{draw_dv, draw_fuel, draw_torpedoes};
 #[allow(clippy::too_many_arguments)]
 fn draw_fuel_transfer_button(view: &View, ui: &mut Ui, station_entity: Entity, location: DockingPortLocation, direction: ResourceTransferDirection, texture: &str, is_transferring: bool, is_other_transferring: bool, can_transfer: bool) {
     if is_transferring {
-        let button = CustomCircularImageButton::new(view, "transfer-cancel", 14.0);
+        let button = CustomCircularImageButton::new(view, "transfer-cancel", 14);
         if ui.add(button).clicked() {
             view.add_model_event(ModelEvent::StopFuelTransfer { station: station_entity, location });
         }
     } else {
         let enabled = can_transfer && !is_other_transferring;
-        let button = CustomCircularImageButton::new(view, texture, 14.0)
+        let button = CustomCircularImageButton::new(view, texture, 14)
             .with_enabled(enabled);
         if ui.add_enabled(enabled, button).clicked() {
             view.add_model_event(ModelEvent::StartFuelTransfer { station: station_entity, location, direction });
@@ -25,13 +25,13 @@ fn draw_fuel_transfer_button(view: &View, ui: &mut Ui, station_entity: Entity, l
 #[allow(clippy::too_many_arguments)]
 fn draw_torpedo_transfer_button(view: &View, ui: &mut Ui, station_entity: Entity, location: DockingPortLocation, direction: ResourceTransferDirection, texture: &str, is_transferring: bool, is_other_transferring: bool, can_transfer: bool) {
     if is_transferring {
-        let button = CustomCircularImageButton::new(view, "transfer-cancel", 14.0);
+        let button = CustomCircularImageButton::new(view, "transfer-cancel", 14);
         if ui.add(button).clicked() {
             view.add_model_event(ModelEvent::StopTorpedoTransfer { station: station_entity, location });
         }
     } else {
         let enabled = can_transfer && !is_other_transferring;
-        let button = CustomCircularImageButton::new(view, texture, 14.0)
+        let button = CustomCircularImageButton::new(view, texture, 14)
             .with_enabled(enabled);
         if ui.add_enabled(enabled, button).clicked() {
             view.add_model_event(ModelEvent::StartTorpedoTransfer { station: station_entity, location, direction });
@@ -112,9 +112,7 @@ fn draw_header(ui: &mut Ui, docking_port: &DockingPort, view: &View, location: D
             (texture, color)
         };
 
-        let button = CustomCircularImageButton::new(view, texture, 24.0)
-            .with_padding(4.0)
-            .with_margin(2.0)
+        let button = CustomCircularImageButton::new(view, texture, 24)
             .with_normal_color(color)
             .with_hover_color(color)
             .with_pointer(false);

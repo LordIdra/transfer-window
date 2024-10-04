@@ -63,9 +63,7 @@ fn render_orbitable(view: &View, ui: &mut Ui, entity: Entity) {
     let texture = orbitable_texture(orbitable_component.type_());
     let name = view.model.name_component(entity).name();
     ui.add_space(-7.0);
-    let button = CustomCircularImageButton::new(view, texture, 24.0)
-        .with_padding(4.0)
-        .with_margin(2.0)
+    let button = CustomCircularImageButton::new(view, texture, 24)
         .with_normal_color(Color32::from_rgb(60, 60, 60))
         .with_hover_color(Color32::from_rgb(90, 90, 90));
     if ui.add(button).clicked() {
@@ -81,9 +79,7 @@ fn render_vessel(view: &View, ui: &mut Ui, entity: Entity) {
     let name = view.model.name_component(entity).name();
     let faction = vessel_component.faction();
     ui.add_space(-7.0);
-    let button = CustomCircularImageButton::new(view, texture, 24.0)
-        .with_padding(4.0)
-        .with_margin(2.0)
+    let button = CustomCircularImageButton::new(view, texture, 24)
         .with_normal_color(vessel_normal_circle_color(faction))
         .with_hover_color(vessel_hover_circle_color(faction));
     if ui.add(button).clicked() {
@@ -103,11 +99,11 @@ fn render_entity(view: &View, ui: &mut Ui, entity: Entity, levels: &[bool]) {
             let level = levels[i];
             let is_last_level = i == levels.len() - 1;
             if level && is_last_level {
-                ui.add(CustomImage::new(view, "explorer-intersection", 24.0));
+                ui.add(CustomImage::new(view, "explorer-intersection", 24));
             } else if level && !is_last_level {
-                ui.add(CustomImage::new(view, "explorer-straight", 24.0));
+                ui.add(CustomImage::new(view, "explorer-straight", 24));
             } else if is_last_level {
-                ui.add(CustomImage::new(view, "explorer-corner", 24.0));
+                ui.add(CustomImage::new(view, "explorer-corner", 24));
             } else {
                 ui.add_space(24.0);
             }

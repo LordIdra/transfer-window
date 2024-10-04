@@ -19,7 +19,7 @@ pub fn update(view: &View) {
         .anchor(Align2::CENTER_CENTER, epaint::vec2(0.0, 0.0))
         .show(&view.context.clone(), |ui| {
             ui.vertical_centered(|ui| {
-                ui.add(CustomImage::new(view, "alert", 60.0));
+                ui.add(CustomImage::new(view, "alert", 60));
                 ui.label(RichText::new("Exit to main menu?").strong());
                 ui.add_space(20.0);
                 ui.horizontal(|ui| {

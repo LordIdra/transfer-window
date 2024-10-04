@@ -1,14 +1,13 @@
 use std::sync::Arc;
 
-use eframe::{egui::{Pos2, Rect}, glow::{self, Framebuffer, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, LINEAR, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, UNSIGNED_BYTE}};
+use eframe::{egui::{Pos2, Rect}, glow::{self, Framebuffer, COLOR_BUFFER_BIT, DRAW_FRAMEBUFFER, FRAMEBUFFER, NEAREST, READ_FRAMEBUFFER, RGBA, TEXTURE_2D, TEXTURE_2D_MULTISAMPLE, UNSIGNED_BYTE}};
 use glow::{Context, HasContext};
+use nalgebra_glm::IVec2;
 
 use super::{shader_program::ShaderProgram, util::{clear_framebuffer, create_multisample_color_attachment, create_normal_color_attachment, SAMPLES}, vertex_array_object::{VertexArrayObject, VertexAttribute}};
 
-/// Problem: egui's inbuilt image widgets do not do antialiasing, so
-/// the textures look horrible at small scales. Solution: provide
-/// our own rendering pipeline which performs MSAA.
-/// Computationally expensive? Yes. Worth it? Fuck yes.
+/// Implement our own MSAA as egui does not provide its own.
+/// Some textures (ie pixel perfect ones) are not affected by this.
 pub struct ScreenTextureRenderer {
     program: ShaderProgram,
     vertex_array_object: VertexArrayObject,
@@ -61,7 +60,22 @@ impl ScreenTextureRenderer {
         }
     }
 
-    pub fn render(&mut self, gl: &Arc<Context>, texture: glow::Texture, screen_rect: Rect, from: Pos2, to: Pos2, alpha: f32) {
+    fn screen_to_window(screen_rect: Rect, coordinate: Pos2) -> IVec2 {
+        IVec2::new(
+            (((coordinate.x + 1.0) / 2.0) * screen_rect.width()) as i32,
+            (((coordinate.y + 1.0) / 2.0) * screen_rect.height()) as i32
+        )
+    }
+
+    fn window_to_screen(screen_rect: Rect, coordinate: IVec2) -> Pos2 {
+        Pos2::new(
+            coordinate.x as f32 * 2.0 / screen_rect.width() - 1.0,
+            coordinate.y as f32 * 2.0 / screen_rect.height() - 1.0,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn render(&mut self, gl: &Arc<Context>, texture: glow::Texture, screen_rect: Rect, corner: Pos2, width: i32, height: i32, alpha: f32) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Screen texture render");
         
@@ -69,6 +83,12 @@ impl ScreenTextureRenderer {
             clear_framebuffer(gl, self.multisample_framebuffer);
             clear_framebuffer(gl, self.intermediate_framebuffer);
         }
+
+        let pixels_from = Self::screen_to_window(screen_rect, corner);
+        let pixels_to = pixels_from + IVec2::new(width, -height);
+
+        let from = Self::window_to_screen(screen_rect, pixels_from);
+        let to = Self::window_to_screen(screen_rect, pixels_to);
 
         let vertices = vec![
             from.x, from.y, 0.0, 0.0,
@@ -93,9 +113,7 @@ impl ScreenTextureRenderer {
         unsafe {
             gl.bind_framebuffer(READ_FRAMEBUFFER, Some(self.multisample_framebuffer));
             gl.bind_framebuffer(DRAW_FRAMEBUFFER, Some(self.intermediate_framebuffer));
-            let width = screen_rect.width() as i32;
-            let height = screen_rect.height() as i32;
-            gl.blit_framebuffer(0, 0, width, height, 0, 0, width, height, COLOR_BUFFER_BIT, NEAREST);
+            gl.blit_framebuffer(pixels_from.x, pixels_from.y, pixels_to.x, pixels_to.y, pixels_from.x, pixels_from.y, pixels_to.x, pixels_to.y, COLOR_BUFFER_BIT, NEAREST);
             gl.bind_framebuffer(FRAMEBUFFER, None);
             gl.bind_texture(TEXTURE_2D, Some(self.intermediate_texture));
         }

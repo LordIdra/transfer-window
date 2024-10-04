@@ -22,7 +22,6 @@ pub struct State {
     transition: Option<Transition>,
 }
 
-
 impl State {
     pub fn new(to: &'static str, condition: Condition) -> Self {
         let transition = Transition::new(to, condition);

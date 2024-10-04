@@ -262,7 +262,7 @@ mod test {
             delta_v: rocket_equation_function.remaining_dv() * tangent,
             time: 0.0,
             mass: dry_mass + fuel_mass,
-            fuel_mass,
+            fuel_kg: fuel_mass,
             engine,
             position,
             velocity

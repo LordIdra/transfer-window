@@ -21,7 +21,7 @@ pub fn draw_burn_labels(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, en
 
     Grid::new("DV grid").show(ui, |ui| {
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, "duration", 20.0);
+            let image = CustomImage::new(view, "duration", 20);
             ui.add(image);
             draw_key(ui, "Duration");
         });
@@ -29,7 +29,7 @@ pub fn draw_burn_labels(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, en
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, "burn-start", 20.0);
+            let image = CustomImage::new(view, "burn-start", 20);
             ui.add(image);
             draw_key(ui, "ΔV start");
         });
@@ -37,7 +37,7 @@ pub fn draw_burn_labels(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, en
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, "burn-burnt", 20.0);
+            let image = CustomImage::new(view, "burn-burnt", 20);
             ui.add(image);
             draw_key(ui, "ΔV burnt");
         });
@@ -45,7 +45,7 @@ pub fn draw_burn_labels(view: &View, ui: &mut Ui, max_dv: f64, start_dv: f64, en
         ui.end_row();
 
         ui.horizontal(|ui| {
-            let image = CustomImage::new(view, "burn-end", 20.0);
+            let image = CustomImage::new(view, "burn-end", 20);
             ui.add(image);
             draw_key(ui, "ΔV end");
         });
@@ -64,17 +64,15 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
         }
 
         let enabled = view.model.can_warp_to(time);
-        let button = CustomCircularImageButton::new(view, "warp-here", 36.0)
-            .with_enabled(enabled)
-            .with_padding(8.0);
+        let button = CustomCircularImageButton::new(view, "warp-here", 36)
+            .with_enabled(enabled);
         if ui.add_enabled(enabled, button).on_hover_text("Warp here").clicked() {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
         let enabled = view.model.can_delete_event_at_time(entity, time);
-        let button = CustomCircularImageButton::new(view, "cancel", 36.0)
-            .with_enabled(enabled)
-            .with_padding(8.0);
+        let button = CustomCircularImageButton::new(view, "cancel", 36)
+            .with_enabled(enabled);
         if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
             view.add_model_event(ModelEvent::CancelLastTimelineEvent { entity });
             view.add_view_event(ViewEvent::SetSelected(Selected::None));

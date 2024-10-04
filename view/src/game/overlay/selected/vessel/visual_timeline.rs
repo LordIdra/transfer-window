@@ -58,25 +58,6 @@ impl VisualTimelineEvent {
         }
     }
 
-    pub fn padding(&self) -> f32 {
-        match self {
-            VisualTimelineEvent::TimelineEvent(event) => match event {
-                TimelineEvent::Intercept(_) => 3.0,
-                TimelineEvent::FireTorpedo(_) => 0.0,
-                TimelineEvent::Burn(_) => 0.0,
-                TimelineEvent::Turn(_) => 0.0,
-                TimelineEvent::EnableGuidance(_) => 0.0,
-            }
-            VisualTimelineEvent::Apsis { .. } => 3.0,
-            VisualTimelineEvent::Approach { .. } => 3.0,
-            VisualTimelineEvent::Encounter { .. } => 3.0,
-            VisualTimelineEvent::Point { .. } => 5.0,
-            VisualTimelineEvent::BurnEnd { .. } => 0.0,
-            VisualTimelineEvent::TurnEnd { .. } => 0.0,
-            VisualTimelineEvent::GuidanceEnd { .. } => 0.0,
-        }
-    }
-
     pub fn name(&self, view: &View) -> String {
         match self {
             VisualTimelineEvent::TimelineEvent(event) => match event {
@@ -284,8 +265,7 @@ fn draw_event(view: &View, ui: &mut Ui, event: &VisualTimelineEvent, entity: Ent
 
     frame.content_ui.horizontal(|ui| {
         ui.style_mut().visuals.panel_fill = Color32::RED;
-        let image = CustomImage::new(view, event.icon(), 20.0)
-            .with_padding(event.padding());
+        let image = CustomImage::new(view, event.icon(), 20);
         ui.add(image);
 
         let time_text = if event.is_selected(view, entity) {

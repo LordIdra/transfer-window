@@ -7,14 +7,13 @@ use crate::game::storyteller::stories::{story_1_03::Story1_03, story_1_04::Story
 use crate::{controller_events::ControllerEvent, game::{overlay::widgets::custom_image::CustomImage, rendering::screen_texture_renderer::ScreenTextureRenderer, storyteller::stories::{story_1_01::Story1_01, story_1_02::Story1_02, StoryBuilder}}, resources::Resources};
 
 impl CustomImage {
-    pub fn new_menu(view: &View, texture_name: &str, width: f32, height: f32) -> Self {
+    pub fn new_menu(view: &View, texture_name: &str, width: i32, height: i32) -> Self {
         let renderer = view.screen_texture_renderer.clone();
         let texture = view.resources.gl_texture(texture_name);
         let screen_rect = view.screen_rect;
         let sense = Sense::union(Sense::click(), Sense::hover());
-        let padding = 0.0;
         let alpha = 1.0;
-        Self::new_from_parts(renderer, texture, screen_rect, width, height, sense, padding, alpha)
+        Self::new_from_parts(renderer, texture, screen_rect, width, height, sense, alpha)
     }
 }
 
@@ -55,7 +54,7 @@ impl View {
             if completed_levels.contains(&level) {
                 level += "-complete";
             }
-            let mut image = CustomImage::new_menu(self, &level, 300.0, 150.0);
+            let mut image = CustomImage::new_menu(self, &level, 300, 150);
             if !hovered {
                 image = image.with_alpha(0.7);
             }
@@ -100,12 +99,12 @@ impl View {
 
         CentralPanel::default().show(context, |ui| {
             ui.vertical_centered(|ui| {
-                ui.add(CustomImage::new_menu(self, "title", 840.0, 160.0));
+                ui.add(CustomImage::new_menu(self, "title", 840, 160));
             });
             ui.horizontal(|ui| {
                 ui.add_space(100.0);
                 ui.vertical(|ui| {
-                    ui.add(CustomImage::new_menu(self, "title-1", 215.0, 70.0));
+                    ui.add(CustomImage::new_menu(self, "title-1", 215, 70));
                     ui.horizontal(|ui| {
                         self.draw_level(context, ui, &mut events, completed_levels, "1-01", Box::new(Story1_01));
                         self.draw_level(context, ui, &mut events, completed_levels, "1-02", Box::new(Story1_02));

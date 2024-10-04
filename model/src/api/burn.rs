@@ -1,46 +1,72 @@
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::{vec2, DMat2, DVec2};
 
-use crate::{components::path_component::{burn::{builder::BurnBuilder, Burn}, orbit::builder::OrbitBuilder, segment::Segment}, storage::entity_allocator::Entity, Model};
+use crate::{components::path_component::{burn::{builder::BurnBuilder, Burn}, orbit::builder::OrbitBuilder, segment::Segment, turn::builder::TurnBuilder}, storage::entity_allocator::Entity, Model};
 
 const MIN_DV_TO_ADJUST_BURN: f64 = 1.0e-2;
 
 impl Model {
-    pub(crate) fn create_burn(&mut self, entity: Entity, time: f64) {
+    pub(crate) fn create_burn(&mut self, entity: Entity, time: f64, delta_v: DVec2) {
         self.path_component_mut(entity).remove_segments_after(time);
 
         let last_segment = self.path_component(entity).end_segment();
         let parent = last_segment.parent();
         let parent_mass = self.mass(parent);
-        let mass = self.mass_at_time(entity, time, None);
-        let fuel_mass = self.fuel_kg_at_time(entity, time);
+        let mass_kg = last_segment.end_mass();
+        let fuel_kg = self.fuel_kg_at_time(entity, time);
+        let dry_mass = mass_kg - fuel_kg;
         let engine = self.vessel_component(entity)
             .engine()
             .expect("Attempt to create a burn on a vessel without an engine")
             .clone();
+        let rcs = self.vessel_component(entity)
+            .rcs()
+            .expect("Attempt to create a burn on a vessel without an RCS")
+            .clone();
+        let tangent = last_segment.end_velocity().normalize();
+        let absolute_delta_v = DMat2::new(
+            tangent.x, -tangent.y, 
+            tangent.y, tangent.x
+        ) * delta_v;
+        let target_rotation = f64::atan2(absolute_delta_v.y, absolute_delta_v.x);
+
+        let turn = TurnBuilder {
+            parent,
+            parent_mass,
+            dry_mass,
+            fuel_kg,
+            time,
+            position: last_segment.end_position(),
+            velocity: last_segment.end_velocity(),
+            rotation: last_segment.end_rotation(),
+            target_rotation,
+            rcs,
+        }.build();
+
+        let turn_end_point = turn.end_point();
 
         let burn = BurnBuilder {
             parent,
             parent_mass,
-            mass,
-            fuel_mass,
+            mass: mass_kg,
+            fuel_kg,
             engine,
-            tangent: last_segment.end_velocity().normalize(),
-            delta_v: vec2(0.0, 0.0),
-            time,
-            position: last_segment.end_position(),
-            velocity: last_segment.end_velocity(),
+            tangent: turn_end_point.velocity().normalize(),
+            delta_v,
+            time: turn_end_point.time(),
+            position: turn_end_point.position(),
+            velocity: turn_end_point.velocity(),
         }.build();
 
-        let end_point = burn.end_point();
+        let burn_end_point = burn.end_point();
 
         let orbit = OrbitBuilder {
             parent,
-            mass: end_point.mass(),
+            mass: burn_end_point.mass(),
             parent_mass,
             rotation: burn.rotation(),
-            position: end_point.position(),
-            velocity: end_point.velocity(),
-            time: end_point.time()
+            position: burn_end_point.position(),
+            velocity: burn_end_point.velocity(),
+            time: burn_end_point.time()
         }.build();
 
         self.path_component_mut(entity).add_segment(Segment::Burn(burn));
