@@ -2810,6 +2810,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a993555f31e5a609f617c12db6250dedcac1b0a85076912c436e6fc9b2c8e6a3"
 
 [[package]]
+name = "quick-impl"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5bd335c245718459bb18a05fa16f07c8919211e551a324d6cd6662a92089afcb"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.79",
+]
+
+[[package]]
 name = "quick-xml"
 version = "0.36.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3764,6 +3775,7 @@ dependencies = [
  "lazy_static",
  "log",
  "nalgebra-glm",
+ "quick-impl",
  "rand",
  "roots",
  "rust-kepler-solver",

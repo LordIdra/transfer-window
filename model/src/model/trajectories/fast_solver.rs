@@ -1,4 +1,4 @@
-use crate::{components::path_component::{orbit::{builder::OrbitBuilder, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model};
+use crate::{components::path_component::{orbit::{builder::OrbitBuilder, Orbit}, segment::Segment}, model::{state_query::StateQuery, Model}, storage::entity_allocator::Entity};
 
 use super::encounter::{Encounter, EncounterType};
 
@@ -78,7 +78,7 @@ pub fn apply_encounter(model: &mut Model, encounter: &Encounter) {
 
 #[cfg(test)]
 mod test {
-    use crate::{components::ComponentType, api::trajectories::{fast_solver::{apply_encounter, solver::find_next_encounter}, test_cases::load_case, encounter::Encounter}};
+    use crate::{components::ComponentType, model::trajectories::{encounter::Encounter, fast_solver::{apply_encounter, solver::find_next_encounter}, test_cases::load_case}};
 
     fn run_case(name: &str) {
         let (mut model, mut encounters, _, end_time, _) = load_case(name);

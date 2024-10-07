@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::builder::OrbitBuilder, segment::Segment, PathComponent}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_builder::EntityBuilder, Model, SEGMENTS_TO_PREDICT};
+use transfer_window_model::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::builder::OrbitBuilder, segment::Segment, PathComponent}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, model::{Model, SEGMENTS_TO_PREDICT}, storage::entity_builder::EntityBuilder};
 
 /// This example was taken from insanity-1 (note insanity-1 case may have changed from time of writing)
 #[test]

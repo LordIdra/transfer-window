@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 
 use log::trace;
 use serde::{Deserialize, Serialize};
+use turn::Turn;
 
 use self::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment};
 
@@ -36,8 +37,8 @@ impl PathComponent {
         Self::default().with_segment(Segment::Burn(burn))
     }
 
-    pub fn past_segments(&self) -> &Vec<Segment> {
-        &self.past_segments
+    pub fn past_segments(&self) -> Vec<&Segment> {
+        self.past_segments.iter().collect()
     }
 
     pub fn past_orbits(&self) -> Vec<&Orbit> {
@@ -52,8 +53,8 @@ impl PathComponent {
             .collect()
     }
 
-    pub fn future_segments(&self) -> &VecDeque<Segment> {
-        &self.future_segments
+    pub fn future_segments(&self) -> Vec<&Segment> {
+        self.future_segments.iter().collect()
     }
 
     pub fn future_orbits(&self) -> Vec<&Orbit> {
@@ -65,6 +66,12 @@ impl PathComponent {
     pub fn future_burns(&self) -> Vec<&Burn> {
         self.future_segments.iter()
             .filter_map(|segment| segment.as_burn())
+            .collect()
+    }
+
+    pub fn future_turns(&self) -> Vec<&Turn> {
+        self.future_segments.iter()
+            .filter_map(|segment| segment.as_turn())
             .collect()
     }
     
@@ -97,13 +104,13 @@ impl PathComponent {
         self.future_guidances().last().copied()
     }
 
-    pub fn end_remaining_dv(&self) -> Option<f64> {
+    pub fn end_dv(&self) -> Option<f64> {
         for segment in self.future_segments.iter().rev() {
             if let Segment::Burn(burn) = segment {
-                return Some(burn.end_remaining_dv());
+                return Some(burn.end_dv());
             }
             if let Segment::Guidance(guidance) = segment {
-                return Some(guidance.end_remaining_dv());
+                return Some(guidance.end_dv());
             }
         }
         None
@@ -122,6 +129,7 @@ impl PathComponent {
     }
 
     pub fn fuel_kg_at_time(&self, time: f64) -> Option<f64> {
+        dbg!(time);
         if let Segment::Burn(burn) = self.future_segment_at_time(time) {
             return Some(burn.fuel_kg_at_time(time));
         }
@@ -302,8 +310,8 @@ impl PathComponent {
         self.future_segments.clear();
     }
     
-    pub fn perceived_segments(&self) -> &Vec<Segment> {
-        &self.perceived_segments
+    pub fn perceived_segments(&self) -> Vec<&Segment> {
+        self.perceived_segments.iter().collect()
     }
 
     pub fn current_perceived_segment(&self) -> &Segment {
@@ -332,6 +340,18 @@ impl PathComponent {
             }
         }
         panic!("No segment exists at the given time")
+    }
+
+    /// Returns the first segment it finds exactly matching the start time
+    /// # Panics
+    /// Panics if the trajectory has no segment at the given time
+    pub fn perceived_segment_starting_at_time(&self, time: f64) -> Option<&Segment> {
+        for segment in &self.perceived_segments {
+            if time == segment.start_time() {
+                return Some(segment)
+            }
+        }
+        None
     }
 
     pub fn set_perceived_segments(&mut self, perceived_segments: Vec<Segment>) {

@@ -1,7 +1,9 @@
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use crate::{storage::entity_allocator::Entity, Model};
+use crate::storage::entity_allocator::Entity;
+
+use super::Model;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Explosion {
@@ -29,11 +31,11 @@ impl Explosion {
 }
 
 impl Model {
-    pub(crate) fn add_explosion(&mut self, explosion: Explosion) {
-        self.explosions_started_this_frame.push(explosion);
-    }
-
     pub fn explosions_started_this_frame(&self) -> &Vec<Explosion> {
         &self.explosions_started_this_frame
+    }
+
+    pub(crate) fn add_explosion(&mut self, explosion: Explosion) {
+        self.explosions_started_this_frame.push(explosion);
     }
 }

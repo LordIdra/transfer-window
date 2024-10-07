@@ -1,6 +1,6 @@
 use nalgebra_glm::DVec2;
 
-use crate::{components::path_component::{orbit::builder::InitialOrbitBuilder, segment::Segment}, Model};
+use crate::{components::path_component::{orbit::builder::InitialOrbitBuilder, segment::Segment}, model::Model};
 
 use super::OrbitableComponentPhysics;
 

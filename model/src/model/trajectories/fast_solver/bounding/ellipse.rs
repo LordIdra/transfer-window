@@ -2,9 +2,9 @@ use std::f64::consts::PI;
 
 use transfer_window_common::{anticlockwise_angular_distance, normalize_angle, numerical_methods::{itp::itp, laguerre::laguerre_to_find_stationary_point}};
 
-use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectories::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity};
 
-use super::{sdf::make_sdf, util::find_other_stationary_point, window::Window};
+use super::{sdf::make_sdf, util::{angle_window_to_time_window, find_other_stationary_point, make_range_containing}, window::Window};
 
 fn find_intersections(f: &impl Fn(f64) -> f64, min_theta: f64, max_theta: f64) -> Result<(f64, f64), &'static str> {
     let theta_1 = itp(&f, min_theta, max_theta)?;

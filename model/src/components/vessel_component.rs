@@ -155,7 +155,39 @@ impl VesselComponent {
                 target: None,
                 fuel_tank: Some(FuelTank::new(60_000.0)),
                 engine: Some(Engine::new(10000.0, 10_000_000.0)),
-                rcs: None,
+                rcs: Some(Rcs::new(5.0, 
+                    vec![
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, 78.0), vec2(0.0, -1.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, 78.0), vec2(1.0, 0.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, 78.0), vec2(-1.0, 0.0)),
+
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, -78.0), vec2(0.0, 1.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, -78.0), vec2(1.0, 0.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(10.0, -78.0), vec2(-1.0, 0.0)),
+
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, 88.0), vec2(0.0, -1.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, 88.0), vec2(1.0, 0.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, 88.0), vec2(-1.0, 0.0)),
+
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, -88.0), vec2(0.0, 1.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, -88.0), vec2(1.0, 0.0)),
+                        RcsThruster::new(1.0, 0.1, vec2(-199.0, -88.0), vec2(-1.0, 0.0)),
+                    ],
+                    RcsControlScheme::new(None, Some(541.0), 
+                        vec![
+                            0.0, 0.0, 1.0,
+                            1.0, 1.0, 0.0,
+                            1.0, 0.0, 1.0,
+                            0.0, 1.0, 0.0
+                        ],
+                        vec![
+                            1.0, 1.0, 0.0,
+                            0.0, 0.0, 1.0,
+                            0.0, 1.0, 0.0,
+                            1.0, 0.0, 1.0
+                        ])
+                    )
+                ),
                 torpedo_storage: Some(TorpedoStorage::new(8)),
                 torpedo_launcher: Some(TorpedoLauncher::new(60.0 * 60.0)),
                 docking: None,

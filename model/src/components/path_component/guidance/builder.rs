@@ -1,6 +1,6 @@
 use nalgebra_glm::DVec2;
 
-use crate::{components::vessel_component::{engine::Engine, faction::Faction}, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::{engine::Engine, faction::Faction}, model::Model, storage::entity_allocator::Entity};
 
 use super::Guidance;
 

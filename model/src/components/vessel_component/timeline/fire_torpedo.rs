@@ -1,7 +1,7 @@
 use nalgebra_glm::DVec2;
 use serde::{Deserialize, Serialize};
 
-use crate::{components::{name_component::NameComponent, path_component::{rocket_equation_function::RocketEquationFunction, orbit::builder::OrbitBuilder, PathComponent}, vessel_component::{class::VesselClass, VesselComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, Model};
+use crate::{components::{name_component::NameComponent, path_component::{orbit::builder::OrbitBuilder, rocket_equation_function::RocketEquationFunction, PathComponent}, vessel_component::{class::VesselClass, VesselComponent}}, model::{state_query::StateQuery, Model}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}};
 
 const TIME_BEFORE_BURN_START: f64 = 0.1;
 const INITIAL_DV: DVec2 = DVec2::new(0.0, 1.0);
@@ -19,7 +19,8 @@ impl FireTorpedoEvent {
         let mut vessel_component = VesselComponent::new(VesselClass::Torpedo, model.vessel_component(fire_from).faction());
         vessel_component.set_target(model.vessel_component(fire_from).target());
 
-        let fire_from_orbit = model.orbit_at_time(fire_from, time, None);
+        let snapshot = &model.snapshot_at(time);
+        let fire_from_orbit = snapshot.orbit(fire_from);
         let point_at_time = fire_from_orbit.point_at_time(time);
         let rocket_equation_function = RocketEquationFunction::fuel_from_vessel_component(&vessel_component);
 
@@ -40,8 +41,7 @@ impl FireTorpedoEvent {
         
         let burn_time = time + TIME_BEFORE_BURN_START;
         model.recompute_trajectory(ghost);
-        model.create_burn(ghost, burn_time);
-        model.adjust_burn(ghost, burn_time, INITIAL_DV);
+        model.create_burn(ghost, burn_time, INITIAL_DV);
 
         Self { time, fire_from, ghost, burn_time }
     }
@@ -91,7 +91,7 @@ impl FireTorpedoEvent {
             if event.time + cooldown > time {
                 return false;
             }
-        } else if model.time + vessel_component.torpedo_launcher.as_ref().unwrap().time_to_reload() > time {
+        } else if model.time() + vessel_component.torpedo_launcher.as_ref().unwrap().time_to_reload() > time {
             return false;
         }
         vessel_component.timeline().is_time_after_last_blocking_event(time)

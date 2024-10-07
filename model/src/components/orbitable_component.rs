@@ -1,4 +1,5 @@
 use nalgebra_glm::{DVec2, vec2};
+use quick_impl::QuickImpl;
 use serde::{Deserialize, Serialize};
 
 use super::path_component::{orbit::Orbit, segment::Segment};
@@ -15,9 +16,11 @@ pub enum OrbitableType {
     Moon,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, QuickImpl)]
 pub enum OrbitableComponentPhysics {
+    #[quick_impl(pub is)]
     Stationary(DVec2),
+    #[quick_impl(pub is)]
     Orbit(Segment), // stored as a segment because you can go from Segment to &Orbit but not vice versa
 }
 

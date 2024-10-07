@@ -1,4 +1,4 @@
-use transfer_window_model::Model;
+use transfer_window_model::model::Model;
 
 #[test]
 fn test_simple_time_step() {

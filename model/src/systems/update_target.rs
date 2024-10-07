@@ -1,4 +1,4 @@
-use crate::{components::ComponentType, Model};
+use crate::{components::ComponentType, model::Model};
 
 impl Model {
     /// Handles deselecting targets that no longer exist or have docked
@@ -8,7 +8,7 @@ impl Model {
         for entity in self.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
             if let Some(target) = self.vessel_component(entity).target() {
                 let docked = self.try_path_component(target).is_none() && self.try_vessel_component(target).is_some();
-                if !self.entity_exists(target) || docked {
+                if !self.exists(target) || docked {
                     self.vessel_component_mut(entity).set_target(None);
                 }
             }

@@ -1,4 +1,6 @@
-use crate::{components::{path_component::{orbit::builder::OrbitBuilder, PathComponent}, vessel_component::docking::{DockingPort, DockingPortLocation, DOCKING_DISTANCE, DOCKING_SPEED}, ComponentType}, storage::entity_allocator::Entity, Model};
+use crate::{components::{path_component::{orbit::builder::OrbitBuilder, PathComponent}, vessel_component::docking::{DockingPort, DockingPortLocation, DOCKING_DISTANCE, DOCKING_SPEED}, ComponentType}, storage::entity_allocator::Entity};
+
+use super::{state_query::StateQuery, Model};
 
 const EXTRA_UNDOCK_VELOCITY: f64 = 1.0;
 

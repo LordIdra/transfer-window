@@ -5,12 +5,12 @@ use log::trace;
 use serde::{Deserialize, Serialize};
 use start_turn::StartTurnEvent;
 
-use crate::Model;
+use crate::model::Model;
 
-use self::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent};
+use self::{start_guidance::StartGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent};
 
 pub mod intercept;
-pub mod enable_guidance;
+pub mod start_guidance;
 pub mod start_burn;
 pub mod start_turn;
 pub mod fire_torpedo;
@@ -19,58 +19,58 @@ pub mod fire_torpedo;
 pub enum TimelineEvent {
     Intercept(InterceptEvent),
     FireTorpedo(FireTorpedoEvent),
-    Burn(StartBurnEvent),
-    Turn(StartTurnEvent),
-    EnableGuidance(EnableGuidanceEvent),
+    StartBurn(StartBurnEvent),
+    StartTurn(StartTurnEvent),
+    StartGuidance(StartGuidanceEvent),
 }
 
 impl TimelineEvent {
     pub fn execute(&self, model: &mut Model) {
         match self {
-            TimelineEvent::Burn(event) => event.execute(model),
-            TimelineEvent::Turn(event) => event.execute(model),
+            TimelineEvent::StartBurn(event) => event.execute(model),
+            TimelineEvent::StartTurn(event) => event.execute(model),
             TimelineEvent::Intercept(event) => event.execute(model),
-            TimelineEvent::EnableGuidance(event) => event.execute(model),
+            TimelineEvent::StartGuidance(event) => event.execute(model),
             TimelineEvent::FireTorpedo(event) => event.execute(model),
         }
     }
 
     pub fn cancel(&self, model: &mut Model) {
         match self {
-            TimelineEvent::Burn(event) => event.cancel(model),
-            TimelineEvent::Turn(event) => event.cancel(model),
+            TimelineEvent::StartBurn(event) => event.cancel(model),
+            TimelineEvent::StartTurn(event) => event.cancel(model),
             TimelineEvent::Intercept(event) => event.cancel(model),
-            TimelineEvent::EnableGuidance(event) => event.cancel(model),
+            TimelineEvent::StartGuidance(event) => event.cancel(model),
             TimelineEvent::FireTorpedo(event) => event.cancel(model),
         }
     }
 
     pub fn time(&self) -> f64 {
         match self {
-            TimelineEvent::Burn(event) => event.time(),
-            TimelineEvent::Turn(event) => event.time(),
+            TimelineEvent::StartBurn(event) => event.time(),
+            TimelineEvent::StartTurn(event) => event.time(),
             TimelineEvent::Intercept(event) => event.time(),
-            TimelineEvent::EnableGuidance(event) => event.time(),
+            TimelineEvent::StartGuidance(event) => event.time(),
             TimelineEvent::FireTorpedo(event) => event.time(),
         }
     }
 
     pub fn can_delete(&self, model: &Model) -> bool {
         match self {
-            TimelineEvent::Burn(event) => event.can_remove(model),
-            TimelineEvent::Turn(event) => event.can_remove(model),
+            TimelineEvent::StartBurn(event) => event.can_remove(model),
+            TimelineEvent::StartTurn(event) => event.can_remove(model),
             TimelineEvent::Intercept(event) => event.can_remove(),
-            TimelineEvent::EnableGuidance(event) => event.can_remove(model),
+            TimelineEvent::StartGuidance(event) => event.can_remove(model),
             TimelineEvent::FireTorpedo(event) => event.can_remove(),
         }
     }
 
     pub fn can_adjust(&self, model: &Model) -> bool {
         match self {
-            TimelineEvent::Burn(event) => event.can_remove(model),
-            TimelineEvent::Turn(event) => event.can_remove(model),
+            TimelineEvent::StartBurn(event) => event.can_remove(model),
+            TimelineEvent::StartTurn(event) => event.can_remove(model),
             TimelineEvent::Intercept(event) => event.can_remove(),
-            TimelineEvent::EnableGuidance(event) => event.can_remove(model),
+            TimelineEvent::StartGuidance(event) => event.can_remove(model),
             TimelineEvent::FireTorpedo(event) => event.can_remove(),
         }
     }
@@ -78,20 +78,20 @@ impl TimelineEvent {
     /// Whether this event should prevent editing earlier events
     pub fn is_blocking(&self) -> bool {
         match self {
-            TimelineEvent::Burn(event) => event.is_blocking(),
-            TimelineEvent::Turn(event) => event.is_blocking(),
+            TimelineEvent::StartBurn(event) => event.is_blocking(),
+            TimelineEvent::StartTurn(event) => event.is_blocking(),
             TimelineEvent::Intercept(event) => event.is_blocking(),
-            TimelineEvent::EnableGuidance(event) => event.is_blocking(),
+            TimelineEvent::StartGuidance(event) => event.is_blocking(),
             TimelineEvent::FireTorpedo(event) => event.is_blocking(),
         }
     }
 
     pub fn is_start_burn(&self) -> bool {
-        matches!(self, TimelineEvent::Burn(_))
+        matches!(self, TimelineEvent::StartBurn(_))
     }
 
     pub fn is_start_turn(&self) -> bool {
-        matches!(self, TimelineEvent::Turn(_))
+        matches!(self, TimelineEvent::StartTurn(_))
     }
 
     pub fn is_intercept(&self) -> bool {
@@ -99,7 +99,7 @@ impl TimelineEvent {
     }
     
     pub fn is_enable_guidance(&self) -> bool {
-        matches!(self, TimelineEvent::EnableGuidance(_))
+        matches!(self, TimelineEvent::StartGuidance(_))
     }
 
     pub fn is_fire_torpedo(&self) -> bool {
@@ -107,7 +107,7 @@ impl TimelineEvent {
     }
 
     pub fn as_start_burn(&self) -> Option<StartBurnEvent> {
-        if let TimelineEvent::Burn(event_type) = self {
+        if let TimelineEvent::StartBurn(event_type) = self {
             Some(event_type.clone())
         } else {
             None
@@ -115,7 +115,7 @@ impl TimelineEvent {
     }
 
     pub fn as_start_turn(&self) -> Option<StartTurnEvent> {
-        if let TimelineEvent::Turn(event_type) = self {
+        if let TimelineEvent::StartTurn(event_type) = self {
             Some(event_type.clone())
         } else {
             None
@@ -130,8 +130,8 @@ impl TimelineEvent {
         }
     }
 
-    pub fn as_enable_guidance(&self) -> Option<EnableGuidanceEvent> {
-        if let TimelineEvent::EnableGuidance(event_type) = self {
+    pub fn as_start_guidance(&self) -> Option<StartGuidanceEvent> {
+        if let TimelineEvent::StartGuidance(event_type) = self {
             Some(event_type.clone())
         } else {
             None

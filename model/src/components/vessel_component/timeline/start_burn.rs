@@ -1,7 +1,7 @@
-use nalgebra_glm::DVec2;
+use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 
-use crate::{storage::entity_allocator::Entity, Model};
+use crate::{model::{state_query::StateQuery, Model}, storage::entity_allocator::Entity};
 
 const MIN_DV_TO_CREATE_BURN: f64 = 1.0;
 
@@ -13,22 +13,27 @@ pub struct StartBurnEvent {
 
 impl StartBurnEvent {
     pub fn new(model: &mut Model, entity: Entity, time: f64) -> Self {
-        model.create_burn(entity, time);
+        model.create_burn(entity, time, vec2(0.01, 0.0));
         Self { entity, time }
     }
 
     pub fn execute(&self, _model: &mut Model) {}
 
     pub fn cancel(&self, model: &mut Model) {
-        model.delete_burn(self.entity, self.time);
+        model.delete_segment(self.entity, self.time);
     }
 
     pub fn adjust(&self, model: &mut Model, amount: DVec2) {
-        model.adjust_burn(self.entity, self.time, amount);
+        let dv = model.snapshot_at(self.burn_segment_time(model)).burn_starting_now(self.entity).delta_v();
+        model.create_burn(self.entity, self.time, dv + amount);
     }
 
     pub fn time(&self) -> f64 {
         self.time
+    }
+
+    pub fn burn_segment_time(&self, model: &Model) -> f64 {
+        model.snapshot_at(self.time).turn_starting_now(self.entity).end_point().time()
     }
 
     pub fn is_blocking(&self) -> bool {

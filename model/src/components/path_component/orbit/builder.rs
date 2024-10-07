@@ -1,6 +1,6 @@
 use nalgebra_glm::{vec2, DVec2};
 
-use crate::{storage::entity_allocator::Entity, Model};
+use crate::{model::{state_query::StateQuery, Model}, storage::entity_allocator::Entity};
 
 use super::{orbit_direction::OrbitDirection, Orbit};
 
@@ -34,7 +34,7 @@ impl InitialOrbitBuilder {
             InitialOrbitBuilder::Circular { parent, distance, angle, direction } => {
                 let parent_mass = model.mass(parent);
                 let position = distance * vec2(f64::cos(angle), f64::sin(angle));
-                Orbit::circle(parent, mass, parent_mass, position, model.time, direction)
+                Orbit::circle(parent, mass, parent_mass, position, model.time(), direction)
             }
             InitialOrbitBuilder::Freeform { parent, distance, angle, direction, speed } => {
                 let parent_mass = model.mass(parent);
@@ -44,7 +44,7 @@ impl InitialOrbitBuilder {
                     velocity *= -1.0;
                 }
                 let rotation = f64::atan2(velocity.y, velocity.x);
-                Orbit::new(parent, mass, parent_mass, rotation, position, velocity, model.time)
+                Orbit::new(parent, mass, parent_mass, rotation, position, velocity, model.time())
             },
         }
     }

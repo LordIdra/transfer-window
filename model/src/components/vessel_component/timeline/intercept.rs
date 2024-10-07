@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{api::explosion::Explosion, storage::entity_allocator::Entity, Model};
+use crate::{model::{explosion::Explosion, state_query::StateQuery, Model}, storage::entity_allocator::Entity};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InterceptEvent {
@@ -16,9 +16,10 @@ impl InterceptEvent {
 
     #[allow(clippy::missing_panics_doc)]
     pub fn execute(&self, model: &mut Model) {
-        let parent = model.parent_at_time(self.entity, self.time, None).unwrap();
-        let offset = model.position_at_time(self.entity, self.time, None);
-        let combined_mass = model.mass(self.entity) + model.mass(self.target);
+        let snapshot = model.snapshot_at(self.time);
+        let parent = snapshot.parent(self.entity).unwrap();
+        let offset = snapshot.position(self.entity);
+        let combined_mass = snapshot.mass(self.entity) + snapshot.mass(self.target);
         model.add_explosion(Explosion::new(parent, offset, combined_mass));
         model.deallocate(self.entity);
         model.deallocate(self.target);

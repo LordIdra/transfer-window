@@ -3,7 +3,7 @@ use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::vessel_component::{engine::Engine, faction::Faction}, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::{engine::Engine, faction::Faction}, model::{state_query::StateQuery, Model}, storage::entity_allocator::Entity};
 
 use self::guidance_point::GuidancePoint;
 
@@ -65,8 +65,8 @@ fn compute_guidance_points(
         // Check if we are on an intercept trajectory
         let distance_at_delta_time = |delta_time: f64| {
             let point = last.next(delta_time, engine);
-            let parent_absolute_position = model.absolute_position_at_time(parent, point.time(), Some(faction));
-            let target_absolute_position = model.absolute_position_at_time(target, point.time(), Some(faction));
+            let parent_absolute_position = model.snapshot_at_observe(point.time(), faction).absolute_position(parent);
+            let target_absolute_position = model.snapshot_at_observe(point.time(), faction).absolute_position(target);
             (parent_absolute_position + point.position() - target_absolute_position).magnitude()
         };
         let distance_prime_at_delta_time = |delta_time: f64| {
@@ -88,10 +88,10 @@ fn compute_guidance_points(
         }
 
         // Calculate acceleration
-        let absolute_position = model.absolute_position_at_time(parent, time, Some(faction)) + last.position();
-        let absolute_velocity = model.absolute_velocity_at_time(parent, time, Some(faction)) + last.velocity();
-        let target_absolute_position = model.absolute_position_at_time(target, time, Some(faction));
-        let target_absolute_velocity = model.absolute_velocity_at_time(target, time, Some(faction));
+        let absolute_position = model.snapshot_at_observe(time, faction).absolute_position(parent) + last.position();
+        let absolute_velocity = model.snapshot_at_observe(time, faction).absolute_velocity(parent) + last.velocity();
+        let target_absolute_position = model.snapshot_at_observe(time, faction).absolute_position(target);
+        let target_absolute_velocity = model.snapshot_at_observe(time, faction).absolute_velocity(target);
         let requested_acceleration = proportional_guidance_acceleration(absolute_position, target_absolute_position, absolute_velocity, target_absolute_velocity);
 
         // Make sure guidance acceleration does not exceed max acceleration
@@ -240,7 +240,7 @@ impl Guidance {
         self.start_rocket_equation_function().remaining_fuel_kg()
     }
 
-    pub fn end_remaining_dv(&self) -> f64 {
+    pub fn end_dv(&self) -> f64 {
         self.end_rocket_equation_function().remaining_dv()
     }
 
@@ -265,7 +265,6 @@ impl Guidance {
     }
 
     pub fn next(&mut self, time: f64) {
-        let delta_time = time - self.current_point.time();
-        self.current_point = self.point_at_time(self.current_point.time() + delta_time);
+        self.current_point = self.point_at_time(time);
     }
 }

@@ -172,7 +172,7 @@ impl Burn {
         self.start_rocket_equation().fuel_kg()
     }
 
-    pub fn end_remaining_dv(&self) -> f64 {
+    pub fn end_dv(&self) -> f64 {
         self.end_rocket_equation().remaining_dv()
     }
 

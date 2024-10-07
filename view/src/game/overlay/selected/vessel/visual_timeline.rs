@@ -35,9 +35,9 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::TimelineEvent(event) => match event {
                 TimelineEvent::Intercept(_) => "intercept",
                 TimelineEvent::FireTorpedo(_) => "torpedo",
-                TimelineEvent::Burn(_) => "burn",
-                TimelineEvent::Turn(_) => "turn",
-                TimelineEvent::EnableGuidance(_) => "enable-guidance",
+                TimelineEvent::StartBurn(_) => "burn",
+                TimelineEvent::StartTurn(_) => "turn",
+                TimelineEvent::StartGuidance(_) => "enable-guidance",
             }
             VisualTimelineEvent::Apsis { type_, .. } => match type_ {
                 ApsisType::Periapsis => "periapsis",
@@ -63,9 +63,9 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::TimelineEvent(event) => match event {
                 TimelineEvent::Intercept(_) => "Intercept".to_string(),
                 TimelineEvent::FireTorpedo(_) => "Torpedo Launch".to_string(),
-                TimelineEvent::Burn(_) => "Burn Start".to_string(),
-                TimelineEvent::Turn(_) => "Turn Start".to_string(),
-                TimelineEvent::EnableGuidance(_) => "Guidance Start".to_string(),
+                TimelineEvent::StartBurn(_) => "Burn Start".to_string(),
+                TimelineEvent::StartTurn(_) => "Turn Start".to_string(),
+                TimelineEvent::StartGuidance(_) => "Guidance Start".to_string(),
             }
             VisualTimelineEvent::Apsis { type_, altitude: distance, .. } => match type_ {
                 ApsisType::Periapsis => format!("Periapsis - {}", format_distance(*distance)),
@@ -88,9 +88,9 @@ impl VisualTimelineEvent {
             VisualTimelineEvent::TimelineEvent(event) => Some(match event {
                 TimelineEvent::Intercept(intercept) => Selected::Intercept { entity, time: intercept.time() },
                 TimelineEvent::FireTorpedo(fire_torpedo) => Selected::FireTorpedo { entity, time: fire_torpedo.time(), state: BurnState::Selected },
-                TimelineEvent::Burn(burn) => Selected::Burn { entity, time: burn.time(), state: BurnState::Selected },
-                TimelineEvent::Turn(turn) => Selected::Turn { entity, time: turn.time() },
-                TimelineEvent::EnableGuidance(enable_guidance) => Selected::EnableGuidance { entity, time: enable_guidance.time() },
+                TimelineEvent::StartBurn(burn) => Selected::Burn { entity, time: burn.time(), state: BurnState::Selected },
+                TimelineEvent::StartTurn(turn) => Selected::Turn { entity, time: turn.time() },
+                TimelineEvent::StartGuidance(enable_guidance) => Selected::EnableGuidance { entity, time: enable_guidance.time() },
             }),
             VisualTimelineEvent::Apsis { type_, time, altitude: _ } => Some(Selected::Apsis { type_: *type_, entity, time: *time }),
             VisualTimelineEvent::Approach { type_, target, time, distance: _ } => Some(Selected::Approach { type_: *type_, entity, target: *target, time: *time }),
@@ -140,11 +140,11 @@ impl VisualTimelineEvent {
                 _ => false,
             }
             Selected::Burn { time, .. } => match self {
-                VisualTimelineEvent::TimelineEvent(TimelineEvent::Burn(event)) => event.time() == time,
+                VisualTimelineEvent::TimelineEvent(TimelineEvent::StartBurn(event)) => event.time() == time,
                 _ => false,
             }
             Selected::Turn { time, .. } => match self {
-                VisualTimelineEvent::TimelineEvent(TimelineEvent::Turn(event)) => event.time() == time,
+                VisualTimelineEvent::TimelineEvent(TimelineEvent::StartTurn(event)) => event.time() == time,
                 _ => false,
             }
             Selected::FireTorpedo { time, .. } => match self {
@@ -152,7 +152,7 @@ impl VisualTimelineEvent {
                 _ => false,
             }
             Selected::EnableGuidance { time, .. } => match self {
-                VisualTimelineEvent::TimelineEvent(TimelineEvent::EnableGuidance(event)) => event.time() == time,
+                VisualTimelineEvent::TimelineEvent(TimelineEvent::StartGuidance(event)) => event.time() == time,
                 _ => false,
             }
         }

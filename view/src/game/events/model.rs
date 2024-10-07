@@ -4,7 +4,7 @@ use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::components::vessel_component::timeline::start_turn::StartTurnEvent;
 use transfer_window_model::story_event::StoryEvent;
-use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, timeline::{enable_guidance::EnableGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}}, storage::entity_allocator::Entity};
+use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, timeline::{start_guidance::StartGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 
@@ -87,7 +87,7 @@ impl View {
     pub fn create_burn(&mut self, entity: Entity, time: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Create burn");
-        let event = TimelineEvent::Burn(StartBurnEvent::new(&mut self.model, entity, time));
+        let event = TimelineEvent::StartBurn(StartBurnEvent::new(&mut self.model, entity, time));
         self.model.add_event(entity, event);
     }
 
@@ -102,7 +102,7 @@ impl View {
     pub fn create_turn(&mut self, entity: Entity, time: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Create turn");
-        let event = TimelineEvent::Turn(StartTurnEvent::new(&mut self.model, entity, time));
+        let event = TimelineEvent::StartTurn(StartTurnEvent::new(&mut self.model, entity, time));
         self.model.add_event(entity, event);
     }
 
@@ -141,7 +141,7 @@ impl View {
     pub fn enable_torpedo_guidance(&mut self, entity: Entity, time: f64) {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Enable torpedo guidance");
-        let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut self.model, entity, time));
+        let event = TimelineEvent::StartGuidance(StartGuidanceEvent::new(&mut self.model, entity, time));
         self.model.add_event(entity, event);
     }
 

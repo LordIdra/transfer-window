@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{storage::entity_allocator::Entity, Model};
+use crate::{model::{state_query::StateQuery, Model}, storage::entity_allocator::Entity};
 
 const MIN_FUEL_TO_CREATE_TURN: f64 = 1.0;
 
@@ -12,14 +12,14 @@ pub struct StartTurnEvent {
 
 impl StartTurnEvent {
     pub fn new(model: &mut Model, entity: Entity, time: f64) -> Self {
-        model.create_turn(entity, time);
+        model.create_turn(entity, time, model.snapshot_at(time).rotation(entity));
         Self { entity, time }
     }
 
     pub fn execute(&self, _model: &mut Model) {}
 
     pub fn cancel(&self, model: &mut Model) {
-        model.delete_turn(self.entity, self.time);
+        model.delete_segment(self.entity, self.time);
     }
 
     pub fn adjust(&self, model: &mut Model, amount: f64) {
@@ -52,6 +52,6 @@ impl StartTurnEvent {
         let vessel_component = model.vessel_component(entity);
         vessel_component.timeline().is_time_after_last_blocking_event(time)
             && !vessel_component.timeline().last_event().is_some_and(|event| event.is_enable_guidance() || event.is_intercept())
-            && model.end_fuel(entity) > MIN_FUEL_TO_CREATE_TURN
+            && model.end_fuel(entity).unwrap() > MIN_FUEL_TO_CREATE_TURN
     }
 }

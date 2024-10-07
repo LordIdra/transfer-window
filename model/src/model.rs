@@ -1,12 +1,30 @@
 use std::{collections::HashSet, sync::Mutex};
 
+use encounters::Encounter;
+use explosion::Explosion;
+use nalgebra_glm::{vec2, DVec2};
 use serde::{Deserialize, Serialize};
+use state_query::StateQuery;
+use story_event::StoryEvent;
+use time::{TimeStep, TimeWarp};
 
-use crate::{components::{name_component::NameComponent, orbitable_component::OrbitableComponent, path_component::PathComponent, vessel_component::VesselComponent}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}}, story_event::StoryEvent, systems::update_warp::TimeWarp};
+use crate::{components::{name_component::NameComponent, orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::Burn, guidance::Guidance, orbit::Orbit, segment::Segment, turn::Turn, PathComponent}, vessel_component::{faction::Faction, VesselComponent}, ComponentType}, storage::{component_storage::ComponentStorage, entity_allocator::{Entity, EntityAllocator}, entity_builder::EntityBuilder}};
 
 pub const SEGMENTS_TO_PREDICT: usize = 3;
 
+pub mod closest_approach;
+pub mod closest_point;
+pub mod component;
+pub mod docking;
+pub mod encounters;
+pub mod explosion;
+pub mod segment;
 pub mod snapshot;
+pub mod state_query;
+pub mod story_event;
+pub mod time;
+pub mod timeline;
+pub mod trajectories;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Model {
@@ -120,40 +138,195 @@ impl Model {
         self.vessel_components.remove_if_exists(entity);
     }
 
-    pub fn add_story_event(&self, event: StoryEvent) {
-        self.story_events.lock().unwrap().push(event);
+    pub fn exists(&self, entity: Entity) -> bool {
+        self.entity_allocator.entities().contains(&entity)
     }
 
-    pub fn name_component_mut(&mut self, entity: Entity) -> &mut NameComponent {
-        self.name_components.get_mut(entity)
+    pub fn faction(&self, entity: Entity) -> Faction {
+        self.vessel_component(entity).faction()
+    }
+}
+
+impl StateQuery for Model {
+    fn future_segments(&self, entity: Entity) -> Vec<&Segment> {
+        self.path_component(entity).future_segments()
     }
 
-    pub fn try_name_component_mut(&mut self, entity: Entity) -> Option<&mut NameComponent> {
-        self.name_components.try_get_mut(entity)
+    fn future_orbits(&self, entity: Entity) -> Vec<&Orbit> {
+        self.path_component(entity).future_orbits()
     }
 
-    pub fn orbitable_component_mut(&mut self, entity: Entity) -> &mut OrbitableComponent {
-        self.orbitable_components.get_mut(entity)
+    fn future_burns(&self, entity: Entity) -> Vec<&Burn> {
+        self.path_component(entity).future_burns()
     }
 
-    pub fn try_orbitable_component_mut(&mut self, entity: Entity) -> Option<&mut OrbitableComponent> {
-        self.orbitable_components.try_get_mut(entity)
+    fn future_turns(&self, entity: Entity) -> Vec<&Turn> {
+        self.path_component(entity).future_turns()
     }
 
-    pub fn path_component_mut(&mut self, entity: Entity) -> &mut PathComponent {
-        self.path_components.get_mut(entity)
+    fn future_guidances(&self, entity: Entity) -> Vec<&Guidance> {
+        self.path_component(entity).future_guidances()
     }
 
-    pub fn try_path_component_mut(&mut self, entity: Entity) -> Option<&mut PathComponent> {
-        self.path_components.try_get_mut(entity)
+    fn segment(&self, entity: Entity) -> &Segment {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            if let OrbitableComponentPhysics::Orbit(segment) = orbitable_component.physics() {
+                return segment;
+            }
+            panic!("Attempted to get segment of stationary orbitable")
+        }
+        self.path_component(entity).current_segment()
     }
 
-    pub fn vessel_component_mut(&mut self, entity: Entity) -> &mut VesselComponent {
-        self.vessel_components.get_mut(entity)
+    fn orbit(&self, entity: Entity) -> &Orbit {
+        self.segment(entity)
+            .as_orbit()
+            .expect("Segment is not orbit")
     }
 
-    pub fn try_vessel_component_mut(&mut self, entity: Entity) -> Option<&mut VesselComponent> {
-        self.vessel_components.try_get_mut(entity)
+    fn burn(&self, entity: Entity) -> &Burn {
+        self.segment(entity)
+            .as_burn()
+            .expect("Segment is not orbit")
+    }
+
+    fn turn(&self, entity: Entity) -> &Turn {
+        self.segment(entity)
+            .as_turn()
+            .expect("Segment is not orbit")
+    }
+
+    fn guidance(&self, entity: Entity) -> &Guidance {
+        self.segment(entity)
+            .as_guidance()
+            .expect("Segment is not orbit")
+    }
+
+    fn parent(&self, entity: Entity) -> Option<Entity> {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return orbitable_component.orbit().map(Orbit::parent);
+        }
+        if let Some(path_component) = self.try_path_component(entity) {
+            return Some(path_component.current_segment().parent());
+        }
+        None
+    }
+
+    fn target(&self, entity: Entity) -> Option<Entity> {
+        self.try_vessel_component(entity)?.target()
+    }
+
+    fn rotation(&self, entity: Entity) -> f64 {
+        if self.try_orbitable_component(entity).is_some() {
+            return 0.0;
+        }
+        self.segment(entity).current_rotation()
+    }
+
+    fn surface_altitude(&self, entity: Entity) -> f64 {
+        let parent = self.parent(entity).expect("Attempt to get surface altitude of entity without parent");
+        let parent_radius = self.orbitable_component(parent).radius();
+        self.position(entity).magnitude() - parent_radius
+    }
+
+    fn position(&self, entity: Entity) -> DVec2 {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return orbitable_component.position();
+        }
+        self.segment(entity).current_position()
+    }
+
+    fn absolute_position(&self, entity: Entity) -> DVec2 {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Absolute position");
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            if let OrbitableComponentPhysics::Stationary(position) = orbitable_component.physics() {
+                // Base case
+                return *position;
+            }
+        }
+        let segment = self.segment(entity);
+        self.absolute_position(segment.parent()) + segment.current_position()
+    }
+
+    fn displacement(&self, entity: Entity, other_entity: Entity) -> DVec2 {
+        self.absolute_position(entity) - self.absolute_position(other_entity)
+    }
+
+    fn distance(&self, entity: Entity, other_entity: Entity) -> f64 {
+        self.displacement(entity, other_entity).magnitude()
+    }
+
+    fn velocity(&self, entity: Entity) -> DVec2 {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return orbitable_component.velocity();
+        }
+        self.segment(entity).current_velocity()
+    }
+
+    fn absolute_velocity(&self, entity: Entity) -> DVec2 {
+        #[cfg(feature = "profiling")]
+        let _span = tracy_client::span!("Absolute velocity");
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            if let OrbitableComponentPhysics::Stationary(_) = orbitable_component.physics() {
+                // Base case
+                return vec2(0.0, 0.0);
+            }
+        }
+        let segment = self.segment(entity);
+        self.absolute_velocity(segment.parent()) + segment.current_velocity()
+    }
+
+    fn relative_velocity(&self, entity: Entity, other_entity: Entity) -> DVec2 {
+        self.absolute_velocity(entity) - self.absolute_velocity(other_entity)
+    }
+
+    fn relative_speed(&self, entity: Entity, other_entity: Entity) -> f64 {
+        self.relative_velocity(entity, other_entity).magnitude()
+    }
+
+    fn mass(&self, entity: Entity) -> f64 {
+        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
+            return orbitable_component.mass();
+        }
+        self.segment(entity).current_mass()
+    }
+
+    fn fuel_kg(&self, entity: Entity) -> f64 {
+        self.vessel_component(entity).fuel_kg()
+    }
+
+    fn end_fuel(&self, entity: Entity) -> Option<f64> {
+        if let Some(path_component) = self.try_path_component(entity) {
+            if let Some(end_fuel_kg) = path_component.end_fuel_kg() {
+                return Some(end_fuel_kg)
+            }
+        }
+        Some(self.vessel_component(entity).fuel_kg())
+    }
+
+    fn end_dv(&self, entity: Entity) -> Option<f64> {
+        if let Some(path_component) = self.try_path_component(entity) {
+            if let Some(end_dv) = path_component.end_dv() {
+                return Some(end_dv)
+            }
+        }
+        if !self.vessel_component(entity).has_engine() {
+            return None;
+        }
+        return Some(self.vessel_component(entity).dv());
+    }
+
+    fn find_next_closest_approach(&self, entity_a: Entity, entity_b: Entity) -> Option<f64> {
+        closest_approach::find_next_closest_approach(self, entity_a, entity_b, self.time, None)
+    }
+
+    fn find_next_two_closest_approaches(&self, entity_a: Entity, entity_b: Entity) -> (Option<f64>, Option<f64>) {
+        closest_approach::find_next_two_closest_approaches(self, entity_a, entity_b, self.time, None)
+    }
+    
+    fn future_encounters(&self, entity: Entity) -> Vec<Encounter> {
+        encounters::future_encounters(self, entity, self.time, None)
     }
 }
 

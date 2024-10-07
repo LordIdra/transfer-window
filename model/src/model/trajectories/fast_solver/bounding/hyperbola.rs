@@ -1,6 +1,6 @@
-use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity, api::trajectories::fast_solver::bounding::util::{angle_window_to_time_window, make_range_containing}};
+use crate::{components::path_component::orbit::Orbit, storage::entity_allocator::Entity};
 
-use super::{sdf::make_sdf, window::Window};
+use super::{sdf::make_sdf, util::{angle_window_to_time_window, make_range_containing}, window::Window};
 
 use transfer_window_common::numerical_methods::{itp::itp, util::differentiate_1};
 

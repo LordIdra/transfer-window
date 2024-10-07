@@ -110,7 +110,12 @@ impl Turn {
             end_rotation);
 
         self.orbit.end_at(self.turn_plan.end_time());
-        self.end_point = TurnPoint::new(self.turn_plan.end_time(), self.orbit.end_point().position(), self.orbit.end_point().velocity(), end_rotation, self.turn_plan.end_mass());
+        self.end_point = TurnPoint::new(
+            self.turn_plan.end_time(), 
+            self.orbit.end_point().position(), 
+            self.orbit.end_point().velocity(), 
+            end_rotation, 
+            self.turn_plan.end_mass());
     }
 
     pub fn next(&mut self, time: f64) {

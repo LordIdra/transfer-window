@@ -1,4 +1,6 @@
-use crate::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity, Model};
+use crate::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
+
+use super::{state_query::StateQuery, Model};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EncounterType {
@@ -14,7 +16,7 @@ pub struct Encounter {
 }
 
 impl Encounter {
-    fn new(time: f64, encounter_type: EncounterType, from: Entity, to: Entity) -> Self {
+    pub fn new(time: f64, encounter_type: EncounterType, from: Entity, to: Entity) -> Self {
         Self { time, encounter_type, from, to }
     }
     
@@ -35,32 +37,34 @@ impl Encounter {
     }
 }
 
-impl Model {
-    pub fn future_encounters(&self, entity: Entity, observer: Option<Faction>) -> Vec<Encounter> {
+pub fn future_encounters(model: &Model, entity: Entity, time: f64, observer: Option<Faction>) -> Vec<Encounter> {
         let mut encounters = vec![];
         let mut previous_parent = None;
-        for segment in self.future_segments(entity, observer) {
-            let Some(orbit) = segment.as_orbit() else {
+        for orbit in model.snapshot(time, observer).future_orbits(entity) {
+            let Some(previous_parent) = previous_parent else {
+                previous_parent = Some(orbit.parent());
                 continue;
             };
-            if let Some(previous_parent) = previous_parent {
-                let new_parent = orbit.parent();
-                if new_parent != previous_parent {
-                    let encounter_type = if let Some(previous_parent_orbit) = self.orbitable_component(previous_parent).segment() {
-                        if previous_parent_orbit.parent() == new_parent {
-                            EncounterType::Exit
-                        } else {
-                            EncounterType::Entrance
-                        }
+
+            let new_parent = orbit.parent();
+            if new_parent == previous_parent {
+                continue;
+            }
+
+            let encounter_type = match model.orbitable_component(previous_parent).segment() {
+                Some(previous_parent_orbit) => {
+                    if previous_parent_orbit.parent() == new_parent {
+                        EncounterType::Exit
                     } else {
                         EncounterType::Entrance
-                    };
-                    let time = orbit.start_point().time();
-                    encounters.push(Encounter::new(time, encounter_type, previous_parent, new_parent));
+                    }
                 }
-            }
-            previous_parent = Some(orbit.parent());
+                None => EncounterType::Entrance,
+            };
+
+            let time = orbit.start_point().time();
+            encounters.push(Encounter::new(time, encounter_type, previous_parent, new_parent));
         }
+
         encounters
     }
-}

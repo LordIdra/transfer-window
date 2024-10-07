@@ -1,7 +1,9 @@
 use log::error;
 use transfer_window_common::numerical_methods::itp::itp;
 
-use crate::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction}, storage::entity_allocator::Entity, Model};
+use crate::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction}, storage::entity_allocator::Entity};
+
+use super::{snapshot::Snapshot, state_query::StateQuery, Model};
 
 const DISTANCE_DERIVATIVE_DELTA: f64 = 0.1;
 
@@ -20,123 +22,118 @@ fn compute_time_step(orbit_a: &Orbit, orbit_b: &Orbit, start_time: f64, end_time
     step_time / 16.0
 }
 
-impl Model {
-    /// Safe to call for orbitables
-    fn perceived_orbits(&self, entity: Entity, observer: Option<Faction>) -> Vec<&Orbit> {
-        if let Some(orbitable_component) = self.try_orbitable_component(entity) {
-            return match orbitable_component.orbit() {
-                Some(orbit) => vec![orbit],
-                None => vec![],
-            }
-        }
-        self.future_orbits(entity, observer)
-    }
+/// Returns an ordered vector of pairs of orbits that have the same parent
+fn find_same_parent_orbit_pairs(snapshot: &Snapshot, entity_a: Entity, entity_b: Entity) -> Vec<(&Orbit, &Orbit)> {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Find same parent orbits");
+    let orbits_a = snapshot.future_orbits(entity_a);
+    let orbits_b = snapshot.future_orbits(entity_b);
 
-    /// Returns an ordered vector of pairs of orbits that have the same parent
-    fn find_same_parent_orbit_pairs(&self, entity_a: Entity, entity_b: Entity, observer: Option<Faction>) -> Vec<(&Orbit, &Orbit)> {
-        #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Find same parent orbits");
-        let orbits_a = self.perceived_orbits(entity_a, observer);
-        let orbits_b = self.perceived_orbits(entity_b, observer);
+    let mut same_parent_orbit_pairs = vec![];
+    let mut index_a = 0;
+    let mut index_b = 0;
 
-        let mut same_parent_orbit_pairs = vec![];
-        let mut index_a = 0;
-        let mut index_b = 0;
-        
-        while index_a < orbits_a.len() && index_b < orbits_b.len() {
-            let orbit_a = orbits_a[index_a];
-            let orbit_b = orbits_b[index_b];
-            
-            if orbit_a.parent() == orbit_b.parent() {
-                same_parent_orbit_pairs.push((orbit_a, orbit_b));
-            }
+    while index_a < orbits_a.len() && index_b < orbits_b.len() {
+        let orbit_a = orbits_a[index_a];
+        let orbit_b = orbits_b[index_b];
 
-            if orbit_a.end_point().time() < orbit_b.end_point().time() {
-                index_a += 1;
-            } else {
-                index_b += 1;
-            }
+        if orbit_a.parent() == orbit_b.parent() {
+            same_parent_orbit_pairs.push((orbit_a, orbit_b));
         }
 
-        same_parent_orbit_pairs
+        if orbit_a.end_point().time() < orbit_b.end_point().time() {
+            index_a += 1;
+        } else {
+            index_b += 1;
+        }
     }
 
-    /// Returns the time at which the next *perceived* closest approach will occur.
-    /// This ignore burns. Why? Picture two spacecraft getting closer
-    /// to each other. One of them starts burning to accelerate and
-    /// ends up moving away from the other spacecraft. This is logical
-    /// and makes sense, but in practice is very counterintuitive and
-    /// isn't really useful information eg when trying to plan a
-    /// rendezvous.
-    pub fn find_next_closest_approach(&self, entity_a: Entity, entity_b: Entity, start_time: f64, observer: Option<Faction>) -> Option<f64> {
-        #[cfg(feature = "profiling")]
-        let _span = tracy_client::span!("Find next closest approach");
-        let same_parent_orbit_pairs = self.find_same_parent_orbit_pairs(entity_a, entity_b, observer);
+    same_parent_orbit_pairs
+}
 
-        for pair in same_parent_orbit_pairs {
-            let orbit_a = pair.0;
-            let orbit_b = pair.1;
-            let start_time = f64::max(f64::max(orbit_b.start_point().time(), orbit_a.start_point().time()), start_time);
-            let end_time = f64::min(orbit_a.end_point().time(), orbit_b.end_point().time());
-            let time_step = compute_time_step(orbit_a, orbit_b, start_time, end_time);
-            let distance = |time: f64| (orbit_a.point_at_time(time).position() - orbit_b.point_at_time(time).position()).magnitude();
-            let distance_prime = |time: f64| (distance(time + DISTANCE_DERIVATIVE_DELTA) - distance(time)) / DISTANCE_DERIVATIVE_DELTA;
+/// Returns the time at which the next *perceived* closest approach will occur.
+/// This ignore burns. Why? Picture two spacecraft getting closer
+/// to each other. One of them starts burning to accelerate and
+/// ends up moving away from the other spacecraft. This is logical
+/// and makes sense, but in practice is very counterintuitive and
+/// isn't really useful information eg when trying to plan a
+/// rendezvous.
+pub fn find_next_closest_approach(model: &Model, entity_a: Entity, entity_b: Entity, start_time: f64, observer: Option<Faction>) -> Option<f64> {
+    #[cfg(feature = "profiling")]
+    let _span = tracy_client::span!("Find next closest approach");
 
-            if start_time > end_time {
-                continue;
+    let snapshot = model.snapshot(start_time, observer);
+    let same_parent_orbit_pairs = find_same_parent_orbit_pairs(&snapshot, entity_a, entity_b);
+
+    for pair in same_parent_orbit_pairs {
+        let orbit_a = pair.0;
+        let orbit_b = pair.1;
+        let start_time = f64::max(f64::max(orbit_b.start_point().time(), orbit_a.start_point().time()), start_time);
+        let end_time = f64::min(orbit_a.end_point().time(), orbit_b.end_point().time());
+        let time_step = compute_time_step(orbit_a, orbit_b, start_time, end_time);
+        let distance = |time: f64| (orbit_a.point_at_time(time).position() - orbit_b.point_at_time(time).position()).magnitude();
+        let distance_prime = |time: f64| (distance(time + DISTANCE_DERIVATIVE_DELTA) - distance(time)) / DISTANCE_DERIVATIVE_DELTA;
+
+        if start_time > end_time {
+            continue;
+        }
+
+        let mut time = start_time;
+        let mut previous_time = time;
+        let mut previous_distance_prime_value = distance_prime(time);
+        time += time_step;
+
+        loop {
+            let distance_prime_value = distance_prime(time);
+            if previous_distance_prime_value.is_sign_negative() && distance_prime_value.is_sign_positive() {
+                let approach_time = itp(&distance_prime, previous_time, time);
+                if let Err(err) = approach_time {
+                    error!("Error while computing closest approach: {}", err);
+                    return None;
+                }
+                return Some(approach_time.unwrap());
             }
+            previous_time = time;
+            previous_distance_prime_value = distance_prime_value;
 
-            let mut time = start_time;
-            let mut previous_time = time;
-            let mut previous_distance_prime_value = distance_prime(time);
+            // This weird time step system is necessary because our time step might leave us in a position
+            // where we overshoot the segment but don't actually evaluate the last point, so the entire 
+            // final section of the segments is skipped
+            if (time - end_time).abs() < 1.0e-3 {
+                break
+            }
             time += time_step;
-            
-            loop {
-                let distance_prime_value = distance_prime(time);
-                if previous_distance_prime_value.is_sign_negative() && distance_prime_value.is_sign_positive() {
-                    let approach_time = itp(&distance_prime, previous_time, time);
-                    if let Err(err) = approach_time {
-                        error!("Error while computing closest approach: {}", err);
-                        return None;
-                    }
-                    return Some(approach_time.unwrap());
-                }
-                previous_time = time;
-                previous_distance_prime_value = distance_prime_value;
-
-                // This weird time step system is necessary because our time step might leave us in a position
-                // where we overshoot the segment but don't actually evaluate the last point, so the entire 
-                // final section of the segments is skipped
-                if (time - end_time).abs() < 1.0e-3 {
-                    break
-                }
-                time += time_step;
-                if time > end_time {
-                    time = end_time;
-                }
+            if time > end_time {
+                time = end_time;
             }
         }
-
-        None
     }
 
-    pub fn find_next_two_closest_approaches(&self, entity_a: Entity, entity_b: Entity, observer: Option<Faction>) -> (Option<f64>, Option<f64>) {
-        if let Some(time_1) = self.find_next_closest_approach(entity_a, entity_b, self.time, observer) {
-            // Add 1.0 to make sure we don't find the same approach by accident
-            if let Some(time_2) = self.find_next_closest_approach(entity_a, entity_b, time_1 + 1.0, observer) {
-                return (Some(time_1), Some(time_2));
-            }
-            return (Some(time_1), None);
+    None
+}
+
+pub fn find_next_two_closest_approaches(
+    model: &Model, 
+    entity_a: Entity, 
+    entity_b: Entity, 
+    start_time: f64, 
+    observer: Option<Faction>
+) -> (Option<f64>, Option<f64>) {
+    if let Some(time_1) = find_next_closest_approach(model, entity_a, entity_b, start_time, observer) {
+        // Add 1.0 to make sure we don't find the same approach by accident
+        if let Some(time_2) = find_next_closest_approach(model, entity_a, entity_b, time_1 + 1.0, observer) {
+            return (Some(time_1), Some(time_2));
         }
-        (None, None)
+        return (Some(time_1), None);
     }
+    (None, None)
 }
 
 #[cfg(test)]
 mod test {
     use nalgebra_glm::vec2;
 
-    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{builder::OrbitBuilder, orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, test_util, Model};
+    use crate::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics, OrbitableType}, path_component::{orbit::{builder::OrbitBuilder, orbit_direction::OrbitDirection, Orbit}, segment::Segment, PathComponent}}, model::{closest_approach::{find_next_closest_approach, find_same_parent_orbit_pairs}, Model}, storage::{entity_allocator::Entity, entity_builder::EntityBuilder}, test_util};
 
     #[test]
     fn test_find_same_parent_orbit_pairs() {
@@ -213,7 +210,8 @@ mod test {
             (segment_d_3, segment_e_5),
         ];
 
-        let actual = model.find_same_parent_orbit_pairs(entity_d, entity_e, None);
+        let snapshot = model.snapshot_now();
+        let actual = find_same_parent_orbit_pairs(&snapshot, entity_d, entity_e);
 
         assert_eq!(actual.len(), expected.len());
 
@@ -241,15 +239,16 @@ mod test {
         let vessel_b = model.allocate(EntityBuilder::default().with_path_component(path_component));
 
         let expected = orbit.period().unwrap() / 4.0;
-        let actual = model.find_next_closest_approach(vessel_a, vessel_b, 0.0, None).unwrap();
+        let actual = find_next_closest_approach(&model, vessel_a, vessel_b, 0.0, None).unwrap();
 
         println!("Actual: {actual} Expected: {expected}");
         assert!((expected - actual).abs() / expected < 1.0e-3);
 
         let expected = orbit.period().unwrap() * 3.0 / 4.0;
-        let actual = model.find_next_closest_approach(vessel_a, vessel_b, orbit.period().unwrap() / 2.0, None).unwrap();
+        let actual = find_next_closest_approach(&model, vessel_a, vessel_b, orbit.period().unwrap() / 2.0, None).unwrap();
 
         println!("Actual: {actual} Expected: {expected}");
         assert!((expected - actual).abs() / expected < 1.0e-3);
     }
 }
+

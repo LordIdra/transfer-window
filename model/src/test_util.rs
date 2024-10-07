@@ -1,5 +1,6 @@
 use nalgebra_glm::{vec2, DVec2};
-use crate::{api::builder::{OrbitableBuilder, VesselBuilder}, components::{orbitable_component::{builder::OrbitablePhysicsBuilder, OrbitableType}, path_component::orbit::{builder::InitialOrbitBuilder, orbit_direction::OrbitDirection}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
+
+use crate::{components::{orbitable_component::{builder::OrbitablePhysicsBuilder, OrbitableType}, path_component::orbit::{builder::InitialOrbitBuilder, orbit_direction::OrbitDirection}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, model::Model, storage::{entity_allocator::Entity, entity_builder::{OrbitableBuilder, VesselBuilder}}};
 
 pub const SUN_MASS: f64 = 1.989e30;
 pub const SUN_RADIUS: f64 = 6.95508e8;

@@ -1,4 +1,4 @@
-use crate::{components::ComponentType, Model};
+use crate::{components::ComponentType, model::Model};
 
 impl Model {
     pub(crate) fn update_launcher_cooldown(&mut self, dt: f64) {

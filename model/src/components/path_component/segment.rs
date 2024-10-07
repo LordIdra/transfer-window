@@ -278,12 +278,12 @@ impl Segment {
         }
     }
 
-    pub fn next(&mut self, delta_time: f64) {
+    pub fn next(&mut self, time: f64) {
         match self {
-            Segment::Orbit(orbit) => orbit.next(delta_time),
-            Segment::Burn(burn) => burn.next(delta_time),
-            Segment::Guidance(guidance) => guidance.next(delta_time),
-            Segment::Turn(turn) => turn.next(delta_time),
+            Segment::Orbit(orbit) => orbit.next(time),
+            Segment::Burn(burn) => burn.next(time),
+            Segment::Guidance(guidance) => guidance.next(time),
+            Segment::Turn(turn) => turn.next(time),
         }
     }
 }

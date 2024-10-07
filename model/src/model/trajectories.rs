@@ -2,9 +2,11 @@ use encounter::EncounterType;
 use fast_solver::{calculate_entrance_encounter, calculate_exit_encounter};
 use log::{error, trace};
 
-use crate::{components::path_component::{orbit::{builder::OrbitBuilder, Orbit}, segment::Segment}, storage::entity_allocator::Entity, Model, SEGMENTS_TO_PREDICT};
+use crate::{components::path_component::{orbit::{builder::OrbitBuilder, Orbit}, segment::Segment}, storage::entity_allocator::Entity};
 
 use self::fast_solver::{apply_encounter, solver::find_next_encounter};
+
+use super::{state_query::StateQuery, Model, SEGMENTS_TO_PREDICT};
 
 mod encounter;
 mod fast_solver;
@@ -90,7 +92,7 @@ impl Model {
         self.recompute_trajectory(entity);
     }
 
-    pub(crate) fn next_orbit(&self, entity: Entity, orbit: &mut Orbit) -> Option<Orbit> {
+    pub fn next_orbit(&self, entity: Entity, orbit: &mut Orbit) -> Option<Orbit> {
         match find_next_encounter(self, orbit, entity, 1.0e10) {
             Ok(encounter) => {
                 if let Some(encounter) = encounter {
@@ -111,7 +113,7 @@ impl Model {
         }
     }
 
-    pub(crate) fn compute_perceived_path(&self, entity: Entity) -> Vec<Segment> {
+    pub fn compute_perceived_path(&self, entity: Entity) -> Vec<Segment> {
         let current_segment = self.path_component(entity).current_segment();
         let parent = current_segment.parent();
         let orbit = OrbitBuilder {
