@@ -1,4 +1,4 @@
-use nalgebra_glm::{vec2, DVec2};
+use nalgebra_glm::{vec2, DMat2, DVec2};
 use serde::{Deserialize, Serialize};
 
 use crate::{model::{state_query::StateQuery, Model}, storage::entity_allocator::Entity};
@@ -13,7 +13,12 @@ pub struct StartBurnEvent {
 
 impl StartBurnEvent {
     pub fn new(model: &mut Model, entity: Entity, time: f64) -> Self {
-        model.create_burn(entity, time, vec2(0.01, 0.0));
+        let tangent = model.snapshot_at(time).velocity(entity).normalize();
+        // The small increment is a hack to ensure that a turn occurs at all
+        let rotation = model.snapshot_at(time).rotation(entity) + 0.001;
+        let rotation_vector = vec2(f64::cos(rotation), f64::sin(rotation));
+        let delta_v = DMat2::new(tangent.x, -tangent.y, tangent.y, tangent.x).try_inverse().unwrap() * rotation_vector;
+        model.create_burn(entity, time, delta_v);
         Self { entity, time }
     }
 

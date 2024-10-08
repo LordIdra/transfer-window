@@ -52,6 +52,7 @@ impl Model {
 
         let last_segment = self.path_component(entity).end_segment();
         let tangent = last_segment.end_velocity().normalize();
+        dbg!(tangent);
         let absolute_delta_v = DMat2::new(tangent.x, -tangent.y, tangent.y, tangent.x) * delta_v;
         let target_rotation = f64::atan2(absolute_delta_v.y, absolute_delta_v.x);
         dbg!(target_rotation);

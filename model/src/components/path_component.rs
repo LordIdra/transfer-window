@@ -129,7 +129,6 @@ impl PathComponent {
     }
 
     pub fn fuel_kg_at_time(&self, time: f64) -> Option<f64> {
-        dbg!(time);
         if let Segment::Burn(burn) = self.future_segment_at_time(time) {
             return Some(burn.fuel_kg_at_time(time));
         }
