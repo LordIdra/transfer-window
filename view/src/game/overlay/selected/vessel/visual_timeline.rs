@@ -1,7 +1,7 @@
 #![allow(clippy::match_same_arms)]
 
 use eframe::egui::{Color32, Frame, RichText, Ui};
-use transfer_window_model::{api::encounters::EncounterType, components::{path_component::segment::Segment, vessel_component::{timeline::TimelineEvent, faction::Faction}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::segment::Segment, vessel_component::{faction::Faction, timeline::TimelineEvent}}, model::{encounters::EncounterType, state_query::StateQuery}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, overlay::widgets::{custom_image::CustomImage, labels::{draw_subtitle, draw_value}, util::advance_cursor_to}, selected::{util::BurnState, Selected}, util::{format_distance, format_time, ApproachType, ApsisType}, View};
 
@@ -166,14 +166,14 @@ fn generate_timeline_events(view: &View, entity: Entity, events: &mut Vec<Visual
 }
 
 fn generate_apoapsis_periapsis(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for orbit in view.model.future_orbits(entity, Some(Faction::Player)) {
+    for orbit in view.model.snapshot_now_observe(Faction::Player).future_orbits(entity) {
         if let Some(time) = orbit.next_periapsis_time() {
-            let altitude = view.model.altitude_at_time(entity, time, Some(Faction::Player));
+            let altitude = view.model.snapshot_at_observe(time, Faction::Player).surface_altitude(entity);
             events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Periapsis, time, altitude });
         }
 
         if let Some(time) = orbit.next_apoapsis_time() {
-            let altitude = view.model.altitude_at_time(entity, time, Some(Faction::Player));
+            let altitude = view.model.snapshot_at_observe(time, Faction::Player).surface_altitude(entity);
             events.push(VisualTimelineEvent::Apsis { type_: ApsisType::Apoapsis, time, altitude });
         }
     }
@@ -184,21 +184,21 @@ fn generate_closest_approaches(view: &View, entity: Entity, events: &mut Vec<Vis
         return;
     };
 
-    let (approach_1_time, approach_2_time) = view.model.find_next_two_closest_approaches(entity, target, Some(Faction::Player));
+    let (approach_1_time, approach_2_time) = view.model.snapshot_now_observe(Faction::Player).find_next_two_closest_approaches(entity, target);
 
     if let Some(time) = approach_1_time {
-        let distance = view.model.distance_at_time(entity, target, time, Some(Faction::Player));
+        let distance = view.model.snapshot_at_observe(time, Faction::Player).distance(entity, target);
         events.push(VisualTimelineEvent::Approach { type_: ApproachType::First, target, time, distance });
     }
 
     if let Some(time) = approach_2_time {
-        let distance = view.model.distance_at_time(entity, target, time, Some(Faction::Player));
+        let distance = view.model.snapshot_at_observe(time, Faction::Player).distance(entity, target);
         events.push(VisualTimelineEvent::Approach { type_: ApproachType::Second, target, time, distance });
     }
 }
 
 fn generate_encounters(view: &View, entity: Entity, events: &mut Vec<VisualTimelineEvent>) {
-    for encounter in view.model.future_encounters(entity, Some(Faction::Player)) {
+    for encounter in view.model.snapshot_now_observe(Faction::Player).future_encounters(entity) {
         events.push(VisualTimelineEvent::Encounter { type_: encounter.encounter_type(), time: encounter.time(), from: encounter.from(), to: encounter.to() });
     }
 }

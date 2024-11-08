@@ -17,7 +17,7 @@ use set_target::SetTargetCondition;
 use start_any_warp_condition::StartAnyWarpCondition;
 use start_burn_adjust_condition::StartBurnAdjustCondition;
 use time_condition::TimeCondition;
-use transfer_window_model::{storage::entity_allocator::Entity, story_event::StoryEvent};
+use transfer_window_model::{model::story_event::StoryEvent, storage::entity_allocator::Entity};
 
 use crate::game::View;
 

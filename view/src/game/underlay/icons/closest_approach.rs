@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::{should_render_at_time, ApproachType}, View};
 
@@ -18,7 +18,8 @@ pub struct ClosestApproach {
 
 impl ClosestApproach {
     pub fn new(view: &View, type_: ApproachType, vessel: Entity, target: Entity, entity: Entity, time: f64) -> Self {
-        let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
+        let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+        let orbit = snapshot.orbit(entity);
         let position = view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
         Self { type_, vessel, target, time, position }
     }
@@ -31,7 +32,7 @@ impl ClosestApproach {
                     return vec![];
                 }
                 if let Some(target) = vessel_component.target() {
-                    let (approach_1, approach_2) = view.model.find_next_two_closest_approaches(entity, target, Some(Faction::Player));
+                    let (approach_1, approach_2) = view.model.snapshot_now_observe(Faction::Player).find_next_two_closest_approaches(entity, target);
                     
                     if let Some(time) = approach_1 {
                         if should_render_at_time(view, entity, time) {

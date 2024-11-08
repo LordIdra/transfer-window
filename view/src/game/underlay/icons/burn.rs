@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::{util::BurnState, Selected}, util::should_render_at_time, View};
 
@@ -66,7 +66,8 @@ impl Icon for Burn {
     fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Burn position");
-        let burn = view.model.burn_starting_at_time(self.entity, self.time);
+        let snapshot = view.model.snapshot_at(self.time);
+        let burn = snapshot.burn_starting_now(self.entity);
         view.model.absolute_position(burn.parent()) + burn.start_point().position()
     }
 
@@ -88,7 +89,7 @@ impl Icon for Burn {
         }
         
         if let Selected::Burn { entity, time, state } = &view.selected {
-            if *entity == self.entity && *time == self.time && view.model.can_adjust_event_at_time(self.entity, self.time) {
+            if *entity == self.entity && *time == self.time && view.model.event(self.entity, self.time).unwrap().can_adjust(&view.model) {
                 let state = if state.is_selected() {
                     trace!("Burn icon clicked; switching Selected -> Adjusting");
                     BurnState::Adjusting

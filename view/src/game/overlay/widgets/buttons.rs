@@ -1,5 +1,5 @@
 use eframe::egui::Ui;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, timeline::{start_guidance::StartGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, start_turn::StartTurnEvent}}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{faction::Faction, timeline::{fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, start_guidance::StartGuidanceEvent, start_turn::StartTurnEvent}}}, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{util::{orbitable_texture, vessel_texture}, View};
 
@@ -38,7 +38,8 @@ pub fn draw_select_orbitable(view: &View, ui: &mut Ui, entity: Entity) -> bool {
 
 // Returns new time if could be drawn & clicked
 pub fn draw_previous(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Option<f64> {
-    let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
+    let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+    let orbit = snapshot.orbit(entity);
     let time = time - orbit.period()?;
     let enabled = time > orbit.current_point().time();
     let button = CustomCircularImageButton::new(view, "previous-orbit", 36)
@@ -52,7 +53,8 @@ pub fn draw_previous(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Opt
 
 // Returns new time if could be drawn & clicked
 pub fn draw_next(view: &View, ui: &mut Ui, time: f64, entity: Entity) -> Option<f64> {
-    let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
+    let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+    let orbit = snapshot.orbit(entity);
     let time = time + orbit.period()?;
     let enabled = time < orbit.end_point().time();
     let button = CustomCircularImageButton::new(view, "next-orbit", 36)

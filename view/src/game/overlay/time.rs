@@ -4,7 +4,7 @@ use super::{super::util::format_time, widgets::custom_image::CustomImage};
 
 use eframe::{egui::{Align2, RichText, Window}, epaint};
 
-use transfer_window_model::api::time::{TimeStep, TIME_STEP_LEVELS};
+use transfer_window_model::model::time::{TimeStep, TIME_STEP_LEVELS};
 
 pub fn update(view: &View) {
     #[cfg(feature = "profiling")]

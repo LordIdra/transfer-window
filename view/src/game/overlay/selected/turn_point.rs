@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_select_vessel, draw_warp_to}, labels::{draw_info_at_time, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
@@ -20,7 +20,8 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
 }
 
 fn draw_turn(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let turn = view.model.turn_at_time(entity, time, Some(Faction::Player));
+    let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+    let turn = snapshot.turn(entity);
     draw_turn_labels(ui, turn.fuel_burnt(), turn.angle(), turn.duration());
 }
 

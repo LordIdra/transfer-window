@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
-use transfer_window_model::{api::encounters::EncounterType, storage::entity_allocator::Entity};
+use transfer_window_model::{model::encounters::EncounterType, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_select_vessel, draw_warp_to}, labels::{draw_encounter_from, draw_encounter_to, draw_subtitle, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 

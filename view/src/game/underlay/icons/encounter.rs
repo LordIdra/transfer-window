@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{api::encounters::EncounterType, components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, model::{encounters::EncounterType, state_query::StateQuery}, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::should_render_at_time, View};
 
@@ -19,7 +19,8 @@ pub struct Encounter {
 
 impl Encounter {
     pub fn new(view: &View, type_: EncounterType, entity: Entity, time: f64, from: Entity, to: Entity) -> Self {
-        let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
+        let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+        let orbit = snapshot.orbit(entity);
         let position = view.model.absolute_position(orbit.parent()) + orbit.point_at_time(time).position();
         Self { type_, entity, time, from, to, position }
     }
@@ -27,7 +28,7 @@ impl Encounter {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in view.model.entities(vec![ComponentType::PathComponent]) {
-            for encounter in view.model.future_encounters(entity, Some(Faction::Player)) {
+            for encounter in view.model.snapshot_now_observe(Faction::Player).future_encounters(entity) {
                 if should_render_at_time(view, entity, encounter.time()) {
                     let icon = Self::new(view, encounter.encounter_type(), entity, encounter.time(), encounter.from(), encounter.to());
                     icons.push(Box::new(icon) as Box<dyn Icon>);

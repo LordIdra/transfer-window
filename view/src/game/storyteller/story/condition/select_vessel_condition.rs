@@ -1,5 +1,5 @@
 use transfer_window_model::storage::entity_allocator::Entity;
-use transfer_window_model::story_event::StoryEvent;
+use transfer_window_model::model::story_event::StoryEvent;
 
 use crate::game::View;
 

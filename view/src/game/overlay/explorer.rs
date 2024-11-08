@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use eframe::{egui::{Align2, Color32, RichText, Ui, Window}, epaint};
-use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::{orbitable_texture, vessel_texture}};
 

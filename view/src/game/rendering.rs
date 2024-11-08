@@ -17,7 +17,7 @@ use log::error;
 
 use crate::{game::rendering::{explosion_renderer::ExplosionRenderer, geometry_renderer::GeometryRenderer, render_pipeline::RenderPipeline, screen_texture_renderer::ScreenTextureRenderer, texture_renderer::TextureRenderer, celestial_object_renderer::CelestialObjectRenderer, atmosphere_renderer::AtmosphereRenderer}, resources::Resources};
 use transfer_window_model::components::ComponentType;
-use transfer_window_model::Model;
+use transfer_window_model::model::Model;
 
 use super::View;
 

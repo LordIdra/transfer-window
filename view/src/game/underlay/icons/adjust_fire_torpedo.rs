@@ -26,7 +26,7 @@ pub struct AdjustFireTorpedo {
 impl AdjustFireTorpedo {
     fn new(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState) -> Self {
         let event = view.model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
-        let event_to_arrow_unit = view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * direction.vector();
+        let event_to_arrow_unit = view.model.snapshot_at(event.burn_time()).burn_starting_now(event.ghost()).rotation_matrix() * direction.vector();
         let mut position = compute_adjust_fire_torpedo_arrow_position(view, entity, time, direction);
 
         // Additional offset if arrow is being dragged
@@ -100,7 +100,7 @@ impl Icon for AdjustFireTorpedo {
 
     fn facing(&self, view: &View) -> Option<DVec2> {
         let event = view.model.fire_torpedo_event_at_time(self.entity, self.time).expect("No fire torpedo event found");
-        Some(view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * self.direction.vector())
+        Some(view.model.snapshot_at(event.burn_time()).burn_starting_now(event.ghost()).rotation_matrix() * self.direction.vector())
     }
 
     fn is_selected(&self, view: &View) -> bool {

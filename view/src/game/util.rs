@@ -1,7 +1,7 @@
 use eframe::epaint::Rgba;
 use nalgebra_glm::{vec2, DVec2, Vec2};
 use thousands::Separable;
-use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{orbitable_component::OrbitableType, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use super::{selected::util::BurnAdjustDirection, View};
 
@@ -154,7 +154,8 @@ pub fn format_speed(speed: f64) -> String {
 }
 
 pub fn compute_burn_arrow_position(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
-    let burn = view.model.burn_starting_at_time(entity, time);
+    let snapshot = view.model.snapshot_at(time);
+    let burn = snapshot.burn_starting_now(entity);
     let burn_position = view.model.absolute_position(burn.parent()) + burn.start_point().position();
     let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
@@ -162,9 +163,10 @@ pub fn compute_burn_arrow_position(view: &View, entity: Entity, time: f64, direc
 
 pub fn compute_adjust_fire_torpedo_arrow_position(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection) -> DVec2 {
     let event = view.model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
-    let orbit = view.model.orbit_at_time(entity, time, None);
-    let burn_position = view.model.absolute_position(orbit.parent()) + view.model.position_at_time(entity, time, None);
-    let burn_to_arrow_unit = view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * direction.vector();
+    let snapshot = view.model.snapshot_at(time);
+    let orbit = snapshot.orbit_starting_now(entity);
+    let burn_position = view.model.absolute_position(orbit.parent()) + view.model.snapshot_at(time).position(entity);
+    let burn_to_arrow_unit = view.model.snapshot_at(event.burn_time()).burn_starting_now(event.ghost()).rotation_matrix() * direction.vector();
     burn_position + BURN_OFFSET * burn_to_arrow_unit / view.camera.zoom()
 }
 
@@ -184,7 +186,7 @@ pub fn should_render(view: &View, entity: Entity) -> bool {
 }
 
 pub fn should_render_at_time(view: &View, entity: Entity, time: f64) -> bool {
-    let Some(parent) = view.model.parent_at_time(entity, time, Some(Faction::Player)) else {
+    let Some(parent) = view.model.snapshot_at_observe(time, Faction::Player).parent(entity) else {
         return true;
     };
     should_render_parent(view, parent)

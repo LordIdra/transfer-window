@@ -1,6 +1,5 @@
 use eframe::{egui::{Align2, Grid, Ui, Window}, epaint};
-use transfer_window_model::story_event::StoryEvent;
-use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction}, model::{state_query::StateQuery, story_event::StoryEvent}, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_create_burn, draw_create_turn, draw_enable_guidance, draw_fire_torpedo, draw_next, draw_previous, draw_select_vessel, draw_warp_to}, labels::{draw_info_at_time_with_orbits, draw_key, draw_subtitle, draw_time_until, draw_title, draw_value}}, selected::{util::BurnState, Selected}, util::{format_distance, format_time}, View}, styles};
 
@@ -100,7 +99,8 @@ pub fn draw_orbit_labels(view: &View, ui: &mut Ui, orbit: &Orbit) {
 }
 
 fn draw_orbit(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
+    let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+    let orbit = snapshot.orbit(entity);
     draw_subtitle(ui, "Orbit");
     Grid::new("Selected point orbit info").show(ui, |ui| {
         draw_orbit_labels(view, ui, orbit);

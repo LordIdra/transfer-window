@@ -9,7 +9,9 @@ use super::util::{burn_adjustment_amount, BurnAdjustDirection};
 
 fn compute_drag_adjustment_amount(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection, mouse_position: Pos2) -> DVec2 {
     let event = view.model.fire_torpedo_event_at_time(entity, time).expect("No fire torpedo event found");
-    let event_to_arrow_unit = view.model.burn_starting_at_time(event.ghost(), event.burn_time()).rotation_matrix() * direction.vector();
+    let event_to_arrow_unit = view.model.snapshot_at(event.burn_time())
+        .burn_starting_now(event.ghost())
+        .rotation_matrix() * direction.vector();
     let arrow_position = compute_adjust_fire_torpedo_arrow_position(view, entity, time, direction);
     let arrow_to_mouse = view.window_space_to_world_space(mouse_position) - arrow_position;
     burn_adjustment_amount(arrow_to_mouse.dot(&event_to_arrow_unit)) * direction.vector() * view.camera.zoom().powi(2)
@@ -31,11 +33,8 @@ pub fn update_adjustment(view: &View, pointer: &PointerState) {
     // Do scroll adjustment
     if let Selected::FireTorpedo { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
         if let Some(mouse_position) = pointer.latest_pos() {
-            let event = &view.model.fire_torpedo_event_at_time(entity, time).unwrap();
             let amount = compute_drag_adjustment_amount(view, entity, time, direction, mouse_position);
-            if let Some(amount) = view.model.calculate_burn_dv(event.ghost(), event.burn_time(), amount) {
-                view.add_model_event(ModelEvent::AdjustFireTorpedo { entity, time, amount });
-            }
+            view.add_model_event(ModelEvent::AdjustFireTorpedo { entity, time, amount });
         }
     }
 

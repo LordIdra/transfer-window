@@ -1,4 +1,5 @@
 use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::model::state_query::StateQuery;
 use transfer_window_model::storage::entity_allocator::Entity;
 
 use crate::game::View;
@@ -21,10 +22,10 @@ impl ConditionCheck for FirstClosestApproachCondition {
         let Some(target) = view.model.target(self.entity) else {
             return false;
         };
-        let Some(time) = view.model.find_next_closest_approach(self.entity, target, view.model.time(), Some(Faction::Player)) else {
+        let Some(time) = view.model.snapshot_at_observe(view.model.time(), Faction::Player).find_next_closest_approach(self.entity, target) else {
             return false;
         };
-        let distance = view.model.distance_at_time(self.entity, target, time, Some(Faction::Player));
+        let distance = view.model.snapshot_at_observe(time, Faction::Player).distance(self.entity, target);
         distance < self.max_distance
     }
 }

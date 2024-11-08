@@ -2,8 +2,16 @@ use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 use transfer_window_model::components::orbitable_component::builder::OrbitablePhysicsBuilder;
+use transfer_window_model::components::orbitable_component::OrbitableType;
 use transfer_window_model::components::path_component::orbit::builder::InitialOrbitBuilder;
-use transfer_window_model::{api::builder::{OrbitableBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::components::path_component::orbit::orbit_direction::OrbitDirection;
+use transfer_window_model::components::vessel_component::class::VesselClass;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::vessel_component::VesselComponent;
+use transfer_window_model::model::state_query::StateQuery;
+use transfer_window_model::model::Model;
+use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::storage::entity_builder::{OrbitableBuilder, VesselBuilder};
 
 use crate::controller_events::ControllerEvent;
 use crate::game::events::{ModelEvent, ViewEvent};
@@ -222,7 +230,7 @@ impl StoryBuilder for Story1_02 {
 
         story.add("warp-first-burn", |view| {
             let ship = view.model.entity_by_name("Ship").unwrap();
-            let time = view.model.future_burns(ship, Some(Faction::Player)).first().unwrap().start_point().time() - 10.0;
+            let time = view.model.snapshot_now_observe(Faction::Player).future_burns(ship).first().unwrap().start_point().time() - 10.0;
             view.add_model_event(ModelEvent::ForceUnpause);
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
@@ -235,7 +243,10 @@ impl StoryBuilder for Story1_02 {
 
         story.add("select-ship", |view| {
             let ship = view.model.entity_by_name("Ship").unwrap();
-            let time = view.model.future_burns(ship, Some(Faction::Player)).first().map_or_else(|| view.model.time(), |burn| burn.end_point().time());
+            let time = view.model.snapshot_now_observe(Faction::Player)
+                .future_burns(ship)
+                .first()
+                .map_or_else(|| view.model.time(), |burn| burn.end_point().time());
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("Now, select the ship, and watch the fuel tanks deplete as it executes this first burn.")
@@ -245,7 +256,7 @@ impl StoryBuilder for Story1_02 {
 
         story.add("warp-to-circle", |view| {
             let ship = view.model.entity_by_name("Ship").unwrap();
-            let time = view.model.future_segments(ship, Some(Faction::Player)).last().unwrap().start_time();
+            let time = view.model.snapshot_now_observe(Faction::Player).future_segments(ship).last().unwrap().start_time();
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
                     .normal("Now warp until the ship is on its final orbit.")

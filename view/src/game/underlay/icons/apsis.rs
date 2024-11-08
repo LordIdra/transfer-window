@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{path_component::orbit::Orbit, vessel_component::faction::Faction, ComponentType}, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::{should_render_at_time, ApsisType}, View};
 
@@ -74,7 +74,7 @@ impl Apsis {
     pub fn generate(view: &View) -> Vec<Box<dyn Icon>> {
         let mut icons = vec![];
         for entity in view.model.entities(vec![ComponentType::VesselComponent, ComponentType::PathComponent]) {
-            for orbit in &view.model.future_orbits(entity, Some(Faction::Player)) {
+            for orbit in &view.model.snapshot_now_observe(Faction::Player).future_orbits(entity) {
                 Self::generate_for_orbit(view, entity, orbit, &mut icons);
             }
         }

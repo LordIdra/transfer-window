@@ -1,7 +1,7 @@
 use eframe::egui::PointerState;
 use log::trace;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{components::{vessel_component::{timeline::TimelineEvent, faction::Faction}, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::{faction::Faction, timeline::TimelineEvent}, ComponentType}, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::should_render_at_time, View};
 
@@ -67,8 +67,8 @@ impl Icon for Intercept {
     fn position(&self, view: &View) -> DVec2 {
         #[cfg(feature = "profiling")]
         let _span = tracy_client::span!("Intercept position");
-        let parent = view.model.parent_at_time(self.entity, self.time, Some(Faction::Player)).unwrap();
-        view.model.absolute_position(parent) + view.model.position_at_time(self.entity, self.time, Some(Faction::Player))
+        let parent = view.model.snapshot_at_observe(self.time, Faction::Player).parent(self.entity).unwrap();
+        view.model.absolute_position(parent) + view.model.snapshot_at_observe(self.time, Faction::Player).position(self.entity)
     }
 
     fn facing(&self, _view: &View) -> Option<DVec2> {

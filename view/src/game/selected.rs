@@ -1,4 +1,4 @@
-use transfer_window_model::{api::encounters::EncounterType, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{model::{encounters::EncounterType, Model}, storage::entity_allocator::Entity};
 
 use self::util::BurnState;
 

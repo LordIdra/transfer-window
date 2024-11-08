@@ -38,7 +38,7 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        let enabled = view.model.can_delete_event_at_time(entity, time);
+        let enabled = view.model.start_turn_event_at_time(entity, time).unwrap().can_remove(&view.model);
         let button = CustomCircularImageButton::new(view, "cancel", 36)
             .with_enabled(enabled);
         if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
@@ -63,7 +63,7 @@ pub fn update(view: &View) {
         return;
     }
 
-    let turn = view.model.turn_starting_at_time(entity, time);
+    let turn = segment.as_turn().unwrap();
     
     Window::new("Selected turn")
             .title_bar(false)

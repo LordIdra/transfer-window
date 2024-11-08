@@ -1,5 +1,5 @@
 use eframe::egui::PointerState;
-use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{selected::Selected, util::add_textured_square, View};
 
@@ -11,7 +11,8 @@ const SELECTED_ALPHA: f32 = 1.0;
 fn draw_selected_circle(view: &View, entity: Entity, time: f64, alpha: f32) {
     let select_radius = SELECT_RADIUS / view.camera.zoom();
     let mut vertices = vec![];
-    let segment = view.model.segment_at_time(entity, time, Some(Faction::Player));
+    let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+    let segment = snapshot.segment(entity);
     let point = view.model.absolute_position(segment.parent()) + segment.position_at_time(time);
     add_textured_square(&mut vertices, point, select_radius, alpha);
     view.renderers.add_texture_vertices("circle", &mut vertices);

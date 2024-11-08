@@ -2,7 +2,7 @@ use std::fs;
 
 use eframe::egui::{Context, ViewportCommand};
 use log::error;
-use transfer_window_model::Model;
+use transfer_window_model::model::Model;
 use transfer_window_view::{game::{self, storyteller::{stories::StoryBuilder, story::Story}, ViewConfig}, Scene};
 
 use crate::Controller;

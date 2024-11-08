@@ -2,7 +2,7 @@
 use log::debug;
 use log::error;
 use nalgebra_glm::DVec2;
-use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::docking::{DockingPortLocation, ResourceTransferDirection}, storage::entity_allocator::Entity, story_event::StoryEvent};
+use transfer_window_model::{components::vessel_component::docking::{DockingPortLocation, ResourceTransferDirection}, model::{state_query::StateQuery, story_event::StoryEvent, time::TimeStep}, storage::{entity_allocator::Entity, entity_builder::VesselBuilder}};
 
 use crate::game::selected::util::BurnState;
 use crate::game::{overlay::{dialogue::Dialogue, objectives::Objective}, util::ApsisType};

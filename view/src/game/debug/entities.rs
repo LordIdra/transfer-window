@@ -1,5 +1,5 @@
 use eframe::egui::{ScrollArea, Ui};
-use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::{burn_point::BurnPoint, Burn}, guidance::{guidance_point::GuidancePoint, Guidance}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment, turn::{turn_point::TurnPoint, Turn}, PathComponent}}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::{components::{orbitable_component::{OrbitableComponent, OrbitableComponentPhysics}, path_component::{burn::{burn_point::BurnPoint, Burn}, guidance::{guidance_point::GuidancePoint, Guidance}, orbit::{orbit_point::OrbitPoint, Orbit}, segment::Segment, turn::{turn_point::TurnPoint, Turn}, PathComponent}}, model::Model, storage::entity_allocator::Entity};
 
 use crate::game::util::format_time;
 

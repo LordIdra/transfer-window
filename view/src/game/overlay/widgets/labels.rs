@@ -1,5 +1,5 @@
 use eframe::egui::{Color32, Grid, RichText, Ui};
-use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{util::{format_distance, format_speed, format_time}, View};
 
@@ -31,13 +31,13 @@ pub fn draw_subtitle(ui: &mut Ui, name: &str) {
 
 pub fn draw_altitude_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_key(ui, "Altitude");
-    draw_value(ui, &format_distance(view.model.altitude_at_time(entity, time, Some(Faction::Player))));
+    draw_value(ui, &format_distance(view.model.snapshot_at_observe(time, Faction::Player).surface_altitude(entity)));
     ui.end_row();
 }
 
 pub fn draw_speed_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     draw_key(ui, "Speed");
-    draw_value(ui, &format_speed(view.model.velocity_at_time(entity, time, Some(Faction::Player)).magnitude()));
+    draw_value(ui, &format_speed(view.model.snapshot_at_observe(time, Faction::Player).velocity(entity).magnitude()));
     ui.end_row();
 }
 
@@ -49,7 +49,7 @@ pub fn draw_mass(view: &View, ui: &mut Ui, entity: Entity) {
 
 pub fn draw_altitude(view: &View, ui: &mut Ui, entity: Entity) {
     ui.label(RichText::new("Altitude").size(12.0).strong());
-    ui.label(RichText::new(format_distance(view.model.altitude(entity))).size(12.0));
+    ui.label(RichText::new(format_distance(view.model.surface_altitude(entity))).size(12.0));
     ui.end_row();
 }
 
@@ -61,7 +61,7 @@ pub fn draw_speed(view: &View, ui: &mut Ui, entity: Entity) {
 
 pub fn draw_target_distance_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     let target = view.model.vessel_component(entity).target().unwrap();
-    let distance = view.model.distance_at_time(entity, target, time, Some(Faction::Player));
+    let distance = view.model.snapshot_at_observe(time, Faction::Player).distance(entity, target);
     draw_key(ui, "Target distance");
     draw_value(ui, &format_distance(distance));
     ui.end_row();
@@ -69,7 +69,7 @@ pub fn draw_target_distance_at_time(view: &View, ui: &mut Ui, entity: Entity, ti
 
 pub fn draw_target_relative_speed_at_time(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
     let target = view.model.vessel_component(entity).target().unwrap();
-    let speed = view.model.relative_speed_at_time(entity, target, time, Some(Faction::Player));
+    let speed = view.model.snapshot_at_observe(time, Faction::Player).relative_speed(entity, target);
     draw_key(ui, "Target relative speed");
     draw_value(ui, &format_speed(speed));
     ui.end_row();
@@ -105,7 +105,8 @@ pub fn draw_torpedo_launcher(view: &View, ui: &mut Ui, entity: Entity) {
 }
 
 pub fn draw_orbits(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let orbit = view.model.orbit_at_time(entity, time, Some(Faction::Player));
+    let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+    let orbit = snapshot.orbit(entity);
     let Some(period) = orbit.period() else {
         return;
     };

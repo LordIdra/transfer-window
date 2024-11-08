@@ -42,7 +42,7 @@ impl Texture {
         let bytes = image.to_rgba8().into_vec();
         let image = ImageSource::Uri(uri.clone().into());
         let gl_texture = texture::Texture::new(gl, size, &bytes);
-        context.try_load_bytes(&uri).expect(&format!("Failed to load texture {}", entry.path().to_str().unwrap()));
+        context.try_load_bytes(&uri).unwrap_or_else(|_| panic!("Failed to load texture {}", entry.path().to_str().unwrap()));
         Texture { image, gl_texture }
     }
 }

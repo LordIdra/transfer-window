@@ -3,7 +3,7 @@ use std::sync::Arc;
 use eframe::{egui::{Pos2, Rect}, glow};
 use glow::Context;
 use nalgebra_glm::DVec2;
-use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::{model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::View;
 

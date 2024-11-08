@@ -2,8 +2,15 @@ use eframe::egui::Color32;
 use nalgebra_glm::vec2;
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
 use transfer_window_model::components::orbitable_component::builder::OrbitablePhysicsBuilder;
+use transfer_window_model::components::orbitable_component::OrbitableType;
 use transfer_window_model::components::path_component::orbit::builder::InitialOrbitBuilder;
-use transfer_window_model::{api::builder::{OrbitableBuilder, VesselBuilder}, components::{orbitable_component::OrbitableType, path_component::orbit::orbit_direction::OrbitDirection, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
+use transfer_window_model::components::path_component::orbit::orbit_direction::OrbitDirection;
+use transfer_window_model::components::vessel_component::class::VesselClass;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::vessel_component::VesselComponent;
+use transfer_window_model::model::Model;
+use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::storage::entity_builder::{OrbitableBuilder, VesselBuilder};
 
 use crate::controller_events::ControllerEvent;
 use crate::game::events::ViewEvent;

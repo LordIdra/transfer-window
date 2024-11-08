@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Ui, Window}, epaint};
-use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::{model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::draw_select_vessel, custom_image_button::CustomCircularImageButton, labels::{draw_subtitle, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
@@ -21,7 +21,7 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        let enabled = view.model.can_delete_event_at_time(entity, time);
+        let enabled = view.model.fire_torpedo_event_at_time(entity, time).unwrap().can_remove();
         let button = CustomCircularImageButton::new(view, "cancel", 36)
             .with_enabled(enabled);
         if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
@@ -43,10 +43,11 @@ pub fn update(view: &View) {
     };
 
     let vessel_component = view.model.vessel_component(fire_torpedo_event.ghost());
-    let burn = view.model.burn_starting_at_time(fire_torpedo_event.ghost(), fire_torpedo_event.burn_time());
+    let snapshot = view.model.snapshot_at(fire_torpedo_event.burn_time());
+    let burn = snapshot.burn(fire_torpedo_event.ghost());
     let max_dv = vessel_component.max_dv();
     let start_dv = burn.start_remaining_dv();
-    let end_dv = burn.end_remaining_dv();
+    let end_dv = burn.end_dv();
     let duration = burn.duration();
     
     Window::new("Torpedo launch")

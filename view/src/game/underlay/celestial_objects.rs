@@ -1,6 +1,6 @@
 use std::f64::consts::TAU;
 use nalgebra_glm::{vec2, DVec2, Vec2, convert};
-use transfer_window_model::components::ComponentType;
+use transfer_window_model::{components::ComponentType, model::state_query::StateQuery};
 
 use crate::game::{util::add_textured_triangle, View};
 

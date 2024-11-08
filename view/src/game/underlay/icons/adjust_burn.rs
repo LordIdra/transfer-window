@@ -25,7 +25,8 @@ pub struct AdjustBurn {
 
 impl AdjustBurn {
     fn new(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection, pointer: &PointerState) -> Self {
-        let burn = view.model.burn_starting_at_time(entity, time);
+        let snapshot = view.model.snapshot_at(time);
+        let burn = snapshot.burn_starting_now(entity);
         let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
         let mut position = compute_burn_arrow_position(view, entity, time, direction);
 
@@ -99,7 +100,8 @@ impl Icon for AdjustBurn {
     }
 
     fn facing(&self, view: &View) -> Option<DVec2> {
-        let burn = view.model.burn_starting_at_time(self.entity, self.time);
+        let snapshot = view.model.snapshot_at(self.time);
+        let burn = snapshot.burn_starting_now(self.entity);
         Some(burn.rotation_matrix() * self.direction.vector())
     }
 

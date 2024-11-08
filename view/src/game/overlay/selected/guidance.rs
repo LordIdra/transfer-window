@@ -21,7 +21,7 @@ fn draw_controls(view: &View, ui: &mut Ui, time: f64, entity: Entity) {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        let enabled = view.model.can_delete_event_at_time(entity, time);
+        let enabled = view.model.start_guidance_event_at_time(entity, time).unwrap().can_remove(&view.model);
         let button = CustomCircularImageButton::new(view, "cancel", 36)
             .with_enabled(enabled);
         if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
@@ -54,7 +54,7 @@ pub fn update(view: &View) {
     let guidance = view.model.path_component(entity).future_segment_starting_at_time(time).unwrap().as_guidance().unwrap();
     let max_dv = view.model.vessel_component(entity).max_dv();
     let start_dv = guidance.start_remaining_dv();
-    let end_dv = guidance.end_remaining_dv();
+    let end_dv = guidance.end_dv();
     let duration = guidance.duration();
     
     Window::new("Selected guidance")

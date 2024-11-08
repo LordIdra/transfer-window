@@ -1,5 +1,5 @@
 use eframe::{egui::{Align2, Ui, Window}, epaint};
-use transfer_window_model::{components::vessel_component::faction::Faction, storage::entity_allocator::Entity};
+use transfer_window_model::{components::vessel_component::faction::Faction, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::{game::{events::{ModelEvent, ViewEvent}, overlay::widgets::{buttons::{draw_select_vessel, draw_warp_to}, labels::{draw_info_at_time, draw_subtitle, draw_time_until, draw_title}}, selected::Selected, View}, styles};
 
@@ -20,10 +20,11 @@ fn draw_controls(view: &View, entity: Entity, ui: &mut Ui, time: f64) {
 }
 
 fn draw_burn(view: &View, ui: &mut Ui, entity: Entity, time: f64) {
-    let burn = view.model.burn_at_time(entity, time, Some(Faction::Player));
+    let snapshot = view.model.snapshot_at_observe(time, Faction::Player);
+    let burn = snapshot.burn(entity);
     let max_dv = view.model.vessel_component(entity).max_dv();
     let start_dv = burn.start_remaining_dv();
-    let end_dv = burn.end_remaining_dv();
+    let end_dv = burn.end_dv();
     let duration = burn.duration();
     draw_subtitle(ui, "Burn");
     draw_burn_labels(view, ui, max_dv, start_dv, end_dv, duration);

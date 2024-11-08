@@ -1,6 +1,6 @@
 use eframe::egui::PointerState;
 use nalgebra_glm::{vec2, DVec2};
-use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, storage::entity_allocator::Entity};
+use transfer_window_model::{components::{vessel_component::faction::Faction, ComponentType}, model::state_query::StateQuery, storage::entity_allocator::Entity};
 
 use crate::game::{events::ViewEvent, selected::Selected, util::vessel_texture, View};
 

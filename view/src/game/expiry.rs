@@ -1,5 +1,5 @@
 use log::trace;
-use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::{components::vessel_component::faction::Faction, model::state_query::StateQuery};
 
 use super::{selected::Selected, util::{should_render, should_render_at_time, ApsisType}, View};
 
@@ -10,7 +10,7 @@ pub fn update(view: &mut View) {
 
     // Unfocus camera if focus no longer exists
     if let Some(entity) = view.camera.focus() {
-        if !view.model.entity_exists(entity) {
+        if !view.model.exists(entity) {
             view.camera.unset_focus();
         }
     }
@@ -33,7 +33,7 @@ pub fn update(view: &mut View) {
 
     // Remove or update selected apsis if apsis no longer exists or is in a different place
     if let Selected::Apsis { type_, entity, time } = view.selected.clone() {
-        if let Some(orbit) = view.model.segment_at_time(entity, time, Some(Faction::Player)).as_orbit() {
+        if let Some(orbit) = view.model.snapshot_at_observe(time, Faction::Player).segment(entity).as_orbit() {
             let expected_time = match type_ {
                 ApsisType::Periapsis => orbit.next_periapsis_time(),
                 ApsisType::Apoapsis => orbit.next_apoapsis_time(),
@@ -53,7 +53,7 @@ pub fn update(view: &mut View) {
     // Remove or update selected encounter if encounter no longer exists or is in a different place
     if let Selected::Encounter { type_, entity, time, from, to } = view.selected {
         let mut any_encounter_matches = false;
-        for encounter in view.model.future_encounters(entity, Some(Faction::Player)) {
+        for encounter in view.model.snapshot_now_observe(Faction::Player).future_encounters(entity) {
             if encounter.encounter_type() == type_ && encounter.from() == from && encounter.to() == to && (time - encounter.time()).abs() < 10.0 {
                 any_encounter_matches = true;
             }
@@ -73,7 +73,7 @@ pub fn update(view: &mut View) {
 
     // Delete selected if its entity no longer exists or should not be rendered
     if let Some(entity) = view.selected.entity(&view.model) {
-        if !view.model.entity_exists(entity) {
+        if !view.model.exists(entity) {
             view.selected = Selected::None;
         }
     }

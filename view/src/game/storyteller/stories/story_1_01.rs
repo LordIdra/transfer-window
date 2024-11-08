@@ -1,7 +1,18 @@
 use eframe::epaint::Color32;
 use nalgebra_glm::vec2;
-use transfer_window_model::{api::{builder::{OrbitableBuilder, VesselBuilder}, time::TimeStep}, components::{orbitable_component::{builder::OrbitablePhysicsBuilder, OrbitableType}, path_component::orbit::{builder::InitialOrbitBuilder, orbit_direction::OrbitDirection}, vessel_component::{class::VesselClass, faction::Faction, VesselComponent}}, storage::entity_allocator::Entity, Model};
 use transfer_window_model::components::orbitable_component::atmosphere::Atmosphere;
+use transfer_window_model::components::orbitable_component::builder::OrbitablePhysicsBuilder;
+use transfer_window_model::components::orbitable_component::OrbitableType;
+use transfer_window_model::components::path_component::orbit::builder::InitialOrbitBuilder;
+use transfer_window_model::components::path_component::orbit::orbit_direction::OrbitDirection;
+use transfer_window_model::components::vessel_component::class::VesselClass;
+use transfer_window_model::components::vessel_component::faction::Faction;
+use transfer_window_model::components::vessel_component::VesselComponent;
+use transfer_window_model::model::state_query::StateQuery;
+use transfer_window_model::model::time::TimeStep;
+use transfer_window_model::model::Model;
+use transfer_window_model::storage::entity_allocator::Entity;
+use transfer_window_model::storage::entity_builder::{OrbitableBuilder, VesselBuilder};
 
 use crate::controller_events::ControllerEvent;
 use crate::game::events::{ModelEvent, ViewEvent};
@@ -112,7 +123,7 @@ impl StoryBuilder for Story1_01 {
 
         story.add("warp", |view| {
             let ship = view.model.entity_by_name("Ship 1").unwrap();
-            let ship_period = view.model.current_segment(ship).as_orbit().unwrap().period().unwrap();
+            let ship_period = view.model.segment(ship).as_orbit().unwrap().period().unwrap();
             let time = view.model.time() + ship_period;
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")
@@ -208,7 +219,7 @@ impl StoryBuilder for Story1_01 {
 
         story.add("orbit-ellipse-warp", |view| {
             let ship = view.model.entity_by_name("Ship 2").unwrap();
-            let ship_period = view.model.current_segment(ship).as_orbit().unwrap().period().unwrap();
+            let ship_period = view.model.segment(ship).as_orbit().unwrap().period().unwrap();
             let time = view.model.time() + ship_period;
             view.add_model_event(ModelEvent::SetTimeStep { 
                 time_step: TimeStep::Level { level: 1, paused: false }
@@ -294,7 +305,7 @@ impl StoryBuilder for Story1_01 {
 
         story.add("warp-one-orbit", move |view| {
             let ship = view.model.entity_by_name("Ship").unwrap();
-            let ship_period = view.model.current_segment(ship).as_orbit().unwrap().period().unwrap();
+            let ship_period = view.model.segment(ship).as_orbit().unwrap().period().unwrap();
             let time = view.model.time() + ship_period;
             view.add_view_event(ViewEvent::ShowDialogue(
                 Dialogue::new("jake")

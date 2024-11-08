@@ -8,7 +8,8 @@ use crate::game::{events::{ModelEvent, ViewEvent}, selected::Selected, util::com
 use super::util::{burn_adjustment_amount, BurnAdjustDirection, BurnState};
 
 fn compute_drag_adjustment_amount(view: &View, entity: Entity, time: f64, direction: BurnAdjustDirection, mouse_position: Pos2) -> DVec2 {
-    let burn = view.model.burn_starting_at_time(entity, time);
+    let snapshot = view.model.snapshot_at(time);
+    let burn = snapshot.burn_starting_now(entity);
     let burn_to_arrow_unit = burn.rotation_matrix() * direction.vector();
     let arrow_position = compute_burn_arrow_position(view, entity, time, direction);
     let arrow_to_mouse = view.window_space_to_world_space(mouse_position) - arrow_position;
@@ -31,11 +32,8 @@ pub fn update_adjustment(view: &View, pointer: &PointerState) {
     // Do scroll adjustment
     if let Selected::Burn { entity, time, state: BurnState::Dragging(direction) } = view.selected.clone() {
         if let Some(mouse_position) = pointer.latest_pos() {
-            let burn_time = view.model.start_burn_event_at_time(entity, time).unwrap().time();
             let amount = compute_drag_adjustment_amount(view, entity, time, direction, mouse_position);
-            if let Some(amount) = view.model.calculate_burn_dv(entity, burn_time, amount) {
-                view.add_model_event(ModelEvent::AdjustBurn { entity, time, amount });
-            }
+            view.add_model_event(ModelEvent::AdjustBurn { entity, time, amount });
         }
     }
 }

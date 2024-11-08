@@ -1,5 +1,5 @@
 use nalgebra_glm::vec2;
-use transfer_window_model::components::ComponentType;
+use transfer_window_model::{components::ComponentType, model::state_query::StateQuery};
 
 use crate::game::{util::add_textured_rectangle_facing, View};
 

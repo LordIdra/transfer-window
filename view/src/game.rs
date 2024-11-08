@@ -6,7 +6,7 @@ use nalgebra_glm::DVec2;
 use overlay::{dialogue::Dialogue, objectives::Objective};
 use rendering::Renderers;
 use storyteller::story::Story;
-use transfer_window_model::{components::ComponentType, storage::entity_allocator::Entity, story_event::StoryEvent, Model};
+use transfer_window_model::{components::ComponentType, model::{state_query::StateQuery, story_event::StoryEvent, Model}, storage::entity_allocator::Entity};
 use util::{should_render, should_render_at_time};
 
 use crate::{controller_events::ControllerEvent, resources::Resources};

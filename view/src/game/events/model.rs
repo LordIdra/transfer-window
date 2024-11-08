@@ -3,8 +3,9 @@ use std::fs;
 use log::error;
 use nalgebra_glm::DVec2;
 use transfer_window_model::components::vessel_component::timeline::start_turn::StartTurnEvent;
-use transfer_window_model::story_event::StoryEvent;
-use transfer_window_model::{api::{builder::VesselBuilder, time::TimeStep}, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, timeline::{start_guidance::StartGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}}, storage::entity_allocator::Entity};
+use transfer_window_model::model::story_event::StoryEvent;
+use transfer_window_model::storage::entity_builder::VesselBuilder;
+use transfer_window_model::{model::time::TimeStep, components::vessel_component::{docking::{DockingPortLocation, ResourceTransferDirection}, timeline::{start_guidance::StartGuidanceEvent, fire_torpedo::FireTorpedoEvent, start_burn::StartBurnEvent, TimelineEvent}}, storage::entity_allocator::Entity};
 
 use crate::game::View;
 

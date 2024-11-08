@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use nalgebra_glm::vec2;
-use transfer_window_model::{components::{path_component::rocket_equation_function::RocketEquationFunction, vessel_component::timeline::{start_burn::StartBurnEvent, start_turn::StartTurnEvent, TimelineEvent}}, model::{state_query::StateQuery, Model}, test_util::{self, assert_dvec_equal, assert_float_equal}};
+use transfer_window_model::{components::vessel_component::timeline::{start_burn::StartBurnEvent, start_turn::StartTurnEvent, TimelineEvent}, model::{state_query::StateQuery, Model}, test_util::{self, assert_float_equal}};
 
 #[test]
 fn test_cannot_turn_as_station() {

@@ -70,7 +70,7 @@ fn draw_controls(ui: &mut Ui, view: &View, time: f64, entity: Entity) {
             view.add_model_event(ModelEvent::StartWarp { end_time: time });
         }
 
-        let enabled = view.model.can_delete_event_at_time(entity, time);
+        let enabled = view.model.start_burn_event_at_time(entity, time).unwrap().can_remove(&view.model);
         let button = CustomCircularImageButton::new(view, "cancel", 36)
             .with_enabled(enabled);
         if ui.add_enabled(enabled, button).on_hover_text("Cancel").clicked() {
@@ -96,10 +96,10 @@ pub fn update(view: &View) {
     }
 
     let vessel_component = view.model.vessel_component(entity);
-    let burn = view.model.burn_starting_at_time(entity, time);
+    let burn = segment.as_burn().unwrap();
     let max_dv = vessel_component.max_dv();
     let start_dv = burn.start_remaining_dv();
-    let end_dv = burn.end_remaining_dv();
+    let end_dv = burn.end_dv();
     let duration = burn.duration();
     
     Window::new("Selected burn")
