@@ -3,13 +3,14 @@
 Transfer window is a WIP real-time-strategy game centered around combat using orbital mechanics.
 
 ## Pictures
-<img width="1865" height="1024" alt="image" src="https://github.com/user-attachments/assets/8e3a55f7-18c8-4d94-8c5a-70ee3e4f7428" />
-<img width="840" height="672" alt="image" src="https://github.com/user-attachments/assets/d8ad4400-71c8-4c22-869d-a7e2be89066f" />
-<img width="648" height="587" alt="image" src="https://github.com/user-attachments/assets/137571ee-9bdb-4f8b-9aff-0177ec61d73b" />
-<img width="662" height="644" alt="image" src="https://github.com/user-attachments/assets/b2fd6fd9-fdcd-4c9d-9b24-11540379fbe5" />
-<img width="1183" height="660" alt="image" src="https://github.com/user-attachments/assets/b3490757-7328-40e8-87c7-6d8fe909f617" />
-<img width="1320" height="868" alt="image" src="https://github.com/user-attachments/assets/3b03d80c-be84-4738-b6bd-69e0ffb204cc" />
-<img width="1865" height="1021" alt="image" src="https://github.com/user-attachments/assets/45c97d4d-f2e6-46f2-9900-534b774b5054" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/8e3a55f7-18c8-4d94-8c5a-70ee3e4f7428" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/45c97d4d-f2e6-46f2-9900-534b774b5054" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/b3490757-7328-40e8-87c7-6d8fe909f617" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/2280a64a-2b94-4e4a-a0fd-be33dba040b9" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/b2fd6fd9-fdcd-4c9d-9b24-11540379fbe5" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/137571ee-9bdb-4f8b-9aff-0177ec61d73b" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/d8ad4400-71c8-4c22-869d-a7e2be89066f" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/57793734-4c1d-4532-a3e0-b344d2cf3d96" />
 
 ## Video demos
 - https://www.youtube.com/watch?v=Tb4rw2ZNZ7s
