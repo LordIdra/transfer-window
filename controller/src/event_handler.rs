@@ -42,9 +42,9 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
     let vessel_component = VesselComponent::new(VesselClass::Scout2, Faction::Player)
         .with_fuel_tank(FuelTankType::FuelTank1)
         .with_engine(EngineType::Regular);
-    let orbit = Orbit::circle(earth, vessel_component.mass(), model.mass(earth), vec2(0.08e9, 0.0), 0.0, OrbitDirection::AntiClockwise)
+    let orbit = Orbit::circle(earth, vessel_component.mass(), model.mass(earth), vec2(-0.08e9, 0.0), 0.0, OrbitDirection::AntiClockwise)
         .with_end_at(1.0e10);
-    let _player_scout = model.allocate(EntityBuilder::default()
+    let player_scout = model.allocate(EntityBuilder::default()
         .with_name_component(NameComponent::new("Scout".to_string()))
         .with_vessel_component(vessel_component)
         .with_path_component(PathComponent::default().with_segment(Segment::Orbit(orbit))));
@@ -106,17 +106,20 @@ pub fn new_game(controller: &mut Controller, context: &Context) {
     
     let event = TimelineEvent::Burn(StartBurnEvent::new(&mut model, torpedo, 130.0));
     model.vessel_component_mut(torpedo).timeline_mut().add(event.clone());
-    model.timeline_event_at_time(torpedo, event.time()).as_start_burn().unwrap().adjust(&mut model, vec2(-353.0, 50.0));
+    model.timeline_event_at_time(torpedo, event.time()).as_start_burn().unwrap().adjust(&mut model, vec2(-410.0, 50.0));
 
     model.update(0.1);
 
-    model.vessel_component_mut(torpedo).set_target(Some(player_frigate));
+    model.vessel_component_mut(torpedo).set_target(Some(player_scout));
 
-    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 716_560.0));
+    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 2.0 * 24.0 * 3600.0 + 23.0 * 3600.0));
     model.vessel_component_mut(torpedo).timeline_mut().add(event);
 
-    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 720_720.0));
+    let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 3.0 * 24.0 * 3600.0 + 0.1 * 3600.0));
     model.vessel_component_mut(torpedo).timeline_mut().add(event);
+
+    //let event = TimelineEvent::EnableGuidance(EnableGuidanceEvent::new(&mut model, torpedo, 2.0 * 24.0 * 3600.0 + 22.0 * 3600.0));
+    //model.vessel_component_mut(torpedo).timeline_mut().add(event);
 
     controller.scene = Scene::Game(game::View::new(controller.gl.clone(), model, context.clone(), controller.resources.clone(), Some(player_frigate)));
 }

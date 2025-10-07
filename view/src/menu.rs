@@ -97,16 +97,6 @@ impl View {
                     ui.add(CustomImage::new_menu(self, "title-1", 215.0, 70.0));
                     ui.horizontal(|ui| {
                         self.draw_level(context, ui, &mut events, "01-welcome");
-                        self.draw_level(context, ui, &mut events, "02-orbits");
-                        self.draw_level(context, ui, &mut events, "01-welcome");
-                        self.draw_level(context, ui, &mut events, "02-orbits");
-                    });
-                    ui.add_space(15.0);
-                    ui.horizontal(|ui| {
-                        self.draw_level(context, ui, &mut events, "01-welcome");
-                        self.draw_level(context, ui, &mut events, "02-orbits");
-                        self.draw_level(context, ui, &mut events, "01-welcome");
-                        self.draw_level(context, ui, &mut events, "02-orbits");
                     });
                 })
             })
