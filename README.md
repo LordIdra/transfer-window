@@ -2,6 +2,10 @@
 ## What the hell is this
 Transfer window is a WIP real-time-strategy game centered around combat using orbital mechanics.
 
+Ultimate aim: Singleplayer open-world game where you fight to control a solar system(s?), gain resources, upgrade your fleet of ships, all that stuff.
+
+Remaining work: Fix the codebase (some major refactors needed), add resources, a tech tree, refine UI, figure out how on earth to make enemy AI for something like this
+
 ## Pictures
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/8e3a55f7-18c8-4d94-8c5a-70ee3e4f7428" />
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/45c97d4d-f2e6-46f2-9900-534b774b5054" />
